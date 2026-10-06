@@ -141,7 +141,26 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
         "attempts": [_data(r) for r in grouped.get("destination_attempt", [])],
         "attempt_events": [_data(r) for r in grouped.get("destination_attempt_event", [])],
         "effects": [_data(r) for r in grouped.get("destination_effect", [])],
+        "observations": [_data(r) for r in grouped.get("executor_observation", [])],
     }
+    contract = (bundle.get("metadata") or {}).get("moltbot_producer_contract")
+    if isinstance(contract, dict) and not contract.get("legacy"):
+        moltbot["producer_profile"] = {
+            "profile_id": contract.get("interface_profile_id"),
+            "profile_version": contract.get("interface_profile_version"),
+            "execution_envelope_version": moltbot["execution_envelope"].get("version"),
+        }
+        moltbot["repository"] = {
+            "repository": "cogno-us/moltbot-safe",
+            "revision": contract.get("repository_revision"),
+            "revision_status": "source_asserted",
+        }
+        provenance = contract.get("provenance") or {}
+        moltbot["provenance"] = {
+            "source_asserted": deepcopy(provenance.get("source_asserted") or {}),
+            "independently_established": deepcopy(provenance.get("independently_established") or []),
+            "meaning": "preserved from Replay producer contract",
+        }
     return cp, proposal, moltbot
 
 
