@@ -142,6 +142,19 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
         "attempt_events": [_data(r) for r in grouped.get("destination_attempt_event", [])],
         "effects": [_data(r) for r in grouped.get("destination_effect", [])],
     }
+    metadata = bundle.get("metadata") if isinstance(bundle.get("metadata"), dict) else {}
+    source_profile = metadata.get("moltbot_source_producer_profile")
+    source_bindings = metadata.get("moltbot_source_bindings")
+    if source_profile is not None:
+        if not isinstance(source_profile, dict) or not isinstance(source_bindings, dict):
+            raise ExportError(
+                "versioned executor producer evidence requires retained producer_profile and bindings"
+            )
+        moltbot["producer_profile"] = deepcopy(source_profile)
+        moltbot["bindings"] = deepcopy(source_bindings)
+        observation = moltbot["execution_result"].get("observation")
+        if isinstance(observation, dict):
+            moltbot["observation"] = deepcopy(observation)
     return cp, proposal, moltbot
 
 
