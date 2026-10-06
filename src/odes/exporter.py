@@ -11,6 +11,7 @@ from .common import (
     PACKAGE_VERSION,
     PINNED_REVISIONS,
     PROFILE_ID,
+    PROFILE_V2_ID, PROFILE_V2_VERSION, PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
     SCHEMA_VERSION,
@@ -184,6 +185,14 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
             "meaning": "preserved from Replay producer contract",
         }
         moltbot["control_plane_attempts"] = attributed_cp_attempts
+        if contract.get("interface_profile_version") == "2.0.0":
+            evidence = grouped.get("executor_control_plane_evidence", [])
+            if len(evidence) != 1:
+                raise ExportError("producer 2.0.0 requires one retained Control Plane evidence record")
+            moltbot["control_plane_evidence"] = _data(evidence[0])
+            moltbot["rejected_observations"] = [
+                _data(r) for r in grouped.get("rejected_executor_observation", [])
+            ]
 
         attempt_id = result.get("attempt_id")
         if attempt_id is None:
@@ -217,7 +226,7 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
                 }
     return cp, proposal, moltbot
 
-def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]]]:
+def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
     try:
         from agent_replay_bundle.importers import ImportContractError as ReplayImportContractError
@@ -225,7 +234,21 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
     except Exception as exc:  # pragma: no cover - exercised in environments without the pinned validator
         raise ExportError("pinned Replay validator is unavailable; install cogno-us/cognous-agent-replay-bundle at the pinned revision") from exc
     try:
-        reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot)
+        revision = (bundle.get("metadata") or {}).get("control_plane_revision", PINNED_REVISIONS["control_plane"])
+        if revision not in {PINNED_REVISIONS["control_plane"], PINNED_V2_REVISIONS["control_plane"]}:
+            raise ExportError("unsupported Control Plane compatibility revision")
+        if revision == PINNED_V2_REVISIONS["control_plane"]:
+            reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot,
+                                                   control_plane_revision=revision)
+            validated = reconstructed.model_dump(mode="json")
+            for field in ("records", "links", "commitments", "producer_profiles", "status"):
+                if bundle.get(field) != validated.get(field):
+                    raise ExportError(f"retained Replay {field} differs from accepted validator reconstruction")
+            for field in ("effect_observation_history", "moltbot_producer_contract"):
+                if bundle.get("metadata", {}).get(field) != validated["metadata"].get(field):
+                    raise ExportError(f"retained Replay {field} differs from accepted validator")
+        else:
+            reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot)
     except ReplayImportContractError as exc:
         raise ExportError(f"pinned Replay semantic validation failed: {exc}") from exc
     status = getattr(reconstructed, "status", "unknown")
@@ -233,7 +256,7 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
     for report in getattr(reconstructed, "import_reports", []) or []:
         for finding in getattr(report, "findings", []) or []:
             findings.append(finding.model_dump() if hasattr(finding, "model_dump") else dict(finding))
-    return str(status), findings
+    return str(status), findings, reconstructed.model_dump(mode="json")
 
 
 def _validate_manifest_binding(manifest: dict[str, Any], proposal: dict[str, Any] | None) -> None:
@@ -444,7 +467,11 @@ def _human_disposition(decision: dict[str, Any]) -> str:
 def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z") -> dict[str, Any]:
     manifest = deepcopy(_obj(manifest, "manifest"))
     bundle = deepcopy(_obj(reconstruction_bundle, "reconstruction_bundle"))
-    replay_status, replay_findings = _run_replay_validation(bundle)
+    replay_status, replay_findings, validated_replay = _run_replay_validation(bundle)
+    repaired = validated_replay["metadata"]["control_plane_revision"] == PINNED_V2_REVISIONS["control_plane"]
+    profile_id = PROFILE_V2_ID if repaired else PROFILE_ID
+    profile_version = PROFILE_V2_VERSION if repaired else PROFILE_VERSION
+    pins = PINNED_V2_REVISIONS if repaired else PINNED_REVISIONS
     _validate_manifest_binding(manifest, _extract_replay_inputs(bundle)[1])
     decision, decision_result = _check_decision_execution_consistency(bundle)
     grouped = _group(bundle)
@@ -483,13 +510,13 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "risk_coordinates": {"risk_tier": "unknown", "jurisdiction": "synthetic", "restricted_use_flag": False, "prohibited_use_flag": False},
         "consumption_conditions": {"permitted_relying_parties": [relying_party], "permitted_purposes": [purpose], "expires_at": expires_at},
         "status": _status_from_sources(bundle),
-        "verification": {"signature_type": "content-digest", "issuer_key_reference": "content-digest-only:no-public-issuer-authentication", "conformance_profile": PROFILE_ID},
+        "verification": {"signature_type": "content-digest", "issuer_key_reference": "content-digest-only:no-public-issuer-authentication", "conformance_profile": profile_id},
     }
     validate_record(record)
-    event_summary = _event_summary(bundle)
+    event_summary = _event_summary_v2(validated_replay) if repaired else _event_summary(bundle)
     package_core = {
         "record": record,
-        "profile": {"implementation_profile": PROFILE_ID, "implementation_profile_version": PROFILE_VERSION, "document_version": DOCUMENT_VERSION, "schema_name": SCHEMA_NAME, "schema_version": SCHEMA_VERSION},
+        "profile": {"implementation_profile": profile_id, "implementation_profile_version": profile_version, "document_version": DOCUMENT_VERSION, "schema_name": SCHEMA_NAME, "schema_version": SCHEMA_VERSION},
     }
     package = {
         "package_type": PACKAGE_TYPE,
@@ -500,9 +527,9 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "profile": package_core["profile"],
         "integrity": {"kind": "content-digest", "algorithm": "SHA-256", "canonicalization_profile": CANONICALIZATION_PROFILE, "value": sha256(package_core), "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."},
         "provenance": {
-            "pinned_revisions": PINNED_REVISIONS,
+            "pinned_revisions": pins,
             "source_artifacts": {"manifest_digest": sha256(manifest), "reconstruction_bundle_digest": sha256(bundle)},
-            "replay_validation": {"status": replay_status, "required_revision": PINNED_REVISIONS["replay"], "findings": replay_findings},
+            "replay_validation": {"status": replay_status, "required_revision": pins["replay"], "findings": replay_findings},
             "source_record_refs": _source_refs(bundle),
             "decision_facts": {"decision_result": decision_result, "proposal_commitment": binding.get("proposal_commitment"), "actor": proposal.get("actor") or binding.get("actor"), "principal": proposal.get("principal") or binding.get("principal"), "grant_revision": binding.get("grant_revision"), "policy_versions": policy_versions, "reasons": decision.get("reasons", []), "human_disposition_source": "retained_decision_record" if human_status != "unknown" else "unavailable"},
             "execution_facts": event_summary,
@@ -511,5 +538,49 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
             "limits": ["Export creates no external effect and renews no authorization.", "Schema validity does not establish deployment approval, operational effectiveness, compliance, current authority, delivery success, independent review, or institutional adoption.", "Content digests bind exported content but do not authenticate the issuer or verify authority.", "BitRep and The Index are related optional evidence interfaces and are not mandatory for generic ODES adoption."],
         },
     }
+    if repaired:
+        package["provenance"]["retained_sources"] = {"manifest": manifest, "reconstruction_bundle": bundle}
+        package["provenance"]["source_artifacts"]["reconstruction_bundle_id"] = bundle["bundle_id"]
+        package["provenance"]["source_import_reports"] = deepcopy(bundle.get("import_reports", []))
     package["package_digest"] = sha256({"record": package["record"], "profile": package["profile"], "integrity": package["integrity"], "provenance": package["provenance"]})
     return package
+
+
+def _event_summary_v2(validated: dict[str, Any]) -> dict[str, Any]:
+    """Use accepted Replay sequence semantics, never completeness or row counts."""
+    grouped = _group(validated)
+    histories = deepcopy(validated["metadata"]["effect_observation_history"])
+    states = [h["latest_supported_destination_state"] for h in histories.values()]
+    # This exporter supports exactly one decision; do not invent ordering among
+    # multiple effects or between historical local and Control Plane observations.
+    destination = states[0] if len(states) == 1 else "unknown"
+    attempts = [_data(r) for r in grouped.get("control_plane_attempt_transition", [])]
+    result = [_data(r) for r in grouped.get("execution_result", [])]
+    ack_states = {"received" if a.get("acknowledgement") else "unknown"
+                  for a in attempts if a.get("status") != "attempted"}
+    if any(r.get("attempted") and r.get("acknowledged") is False for r in result):
+        ack_states.add("unknown")
+    acknowledgement = "mixed" if len(ack_states) > 1 else next(iter(ack_states), "not_applicable")
+    return {
+        "reconstruction_status": validated["status"],
+        "effect_observation_history": histories,
+        "destination_observed": destination,
+        "destination_observation_scope": "latest supplied Control Plane reconciliation per exact effect; not a fresh query",
+        "acknowledgement_summary": acknowledgement,
+        "control_plane_attempt_transitions": attempts,
+        "execution_results": result,
+        "destination_effects": [_data(r) for r in grouped.get("destination_effect", [])],
+        "accepted_control_plane_observations": [_data(r) for r in grouped.get("effect_observation", [])],
+        "executor_observations": [_data(r) for r in grouped.get("executor_observation", [])],
+        "rejected_observations": [_data(r) for r in grouped.get("rejected_executor_observation", [])],
+        "reconciliations": [_data(r) for r in grouped.get("reconciliation", [])],
+        "control_plane_evidence": [_data(r) for r in grouped.get("executor_control_plane_evidence", [])],
+        "attempt_namespaces": {
+            "control_plane": sorted({a["attempt_id"] for a in attempts}),
+            "executor": sorted({_data(r)["attempt_id"] for r in grouped.get("destination_attempt", [])}),
+        },
+        "explicit_links": deepcopy(validated.get("links", [])),
+        "historical_local_observation": bool(result and result[0].get("status") == "observed"),
+        "retry_permission": "not_established",
+        "independent_delivery_verification": "unavailable",
+    }

@@ -9,6 +9,7 @@ from .common import (
     PACKAGE_TYPE,
     PACKAGE_VERSION,
     PROFILE_ID,
+    PROFILE_V2_ID, PROFILE_V2_VERSION, PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
     SCHEMA_VERSION,
@@ -65,9 +66,13 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
         return _result("unsupported", [f"unsupported declared profile {declared!r}"], {"declared_profile": declared, "supported_profiles": supported_profiles})
     if declared != record.get("verification", {}).get("conformance_profile"):
         reasons.append("package profile and record verification.conformance_profile differ")
-    if declared == PROFILE_ID:
-        if profile.get("implementation_profile_version") != PROFILE_VERSION:
-            return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": PROFILE_VERSION})
+    provenance = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
+    if declared == PROFILE_ID and provenance.get("pinned_revisions", {}).get("control_plane") == PINNED_V2_REVISIONS["control_plane"]:
+        reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
+    if declared in {PROFILE_ID, PROFILE_V2_ID}:
+        expected_version = PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
+        if profile.get("implementation_profile_version") != expected_version:
+            return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": expected_version})
         if profile.get("schema_name") != SCHEMA_NAME or profile.get("schema_version") != SCHEMA_VERSION:
             reasons.append("profile schema coordinates do not match pder-v0.1")
         if not isinstance(package.get("provenance"), dict):
@@ -239,6 +244,26 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
     return _result("fail" if reasons else "pass", reasons, {"permitted_relying_parties": parties, "permitted_purposes": purposes})
 
 
+
+def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
+    if package.get("profile", {}).get("implementation_profile") != PROFILE_V2_ID:
+        return _result("not_applicable", ["historical profile validation unchanged"])
+    try:
+        from .exporter import export_cognous_stack_package
+        sources = package["provenance"]["retained_sources"]
+        conditions = package["record"]["consumption_conditions"]
+        parties, purposes = conditions["permitted_relying_parties"], conditions["permitted_purposes"]
+        if len(parties) != 1 or len(purposes) != 1:
+            raise ValueError("implementation profile requires exact single-recipient/purpose export")
+        expected = export_cognous_stack_package(sources["manifest"], sources["reconstruction_bundle"],
+            relying_party=parties[0], purpose=purposes[0], expires_at=conditions["expires_at"])
+        if _material_package_content(package) != _material_package_content(expected):
+            raise ValueError("package semantics differ from accepted Replay-derived transformation")
+    except Exception as exc:
+        return _result("fail", [f"Replay semantic validation failed: {exc}"])
+    return _result("pass", ["retained content matches accepted Replay validation; no source authentication or authority renewal"])
+
+
 def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
     package = deepcopy(package)
     policy = deepcopy(policy)
@@ -247,8 +272,11 @@ def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) 
     record = package.get("record") if isinstance(package.get("record"), dict) else {}
     trusted_digests = policy.get("trusted_digests", []) or policy.get("trusted_package_digests", []) or []
     status_inputs = policy.get("status_inputs", {})
+    profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
     layers = {
         "schema_validity": _evaluate_schema(record),
+        **({"replay_semantic_consistency": _evaluate_replay_semantics(package)}
+           if profile.get("implementation_profile") == PROFILE_V2_ID else {}),
         "declared_profile_conformance": _evaluate_profile(package, policy.get("supported_profiles", [PROFILE_ID])),
         "package_content_integrity": _evaluate_package_content_integrity(package, trusted_digests),
         "integrity_authentication_checks": _evaluate_authentication(package, policy.get("trusted_key_refs", []), trusted_digests),

@@ -63,3 +63,13 @@ Example policy additions:
 ```json
 {"evaluation_scope": "recipient_reliance", "status_max_age_seconds": 300}
 ```
+
+## Profile 0.2 semantic consistency
+
+Recipients must explicitly support `odes_cognous_stack_export_0_2` to inspect new
+producer-2.0.0 packages. The new `replay_semantic_consistency` layer revalidates
+retained original Replay through the accepted importer and checks the full
+material transformation. It is additional to package integrity, authentication,
+historical authority, current status and consumption-condition checks. Content
+consistency is not independent producer authentication or authority verification.
+See [profile 0.2](../profiles/cognous-stack-export-0.2.md).

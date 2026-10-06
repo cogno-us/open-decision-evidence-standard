@@ -27,6 +27,16 @@ PINNED_REVISIONS = {
 }
 
 
+PROFILE_V2_ID = "odes_cognous_stack_export_0_2"
+PROFILE_V2_VERSION = "odes-cognous-stack-export-0.2.0"
+PINNED_V2_REVISIONS = {
+    **PINNED_REVISIONS,
+    "control_plane": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+    "moltbot_safe": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+    "replay": "274543f1cd7171784a923a8e37015017a0d8bc9d",
+}
+
+
 def canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
 
