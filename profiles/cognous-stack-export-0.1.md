@@ -21,15 +21,35 @@ A conforming package under this profile contains:
 - `record`: a schema-valid `pder-v0.1` Portable Decision Evidence Record;
 - `profile`: document, schema and implementation-profile version metadata;
 - `integrity`: a content digest binding the exported record and profile metadata;
-- `provenance`: source artifact hashes, pinned revisions, source-record references, Replay validation result, mapped decision facts, execution facts and explicit limitations.
+- `package_digest`: a content digest binding the material package content, including record, profile, integrity metadata and provenance;
+- `provenance`: source artifact hashes, pinned revisions, source-record references, Replay validation result, mapped decision facts, execution facts, redaction lineage and explicit limitations.
 
-The package is not itself the `pder-v0.1` record. Consumers must not silently treat profile provenance fields as base-schema fields.
+The package is not itself the `pder-v0.1` record. Consumers must not silently treat profile provenance fields as base-schema fields or as adopted ODES conformance fields.
 
-## Integrity boundary
+## Integrity, authentication and authority boundary
 
-The reference implementation uses a content digest. It binds exported content. It does not establish public issuer identity, production key custody, institutional authority, independent review, deployment approval or successful delivery.
+The reference implementation uses content digests. They bind exported content. They do not establish public issuer identity, production key custody, signing time, institutional authority, present validity, independent review, deployment approval or successful delivery.
+
+Recipient validation separates:
+
+- schema validity;
+- declared-profile conformance;
+- package content integrity;
+- issuer authentication;
+- historical authority assertions;
+- present authority/status/freshness;
+- consumption conditions;
+- recipient reliance.
+
+A record self-assertion such as `authority_valid_at_decision=true` is not recipient-verified authority. Missing authentication or authority evidence remains `unavailable`. If recipient policy permits inspection of unauthenticated material, the validator reports `informational_only`; it does not report reliance, authorization or verified authority.
 
 BitRep and The Index remain optional related evidence interfaces. They are not mandatory for ODES adoption and do not create institutional authority merely by verifying a signature or inclusion event.
+
+## Time and status evidence
+
+Time-dependent recipient acceptance requires a valid recipient evaluation time. Missing or malformed evaluation time prevents acceptance for the affected purpose.
+
+Decision-critical status evidence must be explicitly supplied by recipient policy and must bind to the record/authority identity and evaluation scope. Missing, stale, unsupported or mismatched status evidence prevents acceptance. The exporter does not default missing freshness to current.
 
 ## Unsupported base-schema semantics
 
@@ -44,7 +64,17 @@ The following source semantics are not native to `pder-v0.1` and therefore remai
 - reconciliation and restart recovery;
 - partial delivery and unresolved delivery detail;
 - Replay import findings and value-state limitations;
-- original versus redacted derivative lineage.
+- original versus redacted derivative lineage;
+- external status evidence;
+- unknown decision time, because `pder-v0.1` requires `decision_timestamp`.
+
+## Source-fact discipline
+
+The exporter does not manufacture human approval, human escalation, human rejection, model identity, production issuer identity, institutional legitimacy, current validity or successful delivery.
+
+- Machine hold/deny does not become a human disposition. It exports as `human_disposition.status=unknown` unless explicit retained human evidence supports another status.
+- Authorization alone does not establish machine execution. The machine role is `execution` only when retained execution evidence is present.
+- Revocation time, supersession linkage and decision time are copied only when evidenced. Export fails rather than substituting generation or export time for unknown required temporal facts.
 
 ## Scope limits
 
