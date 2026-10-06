@@ -39,21 +39,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cogno-us/moltbot-safe
-          ref: 6b0ba1185bcd390f71df947dda349415e4105f5f
+          ref: a4df7a925ca1b820b9958c479ce28616547cc6d0
           path: external/moltbot-safe
 
       - name: Checkout pinned Replay
         uses: actions/checkout@v4
         with:
           repository: cogno-us/cognous-agent-replay-bundle
-          ref: f12648313cedc2cf06145d397fa56cdea18cc800
+          ref: 1b4eb0e79f76abc28f9816756cb774a8fc4b115f
           path: external/replay
 
       - name: Checkout pinned Governance Evidence Pack
         uses: actions/checkout@v4
         with:
           repository: cogno-us/cognous-agent-governance-evidence-pack
-          ref: c699c1fb7c4f8057631c4e5909d11a721c2c958d
+          ref: a3037942c352c22863bf06466b13aa3ab38766e0
           path: external/agep
 
       - name: Verify pinned revisions
@@ -61,9 +61,9 @@ jobs:
           test "$(git -C external/manifest rev-parse HEAD)" = "46c950bed37fe3812000895430bc0312d29e37ce"
           test "$(git -C external/alvorada rev-parse HEAD)" = "fb3d97938969a89e149e8ff8db2756091d1233fc"
           test "$(git -C external/control-plane rev-parse HEAD)" = "283500652d47a692fb0b99a1172a6d5faffbd9a7"
-          test "$(git -C external/moltbot-safe rev-parse HEAD)" = "6b0ba1185bcd390f71df947dda349415e4105f5f"
-          test "$(git -C external/replay rev-parse HEAD)" = "f12648313cedc2cf06145d397fa56cdea18cc800"
-          test "$(git -C external/agep rev-parse HEAD)" = "c699c1fb7c4f8057631c4e5909d11a721c2c958d"
+          test "$(git -C external/moltbot-safe rev-parse HEAD)" = "a4df7a925ca1b820b9958c479ce28616547cc6d0"
+          test "$(git -C external/replay rev-parse HEAD)" = "1b4eb0e79f76abc28f9816756cb774a8fc4b115f"
+          test "$(git -C external/agep rev-parse HEAD)" = "a3037942c352c22863bf06466b13aa3ab38766e0"
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
