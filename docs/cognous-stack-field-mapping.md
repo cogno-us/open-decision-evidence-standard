@@ -15,8 +15,8 @@ ODES narrative document version `0.2`, base schema version `pder-v0.1`, and impl
 | Manifest v1.1 | Declares operations and requirements | `46c950bed37fe3812000895430bc0312d29e37ce` |
 | Authority Context 0.1.0 | Authority profile/context evidence | `fb3d97938969a89e149e8ff8db2756091d1233fc` |
 | Control Plane | Resolves authorization and attempts | `283500652d47a692fb0b99a1172a6d5faffbd9a7` |
-| Moltbot Safe | Bounded execution envelope/evidence | `6b0ba1185bcd390f71df947dda349415e4105f5f` |
-| Replay | Reconstructs retained producer records | `f12648313cedc2cf06145d397fa56cdea18cc800` |
+| Moltbot Safe | Bounded execution envelope/evidence | `1d308faf664c504b6e310db3c7a310153ef7b067` (accepted producer profile 1.0.0 implementation) |
+| Replay | Reconstructs retained producer records | `f63ce914504dd06813c4ccd199b0570dbd8dd427` (accepted Replay producer-profile consumer) |
 | Governance Evidence Pack | Business-readable review evidence | `c699c1fb7c4f8057631c4e5909d11a721c2c958d` |
 
 ## Mapping table
@@ -61,3 +61,35 @@ Recomputing hashes after altering the package can restore content self-consisten
 ODES carries portable decision evidence. Manifest declares operations. The Control Plane resolves authorization. Moltbot Safe enforces the bounded execution path. Replay reconstructs evidence. Governance Evidence Pack presents review material. The recipient determines reliance.
 
 This mapping does not implement GAX messaging, IMX continuity, a scheduler, a runtime gate, a constitutional engine, production key custody, authenticated institutional resolvers, or a replacement runtime.
+
+## Executor producer migration
+
+ODES consumes executor semantics through the Reconstruction Bundle and Replay validator. Versioned executor producer data must retain the `urn:cognous:profiles:moltbot-safe-executor-producer` profile at version `1.0.0`, including its source-asserted repository revision. Legacy unversioned executor records remain valid only through Replay's explicit revision-pinned legacy path; ODES does not relabel them.
+
+
+## Batch 3B accepted compatibility mapping
+
+ODES Cognous-stack export now validates Replay output against:
+
+- Replay: `f63ce914504dd06813c4ccd199b0570dbd8dd427`
+- Moltbot Safe: `1d308faf664c504b6e310db3c7a310153ef7b067`
+- executor producer profile:
+  `urn:cognous:profiles:moltbot-safe-executor-producer` / `1.0.0`
+
+Versioned Replay output preserves executor and Control Plane attempt namespaces.
+ODES reconstructs the Replay-validation input only from Replay-validated records:
+
+- destination attempts remain executor-owned;
+- `moltbot_attributed_control_plane_attempt` records remain Control Plane-owned;
+- the execution-result attempt must resolve to exactly one of those namespaces;
+- ambiguity or unresolved lineage fails export.
+
+Source-asserted producer provenance remains source-asserted. ODES does not promote
+repository assertions or package content digests to issuer authentication or
+independent verification.
+
+Historical unversioned executor evidence remains a Replay-managed legacy path
+pinned to Moltbot Safe
+`6b0ba1185bcd390f71df947dda349415e4105f5f`.
+ODES does not relabel those historical artifacts as producer-profile 1.0.0
+evidence.

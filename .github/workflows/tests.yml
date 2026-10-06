@@ -3,7 +3,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [main, worker8-odes-cognous-export]
+    branches: [main, worker8-odes-cognous-export, worker14/executor-profile-v1]
 
 jobs:
   test:
@@ -39,14 +39,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cogno-us/moltbot-safe
-          ref: 6b0ba1185bcd390f71df947dda349415e4105f5f
+          ref: 1d308faf664c504b6e310db3c7a310153ef7b067
           path: external/moltbot-safe
 
       - name: Checkout pinned Replay
         uses: actions/checkout@v4
         with:
           repository: cogno-us/cognous-agent-replay-bundle
-          ref: f12648313cedc2cf06145d397fa56cdea18cc800
+          ref: f63ce914504dd06813c4ccd199b0570dbd8dd427
           path: external/replay
 
       - name: Checkout pinned Governance Evidence Pack
@@ -61,8 +61,8 @@ jobs:
           test "$(git -C external/manifest rev-parse HEAD)" = "46c950bed37fe3812000895430bc0312d29e37ce"
           test "$(git -C external/alvorada rev-parse HEAD)" = "fb3d97938969a89e149e8ff8db2756091d1233fc"
           test "$(git -C external/control-plane rev-parse HEAD)" = "283500652d47a692fb0b99a1172a6d5faffbd9a7"
-          test "$(git -C external/moltbot-safe rev-parse HEAD)" = "6b0ba1185bcd390f71df947dda349415e4105f5f"
-          test "$(git -C external/replay rev-parse HEAD)" = "f12648313cedc2cf06145d397fa56cdea18cc800"
+          test "$(git -C external/moltbot-safe rev-parse HEAD)" = "1d308faf664c504b6e310db3c7a310153ef7b067"
+          test "$(git -C external/replay rev-parse HEAD)" = "f63ce914504dd06813c4ccd199b0570dbd8dd427"
           test "$(git -C external/agep rev-parse HEAD)" = "c699c1fb7c4f8057631c4e5909d11a721c2c958d"
 
       - name: Set up Python ${{ matrix.python-version }}
@@ -87,6 +87,10 @@ jobs:
           UPSTREAM_MANIFEST_EXAMPLE: external/manifest/examples/refund_integration_v1_1.manifest.json
           UPSTREAM_REPLAY_SUCCESS_EXAMPLE: external/replay/examples/bounded_success_reconstruction_v0_2.json
           UPSTREAM_REPLAY_LOST_ACK_EXAMPLE: external/replay/examples/bounded_lost_ack_reconstruction_v0_2.json
+          ODES_PINNED_CONTROL_PLANE_ROOT: external/control-plane
+          ODES_PINNED_MOLTBOT_ROOT: external/moltbot-safe
+          ODES_PINNED_REPLAY_ROOT: external/replay
+          ODES_PINNED_MANIFEST_FIXTURE: external/manifest/examples/refund_integration_v1_1.manifest.json
         run: pytest -q tests
 
       - name: Generate and validate ODES export package
