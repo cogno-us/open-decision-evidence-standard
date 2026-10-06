@@ -306,19 +306,31 @@ def _event_summary(bundle: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _status_from_sources(bundle: dict[str, Any], decision_result: str) -> dict[str, Any]:
+def _status_from_sources(bundle: dict[str, Any]) -> dict[str, Any]:
     metadata = bundle.get("metadata") if isinstance(bundle.get("metadata"), dict) else {}
-    freshness = metadata.get("odes_freshness") or metadata.get("freshness") or "current"
+    freshness = metadata.get("odes_freshness") or metadata.get("freshness") or "unknown"
     revoked = bool(metadata.get("revoked") or freshness == "revoked")
     superseded = bool(metadata.get("superseded") or freshness == "superseded")
-    if decision_result in {"held", "denied"} and freshness == "current":
-        freshness = "current"
     status = {"freshness": str(freshness), "superseded": superseded, "revoked": revoked}
     if superseded:
-        status["superseded_by"] = str(metadata.get("superseded_by") or "unavailable-superseding-record")
+        if not metadata.get("superseded_by"):
+            raise ExportError("superseded status requires evidenced superseded_by; exporter will not invent it")
+        status["superseded_by"] = str(metadata["superseded_by"])
     if revoked:
-        status["revoked_at"] = str(metadata.get("revoked_at") or metadata.get("generated_at") or bundle.get("generated_at") or utc_now_iso())
+        if not metadata.get("revoked_at"):
+            raise ExportError("revoked status requires evidenced revoked_at; exporter will not substitute generation or export time")
+        status["revoked_at"] = str(metadata["revoked_at"])
     return status
+
+
+def _human_disposition(decision: dict[str, Any]) -> str:
+    human = decision.get("human_disposition") or decision.get("human_review") or decision.get("review")
+    if not isinstance(human, dict):
+        return "unknown"
+    raw = str(human.get("status") or human.get("disposition") or "unknown").lower().strip()
+    if raw in {"accepted", "modified", "rejected", "overridden", "escalated", "not_reviewed", "reviewed_under_constraint", "unknown"}:
+        return raw
+    return "unknown"
 
 
 def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z") -> dict[str, Any]:
@@ -330,8 +342,11 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
     grouped = _group(bundle)
     proposal = _data(grouped.get("runtime_proposal", [])[0]) if grouped.get("runtime_proposal") else {}
     binding = decision.get("binding") if isinstance(decision.get("binding"), dict) else {}
+    has_execution = any(grouped.get(kind) for kind in ("execution_envelope", "execution_result", "destination_attempt", "destination_effect"))
     action = _find_action(manifest, proposal.get("action_id") or binding.get("action_id")) or {}
-    decided_at = decision.get("decided_at") or bundle.get("generated_at") or utc_now_iso()
+    decided_at = decision.get("decided_at")
+    if not decided_at:
+        raise ExportError("decision_timestamp is required by pder-v0.1 but no retained decision time is evidenced; exporter will not substitute bundle generation or export time")
     policy_versions = binding.get("policy_versions") if isinstance(binding.get("policy_versions"), list) else []
     policy_basis = []
     for item in policy_versions:
@@ -341,12 +356,10 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         policy_basis.append({"policy_id": str(binding.get("requirement_id") or proposal.get("requirement_id") or action.get("action_id") or "unavailable_policy_basis"), "policy_type": "authority_requirement"})
     authority_basis = str(binding.get("grant_id") or proposal.get("authority_context_ref") or action.get("authority_requirement") or "unavailable_authority_basis")
     authority_valid = decision_result == "authorized"
-    if decision_result == "held":
-        human_status = "escalated"
-    elif decision_result == "denied":
-        human_status = "rejected"
-    else:
-        human_status = "unknown"
+    human_status = _human_disposition(decision)
+    machine_role = "execution" if decision_result == "authorized" and has_execution else "assistance"
+    if decision_result in {"held", "denied"}:
+        machine_role = "escalation"
     record = {
         "record_type": "portable_decision_evidence_record",
         "schema_version": SCHEMA_VERSION,
@@ -355,13 +368,13 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "decision_timestamp": str(decided_at),
         "issuer": {"organization_id": "cognous.synthetic.baseline", "system_id": "cognous-stack-exporter"},
         "authority": {"human_reviewer_role": "unknown", "authority_basis": authority_basis, "authority_valid_at_decision": authority_valid},
-        "machine_role": {"ai_used": True, "role": "execution" if decision_result == "authorized" else "escalation", "model_id": "unavailable", "model_version": "unavailable", "runtime_profile": "cognous-bounded-synthetic-baseline"},
+        "machine_role": {"ai_used": True, "role": machine_role, "model_id": "unavailable", "model_version": "unavailable", "runtime_profile": "cognous-bounded-synthetic-baseline"},
         "human_disposition": {"status": human_status, "review_substantiveness": "unknown", "machine_reliance_level": "unknown"},
         "evidence": {"evidence_commitment_type": "hash", "evidence_hash": sha256({"manifest": manifest, "reconstruction_bundle": bundle}), "selective_disclosure_available": bool(bundle.get("derivation"))},
         "policy_basis": policy_basis,
         "risk_coordinates": {"risk_tier": "unknown", "jurisdiction": "synthetic", "restricted_use_flag": False, "prohibited_use_flag": False},
         "consumption_conditions": {"permitted_relying_parties": [relying_party], "permitted_purposes": [purpose], "expires_at": expires_at},
-        "status": _status_from_sources(bundle, decision_result),
+        "status": _status_from_sources(bundle),
         "verification": {"signature_type": "content-digest", "issuer_key_reference": "content-digest-only:no-public-issuer-authentication", "conformance_profile": PROFILE_ID},
     }
     validate_record(record)
@@ -383,11 +396,11 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
             "source_artifacts": {"manifest_digest": sha256(manifest), "reconstruction_bundle_digest": sha256(bundle)},
             "replay_validation": {"status": replay_status, "required_revision": PINNED_REVISIONS["replay"], "findings": replay_findings},
             "source_record_refs": _source_refs(bundle),
-            "decision_facts": {"decision_result": decision_result, "proposal_commitment": binding.get("proposal_commitment"), "actor": proposal.get("actor") or binding.get("actor"), "principal": proposal.get("principal") or binding.get("principal"), "grant_revision": binding.get("grant_revision"), "policy_versions": policy_versions, "reasons": decision.get("reasons", [])},
+            "decision_facts": {"decision_result": decision_result, "proposal_commitment": binding.get("proposal_commitment"), "actor": proposal.get("actor") or binding.get("actor"), "principal": proposal.get("principal") or binding.get("principal"), "grant_revision": binding.get("grant_revision"), "policy_versions": policy_versions, "reasons": decision.get("reasons", []), "human_disposition_source": "retained_decision_record" if human_status != "unknown" else "unavailable"},
             "execution_facts": event_summary,
             "redaction": {"derivation": bundle.get("derivation"), "status": "redacted_derivative" if bundle.get("derivation") else "not_declared"},
-            "unsupported_semantics": ["pder-v0.1 has no native fields for effect_id, separate Control Plane and executor attempt namespaces, reconciliation records, execution-result namespaces, restart recovery, partial delivery detail, or producer import findings; these are carried in this package provenance and in the proposed profile, not in the base record."],
-            "limits": ["Export creates no external effect and renews no authorization.", "Schema validity does not establish deployment approval, operational effectiveness, compliance, current authority, delivery success, independent review, or institutional adoption.", "BitRep and The Index are related optional evidence interfaces and are not mandatory for generic ODES adoption."],
+            "unsupported_semantics": ["pder-v0.1 has no native fields for effect_id, separate Control Plane and executor attempt namespaces, reconciliation records, execution-result namespaces, restart recovery, partial delivery detail, producer import findings, external status evidence, or unknown decision_timestamp; these are carried in package provenance where evidenced or reported as unavailable, not silently invented in the base record."],
+            "limits": ["Export creates no external effect and renews no authorization.", "Schema validity does not establish deployment approval, operational effectiveness, compliance, current authority, delivery success, independent review, or institutional adoption.", "Content digests bind exported content but do not authenticate the issuer or verify authority.", "BitRep and The Index are related optional evidence interfaces and are not mandatory for generic ODES adoption."],
         },
     }
     package["package_digest"] = sha256({"record": package["record"], "profile": package["profile"], "integrity": package["integrity"], "provenance": package["provenance"]})
