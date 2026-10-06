@@ -87,7 +87,7 @@ jobs:
           UPSTREAM_MANIFEST_EXAMPLE: external/manifest/examples/refund_integration_v1_1.manifest.json
           UPSTREAM_REPLAY_SUCCESS_EXAMPLE: external/replay/examples/bounded_success_reconstruction_v0_2.json
           UPSTREAM_REPLAY_LOST_ACK_EXAMPLE: external/replay/examples/bounded_lost_ack_reconstruction_v0_2.json
-        run: pytest -q
+        run: pytest -q tests
 
       - name: Generate and validate ODES export package
         env:
