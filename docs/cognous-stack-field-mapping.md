@@ -15,8 +15,8 @@ ODES narrative document version `0.2`, base schema version `pder-v0.1`, and impl
 | Manifest v1.1 | Declares operations and requirements | `46c950bed37fe3812000895430bc0312d29e37ce` |
 | Authority Context 0.1.0 | Authority profile/context evidence | `fb3d97938969a89e149e8ff8db2756091d1233fc` |
 | Control Plane | Resolves authorization and attempts | `283500652d47a692fb0b99a1172a6d5faffbd9a7` |
-| Moltbot Safe | Bounded execution envelope/evidence | `6b0ba1185bcd390f71df947dda349415e4105f5f` |
-| Replay | Reconstructs retained producer records | `f12648313cedc2cf06145d397fa56cdea18cc800` |
+| Moltbot Safe | Bounded execution envelope/evidence | `054e92d12ccb0bc756ca6652f39fc13b51e05d9b` (producer profile 1.0.0; proposed dependency head) |
+| Replay | Reconstructs retained producer records | `22aa742b2735b64b850c2c37688ef1fae5ff9014` (proposed dependency head) |
 | Governance Evidence Pack | Business-readable review evidence | `c699c1fb7c4f8057631c4e5909d11a721c2c958d` |
 
 ## Mapping table
@@ -61,3 +61,7 @@ Recomputing hashes after altering the package can restore content self-consisten
 ODES carries portable decision evidence. Manifest declares operations. The Control Plane resolves authorization. Moltbot Safe enforces the bounded execution path. Replay reconstructs evidence. Governance Evidence Pack presents review material. The recipient determines reliance.
 
 This mapping does not implement GAX messaging, IMX continuity, a scheduler, a runtime gate, a constitutional engine, production key custody, authenticated institutional resolvers, or a replacement runtime.
+
+## Executor producer migration
+
+ODES consumes executor semantics through the Reconstruction Bundle and Replay validator. Versioned executor producer data must retain the `urn:cognous:profiles:moltbot-safe-executor-producer` profile at version `1.0.0`, including its source-asserted repository revision. Legacy unversioned executor records remain valid only through Replay's explicit revision-pinned legacy path; ODES does not relabel them.
