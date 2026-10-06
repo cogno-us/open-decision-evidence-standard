@@ -1,0 +1,11 @@
+{
+  "now": "2026-10-06T00:00:00Z",
+  "purpose": "audit",
+  "relying_party": "recipient.example.org",
+  "status_inputs": {},
+  "supported_profiles": [
+    "odes_cognous_stack_export_0_1"
+  ],
+  "trusted_digests": [],
+  "trusted_key_refs": []
+}

@@ -1,0 +1,105 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main, worker8-odes-cognous-export]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout pinned Manifest
+        uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-agent-action-manifest
+          ref: 46c950bed37fe3812000895430bc0312d29e37ce
+          path: external/manifest
+
+      - name: Checkout pinned Authority Context
+        uses: actions/checkout@v4
+        with:
+          repository: cogno-us/constitutional-governance-for-institutions
+          ref: fb3d97938969a89e149e8ff8db2756091d1233fc
+          path: external/alvorada
+
+      - name: Checkout pinned Control Plane
+        uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-agent-control-plane
+          ref: 283500652d47a692fb0b99a1172a6d5faffbd9a7
+          path: external/control-plane
+
+      - name: Checkout pinned Moltbot Safe
+        uses: actions/checkout@v4
+        with:
+          repository: cogno-us/moltbot-safe
+          ref: 6b0ba1185bcd390f71df947dda349415e4105f5f
+          path: external/moltbot-safe
+
+      - name: Checkout pinned Replay
+        uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-agent-replay-bundle
+          ref: f12648313cedc2cf06145d397fa56cdea18cc800
+          path: external/replay
+
+      - name: Checkout pinned Governance Evidence Pack
+        uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-agent-governance-evidence-pack
+          ref: c699c1fb7c4f8057631c4e5909d11a721c2c958d
+          path: external/agep
+
+      - name: Verify pinned revisions
+        run: |
+          test "$(git -C external/manifest rev-parse HEAD)" = "46c950bed37fe3812000895430bc0312d29e37ce"
+          test "$(git -C external/alvorada rev-parse HEAD)" = "fb3d97938969a89e149e8ff8db2756091d1233fc"
+          test "$(git -C external/control-plane rev-parse HEAD)" = "283500652d47a692fb0b99a1172a6d5faffbd9a7"
+          test "$(git -C external/moltbot-safe rev-parse HEAD)" = "6b0ba1185bcd390f71df947dda349415e4105f5f"
+          test "$(git -C external/replay rev-parse HEAD)" = "f12648313cedc2cf06145d397fa56cdea18cc800"
+          test "$(git -C external/agep rev-parse HEAD)" = "c699c1fb7c4f8057631c4e5909d11a721c2c958d"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and pinned Replay validator
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e external/replay
+          python -m pip install -e .[dev]
+
+      - name: Import smoke checks
+        run: |
+          python -c "import odes"
+          python -c "from odes.exporter import export_cognous_stack_package"
+          python -c "from odes.recipient_validator import evaluate_recipient_package"
+
+      - name: Run tests
+        env:
+          UPSTREAM_MANIFEST_EXAMPLE: external/manifest/examples/refund_integration_v1_1.manifest.json
+          UPSTREAM_REPLAY_SUCCESS_EXAMPLE: external/replay/examples/bounded_success_reconstruction_v0_2.json
+          UPSTREAM_REPLAY_LOST_ACK_EXAMPLE: external/replay/examples/bounded_lost_ack_reconstruction_v0_2.json
+        run: pytest -q
+
+      - name: Generate and validate ODES export package
+        env:
+          UPSTREAM_MANIFEST_EXAMPLE: external/manifest/examples/refund_integration_v1_1.manifest.json
+          UPSTREAM_REPLAY_SUCCESS_EXAMPLE: external/replay/examples/bounded_success_reconstruction_v0_2.json
+        run: |
+          odes export-cognous --manifest "$UPSTREAM_MANIFEST_EXAMPLE" --reconstruction "$UPSTREAM_REPLAY_SUCCESS_EXAMPLE" --out /tmp/odes-package.json --relying-party recipient.example.org --purpose audit
+          odes validate-record /tmp/odes-package.json
+          odes recipient-validate /tmp/odes-package.json --policy examples/policies/recipient-audit-policy.json --out /tmp/odes-recipient-result.json
+          python - <<'PY'
+          import json
+          result = json.load(open('/tmp/odes-recipient-result.json'))
+          assert result['schema_validity']['status'] == 'pass'
+          assert result['recipient_reliance_decision']['status'] == 'pass'
+          PY
