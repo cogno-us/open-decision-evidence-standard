@@ -84,7 +84,7 @@ def _accepted_success(tmp_path):
         h._integrated(tmp_path)
     )
     result = executor.execute(
-        envelope=request, proposal=proposal, decision=decision, now=h.NOW
+        envelope=request, proposal=proposal, decision=decision, now=helper.NOW
     )
     assert result.status == "executed"
     cp, p, producer = _export_sources(
@@ -158,7 +158,7 @@ def test_accepted_profile_reconciliation_preserves_attempt_namespaces(tmp_path):
         h._integrated(tmp_path)
     )
     first = executor.execute(
-        envelope=request, proposal=proposal, decision=decision, now=h.NOW
+        envelope=request, proposal=proposal, decision=decision, now=helper.NOW
     )
     assert first.status == "executed"
     restarted_destination = h.DurableRefundDestination(destination.root)
@@ -168,7 +168,7 @@ def test_accepted_profile_reconciliation_preserves_attempt_namespaces(tmp_path):
         policy=h.policy(request.operation),
     )
     reconciled = restarted_executor.execute(
-        envelope=request, proposal=proposal, decision=decision, now=h.NOW
+        envelope=request, proposal=proposal, decision=decision, now=helper.NOW
     )
     assert reconciled.status == "reconciled"
 
@@ -196,7 +196,7 @@ def test_accepted_profile_lost_ack_and_partial_survive_odes(tmp_path, mode):
         envelope=request,
         proposal=proposal,
         decision=decision,
-        now=h.NOW,
+        now=helper.NOW,
         simulate=mode,
     )
     cp, p, producer = _export_sources(
@@ -257,7 +257,7 @@ def test_accepted_profile_denied_no_effect_survives_odes(tmp_path):
     grant = resolver.contexts[helper.PROFILE]["grant"]
     resolver.statuses[grant["grant_id"]].status = "revoked"
     denied = executor.execute(
-        envelope=request, proposal=proposal, decision=decision, now=h.NOW
+        envelope=request, proposal=proposal, decision=decision, now=helper.NOW
     )
     assert denied.status == "denied"
     cp, p, producer = _export_sources(
@@ -275,7 +275,7 @@ def test_odes_rejects_incorrect_versioned_producer_contract(tmp_path, mutation):
         h._integrated(tmp_path)
     )
     result = executor.execute(
-        envelope=request, proposal=proposal, decision=decision, now=h.NOW
+        envelope=request, proposal=proposal, decision=decision, now=helper.NOW
     )
     cp, p, producer = _export_sources(
         workflow, proposal, request, result, destination
