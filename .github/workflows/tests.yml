@@ -96,9 +96,12 @@ jobs:
         run: |
           python - <<'PY'
           import json
-          source = json.load(open('$UPSTREAM_REPLAY_SUCCESS_EXAMPLE'))
+          import os
+          with open(os.environ['UPSTREAM_REPLAY_SUCCESS_EXAMPLE'], encoding='utf-8') as handle:
+              source = json.load(handle)
           source.setdefault('metadata', {})['freshness'] = 'current'
-          json.dump(source, open('/tmp/reconstruction-current.json', 'w'), sort_keys=True)
+          with open('/tmp/reconstruction-current.json', 'w', encoding='utf-8') as handle:
+              json.dump(source, handle, sort_keys=True)
           PY
           odes export-cognous --manifest "$UPSTREAM_MANIFEST_EXAMPLE" --reconstruction /tmp/reconstruction-current.json --out /tmp/odes-package.json --relying-party recipient.example.org --purpose audit
           odes validate-record /tmp/odes-package.json
