@@ -15,9 +15,9 @@ ODES narrative document version `0.2`, base schema version `pder-v0.1`, and impl
 | Manifest v1.1 | Declares operations and requirements | `46c950bed37fe3812000895430bc0312d29e37ce` |
 | Authority Context 0.1.0 | Authority profile/context evidence | `fb3d97938969a89e149e8ff8db2756091d1233fc` |
 | Control Plane | Resolves authorization and attempts | `283500652d47a692fb0b99a1172a6d5faffbd9a7` |
-| Moltbot Safe | Bounded execution envelope/evidence | `6b0ba1185bcd390f71df947dda349415e4105f5f` |
-| Replay | Reconstructs retained producer records | `f12648313cedc2cf06145d397fa56cdea18cc800` |
-| Governance Evidence Pack | Business-readable review evidence | `c699c1fb7c4f8057631c4e5909d11a721c2c958d` |
+| Moltbot Safe | Bounded execution envelope/evidence | `a4df7a925ca1b820b9958c479ce28616547cc6d0` |
+| Replay | Reconstructs retained producer records | `1b4eb0e79f76abc28f9816756cb774a8fc4b115f` |
+| Governance Evidence Pack | Business-readable review evidence | `a3037942c352c22863bf06466b13aa3ab38766e0` |
 
 ## Mapping table
 
@@ -61,3 +61,15 @@ Recomputing hashes after altering the package can restore content self-consisten
 ODES carries portable decision evidence. Manifest declares operations. The Control Plane resolves authorization. Moltbot Safe enforces the bounded execution path. Replay reconstructs evidence. Governance Evidence Pack presents review material. The recipient determines reliance.
 
 This mapping does not implement GAX messaging, IMX continuity, a scheduler, a runtime gate, a constitutional engine, production key custody, authenticated institutional resolvers, or a replacement runtime.
+
+
+## Executor evidence compatibility
+
+The Cognous-stack export profile uses Replay as the semantic validator for
+executor evidence. Versioned executor producer evidence 1.0.0 is passed back to
+Replay with its retained producer declaration and bindings. ODES does not
+reinterpret those fields as authority or independent provenance.
+
+Historical Reconstruction Bundles using the legacy unversioned executor profile
+remain exportable when the pinned Replay compatibility adapter accepts them.
+Existing ODES artifacts are not relabeled.
