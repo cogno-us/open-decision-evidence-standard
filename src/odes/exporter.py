@@ -130,19 +130,39 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
         "reconciliations": [_data(r) for r in grouped.get("reconciliation", [])],
     }
     proposal = proposals[0] if proposals else None
-    has_execution = any(grouped.get(kind) for kind in ("execution_envelope", "execution_result", "destination_attempt", "destination_effect"))
+    has_execution = any(
+        grouped.get(kind)
+        for kind in (
+            "execution_envelope",
+            "execution_result",
+            "destination_attempt",
+            "destination_effect",
+            "executor_observation",
+        )
+    )
     if not has_execution:
         return cp, proposal, None
     if len(grouped.get("execution_envelope", [])) != 1 or len(grouped.get("execution_result", [])) != 1:
-        raise ExportError("execution evidence must include exactly one execution_envelope and one execution_result when present")
+        raise ExportError(
+            "execution evidence must include exactly one execution_envelope "
+            "and one execution_result when present"
+        )
+
+    result = _data(grouped["execution_result"][0])
+    executor_attempts = [_data(r) for r in grouped.get("destination_attempt", [])]
+    attributed_cp_attempts = [
+        _data(r)
+        for r in grouped.get("moltbot_attributed_control_plane_attempt", [])
+    ]
     moltbot = {
         "execution_envelope": _data(grouped["execution_envelope"][0]),
-        "execution_result": _data(grouped["execution_result"][0]),
-        "attempts": [_data(r) for r in grouped.get("destination_attempt", [])],
+        "execution_result": result,
+        "attempts": executor_attempts,
         "attempt_events": [_data(r) for r in grouped.get("destination_attempt_event", [])],
         "effects": [_data(r) for r in grouped.get("destination_effect", [])],
         "observations": [_data(r) for r in grouped.get("executor_observation", [])],
     }
+
     contract = (bundle.get("metadata") or {}).get("moltbot_producer_contract")
     if isinstance(contract, dict) and not contract.get("legacy"):
         moltbot["producer_profile"] = {
@@ -158,11 +178,44 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
         provenance = contract.get("provenance") or {}
         moltbot["provenance"] = {
             "source_asserted": deepcopy(provenance.get("source_asserted") or {}),
-            "independently_established": deepcopy(provenance.get("independently_established") or []),
+            "independently_established": deepcopy(
+                provenance.get("independently_established") or []
+            ),
             "meaning": "preserved from Replay producer contract",
         }
-    return cp, proposal, moltbot
+        moltbot["control_plane_attempts"] = attributed_cp_attempts
 
+        attempt_id = result.get("attempt_id")
+        if attempt_id is None:
+            moltbot["attempt_identity"] = None
+        else:
+            executor_ids = {
+                row.get("attempt_id") for row in executor_attempts
+                if row.get("attempt_id")
+            }
+            cp_ids = {
+                row.get("attempt_id") for row in attributed_cp_attempts
+                if row.get("attempt_id")
+            }
+            in_executor = attempt_id in executor_ids
+            in_cp = attempt_id in cp_ids
+            if in_executor == in_cp:
+                raise ExportError(
+                    "versioned Replay attempt identity is ambiguous or unresolved"
+                )
+            if in_executor:
+                moltbot["attempt_identity"] = {
+                    "namespace": "executor",
+                    "attempt_id": attempt_id,
+                    "owner": "cogno-us/moltbot-safe",
+                }
+            else:
+                moltbot["attempt_identity"] = {
+                    "namespace": "control_plane",
+                    "attempt_id": attempt_id,
+                    "owner": "cogno-us/cognous-agent-control-plane",
+                }
+    return cp, proposal, moltbot
 
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]]]:
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
@@ -230,13 +283,45 @@ def _check_decision_execution_consistency(bundle: dict[str, Any]) -> tuple[dict[
             raise ExportError("execution target does not match proposal target")
         if operation.get("payload_commitment") != proposal.get("payload_commitment"):
             raise ExportError("execution payload commitment does not match proposal")
-        allowed_attempts = {a.get("attempt_id") for a in [_data(r) for r in grouped.get("destination_attempt", [])]}
-        allowed_attempts |= {a.get("attempt_id") for a in [_data(r) for r in grouped.get("control_plane_attempt_transition", [])]}
-        allowed_attempts.discard(None)
+        executor_attempts = {
+            a.get("attempt_id")
+            for a in [_data(r) for r in grouped.get("destination_attempt", [])]
+            if a.get("attempt_id")
+        }
+        attributed_cp_attempts = {
+            a.get("attempt_id")
+            for a in [
+                _data(r)
+                for r in grouped.get("moltbot_attributed_control_plane_attempt", [])
+            ]
+            if a.get("attempt_id")
+        }
+        all_cp_attempts = {
+            a.get("attempt_id")
+            for a in [_data(r) for r in grouped.get("control_plane_attempt_transition", [])]
+            if a.get("attempt_id")
+        }
         result_record = _data(grouped["execution_result"][0])
         attempt_id = result_record.get("attempt_id")
-        if attempt_id and attempt_id not in allowed_attempts:
-            raise ExportError("execution_result.attempt_id does not reference a retained destination or Control Plane attempt")
+        contract = (bundle.get("metadata") or {}).get("moltbot_producer_contract")
+        versioned = isinstance(contract, dict) and not contract.get("legacy")
+        if attempt_id:
+            if versioned:
+                in_executor = attempt_id in executor_attempts
+                in_attributed_cp = attempt_id in attributed_cp_attempts
+                if in_executor == in_attributed_cp:
+                    raise ExportError(
+                        "versioned execution_result.attempt_id has ambiguous or unresolved namespace"
+                    )
+                if in_attributed_cp and attempt_id not in all_cp_attempts:
+                    raise ExportError(
+                        "attributed Control Plane attempt lacks retained owning run record"
+                    )
+            elif attempt_id not in executor_attempts | all_cp_attempts:
+                raise ExportError(
+                    "execution_result.attempt_id does not reference a retained "
+                    "destination or Control Plane attempt"
+                )
         for dest in [_data(r) for r in grouped.get("destination_effect", [])]:
             if dest.get("target") != operation.get("target"):
                 raise ExportError("destination_effect.target does not match execution operation target")
@@ -314,6 +399,10 @@ def _event_summary(bundle: dict[str, Any]) -> dict[str, Any]:
         "control_plane_transition_statuses": dict(sorted(cp_statuses.items())),
         "control_plane_attempt_ids": sorted(cp_attempts),
         "executor_attempt_ids": sorted(executor_attempts),
+        "attempt_namespaces": {
+            "control_plane": sorted(cp_attempts),
+            "executor": sorted(executor_attempts),
+        },
         "acknowledgement_summary": ack_summary,
         "acknowledgement_sources": ack_sources,
         "execution_results": execution_results,
