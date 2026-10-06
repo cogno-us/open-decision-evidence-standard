@@ -19,9 +19,9 @@ PINNED_REVISIONS = {
     "manifest": "46c950bed37fe3812000895430bc0312d29e37ce",
     "authority_context": "fb3d97938969a89e149e8ff8db2756091d1233fc",
     "control_plane": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
-    "moltbot_safe": "6b0ba1185bcd390f71df947dda349415e4105f5f",
-    "replay": "f12648313cedc2cf06145d397fa56cdea18cc800",
-    "governance_evidence_pack": "c699c1fb7c4f8057631c4e5909d11a721c2c958d",
+    "moltbot_safe": "a4df7a925ca1b820b9958c479ce28616547cc6d0",
+    "replay": "1b4eb0e79f76abc28f9816756cb774a8fc4b115f",
+    "governance_evidence_pack": "a3037942c352c22863bf06466b13aa3ab38766e0",
     "bitrep": "5b5077dafde232a7801cb425c4efddcffb468723",
     "index": "d5e45d275cb301d9684b543e93b05997991d1cf2",
 }
