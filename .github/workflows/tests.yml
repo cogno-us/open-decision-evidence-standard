@@ -112,6 +112,8 @@ jobs:
               'supported_profiles': ['odes_cognous_stack_export_0_1'],
               'relying_party': 'recipient.example.org',
               'purpose': 'audit',
+              'evaluation_scope': 'recipient_reliance',
+              'status_max_age_seconds': 300,
               'now': '2026-10-06T00:00:00Z',
               'trusted_digests': [package['package_digest']],
               'trusted_key_refs': [],

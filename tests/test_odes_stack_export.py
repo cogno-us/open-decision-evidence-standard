@@ -74,6 +74,8 @@ def _policy(package: dict | None = None, **overrides):
         "trusted_digests": [],
         "trusted_key_refs": [],
         "status_inputs": {},
+        "evaluation_scope": "recipient_reliance",
+        "status_max_age_seconds": 300,
     }
     if package is not None:
         policy["trusted_digests"] = [package["package_digest"]]
@@ -324,3 +326,77 @@ def test_consumer_evaluation_does_not_change_exported_package():
     before = copy.deepcopy(package)
     evaluate_recipient_package(package, _policy(package))
     assert package == before
+
+
+@pytest.mark.parametrize("evaluated_at", [
+    "2020-01-01T00:00:00Z",
+    "2026-10-05T23:54:59Z",
+    "2026-10-06T00:00:01Z",
+    "2026-10-06T00:00:00",
+])
+def test_recipient_enforces_status_age_and_aware_clock(evaluated_at):
+    package = export_cognous_stack_package(_manifest(), _current_success())
+    policy = _policy(package, allow_unauthenticated_informational_inspection=True)
+    policy["status_inputs"]["evaluated_at"] = evaluated_at
+    result = evaluate_recipient_package(package, policy)
+    assert result["authority_status_and_freshness"]["status"] == "fail"
+    assert result["recipient_reliance_decision"]["status"] == "fail"
+
+
+@pytest.mark.parametrize("max_age", [None, True, -1, 300.0, "300", float("nan"), float("inf")])
+def test_recipient_rejects_missing_or_invalid_status_age_policy(max_age):
+    package = export_cognous_stack_package(_manifest(), _current_success())
+    policy = _policy(package, allow_unauthenticated_informational_inspection=True)
+    if max_age is None:
+        policy.pop("status_max_age_seconds")
+    else:
+        policy["status_max_age_seconds"] = max_age
+    result = evaluate_recipient_package(package, policy)
+    assert result["authority_status_and_freshness"]["status"] == "fail"
+    assert result["recipient_reliance_decision"]["status"] == "fail"
+
+
+@pytest.mark.parametrize("scope", [None, "audit", "inspection", "unsupported"])
+def test_recipient_requires_exact_status_scope(scope):
+    package = export_cognous_stack_package(_manifest(), _current_success())
+    policy = _policy(package, allow_unauthenticated_informational_inspection=True)
+    policy["status_inputs"]["evaluation_scope"] = scope
+    result = evaluate_recipient_package(package, policy)
+    assert result["historical_authority_assertions"]["status"] == "fail"
+    assert result["authority_status_and_freshness"]["status"] == "fail"
+    assert result["recipient_reliance_decision"]["status"] == "fail"
+
+
+@pytest.mark.parametrize("age_seconds", [0, 299, 300])
+def test_recipient_accepts_fresh_matching_status_only_for_inspection(age_seconds):
+    from datetime import datetime, timedelta, timezone
+    package = export_cognous_stack_package(_manifest(), _current_success())
+    policy = _policy(package, allow_unauthenticated_informational_inspection=True)
+    policy["status_inputs"]["evaluated_at"] = (
+        datetime(2026, 10, 6, tzinfo=timezone.utc) - timedelta(seconds=age_seconds)
+    ).isoformat()
+    result = evaluate_recipient_package(package, policy)
+    assert result["historical_authority_assertions"]["status"] == "pass"
+    assert result["authority_status_and_freshness"]["status"] == "pass"
+    assert result["integrity_authentication_checks"]["status"] == "unavailable"
+    assert result["recipient_reliance_decision"]["status"] == "informational_only"
+
+
+def test_old_status_does_not_erase_historical_assertion_but_blocks_current_acceptance():
+    package = export_cognous_stack_package(_manifest(), _current_success())
+    policy = _policy(package, allow_unauthenticated_informational_inspection=True)
+    policy["status_inputs"]["evaluated_at"] = "2020-01-01T00:00:00Z"
+    result = evaluate_recipient_package(package, policy)
+    assert result["historical_authority_assertions"]["status"] == "pass"
+    assert result["authority_status_and_freshness"]["status"] == "fail"
+    assert result["recipient_reliance_decision"]["status"] == "fail"
+
+
+def test_missing_recipient_scope_policy_blocks_acceptance():
+    package = export_cognous_stack_package(_manifest(), _current_success())
+    policy = _policy(package, allow_unauthenticated_informational_inspection=True)
+    policy.pop("evaluation_scope")
+    result = evaluate_recipient_package(package, policy)
+    assert result["historical_authority_assertions"]["status"] == "fail"
+    assert result["authority_status_and_freshness"]["status"] == "fail"
+    assert result["recipient_reliance_decision"]["status"] == "fail"

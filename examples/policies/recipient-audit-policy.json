@@ -7,5 +7,7 @@
     "odes_cognous_stack_export_0_1"
   ],
   "trusted_digests": [],
-  "trusted_key_refs": []
+  "trusted_key_refs": [],
+  "evaluation_scope": "audit",
+  "status_max_age_seconds": 300
 }

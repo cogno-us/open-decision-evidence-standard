@@ -39,7 +39,10 @@ def _parse_time_result(value: Any, label: str) -> tuple[datetime | None, list[st
     if not isinstance(value, str) or not value:
         return None, [f"{label} is unavailable"]
     try:
-        return parse_time(value), []
+        parsed = parse_time(value)
+        if parsed is None or parsed.tzinfo is None or parsed.utcoffset() is None:
+            return None, [f"{label} must include a timezone"]
+        return parsed, []
     except Exception:
         return None, [f"{label} is malformed"]
 
@@ -131,7 +134,7 @@ def _evaluate_authentication(package: dict[str, Any], trusted_key_refs: list[str
     return _result("unsupported", ["signature verification profile is not implemented by this reference validator"], {"signature_type": signature_type, "issuer_key_reference": key_ref})
 
 
-def _status_identity_matches(record: dict[str, Any], status_inputs: dict[str, Any]) -> list[str]:
+def _status_identity_matches(record: dict[str, Any], status_inputs: dict[str, Any], policy: dict[str, Any]) -> list[str]:
     reasons: list[str] = []
     authority = record.get("authority", {}) if isinstance(record.get("authority"), dict) else {}
     if status_inputs.get("record_id") != record.get("decision_id"):
@@ -139,12 +142,15 @@ def _status_identity_matches(record: dict[str, Any], status_inputs: dict[str, An
     if status_inputs.get("authority_basis") != authority.get("authority_basis"):
         reasons.append("status evidence authority_basis does not match record.authority.authority_basis")
     scope = status_inputs.get("evaluation_scope")
-    if scope not in {"recipient_reliance", "audit", "inspection"}:
-        reasons.append("status evidence evaluation_scope is unsupported or unavailable")
+    expected_scope = policy.get("evaluation_scope")
+    if expected_scope not in {"recipient_reliance", "audit", "inspection"}:
+        reasons.append("recipient policy evaluation_scope is unsupported or unavailable")
+    elif scope != expected_scope:
+        reasons.append("status evidence evaluation_scope does not match recipient policy evaluation_scope")
     return reasons
 
 
-def _evaluate_historical_authority(record: dict[str, Any], status_inputs: dict[str, Any]) -> dict[str, Any]:
+def _evaluate_historical_authority(record: dict[str, Any], status_inputs: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
     reasons: list[str] = []
     evidence: dict[str, Any] = {}
     authority = record.get("authority", {}) if isinstance(record.get("authority"), dict) else {}
@@ -152,7 +158,7 @@ def _evaluate_historical_authority(record: dict[str, Any], status_inputs: dict[s
     evidence["record_assertion_authority_valid_at_decision"] = asserted
     if not status_inputs:
         return _result("unavailable", ["no external authority/status evidence supplied; record self-assertion is not authority verification"], evidence)
-    reasons.extend(_status_identity_matches(record, status_inputs))
+    reasons.extend(_status_identity_matches(record, status_inputs, policy))
     if status_inputs.get("authority_valid_at_decision_verified") is not True:
         reasons.append("external status evidence does not verify historical authority at decision time")
     if reasons:
@@ -160,7 +166,7 @@ def _evaluate_historical_authority(record: dict[str, Any], status_inputs: dict[s
     return _result("pass", ["historical authority is accepted only under explicitly configured recipient status evidence"], evidence)
 
 
-def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dict[str, Any], now: str | None) -> dict[str, Any]:
+def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dict[str, Any], now: str | None, policy: dict[str, Any]) -> dict[str, Any]:
     reasons: list[str] = []
     evidence: dict[str, Any] = {}
     status = record.get("status", {}) if isinstance(record.get("status"), dict) else {}
@@ -179,14 +185,24 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
     if not isinstance(status_inputs, dict) or not status_inputs:
         return _result("unavailable", reasons + ["external status evidence is required for present authority/freshness acceptance"], {**evidence, "record_reported_freshness": status.get("freshness")})
 
-    reasons.extend(_status_identity_matches(record, status_inputs))
+    max_age = policy.get("status_max_age_seconds")
+    valid_max_age = type(max_age) is int and max_age >= 0
+    if not valid_max_age:
+        reasons.append("recipient policy status_max_age_seconds must be an explicit non-negative integer")
+    evidence["status_max_age_seconds"] = max_age
+    reasons.extend(_status_identity_matches(record, status_inputs, policy))
     evaluated_at, evaluated_at_errors = _parse_time_result(status_inputs.get("evaluated_at"), "status evidence evaluated_at")
     if evaluated_at_errors:
         reasons.extend(evaluated_at_errors)
     else:
         evidence["status_evidence_evaluated_at"] = status_inputs.get("evaluated_at")
-        if now_dt and evaluated_at and evaluated_at > now_dt:
-            reasons.append("status evidence evaluated_at is after recipient evaluation time")
+        if now_dt and evaluated_at:
+            age_seconds = (now_dt - evaluated_at).total_seconds()
+            evidence["status_age_seconds"] = age_seconds
+            if age_seconds < 0:
+                reasons.append("status evidence evaluated_at is after recipient evaluation time")
+            elif valid_max_age and age_seconds > max_age:
+                reasons.append("status evidence exceeds recipient policy status_max_age_seconds")
     if status_inputs.get("evidence_freshness") not in {"current", "recent"}:
         reasons.append("status evidence freshness is missing, stale, or unsupported")
     if status_inputs.get("authority_valid_at_decision_verified") is not True:
@@ -236,8 +252,8 @@ def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) 
         "declared_profile_conformance": _evaluate_profile(package, policy.get("supported_profiles", [PROFILE_ID])),
         "package_content_integrity": _evaluate_package_content_integrity(package, trusted_digests),
         "integrity_authentication_checks": _evaluate_authentication(package, policy.get("trusted_key_refs", []), trusted_digests),
-        "historical_authority_assertions": _evaluate_historical_authority(record, status_inputs),
-        "authority_status_and_freshness": _evaluate_authority_and_freshness(record, status_inputs, policy.get("now")),
+        "historical_authority_assertions": _evaluate_historical_authority(record, status_inputs, policy),
+        "authority_status_and_freshness": _evaluate_authority_and_freshness(record, status_inputs, policy.get("now"), policy),
         "consumption_conditions": _evaluate_consumption(record, policy.get("relying_party"), policy.get("purpose")),
     }
     failed = [name for name, layer in layers.items() if layer["status"] not in {"pass"}]

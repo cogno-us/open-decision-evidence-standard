@@ -38,7 +38,7 @@ Decision-critical status evidence must be explicitly configured by the recipient
 
 - `record_id` matching `record.decision_id`;
 - `authority_basis` matching `record.authority.authority_basis`;
-- `evaluation_scope` in the supported recipient scopes;
+- `evaluation_scope` exactly matching recipient policy `evaluation_scope` (one of `recipient_reliance`, `audit`, or `inspection`);
 - `evaluated_at` as a valid timestamp;
 - `evidence_freshness` that is current or recent;
 - present `freshness`, `revoked` and `superseded` status;
@@ -51,3 +51,15 @@ Missing, stale, unsupported or mismatched status evidence prevents acceptance fo
 Historical admission, present validity, issuer authentication and proven signing time are separate. This reference implementation does not invent historical authority verification. The record's own `authority_valid_at_decision=true` is treated as an issuer assertion, not recipient-verified authority.
 
 If recipient policy permits inspection of unauthenticated material, the validator reports `recipient_reliance_decision.status = informational_only`. That disposition permits review of the exported material only; it is not reliance, authorization, institutional approval, deployment approval or independent verification.
+
+### Recipient freshness policy
+
+Recipient policy must explicitly supply `status_max_age_seconds`, a non-negative integer (booleans, fractions, non-finite values and strings are rejected), and `evaluation_scope`. No default age or cross-scope mapping is inferred. The age is computed as `now - status_inputs.evaluated_at`; it must be between zero and the configured maximum, inclusive. Future observations fail with no implicit clock tolerance. Both timestamps must include a timezone. A source's `current` or `recent` label cannot override the computed age.
+
+Historical authority assertions remain a separate result: an old observation may retain its configured historical assertion while failing present freshness and preventing recipient acceptance. Scope matching applies to both evaluations. These checks do not add issuer authentication.
+
+Example policy additions:
+
+```json
+{"evaluation_scope": "recipient_reliance", "status_max_age_seconds": 300}
+```
