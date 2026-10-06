@@ -17,7 +17,7 @@ ODES narrative document version `0.2`, base schema version `pder-v0.1`, and impl
 | Control Plane | Resolves authorization and attempts | `283500652d47a692fb0b99a1172a6d5faffbd9a7` |
 | Moltbot Safe | Bounded execution envelope/evidence | `a4df7a925ca1b820b9958c479ce28616547cc6d0` |
 | Replay | Reconstructs retained producer records | `1b4eb0e79f76abc28f9816756cb774a8fc4b115f` |
-| Governance Evidence Pack | Business-readable review evidence | `a3037942c352c22863bf06466b13aa3ab38766e0` |
+| Governance Evidence Pack | Business-readable review evidence | `8b59d430a43d09932bca5ea6b0b8f1f05f8f6f4` |
 
 ## Mapping table
 
