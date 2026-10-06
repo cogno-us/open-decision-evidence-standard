@@ -93,3 +93,12 @@ pinned to Moltbot Safe
 `6b0ba1185bcd390f71df947dda349415e4105f5f`.
 ODES does not relabel those historical artifacts as producer-profile 1.0.0
 evidence.
+
+## Producer 2.0.0 transformation
+
+See [implementation profile 0.2](../profiles/cognous-stack-export-0.2.md) for the
+explicit new mapping. The historical 0.1 mapping above remains unchanged.
+Original Replay sources, null/rejected observations, all reconciliation policy and
+evaluation metadata, and owning attempt records are retained in package
+provenance. Accepted Replay checks the reconstructed inputs and their original
+records; a local summary does not substitute for that validation.

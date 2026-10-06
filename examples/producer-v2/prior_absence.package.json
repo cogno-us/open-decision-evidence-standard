@@ -1,0 +1,1510 @@
+{
+  "package_type": "odes_decision_evidence_export_package",
+  "package_version": "0.1.0",
+  "created_by": "open-decision-evidence-standard/reference-exporter",
+  "created_at": "2026-10-06T23:11:37Z",
+  "record": {
+    "record_type": "portable_decision_evidence_record",
+    "schema_version": "0.1",
+    "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+    "decision_type": "agent_action_authorized",
+    "decision_timestamp": "2026-10-05T19:00:00+00:00",
+    "issuer": {
+      "organization_id": "cognous.synthetic.baseline",
+      "system_id": "cognous-stack-exporter"
+    },
+    "authority": {
+      "human_reviewer_role": "unknown",
+      "authority_basis": "urn:cognous:grant:routine-1",
+      "authority_valid_at_decision": true
+    },
+    "machine_role": {
+      "ai_used": true,
+      "role": "execution",
+      "model_id": "unavailable",
+      "model_version": "unavailable",
+      "runtime_profile": "cognous-bounded-synthetic-baseline"
+    },
+    "human_disposition": {
+      "status": "unknown",
+      "review_substantiveness": "unknown",
+      "machine_reliance_level": "unknown"
+    },
+    "evidence": {
+      "evidence_commitment_type": "hash",
+      "evidence_hash": "sha256:690ae22c5d80fc72d865e4b2b516923967f17cc222eb0468581abe74f8627df6",
+      "selective_disclosure_available": false
+    },
+    "policy_basis": [
+      {
+        "policy_id": "urn:cognous:policy:refund-policy",
+        "policy_version": "1.0",
+        "policy_type": "internal_policy"
+      }
+    ],
+    "risk_coordinates": {
+      "risk_tier": "unknown",
+      "jurisdiction": "synthetic",
+      "restricted_use_flag": false,
+      "prohibited_use_flag": false
+    },
+    "consumption_conditions": {
+      "permitted_relying_parties": [
+        "recipient.example.org"
+      ],
+      "permitted_purposes": [
+        "audit"
+      ],
+      "expires_at": "2027-01-01T00:00:00Z"
+    },
+    "status": {
+      "freshness": "current",
+      "superseded": false,
+      "revoked": false
+    },
+    "verification": {
+      "signature_type": "content-digest",
+      "issuer_key_reference": "content-digest-only:no-public-issuer-authentication",
+      "conformance_profile": "odes_cognous_stack_export_0_2"
+    }
+  },
+  "profile": {
+    "implementation_profile": "odes_cognous_stack_export_0_2",
+    "implementation_profile_version": "odes-cognous-stack-export-0.2.0",
+    "document_version": "0.2",
+    "schema_name": "pder-v0.1",
+    "schema_version": "0.1"
+  },
+  "integrity": {
+    "kind": "content-digest",
+    "algorithm": "SHA-256",
+    "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+    "value": "sha256:ee37f9003c4c7a52dc174c776eedeec5725e92f8b7708c5e3d35cdd5f395e811",
+    "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."
+  },
+  "provenance": {
+    "pinned_revisions": {
+      "manifest": "46c950bed37fe3812000895430bc0312d29e37ce",
+      "authority_context": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+      "control_plane": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+      "moltbot_safe": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+      "replay": "274543f1cd7171784a923a8e37015017a0d8bc9d",
+      "governance_evidence_pack": "c699c1fb7c4f8057631c4e5909d11a721c2c958d",
+      "bitrep": "5b5077dafde232a7801cb425c4efddcffb468723",
+      "index": "d5e45d275cb301d9684b543e93b05997991d1cf2"
+    },
+    "source_artifacts": {
+      "manifest_digest": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+      "reconstruction_bundle_digest": "sha256:c0551f5de418d88728a04e1423f1e22a1a37cd4c667b0889577f4ca7f036d88d",
+      "reconstruction_bundle_id": "94c597aa-a551-4fe9-8f93-ffa0447b833d"
+    },
+    "replay_validation": {
+      "status": "reconstruction_complete",
+      "required_revision": "274543f1cd7171784a923a8e37015017a0d8bc9d",
+      "findings": [
+        {
+          "code": "M002",
+          "category": "unsupported_semantic",
+          "severity": "warning",
+          "path": "attempt_correlation",
+          "message": "Control Plane and executor attempt namespaces are preserved separately; no equivalence is inferred.",
+          "value_state": "unknown"
+        },
+        {
+          "code": "M003",
+          "category": "conversion_warning",
+          "severity": "info",
+          "path": "moltbot.execution_envelope.operation.institution_id",
+          "message": "Institution/domain provenance is the trusted Moltbot integration context, not Control Plane AuthorizationBinding.",
+          "value_state": null
+        },
+        {
+          "code": "M004",
+          "category": "conversion_warning",
+          "severity": "info",
+          "path": "moltbot.execution_envelope.operation.authority_context_id",
+          "message": "At the pinned adapter this field carries the proposal profile reference; it is distinct from the Control Plane binding context-instance ID.",
+          "value_state": null
+        }
+      ]
+    },
+    "source_record_refs": [
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:runtime_proposal:0",
+        "record_type": "runtime_proposal",
+        "source_path": "proposal",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:e72961e2b5814723f665fcb1335516c1541c158862087867def4116864893ba4"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+        "record_type": "runtime_decision",
+        "source_path": "decisions[0]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:047575b6a4856ee31d8d01ec955516c9b1df203766725fdd26ceb5b46189b85d"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:control_plane_attempt_transition:2",
+        "record_type": "control_plane_attempt_transition",
+        "source_path": "attempts[0]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:86c671f134d759fdac08a10c39970534fd02e73e8fe872d916d1fba566c40baa"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:control_plane_attempt_transition:3",
+        "record_type": "control_plane_attempt_transition",
+        "source_path": "attempts[1]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:0978962d107b19f52c535e88c7f5f1af1406e2457cede2a7dfc07d023e684d4c"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:4",
+        "record_type": "effect_observation",
+        "source_path": "observations[0]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:7a3a403677038b34e5b1d80e64eef174f348e9946b042263289b530a121f44c3"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:5",
+        "record_type": "effect_observation",
+        "source_path": "observations[1]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:aa16ec95872a893f4a3629e08be7fa22badc9e4c5d9aa9f2c7e16bba5983d932"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:6",
+        "record_type": "effect_observation",
+        "source_path": "observations[2]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:042b105e7da1802e4f776c18ed031a6475ea3e0f90e3c603ab67b5bf49289ad0"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:7",
+        "record_type": "effect_observation",
+        "source_path": "observations[3]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:f46ef85d30de996d1000eb9b9fad50bbf7a87e8a31f820c3aca99401ee5000aa"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:8",
+        "record_type": "reconciliation",
+        "source_path": "reconciliations[0]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:82960002044a7dbfd38f1c22ee6dfd2041ee6f029b7a36ba195dcae0ddc4d6e7"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:9",
+        "record_type": "reconciliation",
+        "source_path": "reconciliations[1]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:a99a5f838df0c626b096a42ae4b51fa82339524829caebca659a6b17afb22641"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:10",
+        "record_type": "reconciliation",
+        "source_path": "reconciliations[2]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:2bf1b65a8089e82847d44afc4b4fae2ad8260e3b54f3900e3a103503eb407580"
+      },
+      {
+        "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:11",
+        "record_type": "reconciliation",
+        "source_path": "reconciliations[3]",
+        "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+        "hash": "sha256:ead83ed6bb3ba006e9002250e2b137d8a0aaa1fb4eba7805b15b056bffbd0f0e"
+      },
+      {
+        "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:execution_envelope:12",
+        "record_type": "execution_envelope",
+        "source_path": "moltbot.execution_envelope",
+        "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+        "hash": "sha256:bf76e9245da221e8f52b7f161f124b0c46d84fa2450af7af89f05e137517f001"
+      },
+      {
+        "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:executor_control_plane_evidence:13",
+        "record_type": "executor_control_plane_evidence",
+        "source_path": "moltbot.control_plane_evidence",
+        "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+        "hash": "sha256:522453c76e703b7eee9e33191fef52b9fce2a1558aed09e6bfd83d2117079275"
+      },
+      {
+        "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:execution_result:14",
+        "record_type": "execution_result",
+        "source_path": "moltbot.execution_result",
+        "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+        "hash": "sha256:6e56b26a4cacc1d071ac8a6219d1fb75015de594f38a48bb2d0e1fa85861d4ad"
+      },
+      {
+        "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:destination_attempt:15",
+        "record_type": "destination_attempt",
+        "source_path": "moltbot.attempts[0]",
+        "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+        "hash": "sha256:0756056323c3ba710e94231d81f2a99a7a52428381e4f85f0d58ccaa521a3eee"
+      },
+      {
+        "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:destination_attempt_event:16",
+        "record_type": "destination_attempt_event",
+        "source_path": "moltbot.attempt_events[0]",
+        "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+        "hash": "sha256:dfc2a78d4be0de0987410df098f5eac459b666cef27bee8343ecfad85f4dc8bb"
+      },
+      {
+        "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:destination_attempt_event:17",
+        "record_type": "destination_attempt_event",
+        "source_path": "moltbot.attempt_events[1]",
+        "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+        "hash": "sha256:2ad47faeec6b38906ff7066e8d2e54b11a833b3b0483e62aee704439fcc64cbb"
+      }
+    ],
+    "decision_facts": {
+      "decision_result": "authorized",
+      "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+      "actor": "urn:cognous:identity:refund-agent-1",
+      "principal": "urn:cognous:principal:refund-service",
+      "grant_revision": "1",
+      "policy_versions": [
+        {
+          "ref": "urn:cognous:policy:refund-policy",
+          "version": "1.0"
+        }
+      ],
+      "reasons": [],
+      "human_disposition_source": "unavailable"
+    },
+    "execution_facts": {
+      "reconstruction_status": "reconstruction_complete",
+      "effect_observation_history": {
+        "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": {
+          "basis": "Control Plane reconciliation array order, filtered by exact effect_id",
+          "rejected_reconciliation_indices": [],
+          "latest_reconciliation": {
+            "source_index": 3,
+            "result": "observed_absent",
+            "observation_accepted": true
+          },
+          "latest_accepted_observation": {
+            "source_index": 3,
+            "observation": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "state": "absent",
+              "destination_state": {}
+            }
+          },
+          "latest_supported_destination_state": "absent",
+          "retry_eligible": false,
+          "acknowledgement_history": [
+            {
+              "source_index": 0,
+              "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+              "status": "attempted",
+              "acknowledgement": {}
+            },
+            {
+              "source_index": 1,
+              "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+              "status": "unknown",
+              "acknowledgement": {}
+            }
+          ],
+          "cross_sequence_order": "not_established",
+          "freshness_at_import": "not_evaluated"
+        }
+      },
+      "destination_observed": "absent",
+      "destination_observation_scope": "latest supplied Control Plane reconciliation per exact effect; not a fresh query",
+      "acknowledgement_summary": "unknown",
+      "control_plane_attempt_transitions": [
+        {
+          "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+          "started_at": "2026-10-05T19:00:00+00:00",
+          "status": "attempted",
+          "acknowledgement": {},
+          "error": null
+        },
+        {
+          "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+          "started_at": "2026-10-05T19:00:00+00:00",
+          "status": "unknown",
+          "acknowledgement": {},
+          "error": "synthetic before-commit interruption"
+        }
+      ],
+      "execution_results": [
+        {
+          "status": "denied",
+          "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "attempt_id": null,
+          "attempted": false,
+          "acknowledged": false,
+          "observed_state": "unknown",
+          "newly_executed": false,
+          "observation": {},
+          "error": "observed absence does not establish retry eligibility after a prior attempt",
+          "control_plane_evidence": {
+            "reconciliation": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "reconciled_at": "2026-10-06T23:11:37.773354+00:00",
+              "result": "observed_absent",
+              "observation": {
+                "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                "observed_at": "2026-10-05T19:00:00+00:00",
+                "state": "absent",
+                "destination_state": {}
+              },
+              "observation_accepted": true,
+              "retry_eligible": false,
+              "reasons": [],
+              "evaluation_time": "2026-10-05T19:00:00+00:00",
+              "observation_max_age_seconds": 60,
+              "observation_clock_tolerance_seconds": 5
+            }
+          }
+        }
+      ],
+      "destination_effects": [],
+      "accepted_control_plane_observations": [
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "observed_at": "2026-10-05T19:00:00+00:00",
+          "state": "absent",
+          "destination_state": {}
+        },
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "observed_at": "2026-10-05T19:00:00+00:00",
+          "state": "absent",
+          "destination_state": {}
+        },
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "observed_at": "2026-10-05T19:00:00+00:00",
+          "state": "absent",
+          "destination_state": {}
+        },
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "observed_at": "2026-10-05T19:00:00+00:00",
+          "state": "absent",
+          "destination_state": {}
+        }
+      ],
+      "executor_observations": [],
+      "rejected_observations": [],
+      "reconciliations": [
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "reconciled_at": "2026-10-06T23:11:37.770005+00:00",
+          "result": "observed_absent",
+          "observation": {
+            "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+            "observed_at": "2026-10-05T19:00:00+00:00",
+            "state": "absent",
+            "destination_state": {}
+          },
+          "observation_accepted": true,
+          "retry_eligible": false,
+          "reasons": [],
+          "evaluation_time": "2026-10-05T19:00:00+00:00",
+          "observation_max_age_seconds": 60,
+          "observation_clock_tolerance_seconds": 5
+        },
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "reconciled_at": "2026-10-06T23:11:37.771493+00:00",
+          "result": "observed_absent",
+          "observation": {
+            "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+            "observed_at": "2026-10-05T19:00:00+00:00",
+            "state": "absent",
+            "destination_state": {}
+          },
+          "observation_accepted": true,
+          "retry_eligible": false,
+          "reasons": [],
+          "evaluation_time": "2026-10-05T19:00:00+00:00",
+          "observation_max_age_seconds": 60,
+          "observation_clock_tolerance_seconds": 5
+        },
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "reconciled_at": "2026-10-06T23:11:37.772137+00:00",
+          "result": "observed_absent",
+          "observation": {
+            "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+            "observed_at": "2026-10-05T19:00:00+00:00",
+            "state": "absent",
+            "destination_state": {}
+          },
+          "observation_accepted": true,
+          "retry_eligible": false,
+          "reasons": [],
+          "evaluation_time": "2026-10-05T19:00:00+00:00",
+          "observation_max_age_seconds": 60,
+          "observation_clock_tolerance_seconds": 5
+        },
+        {
+          "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+          "reconciled_at": "2026-10-06T23:11:37.773354+00:00",
+          "result": "observed_absent",
+          "observation": {
+            "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+            "observed_at": "2026-10-05T19:00:00+00:00",
+            "state": "absent",
+            "destination_state": {}
+          },
+          "observation_accepted": true,
+          "retry_eligible": false,
+          "reasons": [],
+          "evaluation_time": "2026-10-05T19:00:00+00:00",
+          "observation_max_age_seconds": 60,
+          "observation_clock_tolerance_seconds": 5
+        }
+      ],
+      "control_plane_evidence": [
+        {
+          "reconciliation": {
+            "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+            "reconciled_at": "2026-10-06T23:11:37.773354+00:00",
+            "result": "observed_absent",
+            "observation": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "state": "absent",
+              "destination_state": {}
+            },
+            "observation_accepted": true,
+            "retry_eligible": false,
+            "reasons": [],
+            "evaluation_time": "2026-10-05T19:00:00+00:00",
+            "observation_max_age_seconds": 60,
+            "observation_clock_tolerance_seconds": 5
+          }
+        }
+      ],
+      "attempt_namespaces": {
+        "control_plane": [
+          "1669aa44-c73c-4220-8ac6-f134ad68d4d5"
+        ],
+        "executor": [
+          "4a2f6331-9b18-4577-9190-698175db5344"
+        ]
+      },
+      "explicit_links": [],
+      "historical_local_observation": false,
+      "retry_permission": "not_established",
+      "independent_delivery_verification": "unavailable"
+    },
+    "redaction": {
+      "derivation": null,
+      "status": "not_declared"
+    },
+    "unsupported_semantics": [
+      "pder-v0.1 has no native fields for effect_id, separate Control Plane and executor attempt namespaces, reconciliation records, execution-result namespaces, restart recovery, partial delivery detail, producer import findings, external status evidence, or unknown decision_timestamp; these are carried in package provenance where evidenced or reported as unavailable, not silently invented in the base record."
+    ],
+    "limits": [
+      "Export creates no external effect and renews no authorization.",
+      "Schema validity does not establish deployment approval, operational effectiveness, compliance, current authority, delivery success, independent review, or institutional adoption.",
+      "Content digests bind exported content but do not authenticate the issuer or verify authority.",
+      "BitRep and The Index are related optional evidence interfaces and are not mandatory for generic ODES adoption."
+    ],
+    "retained_sources": {
+      "manifest": {
+        "manifest_version": "1.1",
+        "manifest_id": "refund-integration-pilot-v1",
+        "agent_name": "Synthetic Refund Agent",
+        "agent_description": "Synthetic bounded integration fixture; not deployed and not an institutional grant.",
+        "owner": "cognous-integration-pilot",
+        "environment": "synthetic",
+        "default_action": "escalate",
+        "tools": [
+          {
+            "tool_name": "refund_adapter",
+            "adapter_id": "urn:cognous:adapter:synthetic-refund-v1",
+            "description": "Synthetic refund destination adapter.",
+            "allowed": true,
+            "external_system": "synthetic-refund-ledger",
+            "data_classification": "synthetic"
+          }
+        ],
+        "actions": [
+          {
+            "action_name": "refund_issue_routine",
+            "action_id": "urn:cognous:action:refund-issue-routine-v1",
+            "tool_name": "refund_adapter",
+            "action_type": "write",
+            "description": "Issue one bounded routine synthetic refund.",
+            "default_action": "escalate",
+            "authority_required": [
+              {
+                "scope": "refund.issue.routine",
+                "description": "Declaration only; downstream resolver must establish a current institutional grant.",
+                "required": true,
+                "source": "alvorada-authority-context-0.1.0"
+              }
+            ],
+            "review_requirement": {
+              "mode": "human_review",
+              "reviewer_role": "customer-service-supervisor",
+              "reason": "Synthetic routine case retains human review for the integration pilot."
+            },
+            "reliance_requirement": {
+              "required": true,
+              "allowed_source_types": [
+                "database",
+                "user_input"
+              ],
+              "description": "Record entitlement and customer request evidence."
+            },
+            "payload_policy": {
+              "required_fields": [
+                "customer_id",
+                "refund_reason"
+              ],
+              "optional_fields": [],
+              "sensitive_fields": [
+                "customer_id"
+              ],
+              "forbidden_fields": []
+            },
+            "target_policy": {
+              "allowed_targets": [
+                "urn:cognous:synthetic-account:customer-001"
+              ],
+              "allow_any_target": false
+            },
+            "effect_limits": {
+              "max_amount": 100.0,
+              "unit": "USD",
+              "max_effects": 1
+            },
+            "authority_context": {
+              "schema_version": "0.1.0",
+              "profile_ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+              "requirement_id": "urn:cognous:authority-requirement:refund-routine-v1",
+              "institution_id": "urn:cognous:institution:synthetic-customer-service",
+              "authority_domain": "customer-refunds",
+              "consequence_tier": "T1",
+              "evidence_obligation_ids": [
+                "urn:cognous:evidence:refund-entitlement"
+              ]
+            },
+            "redaction_hints": [
+              {
+                "field_path": "customer_id",
+                "reason": "Synthetic identifier is treated as sensitive in exported evidence.",
+                "replacement": "[REDACTED]"
+              }
+            ],
+            "tags": [
+              "synthetic",
+              "refund",
+              "routine"
+            ],
+            "metadata": {}
+          },
+          {
+            "action_name": "refund_issue_high_consequence",
+            "action_id": "urn:cognous:action:refund-issue-high-v1",
+            "tool_name": "refund_adapter",
+            "action_type": "write",
+            "description": "Issue one higher-consequence synthetic refund requiring explicit approval downstream.",
+            "default_action": "escalate",
+            "authority_required": [
+              {
+                "scope": "refund.issue.high",
+                "description": "Declaration only; downstream resolver must establish a current institutional grant.",
+                "required": true,
+                "source": "alvorada-authority-context-0.1.0"
+              }
+            ],
+            "review_requirement": {
+              "mode": "approval_required",
+              "reviewer_role": "refund-authorizer",
+              "reason": "Higher-consequence synthetic case requires explicit approval."
+            },
+            "reliance_requirement": {
+              "required": true,
+              "allowed_source_types": [
+                "database",
+                "user_input"
+              ],
+              "description": "Record entitlement, amount basis and approval evidence."
+            },
+            "payload_policy": {
+              "required_fields": [
+                "customer_id",
+                "refund_reason",
+                "case_reference"
+              ],
+              "optional_fields": [],
+              "sensitive_fields": [
+                "customer_id"
+              ],
+              "forbidden_fields": []
+            },
+            "target_policy": {
+              "allowed_targets": [
+                "urn:cognous:synthetic-account:customer-002"
+              ],
+              "allow_any_target": false
+            },
+            "effect_limits": {
+              "max_amount": 1000.0,
+              "unit": "USD",
+              "max_effects": 1
+            },
+            "authority_context": {
+              "schema_version": "0.1.0",
+              "profile_ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+              "requirement_id": "urn:cognous:authority-requirement:refund-high-v1",
+              "institution_id": "urn:cognous:institution:synthetic-customer-service",
+              "authority_domain": "customer-refunds",
+              "consequence_tier": "T2",
+              "evidence_obligation_ids": [
+                "urn:cognous:evidence:refund-entitlement",
+                "urn:cognous:evidence:refund-approval"
+              ]
+            },
+            "redaction_hints": [
+              {
+                "field_path": "customer_id",
+                "reason": "Synthetic identifier is treated as sensitive in exported evidence.",
+                "replacement": "[REDACTED]"
+              }
+            ],
+            "tags": [
+              "synthetic",
+              "refund",
+              "higher-consequence"
+            ],
+            "metadata": {}
+          }
+        ],
+        "metadata": {
+          "upstream_alvorada_commit": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+          "authority_context_version": "0.1.0",
+          "deployment_status": "not_deployed"
+        }
+      },
+      "reconstruction_bundle": {
+        "bundle_id": "94c597aa-a551-4fe9-8f93-ffa0447b833d",
+        "bundle_version": "0.2.0",
+        "run_id": "run-1",
+        "status": "reconstruction_complete",
+        "generated_at": "2026-10-06T23:11:37.775374+00:00",
+        "producer_profiles": [
+          {
+            "profile_id": "control-plane-bounded-run@2ea9528e",
+            "producer": "Cognous Agent Control Plane",
+            "repository": "cogno-us/cognous-agent-control-plane",
+            "revision": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+            "format_name": "BoundedRunRecord",
+            "format_version": null,
+            "schema_ref": null,
+            "notes": "No embedded format version; adapter is revision-pinned."
+          },
+          {
+            "profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "producer": "Moltbot Safe",
+            "repository": "cogno-us/moltbot-safe",
+            "revision": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+            "format_name": "Executor producer export",
+            "format_version": "2.0.0",
+            "schema_ref": null,
+            "notes": "Versioned producer profile; repository provenance remains source-asserted unless separately established."
+          }
+        ],
+        "records": [
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:runtime_proposal:0",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "runtime_proposal",
+            "source_sequence": 0,
+            "source_path": "proposal",
+            "recorded_at": null,
+            "identifiers": {
+              "run_id": "run-1",
+              "correlation_id": "case-1",
+              "action_id": "urn:cognous:action:refund-issue-routine-v1",
+              "manifest_id": "refund-integration-pilot-v1",
+              "authority_context_profile_ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+              "requirement_id": "urn:cognous:authority-requirement:refund-routine-v1"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "manifest_id": "refund-integration-pilot-v1",
+              "manifest_version": "1.1",
+              "manifest_digest": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+              "actor": "urn:cognous:identity:refund-agent-1",
+              "principal": "urn:cognous:principal:refund-service",
+              "action_id": "urn:cognous:action:refund-issue-routine-v1",
+              "adapter_id": "urn:cognous:adapter:synthetic-refund-v1",
+              "target": "urn:cognous:synthetic-account:customer-001",
+              "payload": {
+                "customer_id": "customer-001",
+                "refund_reason": "duplicate"
+              },
+              "payload_commitment": "sha256:6b782ebbcc034edeca4069b31aa4d8cbc9d3eeaf3b2034ab989bb430de962c0e",
+              "requested_permissions": [
+                "refund.issue.routine"
+              ],
+              "amount": 50.0,
+              "unit": "USD",
+              "effects": 1,
+              "authority_context_ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+              "requirement_id": "urn:cognous:authority-requirement:refund-routine-v1",
+              "risk_metadata": {},
+              "not_before": null,
+              "expires_at": null,
+              "correlation_id": "case-1",
+              "run_id": "run-1",
+              "expected_side_effects": [],
+              "evidence_refs": [
+                "urn:cognous:evidence:refund-entitlement"
+              ]
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "runtime_decision",
+            "source_sequence": 1,
+            "source_path": "decisions[0]",
+            "recorded_at": "2026-10-05T19:00:00+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "manifest_id": "refund-integration-pilot-v1",
+              "action_id": "urn:cognous:action:refund-issue-routine-v1",
+              "grant_id": "urn:cognous:grant:routine-1",
+              "grant_revision": "1",
+              "authority_context_instance_id": "urn:cognous:authority-context:pilot-1",
+              "requirement_id": "urn:cognous:authority-requirement:refund-routine-v1"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "result": "authorized",
+              "reasons": [],
+              "decided_at": "2026-10-05T19:00:00+00:00",
+              "binding": {
+                "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+                "manifest_id": "refund-integration-pilot-v1",
+                "manifest_version": "1.1",
+                "manifest_digest": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+                "actor": "urn:cognous:identity:refund-agent-1",
+                "principal": "urn:cognous:principal:refund-service",
+                "action_id": "urn:cognous:action:refund-issue-routine-v1",
+                "adapter_id": "urn:cognous:adapter:synthetic-refund-v1",
+                "target": "urn:cognous:synthetic-account:customer-001",
+                "payload_commitment": "sha256:6b782ebbcc034edeca4069b31aa4d8cbc9d3eeaf3b2034ab989bb430de962c0e",
+                "requested_permissions": [
+                  "refund.issue.routine"
+                ],
+                "amount": 50.0,
+                "unit": "USD",
+                "effects": 1,
+                "authority_context_id": "urn:cognous:authority-context:pilot-1",
+                "authority_context_version": "0.1.0",
+                "authority_context_status": "proposed_pending_governor_review",
+                "requirement_id": "urn:cognous:authority-requirement:refund-routine-v1",
+                "requirement_commitment": "sha256:6590406e701b51e637c87953860d1ceb72d8da0af87311048f152e0ee2b8ccb6",
+                "grant_id": "urn:cognous:grant:routine-1",
+                "grant_revision": "1",
+                "policy_versions": [
+                  {
+                    "ref": "urn:cognous:policy:refund-policy",
+                    "version": "1.0"
+                  }
+                ],
+                "role_mapping_version": "roles-v1",
+                "role_mapping_digest": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d",
+                "effective_max_effects": 1
+              }
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:control_plane_attempt_transition:2",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "control_plane_attempt_transition",
+            "source_sequence": 2,
+            "source_path": "attempts[0]",
+            "recorded_at": "2026-10-05T19:00:00+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "started_at": "2026-10-05T19:00:00+00:00",
+              "status": "attempted",
+              "acknowledgement": {},
+              "error": null
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:control_plane_attempt_transition:3",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "control_plane_attempt_transition",
+            "source_sequence": 3,
+            "source_path": "attempts[1]",
+            "recorded_at": "2026-10-05T19:00:00+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "started_at": "2026-10-05T19:00:00+00:00",
+              "status": "unknown",
+              "acknowledgement": {},
+              "error": "synthetic before-commit interruption"
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:4",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "effect_observation",
+            "source_sequence": 4,
+            "source_path": "observations[0]",
+            "recorded_at": "2026-10-05T19:00:00+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "state": "absent",
+              "destination_state": {}
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:5",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "effect_observation",
+            "source_sequence": 5,
+            "source_path": "observations[1]",
+            "recorded_at": "2026-10-05T19:00:00+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "state": "absent",
+              "destination_state": {}
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:6",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "effect_observation",
+            "source_sequence": 6,
+            "source_path": "observations[2]",
+            "recorded_at": "2026-10-05T19:00:00+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "state": "absent",
+              "destination_state": {}
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:effect_observation:7",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "effect_observation",
+            "source_sequence": 7,
+            "source_path": "observations[3]",
+            "recorded_at": "2026-10-05T19:00:00+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "state": "absent",
+              "destination_state": {}
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:8",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "reconciliation",
+            "source_sequence": 8,
+            "source_path": "reconciliations[0]",
+            "recorded_at": "2026-10-06T23:11:37.770005+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "reconciled_at": "2026-10-06T23:11:37.770005+00:00",
+              "result": "observed_absent",
+              "observation": {
+                "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                "observed_at": "2026-10-05T19:00:00+00:00",
+                "state": "absent",
+                "destination_state": {}
+              },
+              "observation_accepted": true,
+              "retry_eligible": false,
+              "reasons": [],
+              "evaluation_time": "2026-10-05T19:00:00+00:00",
+              "observation_max_age_seconds": 60,
+              "observation_clock_tolerance_seconds": 5
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:9",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "reconciliation",
+            "source_sequence": 9,
+            "source_path": "reconciliations[1]",
+            "recorded_at": "2026-10-06T23:11:37.771493+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "reconciled_at": "2026-10-06T23:11:37.771493+00:00",
+              "result": "observed_absent",
+              "observation": {
+                "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                "observed_at": "2026-10-05T19:00:00+00:00",
+                "state": "absent",
+                "destination_state": {}
+              },
+              "observation_accepted": true,
+              "retry_eligible": false,
+              "reasons": [],
+              "evaluation_time": "2026-10-05T19:00:00+00:00",
+              "observation_max_age_seconds": 60,
+              "observation_clock_tolerance_seconds": 5
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:10",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "reconciliation",
+            "source_sequence": 10,
+            "source_path": "reconciliations[2]",
+            "recorded_at": "2026-10-06T23:11:37.772137+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "reconciled_at": "2026-10-06T23:11:37.772137+00:00",
+              "result": "observed_absent",
+              "observation": {
+                "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                "observed_at": "2026-10-05T19:00:00+00:00",
+                "state": "absent",
+                "destination_state": {}
+              },
+              "observation_accepted": true,
+              "retry_eligible": false,
+              "reasons": [],
+              "evaluation_time": "2026-10-05T19:00:00+00:00",
+              "observation_max_age_seconds": 60,
+              "observation_clock_tolerance_seconds": 5
+            }
+          },
+          {
+            "record_id": "control-plane-bounded-run@2ea9528e:reconciliation:11",
+            "producer_profile_id": "control-plane-bounded-run@2ea9528e",
+            "record_type": "reconciliation",
+            "source_sequence": 11,
+            "source_path": "reconciliations[3]",
+            "recorded_at": "2026-10-06T23:11:37.773354+00:00",
+            "identifiers": {
+              "run_id": "run-1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "reconciled_at": "2026-10-06T23:11:37.773354+00:00",
+              "result": "observed_absent",
+              "observation": {
+                "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                "observed_at": "2026-10-05T19:00:00+00:00",
+                "state": "absent",
+                "destination_state": {}
+              },
+              "observation_accepted": true,
+              "retry_eligible": false,
+              "reasons": [],
+              "evaluation_time": "2026-10-05T19:00:00+00:00",
+              "observation_max_age_seconds": 60,
+              "observation_clock_tolerance_seconds": 5
+            }
+          },
+          {
+            "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:execution_envelope:12",
+            "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "record_type": "execution_envelope",
+            "source_sequence": 12,
+            "source_path": "moltbot.execution_envelope",
+            "recorded_at": null,
+            "identifiers": {
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "manifest_id": "refund-integration-pilot-v1",
+              "action_id": "urn:cognous:action:refund-issue-routine-v1",
+              "grant_id": "urn:cognous:grant:routine-1",
+              "grant_revision": "1",
+              "authority_context_profile_ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+              "institution_id": "urn:cognous:institution:synthetic-customer-service",
+              "authority_domain": "customer-refunds"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "version": "0.2.0",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "operation": {
+                "actor": "urn:cognous:identity:refund-agent-1",
+                "principal": "urn:cognous:principal:refund-service",
+                "institution_id": "urn:cognous:institution:synthetic-customer-service",
+                "authority_domain": "customer-refunds",
+                "manifest_id": "refund-integration-pilot-v1",
+                "manifest_version": "1.1",
+                "manifest_digest": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+                "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+                "action_id": "urn:cognous:action:refund-issue-routine-v1",
+                "adapter_id": "urn:cognous:adapter:synthetic-refund-v1",
+                "target": "urn:cognous:synthetic-account:customer-001",
+                "payload": {
+                  "customer_id": "customer-001",
+                  "refund_reason": "duplicate"
+                },
+                "payload_commitment": "sha256:6b782ebbcc034edeca4069b31aa4d8cbc9d3eeaf3b2034ab989bb430de962c0e",
+                "requested_permissions": [
+                  "refund.issue.routine"
+                ],
+                "amount": 50.0,
+                "unit": "USD",
+                "effects": 1,
+                "authority_context_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+                "requirement_id": "urn:cognous:authority-requirement:refund-routine-v1",
+                "grant_id": "urn:cognous:grant:routine-1",
+                "grant_revision": "1",
+                "effective_max_effects": 1
+              },
+              "attempt_id": null
+            }
+          },
+          {
+            "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:executor_control_plane_evidence:13",
+            "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "record_type": "executor_control_plane_evidence",
+            "source_sequence": 13,
+            "source_path": "moltbot.control_plane_evidence",
+            "recorded_at": null,
+            "identifiers": {},
+            "evidence_class": "producer_reported",
+            "data": {
+              "reconciliation": {
+                "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                "reconciled_at": "2026-10-06T23:11:37.773354+00:00",
+                "result": "observed_absent",
+                "observation": {
+                  "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                  "observed_at": "2026-10-05T19:00:00+00:00",
+                  "state": "absent",
+                  "destination_state": {}
+                },
+                "observation_accepted": true,
+                "retry_eligible": false,
+                "reasons": [],
+                "evaluation_time": "2026-10-05T19:00:00+00:00",
+                "observation_max_age_seconds": 60,
+                "observation_clock_tolerance_seconds": 5
+              }
+            }
+          },
+          {
+            "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:execution_result:14",
+            "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "record_type": "execution_result",
+            "source_sequence": 14,
+            "source_path": "moltbot.execution_result",
+            "recorded_at": null,
+            "identifiers": {
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "status": "denied",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "attempt_id": null,
+              "attempted": false,
+              "acknowledged": false,
+              "observed_state": "unknown",
+              "newly_executed": false,
+              "observation": {},
+              "error": "observed absence does not establish retry eligibility after a prior attempt",
+              "control_plane_evidence": {
+                "reconciliation": {
+                  "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                  "reconciled_at": "2026-10-06T23:11:37.773354+00:00",
+                  "result": "observed_absent",
+                  "observation": {
+                    "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                    "observed_at": "2026-10-05T19:00:00+00:00",
+                    "state": "absent",
+                    "destination_state": {}
+                  },
+                  "observation_accepted": true,
+                  "retry_eligible": false,
+                  "reasons": [],
+                  "evaluation_time": "2026-10-05T19:00:00+00:00",
+                  "observation_max_age_seconds": 60,
+                  "observation_clock_tolerance_seconds": 5
+                }
+              }
+            }
+          },
+          {
+            "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:destination_attempt:15",
+            "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "record_type": "destination_attempt",
+            "source_sequence": 15,
+            "source_path": "moltbot.attempts[0]",
+            "recorded_at": null,
+            "identifiers": {
+              "attempt_id": "4a2f6331-9b18-4577-9190-698175db5344",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "attempt_id": "4a2f6331-9b18-4577-9190-698175db5344",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e",
+              "operation_digest": "sha256:ffcad4c587ea3a81df49e9b2c5d3ee817a929d07356d8704db82c1b9c70af175",
+              "created_at": 1791328297.7705283
+            }
+          },
+          {
+            "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:destination_attempt_event:16",
+            "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "record_type": "destination_attempt_event",
+            "source_sequence": 16,
+            "source_path": "moltbot.attempt_events[0]",
+            "recorded_at": null,
+            "identifiers": {
+              "attempt_id": "4a2f6331-9b18-4577-9190-698175db5344",
+              "event_id": "1",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "event_id": 1,
+              "attempt_id": "4a2f6331-9b18-4577-9190-698175db5344",
+              "status": "attempted",
+              "error": null,
+              "created_at": 1791328297.7706263
+            }
+          },
+          {
+            "record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:destination_attempt_event:17",
+            "producer_profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "record_type": "destination_attempt_event",
+            "source_sequence": 17,
+            "source_path": "moltbot.attempt_events[1]",
+            "recorded_at": null,
+            "identifiers": {
+              "attempt_id": "4a2f6331-9b18-4577-9190-698175db5344",
+              "event_id": "2",
+              "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+              "decision_id": "14784026-5004-46c7-ab43-d09b30cb9d5e"
+            },
+            "evidence_class": "producer_reported",
+            "data": {
+              "event_id": 2,
+              "attempt_id": "4a2f6331-9b18-4577-9190-698175db5344",
+              "status": "unknown",
+              "error": "synthetic before-commit interruption",
+              "created_at": 1791328297.7709687
+            }
+          }
+        ],
+        "links": [],
+        "commitments": [
+          {
+            "label": "payload_commitment",
+            "value": "sha256:6b782ebbcc034edeca4069b31aa4d8cbc9d3eeaf3b2034ab989bb430de962c0e",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "control-plane-bounded-run@2ea9528e:runtime_proposal:0",
+            "source_path": "proposal.payload_commitment",
+            "verification_status": "checked_match",
+            "notes": null
+          },
+          {
+            "label": "effect_id",
+            "value": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+            "source_path": "decisions[0].effect_id",
+            "verification_status": "checked_match",
+            "notes": "Checked under pinned Control Plane effect-id contract."
+          },
+          {
+            "label": "proposal_commitment",
+            "value": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+            "source_path": "decisions[0].binding.proposal_commitment",
+            "verification_status": "attributed_claim",
+            "notes": null
+          },
+          {
+            "label": "manifest_digest",
+            "value": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+            "source_path": "decisions[0].binding.manifest_digest",
+            "verification_status": "attributed_claim",
+            "notes": null
+          },
+          {
+            "label": "payload_commitment",
+            "value": "sha256:6b782ebbcc034edeca4069b31aa4d8cbc9d3eeaf3b2034ab989bb430de962c0e",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+            "source_path": "decisions[0].binding.payload_commitment",
+            "verification_status": "attributed_claim",
+            "notes": null
+          },
+          {
+            "label": "requirement_commitment",
+            "value": "sha256:6590406e701b51e637c87953860d1ceb72d8da0af87311048f152e0ee2b8ccb6",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+            "source_path": "decisions[0].binding.requirement_commitment",
+            "verification_status": "attributed_claim",
+            "notes": null
+          },
+          {
+            "label": "role_mapping_digest",
+            "value": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "control-plane-bounded-run@2ea9528e:runtime_decision:1",
+            "source_path": "decisions[0].binding.role_mapping_digest",
+            "verification_status": "attributed_claim",
+            "notes": null
+          },
+          {
+            "label": "payload_commitment",
+            "value": "sha256:6b782ebbcc034edeca4069b31aa4d8cbc9d3eeaf3b2034ab989bb430de962c0e",
+            "algorithm": "SHA-256",
+            "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+            "source_record_id": "moltbot-safe-executor-producer-2.0.0@177354e9:execution_envelope:12",
+            "source_path": "moltbot.execution_envelope.operation.payload_commitment",
+            "verification_status": "checked_match",
+            "notes": null
+          }
+        ],
+        "import_reports": [
+          {
+            "adapter_profile": "control-plane-bounded-run@2ea9528e",
+            "source_revision": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+            "complete": true,
+            "field_mappings": {
+              "decisions": "records[runtime_decision]",
+              "attempts": "records[control_plane_attempt_transition]",
+              "observations": "records[effect_observation]",
+              "reconciliations": "records[reconciliation]"
+            },
+            "findings": [
+              {
+                "code": "M002",
+                "category": "unsupported_semantic",
+                "severity": "warning",
+                "path": "attempt_correlation",
+                "message": "Control Plane and executor attempt namespaces are preserved separately; no equivalence is inferred.",
+                "value_state": "unknown"
+              },
+              {
+                "code": "M003",
+                "category": "conversion_warning",
+                "severity": "info",
+                "path": "moltbot.execution_envelope.operation.institution_id",
+                "message": "Institution/domain provenance is the trusted Moltbot integration context, not Control Plane AuthorizationBinding.",
+                "value_state": null
+              },
+              {
+                "code": "M004",
+                "category": "conversion_warning",
+                "severity": "info",
+                "path": "moltbot.execution_envelope.operation.authority_context_id",
+                "message": "At the pinned adapter this field carries the proposal profile reference; it is distinct from the Control Plane binding context-instance ID.",
+                "value_state": null
+              }
+            ]
+          }
+        ],
+        "semantics": {
+          "record_reconstruction": true,
+          "policy_reevaluation": false,
+          "model_reexecution": false,
+          "external_effect_execution": false,
+          "destination_observation": "producer_reported",
+          "independent_effect_verification": false,
+          "notes": "Replay reconstructs recorded events only; import never renews permission or creates an effect."
+        },
+        "derivation": null,
+        "integrity": [],
+        "metadata": {
+          "effect_observation_history": {
+            "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": {
+              "basis": "Control Plane reconciliation array order, filtered by exact effect_id",
+              "rejected_reconciliation_indices": [],
+              "latest_reconciliation": {
+                "source_index": 3,
+                "result": "observed_absent",
+                "observation_accepted": true
+              },
+              "latest_accepted_observation": {
+                "source_index": 3,
+                "observation": {
+                  "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+                  "observed_at": "2026-10-05T19:00:00+00:00",
+                  "state": "absent",
+                  "destination_state": {}
+                }
+              },
+              "latest_supported_destination_state": "absent",
+              "retry_eligible": false,
+              "acknowledgement_history": [
+                {
+                  "source_index": 0,
+                  "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+                  "status": "attempted",
+                  "acknowledgement": {}
+                },
+                {
+                  "source_index": 1,
+                  "attempt_id": "1669aa44-c73c-4220-8ac6-f134ad68d4d5",
+                  "status": "unknown",
+                  "acknowledgement": {}
+                }
+              ],
+              "cross_sequence_order": "not_established",
+              "freshness_at_import": "not_evaluated"
+            }
+          },
+          "control_plane_revision": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+          "moltbot_safe_revision": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+          "moltbot_producer_contract": {
+            "profile_id": "moltbot-safe-executor-producer-2.0.0@177354e9",
+            "control_plane_revision": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+            "repository_revision": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+            "interface_profile_id": "urn:cognous:profiles:moltbot-safe-executor-producer",
+            "interface_profile_version": "2.0.0",
+            "provenance": {
+              "mode": "versioned_profile",
+              "source_asserted": {
+                "repository_revision": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+                "producer_profile_id": "urn:cognous:profiles:moltbot-safe-executor-producer",
+                "producer_profile_version": "2.0.0"
+              },
+              "independently_established": []
+            },
+            "legacy": false
+          },
+          "manifest_revision": "46c950bed37fe3812000895430bc0312d29e37ce",
+          "alvorada_revision": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+          "freshness": "current"
+        }
+      }
+    },
+    "source_import_reports": [
+      {
+        "adapter_profile": "control-plane-bounded-run@2ea9528e",
+        "source_revision": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+        "complete": true,
+        "field_mappings": {
+          "decisions": "records[runtime_decision]",
+          "attempts": "records[control_plane_attempt_transition]",
+          "observations": "records[effect_observation]",
+          "reconciliations": "records[reconciliation]"
+        },
+        "findings": [
+          {
+            "code": "M002",
+            "category": "unsupported_semantic",
+            "severity": "warning",
+            "path": "attempt_correlation",
+            "message": "Control Plane and executor attempt namespaces are preserved separately; no equivalence is inferred.",
+            "value_state": "unknown"
+          },
+          {
+            "code": "M003",
+            "category": "conversion_warning",
+            "severity": "info",
+            "path": "moltbot.execution_envelope.operation.institution_id",
+            "message": "Institution/domain provenance is the trusted Moltbot integration context, not Control Plane AuthorizationBinding.",
+            "value_state": null
+          },
+          {
+            "code": "M004",
+            "category": "conversion_warning",
+            "severity": "info",
+            "path": "moltbot.execution_envelope.operation.authority_context_id",
+            "message": "At the pinned adapter this field carries the proposal profile reference; it is distinct from the Control Plane binding context-instance ID.",
+            "value_state": null
+          }
+        ]
+      }
+    ]
+  },
+  "package_digest": "sha256:d4ffdd83227d3ae481049f7a411e69329d9e0bacb65d3340daf2364a3ed64334"
+}
