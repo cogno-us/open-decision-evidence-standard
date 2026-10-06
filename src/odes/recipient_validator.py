@@ -189,6 +189,8 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
             reasons.append("status evidence evaluated_at is after recipient evaluation time")
     if status_inputs.get("evidence_freshness") not in {"current", "recent"}:
         reasons.append("status evidence freshness is missing, stale, or unsupported")
+    if status_inputs.get("authority_valid_at_decision_verified") is not True:
+        reasons.append("status evidence does not verify historical authority required for present reliance")
 
     freshness = status_inputs.get("freshness")
     if freshness not in {"current"}:
