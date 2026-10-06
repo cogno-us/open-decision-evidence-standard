@@ -20,7 +20,7 @@ PINNED_REVISIONS = {
     "authority_context": "fb3d97938969a89e149e8ff8db2756091d1233fc",
     "control_plane": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
     "moltbot_safe": "054e92d12ccb0bc756ca6652f39fc13b51e05d9b",
-    "replay": "22aa742b2735b64b850c2c37688ef1fae5ff9014",
+    "replay": "710ceb5667762a5e8f3a7b02e14c40eb8e1a9379",
     "governance_evidence_pack": "c699c1fb7c4f8057631c4e5909d11a721c2c958d",
     "bitrep": "5b5077dafde232a7801cb425c4efddcffb468723",
     "index": "d5e45d275cb301d9684b543e93b05997991d1cf2",
