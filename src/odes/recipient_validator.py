@@ -9,10 +9,14 @@ from .common import (
     PACKAGE_TYPE,
     PACKAGE_VERSION,
     PROFILE_ID,
-    PROFILE_V2_ID, PROFILE_V2_VERSION, PINNED_V2_REVISIONS,
+    PROFILE_V2_ID,
+    PROFILE_V2_VERSION,
+    PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
     SCHEMA_VERSION,
+    SUPPORTED_V2_CONTROL_PLANE_REVISIONS,
+    SUPPORTED_V2_REPLAY_REVISIONS,
     parse_time,
     sha256,
 )
@@ -67,7 +71,8 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
     if declared != record.get("verification", {}).get("conformance_profile"):
         reasons.append("package profile and record verification.conformance_profile differ")
     provenance = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
-    if declared == PROFILE_ID and provenance.get("pinned_revisions", {}).get("control_plane") == PINNED_V2_REVISIONS["control_plane"]:
+    selected_control_plane = provenance.get("pinned_revisions", {}).get("control_plane")
+    if declared == PROFILE_ID and selected_control_plane in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
         reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
     if declared in {PROFILE_ID, PROFILE_V2_ID}:
         expected_version = PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
@@ -244,6 +249,33 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
     return _result("fail" if reasons else "pass", reasons, {"permitted_relying_parties": parties, "permitted_purposes": purposes})
 
 
+def _normalized_replay_material(package: dict[str, Any], expected: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Compare semantic material while tolerating older accepted Replay adapter pins.
+
+    Existing packages generated under the previous accepted Replay revision remain
+    valid if their retained source records re-export to the same decision,
+    execution, and recipient material. The selected Replay revision is provenance
+    about the validator used, not a re-labeling of producer records.
+    """
+    left = deepcopy(_material_package_content(package))
+    right = deepcopy(_material_package_content(expected))
+    lprov = left.get("provenance") or {}
+    rprov = right.get("provenance") or {}
+    lreplay = (lprov.get("pinned_revisions") or {}).get("replay")
+    if (lreplay == SUPPORTED_V2_REPLAY_REVISIONS[0]
+            and lprov["pinned_revisions"].get("control_plane") != SUPPORTED_V2_CONTROL_PLANE_REVISIONS[0]):
+        raise ValueError("historical Replay revision does not support selected Control Plane revision")
+    if lreplay in SUPPORTED_V2_REPLAY_REVISIONS:
+        rprov.setdefault("pinned_revisions", {})["replay"] = lreplay
+        rprov.setdefault("replay_validation", {})["required_revision"] = lreplay
+    if "supported_revisions" not in lprov:
+        rprov.pop("supported_revisions", None)
+    if "selected_revisions" not in lprov:
+        rprov.pop("selected_revisions", None)
+    else:
+        rprov["selected_revisions"] = deepcopy(rprov["pinned_revisions"])
+    return left, right
+
 
 def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
     if package.get("profile", {}).get("implementation_profile") != PROFILE_V2_ID:
@@ -257,7 +289,8 @@ def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
             raise ValueError("implementation profile requires exact single-recipient/purpose export")
         expected = export_cognous_stack_package(sources["manifest"], sources["reconstruction_bundle"],
             relying_party=parties[0], purpose=purposes[0], expires_at=conditions["expires_at"])
-        if _material_package_content(package) != _material_package_content(expected):
+        actual_material, expected_material = _normalized_replay_material(package, expected)
+        if actual_material != expected_material:
             raise ValueError("package semantics differ from accepted Replay-derived transformation")
     except Exception as exc:
         return _result("fail", [f"Replay semantic validation failed: {exc}"])

@@ -29,11 +29,19 @@ PINNED_REVISIONS = {
 
 PROFILE_V2_ID = "odes_cognous_stack_export_0_2"
 PROFILE_V2_VERSION = "odes-cognous-stack-export-0.2.0"
+SUPPORTED_V2_CONTROL_PLANE_REVISIONS = (
+    "2ea9528eeb87e14ff10f05de06473122b9df540f",
+    "248d899634d9db3518e831bc7ab568a48733f825",
+)
+SUPPORTED_V2_REPLAY_REVISIONS = (
+    "274543f1cd7171784a923a8e37015017a0d8bc9d",
+    "043830b56595cecddfa65c064afd1c0b95e64792",
+)
 PINNED_V2_REVISIONS = {
     **PINNED_REVISIONS,
-    "control_plane": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+    "control_plane": "248d899634d9db3518e831bc7ab568a48733f825",
     "moltbot_safe": "177354e959cc78c59c1a776f018cfbfbf28c927b",
-    "replay": "274543f1cd7171784a923a8e37015017a0d8bc9d",
+    "replay": "043830b56595cecddfa65c064afd1c0b95e64792",
 }
 
 

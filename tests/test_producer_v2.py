@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from odes.common import PROFILE_V2_ID, sha256
+from odes.common import PINNED_V2_REVISIONS, PROFILE_V2_ID, SUPPORTED_V2_CONTROL_PLANE_REVISIONS, sha256
 from odes.exporter import ExportError, export_cognous_stack_package
 from odes.recipient_validator import evaluate_recipient_package
 from odes.schema_validation import validate_record
@@ -50,6 +50,12 @@ def test_actual_producer_lifecycle(produced, name):
     assert package['provenance']['retained_sources']['reconstruction_bundle'] == source
     assert package['provenance']['source_artifacts']['reconstruction_bundle_digest'] == sha256(source)
     assert package['provenance']['source_artifacts']['reconstruction_bundle_id'] == source['bundle_id']
+    selected_cp = source['metadata']['control_plane_revision']
+    assert selected_cp in SUPPORTED_V2_CONTROL_PLANE_REVISIONS
+    assert package['provenance']['pinned_revisions']['control_plane'] == selected_cp
+    assert package['provenance']['selected_revisions']['control_plane'] == selected_cp
+    assert package['provenance']['pinned_revisions']['replay'] == PINNED_V2_REVISIONS['replay']
+    assert package['provenance']['replay_validation']['required_revision'] == PINNED_V2_REVISIONS['replay']
     facts = package['provenance']['execution_facts']
     assert facts['retry_permission'] == 'not_established'
     assert facts['independent_delivery_verification'] == 'unavailable'
@@ -180,3 +186,46 @@ def test_generated_lifecycle_packages():
         assert result['recipient_reliance_decision']['status'] == 'informational_only'
         replay = package['provenance']['retained_sources']['reconstruction_bundle']
         assert package['provenance']['source_artifacts']['reconstruction_bundle_digest'] == sha256(replay)
+
+
+@pytest.mark.parametrize('field', ['control_plane', 'moltbot_safe', 'replay'])
+def test_selected_revision_contradictions_rejected(produced, field):
+    package = copy.deepcopy(produced['cases']['success']['package'])
+    package['provenance']['selected_revisions'][field] = 'contradictory'
+    package['package_digest'] = sha256({k: package[k] for k in ('record', 'profile', 'integrity', 'provenance')})
+    result = evaluate_recipient_package(package, policy(package))
+    assert result['package_content_integrity']['status'] == 'pass'
+    assert result['replay_semantic_consistency']['status'] == 'fail'
+    assert result['recipient_reliance_decision']['status'] == 'fail'
+
+
+def test_old_replay_cannot_claim_new_control_plane(produced):
+    from odes.common import SUPPORTED_V2_REPLAY_REVISIONS
+    package = copy.deepcopy(produced['cases']['success']['package'])
+    provenance = package['provenance']
+    for field in ('pinned_revisions', 'selected_revisions'):
+        provenance[field]['replay'] = SUPPORTED_V2_REPLAY_REVISIONS[0]
+    provenance['replay_validation']['required_revision'] = SUPPORTED_V2_REPLAY_REVISIONS[0]
+    package['package_digest'] = sha256({k: package[k] for k in ('record', 'profile', 'integrity', 'provenance')})
+    result = evaluate_recipient_package(package, policy(package))
+    assert result['replay_semantic_consistency']['status'] == 'fail'
+
+
+@pytest.mark.parametrize('field', ['moltbot_safe_revision', 'manifest_revision', 'alvorada_revision'])
+def test_source_revision_contradictions_rejected(produced, field):
+    source = copy.deepcopy(produced['cases']['success']['bundle'])
+    source['metadata'][field] = 'contradictory'
+    with pytest.raises(ExportError, match=field):
+        export_cognous_stack_package(produced['manifest'], source)
+
+
+def test_historical_export_preserves_selected_revision_and_source():
+    for path in Path('examples/producer-v2').glob('*.package.json'):
+        original = json.loads(path.read_text())
+        before = copy.deepcopy(original)
+        sources = original['provenance']['retained_sources']
+        package = export_cognous_stack_package(sources['manifest'], sources['reconstruction_bundle'])
+        assert package['provenance']['selected_revisions']['control_plane'] == SUPPORTED_V2_CONTROL_PLANE_REVISIONS[0]
+        assert package['provenance']['retained_sources'] == sources
+        assert evaluate_recipient_package(package, policy(package))['replay_semantic_consistency']['status'] == 'pass'
+        assert original == before

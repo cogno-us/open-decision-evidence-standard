@@ -15,9 +15,16 @@ profile 0.1 remains the historical transformation and is not silently redefined.
 
 | Profile | Executor interface / revision | Control Plane revision | Replay decoder |
 |---|---|---|---|
-| 0.2 | Producer 2.0.0 / `177354e959cc78c59c1a776f018cfbfbf28c927b` | `2ea9528eeb87e14ff10f05de06473122b9df540f` | `274543f1cd7171784a923a8e37015017a0d8bc9d` |
+| 0.2 | Producer 2.0.0 / `177354e959cc78c59c1a776f018cfbfbf28c927b` | `248d899634d9db3518e831bc7ab568a48733f825` or `2ea9528eeb87e14ff10f05de06473122b9df540f` | `043830b56595cecddfa65c064afd1c0b95e64792` |
 | 0.1 | Producer 1.0.0 / `1d308faf664c504b6e310db3c7a310153ef7b067` | `283500652d47a692fb0b99a1172a6d5faffbd9a7` | Historical mapping at `f63ce914504dd06813c4ccd199b0570dbd8dd427` |
 | 0.1 | Legacy unversioned / `6b0ba1185bcd390f71df947dda349415e4105f5f` | `283500652d47a692fb0b99a1172a6d5faffbd9a7` | Same historical Replay mapping |
+
+The current selected profile-0.2 Replay revision is
+`043830b56595cecddfa65c064afd1c0b95e64792`. The accepted Replay contract supports
+both exact profile-0.2 Control Plane revisions listed above. The persistence
+repair changes record-store mechanics, not the bounded-record wire model; ODES
+therefore does not bump this implementation profile or the base `pder-v0.1`
+schema solely because the selected repository revision changed.
 
 Accepted Replay also implements the historical decoder paths; CI installs the
 accepted runtime and tests both generations. Existing historical packages retain
@@ -71,9 +78,13 @@ The full material package digest includes these retained sources and summaries.
 
 Recipient validation adds `replay_semantic_consistency` for profile 0.2: it invokes
 the same exporter/accepted Replay validation on retained sources and compares the
-entire material transformation. Even recomputed package hashes cannot promote
-completeness into delivery success or bypass semantic contradictions. This check
-is source-content consistency, not authentication of the supplied producer data.
+entire material transformation. Existing accepted packages generated under the
+previous Replay decoder remain semantically valid when their retained source
+records reconstruct identically; selected Replay revision provenance does not
+relabel the original producer records. Even recomputed package hashes cannot
+promote completeness into delivery success or bypass semantic contradictions.
+This check is source-content consistency, not authentication of the supplied
+producer data.
 
 All original recipient controls remain: explicit policy profile, recipient,
 purpose, timezone-aware evaluation time, status maximum age, exact policy scope,
@@ -87,3 +98,9 @@ only. Held/no-authority records cannot acquire authority through inspection.
 Exporter and recipient validation read supplied JSON only, not producer stores;
 qualification nevertheless checks actual SQLite and CP stores before and after
 all operations. No effects, retries or authority decisions are created.
+
+Historical Replay `274543f1cd7171784a923a8e37015017a0d8bc9d` attribution is
+accepted only for Control Plane `2ea9528eeb87e14ff10f05de06473122b9df540f`.
+Its absent supported-revision-set field is tolerated during comparison; selected
+revision and producer-profile contradictions are not. When present,
+`selected_revisions` must equal the package's validated `pinned_revisions`.

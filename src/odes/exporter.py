@@ -11,10 +11,13 @@ from .common import (
     PACKAGE_VERSION,
     PINNED_REVISIONS,
     PROFILE_ID,
-    PROFILE_V2_ID, PROFILE_V2_VERSION, PINNED_V2_REVISIONS,
+    PROFILE_V2_ID,
+    PROFILE_V2_VERSION,
+    PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
     SCHEMA_VERSION,
+    SUPPORTED_V2_CONTROL_PLANE_REVISIONS,
     sha256,
     utc_now_iso,
 )
@@ -226,6 +229,7 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
                 }
     return cp, proposal, moltbot
 
+
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
     try:
@@ -235,17 +239,30 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
         raise ExportError("pinned Replay validator is unavailable; install cogno-us/cognous-agent-replay-bundle at the pinned revision") from exc
     try:
         revision = (bundle.get("metadata") or {}).get("control_plane_revision", PINNED_REVISIONS["control_plane"])
-        if revision not in {PINNED_REVISIONS["control_plane"], PINNED_V2_REVISIONS["control_plane"]}:
+        if revision not in {PINNED_REVISIONS["control_plane"], *SUPPORTED_V2_CONTROL_PLANE_REVISIONS}:
             raise ExportError("unsupported Control Plane compatibility revision")
-        if revision == PINNED_V2_REVISIONS["control_plane"]:
-            reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot,
-                                                   control_plane_revision=revision)
+        if revision in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
+            reconstructed = import_bounded_workflow(
+                cp,
+                proposal=proposal,
+                moltbot_export=moltbot,
+                control_plane_revision=revision,
+            )
             validated = reconstructed.model_dump(mode="json")
             for field in ("records", "links", "commitments", "producer_profiles", "status"):
                 if bundle.get(field) != validated.get(field):
                     raise ExportError(f"retained Replay {field} differs from accepted validator reconstruction")
-            for field in ("effect_observation_history", "moltbot_producer_contract"):
-                if bundle.get("metadata", {}).get(field) != validated["metadata"].get(field):
+            for field in ("effect_observation_history", "moltbot_producer_contract",
+                          "moltbot_safe_revision", "manifest_revision", "alvorada_revision"):
+                retained = bundle.get("metadata", {}).get(field)
+                expected = deepcopy(validated["metadata"].get(field))
+                # Older accepted Replay did not emit the supported revision set.
+                # Compare its original selected attribution without rewriting it.
+                if (field == "moltbot_producer_contract" and isinstance(retained, dict)
+                        and revision == SUPPORTED_V2_CONTROL_PLANE_REVISIONS[0]
+                        and "compatible_control_plane_revisions" not in retained):
+                    expected.pop("compatible_control_plane_revisions", None)
+                if retained != expected:
                     raise ExportError(f"retained Replay {field} differs from accepted validator")
         else:
             reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot)
@@ -464,14 +481,21 @@ def _human_disposition(decision: dict[str, Any]) -> str:
     return "unknown"
 
 
+def _selected_v2_pins(control_plane_revision: str) -> dict[str, str]:
+    if control_plane_revision not in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
+        raise ExportError("unsupported Control Plane compatibility revision")
+    return {**PINNED_V2_REVISIONS, "control_plane": control_plane_revision}
+
+
 def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z") -> dict[str, Any]:
     manifest = deepcopy(_obj(manifest, "manifest"))
     bundle = deepcopy(_obj(reconstruction_bundle, "reconstruction_bundle"))
     replay_status, replay_findings, validated_replay = _run_replay_validation(bundle)
-    repaired = validated_replay["metadata"]["control_plane_revision"] == PINNED_V2_REVISIONS["control_plane"]
+    control_plane_revision = validated_replay["metadata"]["control_plane_revision"]
+    repaired = control_plane_revision in SUPPORTED_V2_CONTROL_PLANE_REVISIONS
     profile_id = PROFILE_V2_ID if repaired else PROFILE_ID
     profile_version = PROFILE_V2_VERSION if repaired else PROFILE_VERSION
-    pins = PINNED_V2_REVISIONS if repaired else PINNED_REVISIONS
+    pins = _selected_v2_pins(control_plane_revision) if repaired else PINNED_REVISIONS
     _validate_manifest_binding(manifest, _extract_replay_inputs(bundle)[1])
     decision, decision_result = _check_decision_execution_consistency(bundle)
     grouped = _group(bundle)
@@ -528,6 +552,8 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "integrity": {"kind": "content-digest", "algorithm": "SHA-256", "canonicalization_profile": CANONICALIZATION_PROFILE, "value": sha256(package_core), "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."},
         "provenance": {
             "pinned_revisions": pins,
+            "supported_revisions": {"control_plane": list(SUPPORTED_V2_CONTROL_PLANE_REVISIONS)} if repaired else {},
+            "selected_revisions": pins,
             "source_artifacts": {"manifest_digest": sha256(manifest), "reconstruction_bundle_digest": sha256(bundle)},
             "replay_validation": {"status": replay_status, "required_revision": pins["replay"], "findings": replay_findings},
             "source_record_refs": _source_refs(bundle),
