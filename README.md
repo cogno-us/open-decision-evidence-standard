@@ -119,3 +119,7 @@ Component links are navigation, not a requirement to install every component. Th
 ## Repository locations
 
 See the [repository rename map and compatibility notes](https://github.com/cogno-us/cognous-open-control-stack/blob/main/docs/repository-renames.md) for current component URLs. Existing package names, schema identifiers and retained producer identities are unchanged.
+
+## Merged producer compatibility
+
+The exact merged Control Plane/executor pair has a versioned `odes-cognous-stack-export-0.2.1` consumer mapping. See [qualification scope and pinned revisions](docs/merged-producer-compatibility.md). This covers the existing bounded export; atomic-claim and refund-intent evidence are not added.

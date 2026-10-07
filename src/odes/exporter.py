@@ -13,6 +13,9 @@ from .common import (
     PROFILE_ID,
     PROFILE_V2_ID,
     PROFILE_V2_VERSION,
+    MERGED_PROFILE_VERSION,
+    MERGED_REVISIONS,
+    ALL_V2_CONTROL_PLANE_REVISIONS,
     PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
@@ -239,9 +242,9 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
         raise ExportError("pinned Replay validator is unavailable; install cogno-us/cognous-agent-replay-bundle at the pinned revision") from exc
     try:
         revision = (bundle.get("metadata") or {}).get("control_plane_revision", PINNED_REVISIONS["control_plane"])
-        if revision not in {PINNED_REVISIONS["control_plane"], *SUPPORTED_V2_CONTROL_PLANE_REVISIONS}:
+        if revision not in {PINNED_REVISIONS["control_plane"], *ALL_V2_CONTROL_PLANE_REVISIONS}:
             raise ExportError("unsupported Control Plane compatibility revision")
-        if revision in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
+        if revision in ALL_V2_CONTROL_PLANE_REVISIONS:
             reconstructed = import_bounded_workflow(
                 cp,
                 proposal=proposal,
@@ -482,9 +485,9 @@ def _human_disposition(decision: dict[str, Any]) -> str:
 
 
 def _selected_v2_pins(control_plane_revision: str) -> dict[str, str]:
-    if control_plane_revision not in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
+    if control_plane_revision not in ALL_V2_CONTROL_PLANE_REVISIONS:
         raise ExportError("unsupported Control Plane compatibility revision")
-    return {**PINNED_V2_REVISIONS, "control_plane": control_plane_revision}
+    return dict(MERGED_REVISIONS) if control_plane_revision == MERGED_REVISIONS["control_plane"] else {**PINNED_V2_REVISIONS, "control_plane": control_plane_revision}
 
 
 def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z") -> dict[str, Any]:
@@ -492,9 +495,9 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
     bundle = deepcopy(_obj(reconstruction_bundle, "reconstruction_bundle"))
     replay_status, replay_findings, validated_replay = _run_replay_validation(bundle)
     control_plane_revision = validated_replay["metadata"]["control_plane_revision"]
-    repaired = control_plane_revision in SUPPORTED_V2_CONTROL_PLANE_REVISIONS
+    repaired = control_plane_revision in ALL_V2_CONTROL_PLANE_REVISIONS
     profile_id = PROFILE_V2_ID if repaired else PROFILE_ID
-    profile_version = PROFILE_V2_VERSION if repaired else PROFILE_VERSION
+    profile_version = MERGED_PROFILE_VERSION if control_plane_revision == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if repaired else PROFILE_VERSION
     pins = _selected_v2_pins(control_plane_revision) if repaired else PINNED_REVISIONS
     _validate_manifest_binding(manifest, _extract_replay_inputs(bundle)[1])
     decision, decision_result = _check_decision_execution_consistency(bundle)
@@ -552,7 +555,7 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "integrity": {"kind": "content-digest", "algorithm": "SHA-256", "canonicalization_profile": CANONICALIZATION_PROFILE, "value": sha256(package_core), "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."},
         "provenance": {
             "pinned_revisions": pins,
-            "supported_revisions": {"control_plane": list(SUPPORTED_V2_CONTROL_PLANE_REVISIONS)} if repaired else {},
+            "supported_revisions": {"control_plane": ([MERGED_REVISIONS["control_plane"]] if control_plane_revision == MERGED_REVISIONS["control_plane"] else list(SUPPORTED_V2_CONTROL_PLANE_REVISIONS))} if repaired else {},
             "selected_revisions": pins,
             "source_artifacts": {"manifest_digest": sha256(manifest), "reconstruction_bundle_digest": sha256(bundle)},
             "replay_validation": {"status": replay_status, "required_revision": pins["replay"], "findings": replay_findings},
