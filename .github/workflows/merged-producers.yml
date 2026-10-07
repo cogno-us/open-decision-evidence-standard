@@ -1,0 +1,61 @@
+name: Merged producer compatibility
+on:
+  push:
+    branches: ["consumer/merged-producer-compatibility"]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: merged-producers-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-action-manifest
+          ref: 46c950bed37fe3812000895430bc0312d29e37ce
+          path: upstream/manifest
+      - uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-replay-bundle
+          ref: 459e4ba62fca49364aebb0050cd5fb2dd5a71bfa
+          path: upstream/replay
+      - uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-control-plane
+          ref: d3dadee70bd319812b207389ab1e0f6efe511916
+          path: upstream/control-plane
+      - uses: actions/checkout@v4
+        with:
+          repository: cogno-us/cognous-execution-runtime
+          ref: c3c3ee7188b9367cf70b08074b9c40a5c70c94ac
+          path: upstream/executor
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install bounded qualification dependencies
+        timeout-minutes: 4
+        run: python -m pip install -e '.[dev]' -e upstream/replay -e upstream/control-plane pyyaml
+      - name: Qualify exact merged producer pair
+        timeout-minutes: 3
+        env:
+          ODES_V2_REPLAY_ROOT: upstream/replay
+          ARB_V2_CONTROL_PLANE_ROOT: upstream/control-plane
+          ARB_V2_MOLTBOT_ROOT: upstream/executor
+          ARB_PINNED_MANIFEST_FIXTURE: upstream/manifest/examples/refund_integration_v1_1.manifest.json
+        run: timeout --kill-after=10s 150s python -m pytest -q qualification/test_merged_producer.py --basetemp=artifacts/pytest --junitxml=artifacts/junit.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: merged-producers-${{ github.sha }}-py${{ matrix.python }}
+          path: artifacts/
+          if-no-files-found: error

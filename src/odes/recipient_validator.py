@@ -11,6 +11,9 @@ from .common import (
     PROFILE_ID,
     PROFILE_V2_ID,
     PROFILE_V2_VERSION,
+    MERGED_PROFILE_VERSION,
+    MERGED_REVISIONS,
+    ALL_V2_CONTROL_PLANE_REVISIONS,
     PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
@@ -72,10 +75,10 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
         reasons.append("package profile and record verification.conformance_profile differ")
     provenance = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
     selected_control_plane = provenance.get("pinned_revisions", {}).get("control_plane")
-    if declared == PROFILE_ID and selected_control_plane in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
+    if declared == PROFILE_ID and selected_control_plane in ALL_V2_CONTROL_PLANE_REVISIONS:
         reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
     if declared in {PROFILE_ID, PROFILE_V2_ID}:
-        expected_version = PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
+        expected_version = MERGED_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
         if profile.get("implementation_profile_version") != expected_version:
             return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": expected_version})
         if profile.get("schema_name") != SCHEMA_NAME or profile.get("schema_version") != SCHEMA_VERSION:
@@ -265,6 +268,8 @@ def _normalized_replay_material(package: dict[str, Any], expected: dict[str, Any
     if (lreplay == SUPPORTED_V2_REPLAY_REVISIONS[0]
             and lprov["pinned_revisions"].get("control_plane") != SUPPORTED_V2_CONTROL_PLANE_REVISIONS[0]):
         raise ValueError("historical Replay revision does not support selected Control Plane revision")
+    if lreplay in SUPPORTED_V2_REPLAY_REVISIONS and lprov["pinned_revisions"].get("control_plane") == MERGED_REVISIONS["control_plane"]:
+        raise ValueError("historical Replay revision does not support merged producers")
     if lreplay in SUPPORTED_V2_REPLAY_REVISIONS:
         rprov.setdefault("pinned_revisions", {})["replay"] = lreplay
         rprov.setdefault("replay_validation", {})["required_revision"] = lreplay

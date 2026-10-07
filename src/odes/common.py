@@ -45,6 +45,16 @@ PINNED_V2_REVISIONS = {
 }
 
 
+MERGED_PROFILE_VERSION = "odes-cognous-stack-export-0.2.1"
+MERGED_REVISIONS = {
+    **PINNED_V2_REVISIONS,
+    "control_plane": "d3dadee70bd319812b207389ab1e0f6efe511916",
+    "moltbot_safe": "c3c3ee7188b9367cf70b08074b9c40a5c70c94ac",
+    "replay": "459e4ba62fca49364aebb0050cd5fb2dd5a71bfa",
+}
+ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"])
+
+
 def canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
 
