@@ -3,7 +3,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [main, worker8-odes-cognous-export, worker14/executor-profile-v1]
+    branches: [main, worker8-odes-cognous-export, worker14/executor-profile-v1, worker8/odes-control-plane-store-compatibility]
 
 jobs:
   test:
@@ -49,18 +49,18 @@ jobs:
           ref: f63ce914504dd06813c4ccd199b0570dbd8dd427
           path: external/replay
 
-      - name: Checkout accepted Replay
+      - name: Checkout accepted Replay persistence mapping
         uses: actions/checkout@v4
         with:
           repository: cogno-us/cognous-agent-replay-bundle
-          ref: 274543f1cd7171784a923a8e37015017a0d8bc9d
+          ref: 043830b56595cecddfa65c064afd1c0b95e64792
           path: external/replay-v2
 
-      - name: Checkout accepted Control Plane observation repair
+      - name: Checkout accepted Control Plane persistence repair
         uses: actions/checkout@v4
         with:
           repository: cogno-us/cognous-agent-control-plane
-          ref: 2ea9528eeb87e14ff10f05de06473122b9df540f
+          ref: 248d899634d9db3518e831bc7ab568a48733f825
           path: external/control-plane-v2
 
       - name: Checkout accepted executor producer 2.0.0
@@ -84,8 +84,8 @@ jobs:
           test "$(git -C external/control-plane rev-parse HEAD)" = "283500652d47a692fb0b99a1172a6d5faffbd9a7"
           test "$(git -C external/moltbot-safe rev-parse HEAD)" = "1d308faf664c504b6e310db3c7a310153ef7b067"
           test "$(git -C external/replay rev-parse HEAD)" = "f63ce914504dd06813c4ccd199b0570dbd8dd427"
-          test "$(git -C external/replay-v2 rev-parse HEAD)" = "274543f1cd7171784a923a8e37015017a0d8bc9d"
-          test "$(git -C external/control-plane-v2 rev-parse HEAD)" = "2ea9528eeb87e14ff10f05de06473122b9df540f"
+          test "$(git -C external/replay-v2 rev-parse HEAD)" = "043830b56595cecddfa65c064afd1c0b95e64792"
+          test "$(git -C external/control-plane-v2 rev-parse HEAD)" = "248d899634d9db3518e831bc7ab568a48733f825"
           test "$(git -C external/moltbot-v2 rev-parse HEAD)" = "177354e959cc78c59c1a776f018cfbfbf28c927b"
           test "$(git -C external/agep rev-parse HEAD)" = "c699c1fb7c4f8057631c4e5909d11a721c2c958d"
 
