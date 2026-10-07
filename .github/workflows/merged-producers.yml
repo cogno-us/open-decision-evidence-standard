@@ -52,7 +52,9 @@ jobs:
           ARB_V2_CONTROL_PLANE_ROOT: upstream/control-plane
           ARB_V2_MOLTBOT_ROOT: upstream/executor
           ARB_PINNED_MANIFEST_FIXTURE: upstream/manifest/examples/refund_integration_v1_1.manifest.json
-        run: timeout --kill-after=10s 150s python -m pytest -q qualification/test_merged_producer.py --basetemp=artifacts/pytest --junitxml=artifacts/junit.xml
+        run: |
+          mkdir -p artifacts
+          timeout --kill-after=10s 150s python -m pytest -q qualification/test_merged_producer.py --basetemp=artifacts/pytest --junitxml=artifacts/junit.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:
