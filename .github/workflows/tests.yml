@@ -17,63 +17,63 @@ jobs:
       - name: Checkout pinned Manifest
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/cognous-agent-action-manifest
+          repository: cogno-us/cognous-action-manifest
           ref: 46c950bed37fe3812000895430bc0312d29e37ce
           path: external/manifest
 
       - name: Checkout pinned Authority Context
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/constitutional-governance-for-institutions
+          repository: cogno-us/cognous-institutional-governance
           ref: fb3d97938969a89e149e8ff8db2756091d1233fc
           path: external/alvorada
 
       - name: Checkout pinned Control Plane
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/cognous-agent-control-plane
+          repository: cogno-us/cognous-control-plane
           ref: 283500652d47a692fb0b99a1172a6d5faffbd9a7
           path: external/control-plane
 
       - name: Checkout pinned Moltbot Safe
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/moltbot-safe
+          repository: cogno-us/cognous-execution-runtime
           ref: 1d308faf664c504b6e310db3c7a310153ef7b067
           path: external/moltbot-safe
 
       - name: Checkout pinned Replay
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/cognous-agent-replay-bundle
+          repository: cogno-us/cognous-replay-bundle
           ref: f63ce914504dd06813c4ccd199b0570dbd8dd427
           path: external/replay
 
       - name: Checkout accepted Replay persistence mapping
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/cognous-agent-replay-bundle
+          repository: cogno-us/cognous-replay-bundle
           ref: 043830b56595cecddfa65c064afd1c0b95e64792
           path: external/replay-v2
 
       - name: Checkout accepted Control Plane persistence repair
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/cognous-agent-control-plane
+          repository: cogno-us/cognous-control-plane
           ref: 248d899634d9db3518e831bc7ab568a48733f825
           path: external/control-plane-v2
 
       - name: Checkout accepted executor producer 2.0.0
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/moltbot-safe
+          repository: cogno-us/cognous-execution-runtime
           ref: 177354e959cc78c59c1a776f018cfbfbf28c927b
           path: external/moltbot-v2
 
       - name: Checkout pinned Governance Evidence Pack
         uses: actions/checkout@v4
         with:
-          repository: cogno-us/cognous-agent-governance-evidence-pack
+          repository: cogno-us/cognous-governance-evidence-pack
           ref: c699c1fb7c4f8057631c4e5909d11a721c2c958d
           path: external/agep
 
