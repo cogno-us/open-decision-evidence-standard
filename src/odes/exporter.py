@@ -252,8 +252,17 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
             for field in ("records", "links", "commitments", "producer_profiles", "status"):
                 if bundle.get(field) != validated.get(field):
                     raise ExportError(f"retained Replay {field} differs from accepted validator reconstruction")
-            for field in ("effect_observation_history", "moltbot_producer_contract"):
-                if bundle.get("metadata", {}).get(field) != validated["metadata"].get(field):
+            for field in ("effect_observation_history", "moltbot_producer_contract",
+                          "moltbot_safe_revision", "manifest_revision", "alvorada_revision"):
+                retained = bundle.get("metadata", {}).get(field)
+                expected = deepcopy(validated["metadata"].get(field))
+                # Older accepted Replay did not emit the supported revision set.
+                # Compare its original selected attribution without rewriting it.
+                if (field == "moltbot_producer_contract" and isinstance(retained, dict)
+                        and revision == SUPPORTED_V2_CONTROL_PLANE_REVISIONS[0]
+                        and "compatible_control_plane_revisions" not in retained):
+                    expected.pop("compatible_control_plane_revisions", None)
+                if retained != expected:
                     raise ExportError(f"retained Replay {field} differs from accepted validator")
         else:
             reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot)

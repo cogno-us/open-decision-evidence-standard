@@ -262,6 +262,9 @@ def _normalized_replay_material(package: dict[str, Any], expected: dict[str, Any
     lprov = left.get("provenance") or {}
     rprov = right.get("provenance") or {}
     lreplay = (lprov.get("pinned_revisions") or {}).get("replay")
+    if (lreplay == SUPPORTED_V2_REPLAY_REVISIONS[0]
+            and lprov["pinned_revisions"].get("control_plane") != SUPPORTED_V2_CONTROL_PLANE_REVISIONS[0]):
+        raise ValueError("historical Replay revision does not support selected Control Plane revision")
     if lreplay in SUPPORTED_V2_REPLAY_REVISIONS:
         rprov.setdefault("pinned_revisions", {})["replay"] = lreplay
         rprov.setdefault("replay_validation", {})["required_revision"] = lreplay
@@ -270,7 +273,7 @@ def _normalized_replay_material(package: dict[str, Any], expected: dict[str, Any
     if "selected_revisions" not in lprov:
         rprov.pop("selected_revisions", None)
     else:
-        rprov["selected_revisions"] = deepcopy(lprov["selected_revisions"])
+        rprov["selected_revisions"] = deepcopy(rprov["pinned_revisions"])
     return left, right
 
 

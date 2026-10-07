@@ -98,3 +98,9 @@ only. Held/no-authority records cannot acquire authority through inspection.
 Exporter and recipient validation read supplied JSON only, not producer stores;
 qualification nevertheless checks actual SQLite and CP stores before and after
 all operations. No effects, retries or authority decisions are created.
+
+Historical Replay `274543f1cd7171784a923a8e37015017a0d8bc9d` attribution is
+accepted only for Control Plane `2ea9528eeb87e14ff10f05de06473122b9df540f`.
+Its absent supported-revision-set field is tolerated during comparison; selected
+revision and producer-profile contradictions are not. When present,
+`selected_revisions` must equal the package's validated `pinned_revisions`.
