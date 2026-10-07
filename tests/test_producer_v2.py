@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from odes.common import PROFILE_V2_ID, sha256
+from odes.common import PINNED_V2_REVISIONS, PROFILE_V2_ID, SUPPORTED_V2_CONTROL_PLANE_REVISIONS, sha256
 from odes.exporter import ExportError, export_cognous_stack_package
 from odes.recipient_validator import evaluate_recipient_package
 from odes.schema_validation import validate_record
@@ -50,6 +50,12 @@ def test_actual_producer_lifecycle(produced, name):
     assert package['provenance']['retained_sources']['reconstruction_bundle'] == source
     assert package['provenance']['source_artifacts']['reconstruction_bundle_digest'] == sha256(source)
     assert package['provenance']['source_artifacts']['reconstruction_bundle_id'] == source['bundle_id']
+    selected_cp = source['metadata']['control_plane_revision']
+    assert selected_cp in SUPPORTED_V2_CONTROL_PLANE_REVISIONS
+    assert package['provenance']['pinned_revisions']['control_plane'] == selected_cp
+    assert package['provenance']['selected_revisions']['control_plane'] == selected_cp
+    assert package['provenance']['pinned_revisions']['replay'] == PINNED_V2_REVISIONS['replay']
+    assert package['provenance']['replay_validation']['required_revision'] == PINNED_V2_REVISIONS['replay']
     facts = package['provenance']['execution_facts']
     assert facts['retry_permission'] == 'not_established'
     assert facts['independent_delivery_verification'] == 'unavailable'
