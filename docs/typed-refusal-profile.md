@@ -1,9 +1,11 @@
 # Typed refusal consumer candidate migration
 
-Draft, nonselected profile. Current exact source pins are CP c7f122ba,
-executor PR #86 head 63bd4d8d, Replay PR #25 head 24fa9571 and Manifest 46c950be.
-Executor/Replay pins must be replaced by their actual merge commits and affected
-checks rerun before integration. No final merged-chain qualification is asserted.
+Separate nonselected profile. Exact actual merged predecessors:
+CP `c7f122ba3a6e39f9268a7163c99be3ee514cd97e`, executor
+`309e194c1b0a3de23e11e20133e6eaf88875e48a` (runtime #86), Replay
+`83fbaf2a0f6f071aca1ea0af859eb8fc6385c26a` (Replay #25), Manifest
+`46c950bed37fe3812000895430bc0312d29e37ce`. The exact-source gate verifies
+these checkouts before executing; final hub candidate qualification remains separate.
 
 The separate transformation profile rebuilds all four retained new CP collections
 (refusals, resolution checks, time floors, closeouts) before calling Replay.
