@@ -1,0 +1,21 @@
+# Cross component test ownership
+
+Cross-component tests and harnesses are maintained in [cognous-stack-qualification](https://github.com/cogno-us/cognous-stack-qualification/tree/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard). Component-local regression tests remain here. The source snapshot for this relocation was `25c7ad608c2e6fd9f450e075db6bbf3ee4091a49`.
+
+The workflows in this repository call immutable reusable qualification workflows, passing the exact source commit. The canonical suite assembles only the listed test/harness files into a disposable CI checkout so relative imports and pinned historical interfaces retain their original meaning. Both the owning source commit and suite commit/file hashes are retained as artifacts. Selected component locks, grants and production permissions are unchanged.
+
+Historical reports remain attached to their original commits and do not qualify this relocation. Existing failing candidate gates remain failing until their owning repairs are accepted and requalified.
+
+| Original path | Canonical path |
+|---|---|
+| `.github/workflows/merged-producers.yml` | [suites/open-decision-evidence-standard/.github/workflows/merged-producers.yml](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/.github/workflows/merged-producers.yml) |
+| `.github/workflows/tests.yml` | [suites/open-decision-evidence-standard/.github/workflows/tests.yml](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/.github/workflows/tests.yml) |
+| `.github/workflows/typed-refusal.yml` | [suites/open-decision-evidence-standard/.github/workflows/typed-refusal.yml](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/.github/workflows/typed-refusal.yml) |
+| `qualification/refusal_sources.py` | [suites/open-decision-evidence-standard/qualification/refusal_sources.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/qualification/refusal_sources.py) |
+| `qualification/test_merged_producer.py` | [suites/open-decision-evidence-standard/qualification/test_merged_producer.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/qualification/test_merged_producer.py) |
+| `qualification/test_refusal_profile.py` | [suites/open-decision-evidence-standard/qualification/test_refusal_profile.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/qualification/test_refusal_profile.py) |
+| `scripts/qualify_merged_producer.py` | [suites/open-decision-evidence-standard/scripts/qualify_merged_producer.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/scripts/qualify_merged_producer.py) |
+| `scripts/qualify_producer_v2.py` | [suites/open-decision-evidence-standard/scripts/qualify_producer_v2.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/scripts/qualify_producer_v2.py) |
+| `tests/test_accepted_replay_profile.py` | [suites/open-decision-evidence-standard/tests/test_accepted_replay_profile.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/tests/test_accepted_replay_profile.py) |
+| `tests/test_odes_stack_export.py` | [suites/open-decision-evidence-standard/tests/test_odes_stack_export.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/tests/test_odes_stack_export.py) |
+| `tests/test_producer_v2.py` | [suites/open-decision-evidence-standard/tests/test_producer_v2.py](https://github.com/cogno-us/cognous-stack-qualification/blob/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard/tests/test_producer_v2.py) |
