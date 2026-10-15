@@ -1,4 +1,6 @@
 <!-- cognous-banner:start -->
+
+Cross-component test commands below now run in a disposable checkout assembled by the [qualification workflows](CROSS_COMPONENT_TESTS.md). Plain local test discovery covers the component-local tests retained here. Historical reports and dependency pins keep their original scope.
 ```text
 ──────────────────────────────────────────────────
    __________  _______   ______  __  _______
@@ -132,3 +134,7 @@ See the [repository rename map and compatibility notes](https://github.com/cogno
 ## Merged producer compatibility
 
 The exact merged Control Plane/executor pair has a versioned `odes-cognous-stack-export-0.2.1` consumer mapping. See [qualification scope and pinned revisions](docs/merged-producer-compatibility.md). This covers the existing bounded export; atomic-claim and refund-intent evidence are not added.
+
+## Cross component qualification
+
+Executable integration suites and harnesses moved to the [qualification repository](https://github.com/cogno-us/cognous-stack-qualification/tree/f99bb7591f52ca5a26d64a50d9ef466b4749ad4e/suites/open-decision-evidence-standard). See [the path migration map](CROSS_COMPONENT_TESTS.md) for current commands and source identity rules. Component-local tests remain here; historical qualification results retain their original scope.

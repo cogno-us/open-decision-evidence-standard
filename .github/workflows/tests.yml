@@ -1,191 +1,35 @@
+# Cross-component suite delegated to its canonical testing repository.
 name: Tests
-
-on:
-  pull_request:
+'on':
+  pull_request: null
   push:
-    branches: [main, worker8-odes-cognous-export, worker14/executor-profile-v1, worker8/odes-control-plane-store-compatibility]
-
+    branches:
+    - main
+    - worker8-odes-cognous-export
+    - worker14/executor-profile-v1
+    - worker8/odes-control-plane-store-compatibility
+permissions:
+  contents: read
 jobs:
-  test:
+  native:
+    name: Component-local checks
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Checkout pinned Manifest
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-action-manifest
-          ref: 46c950bed37fe3812000895430bc0312d29e37ce
-          path: external/manifest
-
-      - name: Checkout pinned Authority Context
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-institutional-governance
-          ref: fb3d97938969a89e149e8ff8db2756091d1233fc
-          path: external/alvorada
-
-      - name: Checkout pinned Control Plane
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-control-plane
-          ref: 283500652d47a692fb0b99a1172a6d5faffbd9a7
-          path: external/control-plane
-
-      - name: Checkout pinned Moltbot Safe
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-execution-runtime
-          ref: 1d308faf664c504b6e310db3c7a310153ef7b067
-          path: external/moltbot-safe
-
-      - name: Checkout pinned Replay
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-replay-bundle
-          ref: f63ce914504dd06813c4ccd199b0570dbd8dd427
-          path: external/replay
-
-      - name: Checkout accepted Replay persistence mapping
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-replay-bundle
-          ref: 043830b56595cecddfa65c064afd1c0b95e64792
-          path: external/replay-v2
-
-      - name: Checkout accepted Control Plane persistence repair
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-control-plane
-          ref: 248d899634d9db3518e831bc7ab568a48733f825
-          path: external/control-plane-v2
-
-      - name: Checkout accepted executor producer 2.0.0
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-execution-runtime
-          ref: 177354e959cc78c59c1a776f018cfbfbf28c927b
-          path: external/moltbot-v2
-
-      - name: Checkout pinned Governance Evidence Pack
-        uses: actions/checkout@v4
-        with:
-          repository: cogno-us/cognous-governance-evidence-pack
-          ref: c699c1fb7c4f8057631c4e5909d11a721c2c958d
-          path: external/agep
-
-      - name: Verify pinned revisions
-        run: |
-          test "$(git -C external/manifest rev-parse HEAD)" = "46c950bed37fe3812000895430bc0312d29e37ce"
-          test "$(git -C external/alvorada rev-parse HEAD)" = "fb3d97938969a89e149e8ff8db2756091d1233fc"
-          test "$(git -C external/control-plane rev-parse HEAD)" = "283500652d47a692fb0b99a1172a6d5faffbd9a7"
-          test "$(git -C external/moltbot-safe rev-parse HEAD)" = "1d308faf664c504b6e310db3c7a310153ef7b067"
-          test "$(git -C external/replay rev-parse HEAD)" = "f63ce914504dd06813c4ccd199b0570dbd8dd427"
-          test "$(git -C external/replay-v2 rev-parse HEAD)" = "043830b56595cecddfa65c064afd1c0b95e64792"
-          test "$(git -C external/control-plane-v2 rev-parse HEAD)" = "248d899634d9db3518e831bc7ab568a48733f825"
-          test "$(git -C external/moltbot-v2 rev-parse HEAD)" = "177354e959cc78c59c1a776f018cfbfbf28c927b"
-          test "$(git -C external/agep rev-parse HEAD)" = "c699c1fb7c4f8057631c4e5909d11a721c2c958d"
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install package and pinned Replay validator
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e external/replay-v2
-          python -m pip install -e .[dev]
-
-      - name: Import smoke checks
-        run: |
-          python -c "import odes"
-          python -c "from odes.exporter import export_cognous_stack_package"
-          python -c "from odes.recipient_validator import evaluate_recipient_package"
-
-      - name: Run tests
-        env:
-          PYTHONPATH: "."
-          ODES_V2_REPLAY_ROOT: external/replay-v2
-          ARB_V2_CONTROL_PLANE_ROOT: external/control-plane-v2
-          ARB_V2_MOLTBOT_ROOT: external/moltbot-v2
-          ARB_PINNED_MANIFEST_FIXTURE: external/manifest/examples/refund_integration_v1_1.manifest.json
-          UPSTREAM_MANIFEST_EXAMPLE: external/manifest/examples/refund_integration_v1_1.manifest.json
-          UPSTREAM_REPLAY_SUCCESS_EXAMPLE: external/replay/examples/bounded_success_reconstruction_v0_2.json
-          UPSTREAM_REPLAY_LOST_ACK_EXAMPLE: external/replay/examples/bounded_lost_ack_reconstruction_v0_2.json
-          ODES_PINNED_CONTROL_PLANE_ROOT: external/control-plane
-          ODES_PINNED_MOLTBOT_ROOT: external/moltbot-safe
-          ODES_PINNED_REPLAY_ROOT: external/replay
-          ODES_PINNED_MANIFEST_FIXTURE: external/manifest/examples/refund_integration_v1_1.manifest.json
-        run: pytest -q tests
-
-      - name: Generate and validate ODES export package
-        env:
-          UPSTREAM_MANIFEST_EXAMPLE: external/manifest/examples/refund_integration_v1_1.manifest.json
-          UPSTREAM_REPLAY_SUCCESS_EXAMPLE: external/replay/examples/bounded_success_reconstruction_v0_2.json
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          with open(os.environ['UPSTREAM_REPLAY_SUCCESS_EXAMPLE'], encoding='utf-8') as handle:
-              source = json.load(handle)
-          source.setdefault('metadata', {})['freshness'] = 'current'
-          with open('/tmp/reconstruction-current.json', 'w', encoding='utf-8') as handle:
-              json.dump(source, handle, sort_keys=True)
-          PY
-          odes export-cognous --manifest "$UPSTREAM_MANIFEST_EXAMPLE" --reconstruction /tmp/reconstruction-current.json --out /tmp/odes-package.json --relying-party recipient.example.org --purpose audit
-          odes validate-record /tmp/odes-package.json
-          python - <<'PY'
-          import json
-          package = json.load(open('/tmp/odes-package.json'))
-          policy = {
-              'supported_profiles': ['odes_cognous_stack_export_0_1'],
-              'relying_party': 'recipient.example.org',
-              'purpose': 'audit',
-              'evaluation_scope': 'recipient_reliance',
-              'status_max_age_seconds': 300,
-              'now': '2026-10-06T00:00:00Z',
-              'trusted_digests': [package['package_digest']],
-              'trusted_key_refs': [],
-              'allow_unauthenticated_informational_inspection': True,
-              'status_inputs': {
-                  'record_id': package['record']['decision_id'],
-                  'authority_basis': package['record']['authority']['authority_basis'],
-                  'evaluation_scope': 'recipient_reliance',
-                  'evaluated_at': '2026-10-06T00:00:00Z',
-                  'evidence_freshness': 'current',
-                  'freshness': 'current',
-                  'revoked': False,
-                  'superseded': False,
-                  'authority_valid_at_decision_verified': True,
-              },
-          }
-          json.dump(policy, open('/tmp/recipient-policy.json', 'w'), sort_keys=True)
-          PY
-          odes recipient-validate /tmp/odes-package.json --policy /tmp/recipient-policy.json --out /tmp/odes-recipient-result.json
-          python - <<'PY'
-          import json
-          result = json.load(open('/tmp/odes-recipient-result.json'))
-          assert result['schema_validity']['status'] == 'pass'
-          assert result['package_content_integrity']['status'] == 'pass'
-          assert result['integrity_authentication_checks']['status'] == 'unavailable'
-          assert result['authority_status_and_freshness']['status'] == 'pass'
-          assert result['recipient_reliance_decision']['status'] == 'informational_only'
-          PY
-
-      - name: Generate actual producer 2.0.0 qualification artifacts
-        env:
-          ODES_V2_REPLAY_ROOT: external/replay-v2
-          ARB_V2_CONTROL_PLANE_ROOT: external/control-plane-v2
-          ARB_V2_MOLTBOT_ROOT: external/moltbot-v2
-          ARB_PINNED_MANIFEST_FIXTURE: external/manifest/examples/refund_integration_v1_1.manifest.json
-        run: python scripts/qualify_producer_v2.py generated-producer-v2
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: odes-producer-v2-${{ github.sha }}-py${{ matrix.python-version }}
-          path: generated-producer-v2/*.json
-          if-no-files-found: error
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      with:
+        persist-credentials: false
+    - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+      with:
+        python-version: '3.12'
+    - run: python -m pip install -e '.[dev]'
+    - run: python -c 'import odes; from odes.exporter import export_cognous_stack_package'
+      env:
+        PYTHONPATH: .:src
+        PYTHONDONTWRITEBYTECODE: '1'
+  cross-component:
+    uses: cogno-us/cognous-stack-qualification/.github/workflows/open-decision-evidence-standard--tests.yml@f99bb7591f52ca5a26d64a50d9ef466b4749ad4e
+    with:
+      source_revision: ${{ github.event.pull_request.head.sha || github.sha }}
+      qualification_revision: f99bb7591f52ca5a26d64a50d9ef466b4749ad4e
+    permissions:
+      contents: read
