@@ -13,6 +13,8 @@ from .common import (
     PROFILE_ID,
     PROFILE_V2_ID,
     PROFILE_V2_VERSION,
+    REFUSAL_PROFILE_VERSION,
+    REFUSAL_REVISIONS,
     MERGED_PROFILE_VERSION,
     MERGED_REVISIONS,
     ALL_V2_CONTROL_PLANE_REVISIONS,
@@ -136,6 +138,9 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
         "observations": [_data(r) for r in grouped.get("effect_observation", [])],
         "reconciliations": [_data(r) for r in grouped.get("reconciliation", [])],
     }
+    if (bundle.get("metadata") or {}).get("control_plane_revision") == REFUSAL_REVISIONS["control_plane"]:
+        from agent_replay_bundle.refusal_evidence import extend_retained_inputs
+        cp = extend_retained_inputs(cp, bundle)
     proposal = proposals[0] if proposals else None
     has_execution = any(
         grouped.get(kind)
@@ -487,6 +492,8 @@ def _human_disposition(decision: dict[str, Any]) -> str:
 def _selected_v2_pins(control_plane_revision: str) -> dict[str, str]:
     if control_plane_revision not in ALL_V2_CONTROL_PLANE_REVISIONS:
         raise ExportError("unsupported Control Plane compatibility revision")
+    if control_plane_revision == REFUSAL_REVISIONS["control_plane"]:
+        return dict(REFUSAL_REVISIONS)
     return dict(MERGED_REVISIONS) if control_plane_revision == MERGED_REVISIONS["control_plane"] else {**PINNED_V2_REVISIONS, "control_plane": control_plane_revision}
 
 
@@ -497,7 +504,7 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
     control_plane_revision = validated_replay["metadata"]["control_plane_revision"]
     repaired = control_plane_revision in ALL_V2_CONTROL_PLANE_REVISIONS
     profile_id = PROFILE_V2_ID if repaired else PROFILE_ID
-    profile_version = MERGED_PROFILE_VERSION if control_plane_revision == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if repaired else PROFILE_VERSION
+    profile_version = REFUSAL_PROFILE_VERSION if control_plane_revision == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if control_plane_revision == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if repaired else PROFILE_VERSION
     pins = _selected_v2_pins(control_plane_revision) if repaired else PINNED_REVISIONS
     _validate_manifest_binding(manifest, _extract_replay_inputs(bundle)[1])
     decision, decision_result = _check_decision_execution_consistency(bundle)
@@ -555,7 +562,7 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "integrity": {"kind": "content-digest", "algorithm": "SHA-256", "canonicalization_profile": CANONICALIZATION_PROFILE, "value": sha256(package_core), "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."},
         "provenance": {
             "pinned_revisions": pins,
-            "supported_revisions": {"control_plane": ([MERGED_REVISIONS["control_plane"]] if control_plane_revision == MERGED_REVISIONS["control_plane"] else list(SUPPORTED_V2_CONTROL_PLANE_REVISIONS))} if repaired else {},
+            "supported_revisions": {"control_plane": ([REFUSAL_REVISIONS["control_plane"]] if control_plane_revision == REFUSAL_REVISIONS["control_plane"] else [MERGED_REVISIONS["control_plane"]] if control_plane_revision == MERGED_REVISIONS["control_plane"] else list(SUPPORTED_V2_CONTROL_PLANE_REVISIONS))} if repaired else {},
             "selected_revisions": pins,
             "source_artifacts": {"manifest_digest": sha256(manifest), "reconstruction_bundle_digest": sha256(bundle)},
             "replay_validation": {"status": replay_status, "required_revision": pins["replay"], "findings": replay_findings},
@@ -591,6 +598,7 @@ def _event_summary_v2(validated: dict[str, Any]) -> dict[str, Any]:
         ack_states.add("unknown")
     acknowledgement = "mixed" if len(ack_states) > 1 else next(iter(ack_states), "not_applicable")
     return {
+        **({kind: [_data(r) for r in grouped.get(kind, [])] for kind in ("effect_time_refusal", "resolution_check", "attempt_closeout", "input_time_floors")} if validated.get("metadata", {}).get("control_plane_revision") == REFUSAL_REVISIONS["control_plane"] else {}),
         "reconstruction_status": validated["status"],
         "effect_observation_history": histories,
         "destination_observed": destination,

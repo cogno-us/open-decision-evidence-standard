@@ -1,0 +1,61 @@
+name: Typed refusal compatibility
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: cogno-us/cognous-control-plane
+          ref: c7f122ba3a6e39f9268a7163c99be3ee514cd97e
+          path: pinned/control-plane
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: cogno-us/cognous-execution-runtime
+          ref: 309e194c1b0a3de23e11e20133e6eaf88875e48a
+          path: pinned/executor
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: cogno-us/cognous-action-manifest
+          ref: 46c950bed37fe3812000895430bc0312d29e37ce
+          path: pinned/manifest
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: cogno-us/cognous-replay-bundle
+          ref: 83fbaf2a0f6f071aca1ea0af859eb8fc6385c26a
+          path: pinned/replay
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pip install -e pinned/replay
+      - name: Verify exact source checkouts
+        run: |
+          test "$(git -C pinned/control-plane rev-parse HEAD)" = "c7f122ba3a6e39f9268a7163c99be3ee514cd97e"
+          test "$(git -C pinned/executor rev-parse HEAD)" = "309e194c1b0a3de23e11e20133e6eaf88875e48a"
+          test "$(git -C pinned/manifest rev-parse HEAD)" = "46c950bed37fe3812000895430bc0312d29e37ce"
+          test "$(git -C pinned/replay rev-parse HEAD)" = "83fbaf2a0f6f071aca1ea0af859eb8fc6385c26a"
+      - run: python -m pytest -q qualification/test_refusal_profile.py --junitxml=refusal-results.xml
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          ARB_REFUSAL_CP_ROOT: ${{ github.workspace }}/pinned/control-plane
+          ARB_REFUSAL_EXECUTOR_ROOT: ${{ github.workspace }}/pinned/executor
+          ARB_PINNED_MANIFEST_FIXTURE: ${{ github.workspace }}/pinned/manifest/examples/refund_integration_v1_1.manifest.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: typed-refusal-${{ matrix.python }}-${{ github.event.pull_request.head.sha || github.sha }}
+          path: refusal-results.xml
+          if-no-files-found: error
