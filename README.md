@@ -25,7 +25,7 @@ Cross-component test commands below now run in a disposable checkout assembled b
 
 ODES is an open, vendor-neutral discussion draft and reference tooling for portable decision evidence. The v0.2 narrative and implementation profile retain the pder-v0.1 record schema. It carries coordinates for recipient evaluation, rather than deciding whether a recipient should rely on the underlying decision.
 
-**Implementation status:** this README describes merged public reference work. Component acceptance, selection in the hub and execution of a qualification are separate facts. The selected revision for this component is `0486b645e99c46d9cd16ca34b1ba7c653a6b3024`; the [hub lock](https://github.com/cogno-us/cognous-open-control-stack/blob/5737267d94d2b445735c95e8480a31de73a2abe8/component-lock.json) is the source of that integration choice.
+**Implementation status:** public reference work. The [current component lock](https://github.com/cogno-us/cognous-open-control-stack/blob/main/component-lock.json) defines the selected integration; a component merge does not automatically change that selection or approve deployment.
 
 ## Purpose and intended users
 
@@ -58,11 +58,11 @@ python -m pip install -e ".[dev]"
 odes --help
 ```
 
-## Evidence and supported scope
+## Scope and compatibility
 
-The selected implementation is `0486b645e99c46d9cd16ca34b1ba7c653a6b3024`, accepting the persistence-compatible Control Plane/Replay generation while preserving older mappings. See the [compatibility checkpoint](docs/workstreams/odes-control-plane-store-checkpoint.md). This accepted implementation does not turn the discussion draft into a ratified standard or establish external adoption.
+The implementation supports the persistence-compatible Control Plane/Replay generation while preserving older mappings. See the [compatibility checkpoint](docs/workstreams/odes-control-plane-store-checkpoint.md). This accepted implementation does not turn the discussion draft into a ratified standard or establish external adoption.
 
-The accepted [hub persistence-generation evidence](https://github.com/cogno-us/cognous-open-control-stack/blob/5737267d94d2b445735c95e8480a31de73a2abe8/examples/control-plane-store-adoption/qualification-summary.json) records 915 Python tests in each of two repetitions, 35 matrix entries satisfying their gates and 120 separate mocked OpenShell tests. Those are aggregate hub results, not a per-component test count or a claim of production readiness. Optional behavioral layers receive static checks only. The [support ledger](https://github.com/cogno-us/cognous-open-control-stack/blob/main/docs/release-status.md) separates implementation, execution and adoption.
+Test results, run commentary and historical qualification records are maintained in the [central test hub](https://github.com/cogno-us/cognous-stack-qualification/blob/main/results/readme-commentary/index.md). Read them against their recorded source revisions; source selection and deployment approval are separate decisions.
 
 ## Limitations and deployment decisions
 
@@ -138,3 +138,6 @@ The exact merged Control Plane/executor pair has a versioned `odes-cognous-stack
 ## Cross component qualification
 
 Executable integration suites and harnesses moved to the [qualification repository](https://github.com/cogno-us/cognous-stack-qualification/tree/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard). See [the path migration map](CROSS_COMPONENT_TESTS.md) for current commands and source identity rules. Component-local tests remain here; historical qualification results retain their original scope.
+
+<!-- Retained anchors for existing documentation links. -->
+<a id="evidence-and-supported-scope"></a>
