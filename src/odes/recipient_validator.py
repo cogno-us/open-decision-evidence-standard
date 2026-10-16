@@ -70,12 +70,13 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
     reasons: list[str] = []
     profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
     record = package.get("record") if isinstance(package.get("record"), dict) else {}
-    declared = profile.get("implementation_profile") or record.get("verification", {}).get("conformance_profile")
+    verification = record.get("verification") if isinstance(record.get("verification"), dict) else {}
+    declared = profile.get("implementation_profile") or verification.get("conformance_profile")
     if package.get("package_version") != PACKAGE_VERSION:
         return _result("unsupported", [f"unsupported package_version {package.get('package_version')!r}"], {"supported_package_version": PACKAGE_VERSION})
     if declared not in supported_profiles:
         return _result("unsupported", [f"unsupported declared profile {declared!r}"], {"declared_profile": declared, "supported_profiles": supported_profiles})
-    if declared != record.get("verification", {}).get("conformance_profile"):
+    if declared != verification.get("conformance_profile"):
         reasons.append("package profile and record verification.conformance_profile differ")
     provenance = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
     selected_control_plane = provenance.get("pinned_revisions", {}).get("control_plane")
@@ -197,7 +198,8 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
         reasons.extend(now_errors)
     evidence["recipient_evaluation_time"] = now
 
-    expires_at, expiry_errors = _parse_time_result(record.get("consumption_conditions", {}).get("expires_at"), "record consumption expiry")
+    conditions = record.get("consumption_conditions") if isinstance(record.get("consumption_conditions"), dict) else {}
+    expires_at, expiry_errors = _parse_time_result(conditions.get("expires_at"), "record consumption expiry")
     if expiry_errors:
         reasons.extend(expiry_errors)
     if expires_at and now_dt and expires_at < now_dt:
@@ -247,6 +249,8 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
 def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, purpose: str | None, policy: dict[str, Any] | None = None) -> dict[str, Any]:
     conditions = record.get("consumption_conditions", {})
     reasons: list[str] = []
+    if not isinstance(conditions, dict):
+        return _result("fail", ["record consumption_conditions must be an object"])
     parties = conditions.get("permitted_relying_parties") if isinstance(conditions.get("permitted_relying_parties"), list) else []
     purposes = conditions.get("permitted_purposes") if isinstance(conditions.get("permitted_purposes"), list) else []
     if relying_party and parties and relying_party not in parties:
@@ -304,7 +308,8 @@ def _normalized_replay_material(package: dict[str, Any], expected: dict[str, Any
 
 
 def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
-    if package.get("profile", {}).get("implementation_profile") != PROFILE_V2_ID:
+    profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
+    if profile.get("implementation_profile") != PROFILE_V2_ID:
         return _result("not_applicable", ["historical profile validation unchanged"])
     try:
         from .exporter import export_cognous_stack_package
@@ -324,6 +329,9 @@ def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
 
 
 def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
+    if not isinstance(package, dict) or not isinstance(policy, dict):
+        reason = "package and recipient policy must be JSON objects"
+        return {"schema_validity": _result("not_evaluated", [reason]), "recipient_reliance_decision": _result("fail", [reason])}
     package = deepcopy(package)
     policy = deepcopy(policy)
     if package.get("package_type") != PACKAGE_TYPE:
@@ -331,9 +339,13 @@ def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) 
     record = package.get("record") if isinstance(package.get("record"), dict) else {}
     trusted_digests = policy.get("trusted_digests", []) or policy.get("trusted_package_digests", []) or []
     status_inputs = policy.get("status_inputs", {})
+    if not isinstance(status_inputs, dict):
+        reason = "recipient policy status_inputs must be an object"
+        return {"schema_validity": _result("not_evaluated", [reason]), "recipient_reliance_decision": _result("fail", [reason])}
     profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
     declared = profile.get("implementation_profile")
-    record_declared = (record.get("verification") or {}).get("conformance_profile")
+    verification = record.get("verification") if isinstance(record.get("verification"), dict) else {}
+    record_declared = verification.get("conformance_profile")
     profile_consistent = bool(declared) and declared == record_declared
     layers = {
         "schema_validity": _evaluate_schema(record),

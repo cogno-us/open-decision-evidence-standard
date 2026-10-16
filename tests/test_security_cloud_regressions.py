@@ -135,3 +135,46 @@ def test_single_inventory_and_tool_only_actions_still_supported():
     assert _actions({'actions': [{'action_id': 'a'}], 'tools': [{'tool_name': 't'}]}) == [{'action_id': 'a'}]
     assert _actions({'tools': [{'tool_name': 't', 'actions': [{'action_id': 'b'}]}]}) == [{'action_id': 'b', 'tool_name': 't'}]
 
+
+def _lost_ack_package():
+    return json.loads((Path(__file__).resolve().parents[1]/'examples/producer-v2/lost_ack.package.json').read_text())
+
+
+@pytest.mark.parametrize('bad', [[], 'x', 1, None, True])
+@pytest.mark.parametrize('where', ['package', 'policy', 'record.verification', 'record.consumption_conditions', 'profile', 'policy.status_inputs'])
+def test_non_object_shapes_return_structured_fail(where, bad):
+    package, policy = _lost_ack_package(), {}
+    if where == 'package':
+        package = bad
+    elif where == 'policy':
+        policy = bad
+    elif where == 'policy.status_inputs':
+        policy = {'status_inputs': bad}
+    elif where == 'profile':
+        package['profile'] = bad
+    else:
+        package['record'][where.split('.')[1]] = bad
+    result = evaluate_recipient_package(package, policy)
+    assert result['recipient_reliance_decision']['status'] == 'fail'
+
+
+@pytest.mark.parametrize('package_text', [
+ '[]',
+ '[{"package_type": "odes_decision_evidence_export_package"}]',
+ '{"package_type": "odes_decision_evidence_export_package", "record": {"verification": []}}',
+ '{"package_type": "odes_decision_evidence_export_package", "record": {"consumption_conditions": "x"}}',
+ '{not json',
+ pytest.param('[' * 200000 + ']' * 200000, id='deeply-nested-array'),
+])
+def test_recipient_cli_malformed_input_exits_nonzero_with_json(tmp_path, capsys, package_text):
+    package = tmp_path/'package.json'; policy = tmp_path/'policy.json'
+    package.write_text(package_text); policy.write_text('{}')
+    assert main(['recipient-validate', str(package), '--policy', str(policy)]) == 1
+    assert json.loads(capsys.readouterr().out)['recipient_reliance_decision']['status'] == 'fail'
+
+
+def test_recipient_cli_non_object_policy_exits_nonzero_with_json(tmp_path, capsys):
+    package = tmp_path/'package.json'; policy = tmp_path/'policy.json'
+    package.write_text(json.dumps(_lost_ack_package())); policy.write_text('[]')
+    assert main(['recipient-validate', str(package), '--policy', str(policy)]) == 1
+    assert json.loads(capsys.readouterr().out)['recipient_reliance_decision']['status'] == 'fail'

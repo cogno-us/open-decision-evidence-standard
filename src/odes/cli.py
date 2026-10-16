@@ -41,7 +41,11 @@ def main(argv: list[str] | None = None) -> int:
         validate_record(record)
         return 0
     if args.cmd == "recipient-validate":
-        result = evaluate_recipient_package(load_json(args.package), load_json(args.policy))
+        try:
+            result = evaluate_recipient_package(load_json(args.package), load_json(args.policy))
+        except (ValueError, RecursionError) as exc:
+            reason = f"recipient input could not be evaluated: {type(exc).__name__}"
+            result = {"recipient_reliance_decision": {"status": "fail", "reasons": [reason], "evidence": {}}}
         if args.out:
             dump_json(result, args.out)
         else:
