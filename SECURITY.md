@@ -15,6 +15,8 @@ In scope are concerns such as:
 - privacy leakage
 - malicious conformance claims
 
+Known limitation: the reference tooling applies no size, depth or processing budgets to package input. See [recipient validation input shape and resource limits](docs/recipient-validation.md#input-shape-and-resource-limits) for the recommended operating-system and process limits.
+
 Security contact: andredelima@cogno.us
 
 Security reports sent to this address should include a concise description of the issue, affected files or record elements, potential impact, and any suggested mitigation.

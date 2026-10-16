@@ -64,6 +64,12 @@ Example policy additions:
 {"evaluation_scope": "recipient_reliance", "status_max_age_seconds": 300}
 ```
 
+## Input shape and resource limits
+
+Packages and recipient policies must be JSON objects, and nested `profile`, `record.verification`, `record.consumption_conditions` and `policy.status_inputs` must be objects. Other shapes return a structured `fail` decision. The `recipient-validate` command also turns malformed JSON and inputs nested too deeply for the Python interpreter into a JSON `fail` result with a nonzero exit, instead of an uncaught exception.
+
+Residual limitation: the reference validator and exporter set no byte-size, nesting-depth, container-count or error-count budgets. They parse the whole document, make deep copies, collect every schema error, canonicalize whole objects and, for profile 0.2, re-export the retained sources. An oversized or very broad package can therefore use a lot of memory and CPU before a decision is returned. Recipients who process packages from untrusted senders should run validation under operating-system or process limits (for example memory, CPU-time and file-size limits, or a timeout), and should reject oversized files before invoking the validator. This is not a hardened parser.
+
 ## Profile 0.2 semantic consistency
 
 Recipients must explicitly support `odes_cognous_stack_export_0_2` to inspect new
