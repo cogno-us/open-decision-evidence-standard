@@ -52,3 +52,35 @@ def test_record_only_v2_profile_cannot_skip_replay_layer():
     result=evaluate_recipient_package(p,{})
     assert 'replay_semantic_consistency' in result
     assert result['declared_profile_conformance']['status']=='fail'
+
+
+# F5b repairs (2026-10-16): lifecycle alias conflicts, Manifest alias/inventory
+# ambiguity, and non-object recipient input shapes.
+from odes.exporter import _status_from_sources
+
+
+@pytest.mark.parametrize('metadata', [
+ {'odes_freshness': 'current', 'freshness': 'revoked', 'revoked_at': '2026-01-01T00:00:00Z'},
+ {'odes_freshness': 'current', 'freshness': 'superseded', 'superseded_by': 'r2'},
+ {'odes_freshness': 'revoked', 'freshness': 'current', 'revoked_at': '2026-01-01T00:00:00Z'},
+])
+def test_conflicting_lifecycle_freshness_aliases_rejected(metadata):
+    with pytest.raises(ExportError, match='conflicting lifecycle freshness'):
+        _status_from_sources({'metadata': metadata})
+
+
+@pytest.mark.parametrize('metadata', [
+ {'freshness': 'current', 'revoked': True, 'revoked_at': '2026-01-01T00:00:00Z'},
+ {'freshness': 'current', 'superseded': True, 'superseded_by': 'r2'},
+ {'freshness': 'revoked', 'revoked': False, 'revoked_at': '2026-01-01T00:00:00Z'},
+ {'odes_freshness': 'superseded', 'superseded': False, 'superseded_by': 'r2'},
+])
+def test_lifecycle_flag_contradicting_freshness_rejected(metadata):
+    with pytest.raises(ExportError, match='contradicts lifecycle freshness'):
+        _status_from_sources({'metadata': metadata})
+
+
+def test_consistent_lifecycle_aliases_still_export():
+    assert _status_from_sources({'metadata': {'odes_freshness': 'current', 'freshness': 'current', 'revoked': False, 'superseded': False}}) == {'freshness': 'current', 'superseded': False, 'revoked': False}
+    assert _status_from_sources({'metadata': {'freshness': 'revoked', 'revoked': True, 'revoked_at': '2026-01-01T00:00:00Z'}})['revoked'] is True
+
