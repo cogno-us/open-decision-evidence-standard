@@ -296,6 +296,10 @@ def _validate_manifest_binding(manifest: dict[str, Any], proposal: dict[str, Any
         raise ExportError("proposal.manifest_version does not match supplied Manifest")
     if proposal.get("manifest_digest") != sha256(manifest):
         raise ExportError("proposal.manifest_digest does not match supplied Manifest digest")
+    action_id = proposal.get("action_id")
+    matches = [action for action in _actions(manifest) if action.get("action_id") == action_id]
+    if not action_id or len(matches) != 1:
+        raise ExportError("proposal action must identify exactly one declared Manifest action")
     if proposal.get("payload_commitment") != sha256(proposal.get("payload")):
         raise ExportError("proposal.payload_commitment does not match proposal.payload")
 
@@ -512,7 +516,24 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
     proposal = _data(grouped.get("runtime_proposal", [])[0]) if grouped.get("runtime_proposal") else {}
     binding = decision.get("binding") if isinstance(decision.get("binding"), dict) else {}
     has_execution = any(grouped.get(kind) for kind in ("execution_envelope", "execution_result", "destination_attempt", "destination_effect"))
-    action = _find_action(manifest, proposal.get("action_id") or binding.get("action_id")) or {}
+    action_id = proposal.get("action_id") or binding.get("action_id")
+    actions = [item for item in _actions(manifest) if item.get("action_id") == action_id]
+    if not action_id or len(actions) != 1:
+        raise ExportError("exact decision/proposal action binding required")
+    action = actions[0]
+    if not proposal and binding.get("manifest_digest") != sha256(manifest):
+        raise ExportError("proposal-less decision requires digest-bound Manifest")
+    if bundle.get("derivation") is not None:
+        raise ExportError("derivation lacks a supported independent validation profile")
+    risk = proposal.get("risk_metadata") or {}
+    if not isinstance(risk, dict):
+        raise ExportError("risk metadata must be an object")
+    risk_coordinates = {
+        "risk_tier": str(risk.get("risk_tier") or "unknown"),
+        "jurisdiction": str(risk.get("jurisdiction") or "unknown"),
+        "restricted_use_flag": risk.get("restricted_use_flag") is not False,
+        "prohibited_use_flag": risk.get("prohibited_use_flag") is not False,
+    }
     decided_at = decision.get("decided_at")
     if not decided_at:
         raise ExportError("decision_timestamp is required by pder-v0.1 but no retained decision time is evidenced; exporter will not substitute bundle generation or export time")
@@ -539,9 +560,9 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "authority": {"human_reviewer_role": "unknown", "authority_basis": authority_basis, "authority_valid_at_decision": authority_valid},
         "machine_role": {"ai_used": True, "role": machine_role, "model_id": "unavailable", "model_version": "unavailable", "runtime_profile": "cognous-bounded-synthetic-baseline"},
         "human_disposition": {"status": human_status, "review_substantiveness": "unknown", "machine_reliance_level": "unknown"},
-        "evidence": {"evidence_commitment_type": "hash", "evidence_hash": sha256({"manifest": manifest, "reconstruction_bundle": bundle}), "selective_disclosure_available": bool(bundle.get("derivation"))},
+        "evidence": {"evidence_commitment_type": "hash", "evidence_hash": sha256({"manifest": manifest, "reconstruction_bundle": bundle}), "selective_disclosure_available": False},
         "policy_basis": policy_basis,
-        "risk_coordinates": {"risk_tier": "unknown", "jurisdiction": "synthetic", "restricted_use_flag": False, "prohibited_use_flag": False},
+        "risk_coordinates": risk_coordinates,
         "consumption_conditions": {"permitted_relying_parties": [relying_party], "permitted_purposes": [purpose], "expires_at": expires_at},
         "status": _status_from_sources(bundle),
         "verification": {"signature_type": "content-digest", "issuer_key_reference": "content-digest-only:no-public-issuer-authentication", "conformance_profile": profile_id},
@@ -569,7 +590,7 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
             "source_record_refs": _source_refs(bundle),
             "decision_facts": {"decision_result": decision_result, "proposal_commitment": binding.get("proposal_commitment"), "actor": proposal.get("actor") or binding.get("actor"), "principal": proposal.get("principal") or binding.get("principal"), "grant_revision": binding.get("grant_revision"), "policy_versions": policy_versions, "reasons": decision.get("reasons", []), "human_disposition_source": "retained_decision_record" if human_status != "unknown" else "unavailable"},
             "execution_facts": event_summary,
-            "redaction": {"derivation": bundle.get("derivation"), "status": "redacted_derivative" if bundle.get("derivation") else "not_declared"},
+            "redaction": {"derivation": bundle.get("derivation"), "status": "not_declared"},
             "unsupported_semantics": ["pder-v0.1 has no native fields for effect_id, separate Control Plane and executor attempt namespaces, reconciliation records, execution-result namespaces, restart recovery, partial delivery detail, producer import findings, external status evidence, or unknown decision_timestamp; these are carried in package provenance where evidenced or reported as unavailable, not silently invented in the base record."],
             "limits": ["Export creates no external effect and renews no authorization.", "Schema validity does not establish deployment approval, operational effectiveness, compliance, current authority, delivery success, independent review, or institutional adoption.", "Content digests bind exported content but do not authenticate the issuer or verify authority.", "BitRep and The Index are related optional evidence interfaces and are not mandatory for generic ODES adoption."],
         },
