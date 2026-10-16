@@ -2,7 +2,7 @@
   "package_type": "odes_decision_evidence_export_package",
   "package_version": "0.1.0",
   "created_by": "open-decision-evidence-standard/reference-exporter",
-  "created_at": "2026-10-06T23:11:37Z",
+  "created_at": "2026-10-16T06:18:07Z",
   "record": {
     "record_type": "portable_decision_evidence_record",
     "schema_version": "0.1",
@@ -44,9 +44,9 @@
     ],
     "risk_coordinates": {
       "risk_tier": "unknown",
-      "jurisdiction": "synthetic",
-      "restricted_use_flag": false,
-      "prohibited_use_flag": false
+      "jurisdiction": "unknown",
+      "restricted_use_flag": true,
+      "prohibited_use_flag": true
     },
     "consumption_conditions": {
       "permitted_relying_parties": [
@@ -79,7 +79,7 @@
     "kind": "content-digest",
     "algorithm": "SHA-256",
     "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
-    "value": "sha256:ee37f9003c4c7a52dc174c776eedeec5725e92f8b7708c5e3d35cdd5f395e811",
+    "value": "sha256:f1165d10f7d490b5922202e74723814adb82054bad41d7df8a5dd92e33359231",
     "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."
   },
   "provenance": {
@@ -88,7 +88,23 @@
       "authority_context": "fb3d97938969a89e149e8ff8db2756091d1233fc",
       "control_plane": "2ea9528eeb87e14ff10f05de06473122b9df540f",
       "moltbot_safe": "177354e959cc78c59c1a776f018cfbfbf28c927b",
-      "replay": "274543f1cd7171784a923a8e37015017a0d8bc9d",
+      "replay": "043830b56595cecddfa65c064afd1c0b95e64792",
+      "governance_evidence_pack": "c699c1fb7c4f8057631c4e5909d11a721c2c958d",
+      "bitrep": "5b5077dafde232a7801cb425c4efddcffb468723",
+      "index": "d5e45d275cb301d9684b543e93b05997991d1cf2"
+    },
+    "supported_revisions": {
+      "control_plane": [
+        "2ea9528eeb87e14ff10f05de06473122b9df540f",
+        "248d899634d9db3518e831bc7ab568a48733f825"
+      ]
+    },
+    "selected_revisions": {
+      "manifest": "46c950bed37fe3812000895430bc0312d29e37ce",
+      "authority_context": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+      "control_plane": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+      "moltbot_safe": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+      "replay": "043830b56595cecddfa65c064afd1c0b95e64792",
       "governance_evidence_pack": "c699c1fb7c4f8057631c4e5909d11a721c2c958d",
       "bitrep": "5b5077dafde232a7801cb425c4efddcffb468723",
       "index": "d5e45d275cb301d9684b543e93b05997991d1cf2"
@@ -100,7 +116,7 @@
     },
     "replay_validation": {
       "status": "reconstruction_complete",
-      "required_revision": "274543f1cd7171784a923a8e37015017a0d8bc9d",
+      "required_revision": "043830b56595cecddfa65c064afd1c0b95e64792",
       "findings": [
         {
           "code": "M002",
@@ -1506,5 +1522,5 @@
       }
     ]
   },
-  "package_digest": "sha256:d4ffdd83227d3ae481049f7a411e69329d9e0bacb65d3340daf2364a3ed64334"
+  "package_digest": "sha256:68b1ba11c1c53f1e0f2a18a2b392f0fc94f830a68c96120c0bb2a26e3217141d"
 }
