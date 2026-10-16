@@ -178,3 +178,77 @@ def test_recipient_cli_non_object_policy_exits_nonzero_with_json(tmp_path, capsy
     package.write_text(json.dumps(_lost_ack_package())); policy.write_text('[]')
     assert main(['recipient-validate', str(package), '--policy', str(policy)]) == 1
     assert json.loads(capsys.readouterr().out)['recipient_reliance_decision']['status'] == 'fail'
+
+
+# F3R (2026-10-16): F5b merged security-runtime generation is added beside the
+# retained security generation; each generation is an exact tuple.
+from odes.common import (SECURITY_REVISIONS, SECURITY_PROFILE_VERSION, F5B_REVISIONS, F5B_PROFILE_VERSION,
+    SECURITY_RUNTIME_GENERATIONS, ALL_V2_CONTROL_PLANE_REVISIONS)
+from odes.exporter import _selected_v2_pins
+from odes.recipient_validator import _evaluate_profile, _normalized_replay_material
+
+GENERATIONS = [(SECURITY_PROFILE_VERSION, SECURITY_REVISIONS), (F5B_PROFILE_VERSION, F5B_REVISIONS)]
+
+
+def test_retained_security_generation_unchanged_and_f5b_added():
+    assert SECURITY_REVISIONS == {'manifest': 'e385f8c19b4444817a8b84b72ed6edbc37deb807',
+        'replay': '3601fb218d5c02f5d86e55d2cf33983e5e130ac3',
+        'control_plane': '996baeb476c8745b1a58ddc968b9eecc6a39b76b',
+        'moltbot_safe': 'fd6b76fa0e85feb5b67324114bf790d3a12fdaf1'}
+    assert F5B_REVISIONS == {'manifest': '2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e',
+        'replay': '79ba16d48b9be1e059b3045989c7df960c3df1c2',
+        'control_plane': 'a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5',
+        'moltbot_safe': 'e20f92e104aba2ba6ad06120d8549c6170eaf63f'}
+    assert SECURITY_PROFILE_VERSION != F5B_PROFILE_VERSION
+    # Generations share no component revision, so no pin can bridge them.
+    assert not set(SECURITY_REVISIONS.values()) & set(F5B_REVISIONS.values())
+    assert {SECURITY_REVISIONS['control_plane'], F5B_REVISIONS['control_plane']} <= set(ALL_V2_CONTROL_PLANE_REVISIONS)
+
+
+@pytest.mark.parametrize('version,pins', GENERATIONS)
+def test_generation_pins_selected_exactly_by_control_plane(version, pins):
+    assert _selected_v2_pins(pins['control_plane']) == pins
+    assert SECURITY_RUNTIME_GENERATIONS[pins['control_plane']] == (version, pins)
+
+
+def _package(version, pins, replay=None):
+    pinned = {**pins, 'replay': replay or pins['replay']}
+    return {'package_version': '0.1.0',
+            'profile': {'implementation_profile': PROFILE_V2_ID, 'implementation_profile_version': version,
+                        'schema_name': 'pder-v0.1', 'schema_version': '0.1'},
+            'record': {'verification': {'conformance_profile': PROFILE_V2_ID}},
+            'provenance': {'pinned_revisions': pinned, 'selected_revisions': pinned,
+                           'replay_validation': {'required_revision': pinned['replay']}}}
+
+
+@pytest.mark.parametrize('version,pins', GENERATIONS)
+def test_generation_profile_version_accepted_for_own_control_plane(version, pins):
+    assert _evaluate_profile(_package(version, pins), [PROFILE_V2_ID])['status'] == 'pass'
+
+
+@pytest.mark.parametrize('version,pins', [(SECURITY_PROFILE_VERSION, F5B_REVISIONS), (F5B_PROFILE_VERSION, SECURITY_REVISIONS)])
+def test_cross_generation_profile_version_rejected(version, pins):
+    assert _evaluate_profile(_package(version, pins), [PROFILE_V2_ID])['status'] == 'unsupported'
+
+
+@pytest.mark.parametrize('pins,replay', [(F5B_REVISIONS, SECURITY_REVISIONS['replay']), (SECURITY_REVISIONS, F5B_REVISIONS['replay'])])
+def test_cross_generation_replay_pin_rejected(pins, replay):
+    version = SECURITY_RUNTIME_GENERATIONS[pins['control_plane']][0]
+    with pytest.raises(ValueError, match='exact qualified Replay revision'):
+        _normalized_replay_material(_package(version, pins, replay), _package(version, pins))
+
+
+@pytest.mark.parametrize('version,pins', GENERATIONS)
+def test_same_generation_replay_pin_accepted(version, pins):
+    left, right = _normalized_replay_material(_package(version, pins), _package(version, pins))
+    assert left == right
+
+
+@pytest.mark.parametrize('component', ['manifest', 'moltbot_safe'])
+def test_cross_generation_component_pin_differs_from_reexport(component):
+    # A package that keeps the F5b CP/Replay but carries a retained-generation
+    # component pin cannot match the exact F5b re-export material.
+    mixed = _package(F5B_PROFILE_VERSION, {**F5B_REVISIONS, component: SECURITY_REVISIONS[component]})
+    expected = _package(F5B_PROFILE_VERSION, _selected_v2_pins(F5B_REVISIONS['control_plane']))
+    left, right = _normalized_replay_material(mixed, expected)
+    assert left != right
