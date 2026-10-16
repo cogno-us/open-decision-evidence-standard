@@ -54,7 +54,12 @@ MERGED_REVISIONS = {
 }
 REFUSAL_PROFILE_VERSION = "odes-cognous-stack-export-0.2.2-refusal-candidate"
 REFUSAL_REVISIONS = {"manifest": PINNED_REVISIONS["manifest"]} | {"control_plane": "c7f122ba3a6e39f9268a7163c99be3ee514cd97e", "moltbot_safe": "309e194c1b0a3de23e11e20133e6eaf88875e48a", "replay": "83fbaf2a0f6f071aca1ea0af859eb8fc6385c26a"}
-ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"])
+SECURITY_PROFILE_VERSION = "odes-cognous-stack-export-0.2.3-security-runtime-candidate"
+SECURITY_REVISIONS = {"manifest": "e385f8c19b4444817a8b84b72ed6edbc37deb807",
+    "replay": "3601fb218d5c02f5d86e55d2cf33983e5e130ac3",
+    "control_plane": "996baeb476c8745b1a58ddc968b9eecc6a39b76b",
+    "moltbot_safe": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1"}
+ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"], SECURITY_REVISIONS["control_plane"])
 
 
 def canonical_bytes(value: Any) -> bytes:
