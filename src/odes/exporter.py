@@ -66,21 +66,34 @@ def _first(mapping: dict[str, Any], *keys: str) -> Any:
     return None
 
 
+def _unambiguous(mapping: dict[str, Any], label: str, *keys: str) -> Any:
+    present = {key: mapping[key] for key in keys if key in mapping and mapping[key] not in (None, "")}
+    if len({str(value) for value in present.values()}) > 1:
+        raise ExportError(f"conflicting {label} aliases: " + ", ".join(sorted(present)))
+    return _first(mapping, *keys)
+
+
 def _manifest_id(manifest: dict[str, Any]) -> str:
-    value = _first(manifest, "manifest_id", "id", "name")
+    value = _unambiguous(manifest, "Manifest identity", "manifest_id", "id", "name")
     if not value:
         raise ExportError("Manifest identity is required")
     return str(value)
 
 
 def _manifest_version(manifest: dict[str, Any]) -> str:
-    value = _first(manifest, "manifest_version", "version", "schema_version")
+    value = _unambiguous(manifest, "Manifest version", "manifest_version", "version", "schema_version")
     if str(value) != "1.1":
         raise ExportError(f"unsupported Manifest version {value!r}; expected 1.1")
     return str(value)
 
 
 def _actions(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    inventories = [key for key in ("actions", "tool_actions", "action_inventory", "declared_actions") if manifest.get(key) is not None]
+    if len(inventories) > 1:
+        raise ExportError("Manifest declares more than one action inventory: " + ", ".join(inventories))
+    tools = manifest.get("tools") if isinstance(manifest.get("tools"), list) else []
+    if inventories and any(isinstance(tool, dict) and tool.get("actions") is not None for tool in tools):
+        raise ExportError(f"Manifest declares both {inventories[0]} and tools[].actions")
     for key in ("actions", "tool_actions", "action_inventory", "declared_actions"):
         if isinstance(manifest.get(key), list):
             return [item for item in manifest[key] if isinstance(item, dict)]
@@ -470,7 +483,11 @@ def _event_summary(bundle: dict[str, Any]) -> dict[str, Any]:
 
 def _status_from_sources(bundle: dict[str, Any]) -> dict[str, Any]:
     metadata = bundle.get("metadata") if isinstance(bundle.get("metadata"), dict) else {}
-    freshness = metadata.get("odes_freshness") or metadata.get("freshness") or "unknown"
+    freshness = _unambiguous(metadata, "lifecycle freshness", "odes_freshness", "freshness") or "unknown"
+    for flag in ("revoked", "superseded"):
+        value = metadata.get(flag)
+        if value is not None and ((bool(value) and freshness == "current") or (not value and freshness == flag)):
+            raise ExportError(f"{flag} flag contradicts lifecycle freshness {freshness!r}")
     revoked = bool(metadata.get("revoked") or freshness == "revoked")
     superseded = bool(metadata.get("superseded") or freshness == "superseded")
     status = {"freshness": str(freshness), "superseded": superseded, "revoked": revoked}

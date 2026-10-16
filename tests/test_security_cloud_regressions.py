@@ -52,3 +52,129 @@ def test_record_only_v2_profile_cannot_skip_replay_layer():
     result=evaluate_recipient_package(p,{})
     assert 'replay_semantic_consistency' in result
     assert result['declared_profile_conformance']['status']=='fail'
+
+
+# F5b repairs (2026-10-16): lifecycle alias conflicts, Manifest alias/inventory
+# ambiguity, and non-object recipient input shapes.
+from odes.exporter import _actions, _manifest_id, _manifest_version, _status_from_sources
+
+
+@pytest.mark.parametrize('metadata', [
+ {'odes_freshness': 'current', 'freshness': 'revoked', 'revoked_at': '2026-01-01T00:00:00Z'},
+ {'odes_freshness': 'current', 'freshness': 'superseded', 'superseded_by': 'r2'},
+ {'odes_freshness': 'revoked', 'freshness': 'current', 'revoked_at': '2026-01-01T00:00:00Z'},
+])
+def test_conflicting_lifecycle_freshness_aliases_rejected(metadata):
+    with pytest.raises(ExportError, match='conflicting lifecycle freshness'):
+        _status_from_sources({'metadata': metadata})
+
+
+@pytest.mark.parametrize('metadata', [
+ {'freshness': 'current', 'revoked': True, 'revoked_at': '2026-01-01T00:00:00Z'},
+ {'freshness': 'current', 'superseded': True, 'superseded_by': 'r2'},
+ {'freshness': 'revoked', 'revoked': False, 'revoked_at': '2026-01-01T00:00:00Z'},
+ {'odes_freshness': 'superseded', 'superseded': False, 'superseded_by': 'r2'},
+])
+def test_lifecycle_flag_contradicting_freshness_rejected(metadata):
+    with pytest.raises(ExportError, match='contradicts lifecycle freshness'):
+        _status_from_sources({'metadata': metadata})
+
+
+def test_consistent_lifecycle_aliases_still_export():
+    assert _status_from_sources({'metadata': {'odes_freshness': 'current', 'freshness': 'current', 'revoked': False, 'superseded': False}}) == {'freshness': 'current', 'superseded': False, 'revoked': False}
+    assert _status_from_sources({'metadata': {'freshness': 'revoked', 'revoked': True, 'revoked_at': '2026-01-01T00:00:00Z'}})['revoked'] is True
+
+
+@pytest.mark.parametrize('manifest', [
+ {'manifest_id': 'm', 'id': 'other'},
+ {'manifest_id': 'm', 'name': 'other'},
+ {'id': 'm', 'name': 'other'},
+])
+def test_conflicting_manifest_identity_aliases_rejected(manifest):
+    with pytest.raises(ExportError, match='conflicting Manifest identity'):
+        _manifest_id(manifest)
+
+
+@pytest.mark.parametrize('manifest', [
+ {'manifest_version': '1.1', 'version': '2.0'},
+ {'manifest_version': '1.1', 'schema_version': '1.0'},
+ {'version': '1.1', 'schema_version': '9'},
+])
+def test_conflicting_manifest_version_aliases_rejected(manifest):
+    with pytest.raises(ExportError, match='conflicting Manifest version'):
+        _manifest_version(manifest)
+
+
+def test_agreeing_manifest_aliases_accepted():
+    assert _manifest_id({'manifest_id': 'm', 'id': 'm'}) == 'm'
+    assert _manifest_version({'manifest_version': '1.1', 'version': '1.1'}) == '1.1'
+
+
+@pytest.mark.parametrize('manifest', [
+ {'actions': [{'action_id': 'a'}], 'tool_actions': [{'action_id': 'b'}]},
+ {'actions': [{'action_id': 'a'}], 'declared_actions': []},
+ {'action_inventory': [{'action_id': 'a'}], 'declared_actions': [{'action_id': 'a'}]},
+])
+def test_multiple_action_inventories_rejected(manifest):
+    with pytest.raises(ExportError, match='more than one action inventory'):
+        _actions(manifest)
+
+
+def test_inventory_alongside_tool_actions_rejected():
+    manifest = {'actions': [{'action_id': 'a'}], 'tools': [{'tool_name': 't', 'actions': [{'action_id': 'b'}]}]}
+    with pytest.raises(ExportError, match='both actions and tools'):
+        _actions(manifest)
+    manifest = {'manifest_id': 'm', 'manifest_version': '1.1', **manifest}
+    proposal = {'manifest_id': 'm', 'manifest_version': '1.1', 'manifest_digest': sha256(manifest),
+                'action_id': 'a', 'payload': {}, 'payload_commitment': sha256({})}
+    with pytest.raises(ExportError, match='both actions and tools'):
+        _validate_manifest_binding(manifest, proposal)
+
+
+def test_single_inventory_and_tool_only_actions_still_supported():
+    assert _actions({'actions': [{'action_id': 'a'}], 'tools': [{'tool_name': 't'}]}) == [{'action_id': 'a'}]
+    assert _actions({'tools': [{'tool_name': 't', 'actions': [{'action_id': 'b'}]}]}) == [{'action_id': 'b', 'tool_name': 't'}]
+
+
+def _lost_ack_package():
+    return json.loads((Path(__file__).resolve().parents[1]/'examples/producer-v2/lost_ack.package.json').read_text())
+
+
+@pytest.mark.parametrize('bad', [[], 'x', 1, None, True])
+@pytest.mark.parametrize('where', ['package', 'policy', 'record.verification', 'record.consumption_conditions', 'profile', 'policy.status_inputs'])
+def test_non_object_shapes_return_structured_fail(where, bad):
+    package, policy = _lost_ack_package(), {}
+    if where == 'package':
+        package = bad
+    elif where == 'policy':
+        policy = bad
+    elif where == 'policy.status_inputs':
+        policy = {'status_inputs': bad}
+    elif where == 'profile':
+        package['profile'] = bad
+    else:
+        package['record'][where.split('.')[1]] = bad
+    result = evaluate_recipient_package(package, policy)
+    assert result['recipient_reliance_decision']['status'] == 'fail'
+
+
+@pytest.mark.parametrize('package_text', [
+ '[]',
+ '[{"package_type": "odes_decision_evidence_export_package"}]',
+ '{"package_type": "odes_decision_evidence_export_package", "record": {"verification": []}}',
+ '{"package_type": "odes_decision_evidence_export_package", "record": {"consumption_conditions": "x"}}',
+ '{not json',
+ pytest.param('[' * 200000 + ']' * 200000, id='deeply-nested-array'),
+])
+def test_recipient_cli_malformed_input_exits_nonzero_with_json(tmp_path, capsys, package_text):
+    package = tmp_path/'package.json'; policy = tmp_path/'policy.json'
+    package.write_text(package_text); policy.write_text('{}')
+    assert main(['recipient-validate', str(package), '--policy', str(policy)]) == 1
+    assert json.loads(capsys.readouterr().out)['recipient_reliance_decision']['status'] == 'fail'
+
+
+def test_recipient_cli_non_object_policy_exits_nonzero_with_json(tmp_path, capsys):
+    package = tmp_path/'package.json'; policy = tmp_path/'policy.json'
+    package.write_text(json.dumps(_lost_ack_package())); policy.write_text('[]')
+    assert main(['recipient-validate', str(package), '--policy', str(policy)]) == 1
+    assert json.loads(capsys.readouterr().out)['recipient_reliance_decision']['status'] == 'fail'
