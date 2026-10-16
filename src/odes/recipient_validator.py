@@ -13,7 +13,7 @@ from .common import (
     PROFILE_V2_VERSION,
     REFUSAL_PROFILE_VERSION,
     SECURITY_PROFILE_VERSION,
-    SECURITY_REVISIONS,
+    SECURITY_RUNTIME_GENERATIONS,
     REFUSAL_REVISIONS,
     MERGED_PROFILE_VERSION,
     MERGED_REVISIONS,
@@ -83,7 +83,7 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
     if declared == PROFILE_ID and selected_control_plane in ALL_V2_CONTROL_PLANE_REVISIONS:
         reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
     if declared in {PROFILE_ID, PROFILE_V2_ID}:
-        expected_version = SECURITY_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == SECURITY_REVISIONS["control_plane"] else REFUSAL_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
+        expected_version = SECURITY_RUNTIME_GENERATIONS[selected_control_plane][0] if declared == PROFILE_V2_ID and selected_control_plane in SECURITY_RUNTIME_GENERATIONS else REFUSAL_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
         if profile.get("implementation_profile_version") != expected_version:
             return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": expected_version})
         if profile.get("schema_name") != SCHEMA_NAME or profile.get("schema_version") != SCHEMA_VERSION:
@@ -293,7 +293,8 @@ def _normalized_replay_material(package: dict[str, Any], expected: dict[str, Any
         raise ValueError("historical Replay revision does not support merged producers")
     if lprov.get("pinned_revisions", {}).get("control_plane") == REFUSAL_REVISIONS["control_plane"] and lreplay != REFUSAL_REVISIONS["replay"]:
         raise ValueError("refusal profile requires exact qualified Replay revision")
-    if lprov.get("pinned_revisions", {}).get("control_plane") == SECURITY_REVISIONS["control_plane"] and lreplay != SECURITY_REVISIONS["replay"]:
+    selected_cp = lprov.get("pinned_revisions", {}).get("control_plane")
+    if selected_cp in SECURITY_RUNTIME_GENERATIONS and lreplay != SECURITY_RUNTIME_GENERATIONS[selected_cp][1]["replay"]:
         raise ValueError("security-runtime profile requires exact qualified Replay revision")
     if lreplay in SUPPORTED_V2_REPLAY_REVISIONS:
         rprov.setdefault("pinned_revisions", {})["replay"] = lreplay
