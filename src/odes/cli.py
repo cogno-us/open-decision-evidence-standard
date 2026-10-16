@@ -47,7 +47,8 @@ def main(argv: list[str] | None = None) -> int:
         else:
             json.dump(result, sys.stdout, indent=2, sort_keys=True)
             sys.stdout.write("\n")
-        return 0
+        status = result.get("recipient_reliance_decision", {}).get("status")
+        return 0 if status == "pass" else 3 if status == "informational_only" else 1
     return 2
 
 

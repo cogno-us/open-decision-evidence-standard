@@ -152,6 +152,10 @@ def _evaluate_authentication(package: dict[str, Any], trusted_key_refs: list[str
 def _status_identity_matches(record: dict[str, Any], status_inputs: dict[str, Any], policy: dict[str, Any]) -> list[str]:
     reasons: list[str] = []
     authority = record.get("authority", {}) if isinstance(record.get("authority"), dict) else {}
+    issuer = record.get("issuer")
+    if (not isinstance(issuer, dict) or not issuer.get("organization_id") or not issuer.get("system_id")
+            or status_inputs.get("issuer") != issuer or policy.get("trusted_issuer") != issuer):
+        reasons.append("status evidence and recipient trust must bind the exact issuer organization and system")
     if status_inputs.get("record_id") != record.get("decision_id"):
         reasons.append("status evidence record_id does not match record.decision_id")
     if status_inputs.get("authority_basis") != authority.get("authority_basis"):
@@ -238,7 +242,7 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
     return _result("fail" if reasons else "pass", reasons, {**evidence, "configured_status_inputs": status_inputs, "record_reported_freshness": status.get("freshness")})
 
 
-def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, purpose: str | None) -> dict[str, Any]:
+def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, purpose: str | None, policy: dict[str, Any] | None = None) -> dict[str, Any]:
     conditions = record.get("consumption_conditions", {})
     reasons: list[str] = []
     parties = conditions.get("permitted_relying_parties") if isinstance(conditions.get("permitted_relying_parties"), list) else []
@@ -251,6 +255,15 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
         reasons.append("recipient purpose is not permitted")
     if not purpose:
         reasons.append("recipient purpose is decision-critical but unavailable")
+    risk = record.get("risk_coordinates", {})
+    policy = policy or {}
+    if not isinstance(risk, dict) or risk.get("prohibited_use_flag") is not False:
+        reasons.append("prohibited or unavailable use restriction")
+    if isinstance(risk, dict):
+        if risk.get("restricted_use_flag") is not False:
+            reasons.append("restricted use has no implemented recipient authorization profile")
+        if not policy.get("jurisdiction") or policy.get("jurisdiction") != risk.get("jurisdiction"):
+            reasons.append("recipient jurisdiction is unavailable or differs from the record")
     return _result("fail" if reasons else "pass", reasons, {"permitted_relying_parties": parties, "permitted_purposes": purposes})
 
 
@@ -315,17 +328,22 @@ def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) 
     trusted_digests = policy.get("trusted_digests", []) or policy.get("trusted_package_digests", []) or []
     status_inputs = policy.get("status_inputs", {})
     profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
+    declared = profile.get("implementation_profile")
+    record_declared = (record.get("verification") or {}).get("conformance_profile")
+    profile_consistent = bool(declared) and declared == record_declared
     layers = {
         "schema_validity": _evaluate_schema(record),
         **({"replay_semantic_consistency": _evaluate_replay_semantics(package)}
-           if profile.get("implementation_profile") == PROFILE_V2_ID else {}),
+           if declared == PROFILE_V2_ID or record_declared == PROFILE_V2_ID else {}),
         "declared_profile_conformance": _evaluate_profile(package, policy.get("supported_profiles", [PROFILE_ID])),
         "package_content_integrity": _evaluate_package_content_integrity(package, trusted_digests),
         "integrity_authentication_checks": _evaluate_authentication(package, policy.get("trusted_key_refs", []), trusted_digests),
         "historical_authority_assertions": _evaluate_historical_authority(record, status_inputs, policy),
         "authority_status_and_freshness": _evaluate_authority_and_freshness(record, status_inputs, policy.get("now"), policy),
-        "consumption_conditions": _evaluate_consumption(record, policy.get("relying_party"), policy.get("purpose")),
+        "consumption_conditions": _evaluate_consumption(record, policy.get("relying_party"), policy.get("purpose"), policy),
     }
+    if not profile_consistent:
+        layers["declared_profile_conformance"] = _result("fail", ["explicit matching package and record profile declarations required"])
     failed = [name for name, layer in layers.items() if layer["status"] not in {"pass"}]
     auth_unavailable_only = failed == ["integrity_authentication_checks"]
     if not failed:
