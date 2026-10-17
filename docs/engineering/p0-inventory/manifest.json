@@ -1,0 +1,273 @@
+{
+ "repo": "cogno-us/cognous-action-manifest",
+ "commit": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
+ "commit_provenance": "Inspected copy at <work-dir>/work-a/manifest. 'git fetch origin main' FAILED (origin is the local pinned clone, detached HEAD, no 'main' ref), so the copy stays at the local revision. Read-only 'git ls-remote https://github.com/cogno-us/cognous-action-manifest HEAD' returned the same sha, so this equals GitHub HEAD at inspection time (not verified as the 'main' branch tip by name). Nothing was pushed or written remotely.",
+ "produces": [
+  {
+   "name": "Agent Action Manifest document",
+   "format_version": "manifest_version '1.0' (legacy) and '1.1' (runtime-consumption profile); validator accepts {'1.0','1.1'}",
+   "record_types": [
+    "tools[]: ToolDefinition (tool_name, adapter_id, allowed, external_system, data_classification)",
+    "actions[]: ToolAction (action_name, action_id, tool_name, action_type, default_action, authority_required, review_requirement, reliance_requirement, payload_policy, target_policy, effect_limits, authority_context, redaction_hints, metadata)"
+   ],
+   "defined_at": [
+    "src/agent_action_manifest/models.py:240-269 (AgentActionManifest)",
+    "src/agent_action_manifest/models.py:176 (ToolDefinition)",
+    "src/agent_action_manifest/models.py:194 (ToolAction)",
+    "src/agent_action_manifest/validator.py:56 (supported_versions)",
+    "schemas/agent_action_manifest.schema.json (manifest_version is an unconstrained string, no const)",
+    "docs/manifest_format.md:150-175",
+    "docs/runtime_consumption_contract.md"
+   ],
+   "consumers": "Control Plane reads it as a dict: manifest_version/manifest_id, tools[].tool_name/adapter_id, actions[].action_id/action_name/tool_name/target_policy/payload_policy/effect_limits/authority_required/authority_context/review_requirement (control_plane bounded.py:1419-1825). Control Plane does NOT read tools[].allowed, default_action, reliance_requirement, redaction_hints or authority_context.evidence_obligation_ids/schema_version."
+  },
+  {
+   "name": "AuthorityContextRequirement declaration (embedded in each action)",
+   "format_version": "schema_version '0.1.0' (default in model, const in schema)",
+   "defined_at": [
+    "src/agent_action_manifest/models.py:143-150",
+    "schemas/authority_context_requirement.schema.json:7-15"
+   ],
+   "consumers": "Control Plane (institution_id, authority_domain, consequence_tier T0-T4, profile_ref, requirement_id) and Alvorada resolver via Control Plane"
+  },
+  {
+   "name": "Canonical commitments: manifest_digest / payload_digest / proposal_digest",
+   "format_version": "'sha256:<hex>' over json.dumps(sort_keys=True, separators=(',',':'), ensure_ascii=False, allow_nan=False) UTF-8; manifest/proposal via model_dump(mode='json', exclude_none=False)",
+   "defined_at": [
+    "src/agent_action_manifest/binding.py:17-40",
+    "docs/runtime_consumption_contract.md:38-58",
+    "docs/w0-c1-c6-contracts.md:19"
+   ],
+   "consumers": "Control Plane re-implements byte-identically (control_plane bounded.py:49-62,1614,1732-1735)"
+  },
+  {
+   "name": "RuntimeActionProposal (1.1) and RuntimeActionProposalV12 (tenant-aware 1.2) models + schemas",
+   "format_version": "'runtime-action-proposal/1.1' and '1.2' (names only in docstrings/description; wire field manifest_version const '1.1' in both schemas)",
+   "defined_at": [
+    "src/agent_action_manifest/models.py:299-328",
+    "src/agent_action_manifest/models.py:331-339",
+    "schemas/runtime_action_proposal.schema.json:26",
+    "schemas/runtime_action_proposal_v1_2.schema.json:5,33",
+    "docs/w0-c1-c6-contracts.md:14-25",
+    "examples/runtime_action_proposal_v1_2.json"
+   ],
+   "consumers": "Control Plane RuntimeProposal / TenantRuntimeProposal (control_plane bounded.py:65-95)"
+  },
+  {
+   "name": "Declaration mismatch reason codes (proposal_mismatches output)",
+   "format_version": "none; free strings",
+   "record_types": [
+    "invalid_manifest",
+    "unsupported_manifest_version",
+    "manifest_id_mismatch",
+    "manifest_version_mismatch",
+    "manifest_digest_mismatch",
+    "payload_commitment_mismatch",
+    "unknown_action",
+    "unknown_tool",
+    "adapter_mismatch",
+    "missing_target_policy",
+    "unbounded_target_policy",
+    "target_out_of_scope",
+    "missing_payload_policy",
+    "missing_required_payload_field",
+    "forbidden_payload_field",
+    "undeclared_payload_field",
+    "effect_count_exceeded",
+    "amount_exceeded",
+    "amount_unit_mismatch",
+    "missing_requested_permission",
+    "authority_profile_mismatch",
+    "authority_requirement_mismatch"
+   ],
+   "defined_at": [
+    "src/agent_action_manifest/binding.py:48-118"
+   ],
+   "consumers": "Control Plane emits an overlapping subset of the same strings from its own copy of the logic (control_plane bounded.py:1724-1800); the vocabulary is not specified in docs/schemas of either repo."
+  },
+  {
+   "name": "ValidationReport (aam validate / validate_manifest)",
+   "format_version": "issue codes E001-E022, W001-W010 (aliases e.g. unsupported_manifest_version for E016)",
+   "defined_at": [
+    "src/agent_action_manifest/models.py:272-296",
+    "src/agent_action_manifest/validator.py:50-400",
+    "schemas/validation_report.schema.json"
+   ],
+   "consumers": "proposal_mismatches (invalid_manifest, binding.py:51-53); CLI exit codes 0/1/2 (cli.py:68, 206, 209-240). No Cognous component consumer found."
+  },
+  {
+   "name": "AppaToolBinding record (optional OpenAPPA declaration bridge)",
+   "format_version": "cognous-openappa-tool-binding/0.1; authority_effect always 'none'",
+   "defined_at": [
+    "src/agent_action_manifest/openappa_binding.py:31-63",
+    "src/agent_action_manifest/openappa_binding.py:66-142",
+    "docs/integrations/openappa-binding.md"
+   ],
+   "consumers": "Hub profile (PR #44, docs/integrations/openappa-binding.md:8-9) and a future runtime join; OpenAPPA itself is a non-Cognous system. No wire contract is pinned in this repo."
+  }
+ ],
+ "consumes": [
+  {
+   "name": "RuntimeActionProposal / V12 instance",
+   "producer": "runtime that builds proposals (in practice the Control Plane caller); no specific Cognous repo emits it",
+   "how_validated": "Pydantic model (extra fields forbidden per models.py:14-15), then proposal_mismatches() deterministic checks against the manifest",
+   "at": [
+    "src/agent_action_manifest/binding.py:48-118"
+   ]
+  },
+  {
+   "name": "Alvorada Authority Context",
+   "producer": "cognous-institutional-governance",
+   "how_validated": "NOT consumed. Only a version expectation is declared: AuthorityContextRequirement.schema_version const '0.1.0' (models.py:144, schemas/authority_context_requirement.schema.json:9). No Alvorada artifact is read or validated in code."
+  },
+  {
+   "name": "APPA/OpenAPPA tool metadata supplied by integrator (appa_tool_name, parameter_roles, sinks)",
+   "producer": "integrator / OpenAPPA mapping (external)",
+   "how_validated": "Strict local checks: identifier hygiene, uniqueness, parameter_roles keys == required u optional fields, role in fixed set, sinks non-empty unique",
+   "at": [
+    "src/agent_action_manifest/openappa_binding.py:66-142"
+   ]
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "src/agent_action_manifest/models.py",
+   "line": 144,
+   "peer": "Alvorada Authority Context",
+   "value": "schema_version default '0.1.0'",
+   "purpose": "Version the downstream resolver is expected to implement; also const in schemas/authority_context_requirement.schema.json:9."
+  },
+  {
+   "file": "docs/runtime_consumption_contract.md",
+   "line": 12,
+   "peer": "cognous-institutional-governance (Alvorada)",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc (repo named line 11; Authority Context schema 0.1.0 line 13)",
+   "purpose": "'Pinned upstream authority baseline' for the synthetic refund pilot."
+  },
+  {
+   "file": "docs/integration_with_agent_control_plane.md",
+   "line": 101,
+   "peer": "Alvorada",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "Authority Context 0.1.0 pinned to this Alvorada commit."
+  },
+  {
+   "file": "CHANGELOG.md",
+   "line": 11,
+   "peer": "Alvorada",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "Release note for bounded integration baseline."
+  },
+  {
+   "file": "examples/refund_integration_v1_1.manifest.json",
+   "line": 143,
+   "peer": "Alvorada",
+   "value": "metadata.upstream_alvorada_commit = fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "Peer pin embedded inside the manifest, so it is covered by manifest_digest (sha256:4d1ad6c9...f6ac, verified by running manifest_digest()). Bumping the pin changes the digest. File is byte-identical to the Control Plane test fixture."
+  },
+  {
+   "file": "examples/refund_integration_v1_1.manifest.json",
+   "line": 62,
+   "peer": "Alvorada",
+   "value": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+   "purpose": "authority_context.profile_ref (also line 121; examples/runtime_action_proposal_v1_2.json:22; tests/test_runtime_binding.py:30)."
+  },
+  {
+   "file": "src/agent_action_manifest/binding.py",
+   "line": 14,
+   "peer": "Control Plane / runtime consumers (accepted-version allowlist)",
+   "value": "SUPPORTED_RUNTIME_MANIFEST_VERSIONS = {'1.1'}",
+   "purpose": "Only accepted manifest_version for runtime binding. Related: validator.py:56 {'1.0','1.1'}; openappa_binding.py:80 literal '1.1'; schemas/runtime_action_proposal.schema.json:26 and runtime_action_proposal_v1_2.schema.json:33 const '1.1'."
+  },
+  {
+   "file": "src/agent_action_manifest/openappa_binding.py",
+   "line": 33,
+   "peer": "OpenAPPA / hub (external-facing)",
+   "value": "cognous-openappa-tool-binding/0.1",
+   "purpose": "Profile literal on AppaToolBinding (also line 129)."
+  },
+  {
+   "file": "collateral/business-collateral.md",
+   "line": 39,
+   "peer": "Manifest hub selection (self) and hub lock",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce; hub lock 5737267d94d2b445735c95e8480a31de73a2abe8 at lines 33, 41, 65; also collateral/one-page-overview.md:26",
+   "purpose": "Prose/links stating which Manifest revision the hub lock selects."
+  },
+  {
+   "file": "docs/w0-c1-c6-contracts.md",
+   "line": 7,
+   "peer": "Manifest hub selection (self)",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "'selected Manifest 1.1 revision remains' statement. Other self-revision refs: docs/w0-c1-c6-contracts.md:6 a56a15ef, docs/integrations/openappa-binding.md:7 911f1778, docs/security-cloud-remediation-20261016.md:4,19, collateral/business-collateral.md:65 b24ac11d; none match inspected HEAD 2c36bcd0."
+  }
+ ],
+ "accepted_revision_allowlists": "No allowlist of accepted PEER revisions in code. The only accepted-value sets are for the Manifest's own versions: binding.py:14 {'1.1'} and validator.py:56 {'1.0','1.1'}. Peer selection happens in the hub component-lock.json (external).",
+ "unwritten_consumer_rules": [
+  {
+   "file": "src/agent_action_manifest/binding.py",
+   "line": "43-46,66-68",
+   "peer": "runtime/Control Plane proposal",
+   "rule": "resolve_action returns None when action_id matches zero OR more than one action, so a manifest with duplicate action_id makes every proposal for it unknown_action.",
+   "checked": "git grep unknown_action / E017 / duplicate_action_id over docs/ schemas/ README.md collateral/ CHANGELOG.md: 0 hits. E017 exists only in validator.py:106-109 (v1.1 only)."
+  },
+  {
+   "file": "src/agent_action_manifest/binding.py",
+   "line": "70-74",
+   "peer": "runtime/Control Plane proposal",
+   "rule": "Tool not found for action.tool_name => unknown_tool; found with different adapter_id => adapter_mismatch.",
+   "checked": "docs/runtime_consumption_contract.md:94 (negative case 4 'substituted adapter') covers adapter_mismatch only; grep unknown_tool in docs/schemas: 0 hits."
+  },
+  {
+   "file": "src/agent_action_manifest/binding.py",
+   "line": "76-82",
+   "peer": "runtime/Control Plane proposal",
+   "rule": "Missing target_policy => missing_target_policy; allow_any_target=true => unbounded_target_policy even if target is listed; target not in allowed_targets => target_out_of_scope.",
+   "checked": "grep missing_target_policy: 0 hits; unbounded_target_policy appears only as validator alias in docs/manifest_format.md:171 (declaration check, not proposal check). Control Plane collapses all three into target_out_of_scope."
+  },
+  {
+   "file": "src/agent_action_manifest/binding.py",
+   "line": "104-105",
+   "peer": "runtime/Control Plane proposal",
+   "rule": "When effect_limits.unit is set, proposal.unit must equal it exactly (amount_unit_mismatch).",
+   "checked": "docs/runtime_consumption_contract.md:98 negative case 7 says 'amount/effect count above declaration limits'; grep amount_unit_mismatch in docs/schemas: 0 hits."
+  },
+  {
+   "file": "src/agent_action_manifest/binding.py",
+   "line": "98-105",
+   "peer": "runtime/Control Plane proposal",
+   "rule": "proposal_mismatches skips limit checks when effect_limits is None, relying on validate_manifest (E022) having already flagged invalid_manifest for effectful actions; non-effectful actions with no effect_limits get no limit.",
+   "checked": "Written for effectful actions (docs/manifest_format.md:168-174, runtime_consumption_contract.md:28-33); the non-effectful (read) case is unwritten."
+  },
+  {
+   "file": "src/agent_action_manifest/openappa_binding.py",
+   "line": "119-121",
+   "peer": "integrator-supplied parameter_roles (OpenAPPA mapping)",
+   "rule": "parameter role must be one of {content, recipient, resource, command, control}.",
+   "checked": "Stated only in the function docstring (openappa_binding.py:77-78); grep 'recipient' / 'parameter_roles' in docs/ schemas/: no role vocabulary (docs/w0-c1-c6-contracts.md:27 names 'source/sink/recipient/parameter role' generically)."
+  },
+  {
+   "file": "src/agent_action_manifest/openappa_binding.py",
+   "line": "21-28",
+   "peer": "integrator-supplied identifiers",
+   "rule": "Identifiers must be non-empty str, equal to their stripped form, with no chars < 0x20 or 0x7f (note: 0x80-0x9f are accepted).",
+   "checked": "docs/integrations/openappa-binding.md:155-160 says 'blank, padded/control-character or duplicate identities' rejected but gives no codepoint range."
+  }
+ ],
+ "external_deps": [
+  "pydantic>=2.0 (pyproject.toml:24)",
+  "OpenAPPA (non-Cognous; openappa_binding.py:1-6, docs/integrations/openappa-binding.md) - declaration-only bridge, no wire dependency",
+  "JSON Schema $id host https://schemas.cognous.ai/agent-action-manifest/ (schemas/*.json) - Cognous-owned domain, not fetched at runtime",
+  "GitHub Actions (.github/workflows/tests.yml)",
+  "pytest, pytest-cov (dev)"
+ ],
+ "notes": [
+  "Manifest has no runtime dependency on any other Cognous component: no imports, no fetches, no sha checks in code. Peer coupling is (a) the Alvorada commit/profile ids in docs and in the example manifest metadata and profile_ref, (b) the shared canonical JSON/digest algorithm, (c) a shared, unspecified reason-code vocabulary, (d) the const '0.1.0' Authority Context schema_version.",
+  "The Alvorada pin is embedded inside a digest-covered artifact (examples/refund_integration_v1_1.manifest.json:143 metadata). Because manifest_digest covers metadata, any peer bump changes manifest_digest and invalidates previously issued proposals/decisions; decoupling needs the pin moved out of metadata or excluded from the digest.",
+  "The Control Plane duplicates proposal_mismatches rather than calling it, and diverges: CP never runs validate_manifest, ignores tools[].allowed (E015) and default_action, and never reads authority_context.evidence_obligation_ids or schema_version; CP's consumed fixture is a byte-identical copy of this repo's example (diff verified). Divergence risk is unguarded by any shared conformance vector.",
+  "Proposal wire format: RuntimeActionProposalV12 has no generation/discriminator field and the schema still pins manifest_version const '1.1' (schemas/runtime_action_proposal_v1_2.schema.json:33); '1.2' exists only in description/docstring (schema line 5, models.py:332). Consumers must pick the class out-of-band.",
+  "docs/integrations and schemas disclaim equivalence: Python models are looser than JSON schemas (docs/manifest_format.md:178-187), so 'valid per aam' does not imply schema-valid; the Control Plane validates neither.",
+  "examples/runtime_action_proposal_v1_2.json uses manifest_id 'urn:cognous:manifest:synthetic-refund-v1' (line 3) while the fixture manifest_id is 'refund-integration-pilot-v1'; its manifest_digest matches the fixture digest, so the sample would yield manifest_id_mismatch if run through proposal_mismatches.",
+  "Doc revision strings (w0 contracts a56a15ef, openappa-binding 911f1778, collateral b24ac11d) are historical and do not equal inspected HEAD 2c36bcd0; do not treat them as current pins.",
+  "Fetch limitation: see commit_provenance."
+ ]
+}

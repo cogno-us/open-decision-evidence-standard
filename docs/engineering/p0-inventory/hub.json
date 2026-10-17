@@ -1,0 +1,282 @@
+{
+ "repo": "cogno-us/cognous-open-control-stack",
+ "commit": "755d35778fc39c358f22ab720694722f12bb5174",
+ "produces": [
+  {
+   "artifact": "component-lock.json (lock_version 1.0, runtime_profile merged-producers-v1, qualification_status accepted)",
+   "file": "component-lock.json",
+   "lines": "2-5,148,193",
+   "summary": "13 selected components (5-139), 1 excluded (140-147)"
+  },
+  {
+   "artifact": "selected lock digest recorded in control panel",
+   "file": "docs/workstreams/release-closeout-control-panel.json",
+   "lines": "5-9",
+   "value": "path component-lock.json, sha256 dc66aafe..., profile merged-producers-v1"
+  },
+  {
+   "artifact": "candidate/profile pin sets",
+   "files": [
+    "profiles/merged-consumer-chain.json",
+    "profiles/security-runtime-candidate-20261016.json",
+    "profiles/security-runtime-f5b-candidate-20261016.json",
+    "profiles/w7-bounded-v1-component-lock.candidate.json",
+    "profiles/bounded-v1-reference-release-selection.json",
+    "profiles/full-release-candidate.json",
+    "profiles/remediation-candidate-20261015.json",
+    "profiles/remediation-full-reference-20261015.json",
+    "profiles/security-remediation-source-probe-20261016.json"
+   ]
+  },
+  {
+   "artifact": "component-pins.json emitted by reference release tooling",
+   "files": [
+    "examples/batch4c-accepted/component-pins.json",
+    "examples/batch4c-integration/component-pins.json"
+   ],
+   "derived_by": "suites/cognous-open-control-stack/tools/reference_release.py:504,551 (qualification repo): git rev-parse HEAD per component"
+  },
+  {
+   "artifact": "platform support statement",
+   "file": "docs/platform-support.md",
+   "lines": "1-9",
+   "content": "Linux only; owner decision D2 recorded in qualification process/v1-validation/v1-2026-10-16-a/preregistration.json; evidence run 38962759690; no component sha in this file"
+  }
+ ],
+ "consumes": [
+  {
+   "what": "qualification reusable workflows",
+   "detail": "21 hub workflows call cogno-us/cognous-stack-qualification workflows with qualification_revision",
+   "pins": {
+    "47f28db6c27eb5c87263a3fbe5b866cd606c9016": "24 occurrences",
+    "78b3f42c93fa3aef64e2fd2216bbdf545db5b0af": "20 occurrences"
+   },
+   "files": ".github/workflows/*.yml (e.g. accepted-authority-effect.yml:16,19; comparative-governance.yml:27,30); contract-artifact-verification.yml:21,45 uses 47f28db6"
+  },
+  {
+   "what": "lock consumers (derived)",
+   "detail": "tools/verify_selected_documentation.py:12-13 builds selected={repo: sha or accepted_sha} from component-lock.json and requires docs/architecture.md links to match (derived value); tools/collateral_evidence_snapshot.py:88 compares lock file sha256; tools/resolver_assurance_qualification.py:25 records lock sha256; tools/federated_governance_qualification.py:16, integrated_assurance_qualification.py:28 list the lock as a source file"
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "component-lock.json",
+   "kind": "component identity table (selected, merged-producers-v1)",
+   "entries": [
+    {
+     "key": "action_manifest",
+     "repo": "cogno-us/cognous-action-manifest",
+     "sha": "46c950bed37fe3812000895430bc0312d29e37ce",
+     "line": 8
+    },
+    {
+     "key": "control_plane",
+     "repo": "cogno-us/cognous-control-plane",
+     "sha": "d3dadee70bd319812b207389ab1e0f6efe511916",
+     "line": 15
+    },
+    {
+     "key": "constitutional_authority",
+     "repo": "cogno-us/cognous-institutional-governance",
+     "sha": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+     "line": 22,
+     "licensing_head": "412fbbdcd57d8390e140efd27f5e95ddc574bda6 (line 26)"
+    },
+    {
+     "key": "gax_imx_transport",
+     "repo": "cogno-us/cognous-governed-exchange",
+     "sha": "a1cbc7b28f702283b0e4f3192bb43e4a9e618ebf",
+     "lines": "30-31 (sha and accepted_sha), history nested 32-70"
+    },
+    {
+     "key": "moltbot_safe",
+     "repo": "cogno-us/cognous-execution-runtime",
+     "accepted_sha": "c3c3ee7188b9367cf70b08074b9c40a5c70c94ac",
+     "lines": "73-74 (accepted_sha, core_interop_sha)"
+    },
+    {
+     "key": "replay_bundle",
+     "repo": "cogno-us/cognous-replay-bundle",
+     "sha": "459e4ba62fca49364aebb0050cd5fb2dd5a71bfa",
+     "line": 84
+    },
+    {
+     "key": "governance_evidence_pack",
+     "repo": "cogno-us/cognous-governance-evidence-pack",
+     "sha": "b4baccd823d2a73be276c1de745b19cf7c56a0d6",
+     "line": 91
+    },
+    {
+     "key": "odes",
+     "repo": "cogno-us/open-decision-evidence-standard",
+     "sha": "c5e9a0f3695ae836b803be06c46d2c669642ee03",
+     "line": 100,
+     "note": "differs from ODES main 9ca8ad05; interfaces 'ODES implementation profile 0.2.1', 'pder-v0.1' (lines 101-104)"
+    },
+    {
+     "key": "bitrep",
+     "repo": "cogno-us/cognous-evidence-attestation",
+     "sha": "5b5077dafde232a7801cb425c4efddcffb468723",
+     "line": 108
+    },
+    {
+     "key": "the_index",
+     "repo": "cogno-us/cognous-evidence-registry",
+     "sha": "d5e45d275cb301d9684b543e93b05997991d1cf2",
+     "line": 116
+    },
+    {
+     "key": "prp",
+     "sha": "cb137f028e92448a56e785e3d4ea074b444fa225",
+     "line": 124
+    },
+    {
+     "key": "research_intelligence",
+     "sha": "30c7274b49c07a0df4c8ca7b281f2e3f8ae68dee",
+     "line": 130
+    },
+    {
+     "key": "tfa",
+     "sha": "442d07b4891870abb1756fcb11c24ccf187706f4",
+     "line": 135
+    }
+   ]
+  },
+  {
+   "file": "component-lock.json",
+   "lines": "149-175",
+   "kind": "historical_test_dependencies (5): CP 28350065, runtime 1d308faf, replay f63ce914, odes cba83a1c, exchange 6bcde026"
+  },
+  {
+   "file": "component-lock.json",
+   "lines": "176-192",
+   "kind": "previous_selected_test_dependencies (3): CP 2ea9528e, replay 274543f1, odes 226adb0e"
+  },
+  {
+   "file": "component-lock.json",
+   "lines": "194-220",
+   "kind": "previous_accepted_test_dependencies (3): CP 248d8996, runtime 177354e9, replay 043830b5"
+  },
+  {
+   "file": "component-lock.json",
+   "lines": "221-228",
+   "kind": "qualification_evidence: reviewed_source_sha 7e43d55c, accepted_hub_merge f801546d, workflow_run 37694032916, candidate gate artifact sha256"
+  },
+  {
+   "file": "component-lock.json",
+   "line": 4,
+   "kind": "hub_start_commit f801546d5272104b02a240e1126b3f92f26486f2"
+  },
+  {
+   "file": "profiles/merged-consumer-chain.json",
+   "lines": "9-34",
+   "kind": "8 shas mirroring the lock (manifest, CP, runtime, replay, pack, odes c5e9a0f3, exchange)"
+  },
+  {
+   "file": "profiles/security-runtime-candidate-20261016.json",
+   "lines": "11-35",
+   "kind": "7 revisions: CP 996baeb4, runtime fd6b76fa, replay 3601fb21, pack 8aba5a10, odes dd2dc7e8, exchange 94a0db18, manifest e385f8c1"
+  },
+  {
+   "file": "profiles/security-runtime-f5b-candidate-20261016.json",
+   "lines": "11-35",
+   "kind": "7 revisions: CP a34c3dc2, runtime e20f92e1, replay 79ba16d4, pack 893aca8d, odes eb83220c, exchange 8be6c6b8, manifest 2c36bcd0; stated nonselected (selected:false, line 4)"
+  },
+  {
+   "file": "profiles/bounded-v1-reference-release-selection.json",
+   "lines": "33-37",
+   "kind": "manifest 8d1572d4, CP e66e5f16, runtime da9f5290, replay 2069a0ba, pack 87293cfc (W7 public bounded selection)"
+  },
+  {
+   "file": "profiles/w7-bounded-v1-component-lock.candidate.json",
+   "kind": "49 sha-like literals (proposed lock candidate)"
+  },
+  {
+   "file": "tools/collateral_evidence_snapshot.py",
+   "lines": "19-20,90-91",
+   "kind": "EXPECTED_HUB_PIN f7d03c71, EXPECTED_LOCK_SHA256 dc66aafe, selected CP d3dadee7 and runtime c3c3ee71 string-compared literals"
+  },
+  {
+   "file": "collateral/evidence-snapshot.json",
+   "lines": "7,10,13-14,20-21,23",
+   "kind": "copies of hub pin, lock sha256, selected CP and runtime"
+  },
+  {
+   "file": "tests/test_w7_release_preflight.py",
+   "lines": "16-18,26-28,34-38,52-56",
+   "kind": "asserts hub lock and W7 candidate shas as literals"
+  },
+  {
+   "file": "docs/architecture.md",
+   "line": 22,
+   "kind": "exchange link a1cbc7b2 (checked against lock by tools/verify_selected_documentation.py:14-22)"
+  },
+  {
+   "file": "docs/workstreams/release-closeout-control-panel.json",
+   "kind": "selected_lock 5-9 (sha256 only) plus 'existing_profiles' file digests 10-15; workers/s0_serial_repairs sections carry ~370 historic sha literals as run records (workers 116, s0_serial_repairs 151, integration 28, final_packet 33)"
+  },
+  {
+   "file": "docs/platform-support.md",
+   "kind": "no component pins"
+  },
+  {
+   "file": "README.md",
+   "line": 247,
+   "kind": "link to qualification at 39f038435afdd71ba162860faa5718d90d7bde64"
+  },
+  {
+   "file": "CROSS_COMPONENT_TESTS.md",
+   "line": 3,
+   "kind": "link to qualification at 47f28db6c27eb5c87263a3fbe5b866cd606c9016 (differs from README 39f03843)"
+  },
+  {
+   "file": ".github/workflows/*.yml",
+   "kind": "qualification_revision / uses @sha pins: 21 workflows; two distinct qualification shas 47f28db6 (24 occ.) and 78b3f42c (20 occ.)"
+  },
+  {
+   "file": "examples/batch4c-accepted/component-pins.json; examples/batch4c-integration/component-pins.json",
+   "kind": "14 keys each; accepted: CP 2ea9528e, odes 226adb0e, replay 274543f1, runtime 177354e9 (historical generation)"
+  }
+ ],
+ "derived_values": [
+  "examples/*/component-pins.json produced by git rev-parse HEAD (reference_release.py:504,551 in qualification)",
+  "tools/verify_selected_documentation.py:12-22 derives expected shas from component-lock.json",
+  "lock sha256 values (control panel :7, snapshot :10) are digests of component-lock.json, checked by tools/collateral_evidence_snapshot.py:88",
+  "everything else above is a literal"
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "rule": "Hub lock key name moltbot_safe maps to repo cognous-execution-runtime; qualification _pins.py maintains a separate alias table (runtime/moltbot_safe, replay/replay_bundle, exchange/gax_imx_transport, manifest/action_manifest, evidence_pack/governance_evidence_pack)",
+   "file": "component-lock.json:72-73 vs qualification suites/_pins.py:32-50"
+  },
+  {
+   "rule": "A component may carry sha or accepted_sha; consumers do (spec.get('sha') or spec['accepted_sha'])",
+   "file": "tools/verify_selected_documentation.py",
+   "lines": "12-13"
+  }
+ ],
+ "external_deps": [
+  {
+   "name": "cogno-us/cognous-stack-qualification workflows (reusable)",
+   "files": "21 workflows in .github/workflows"
+  },
+  {
+   "name": "tools/requirements-release.lock (hash-pinned pip lock)",
+   "file": "tools/requirements-release.lock"
+  },
+  {
+   "name": "actions/checkout 11d5960a (x21), actions/upload-artifact ea165f8d (x8)",
+   "file": ".github/workflows"
+  }
+ ],
+ "notes": {
+  "component_lock_vs_f5b": "component-lock.json selects merged generation (CP d3dadee7). The F5B generation (CP a34c3dc2) exists only as profiles/security-runtime-f5b-candidate-20261016.json (selected false). The ODES source supports both (common.py:49-54, 68-71).",
+  "drift_observed": [
+   "hub lock odes c5e9a0f3 vs hub f5b profile odes eb83220c vs qualification refreeze end state 5675f1b9 vs ODES main 9ca8ad05",
+   "hub f5b profile runtime e20f92e1 / replay 79ba16d4 vs ODES F5B_REVISIONS runtime 4a83b175 / replay def0ee0f (qualification refreeze RF-2/RF-7 moved them)"
+  ],
+  "files_with_sha_literals": "370 files containing a 40-hex literal (excluding .git), all file types",
+  "platform_support": "Linux only (docs/platform-support.md:3)",
+  "inspected_via": "git clone of /home/claude/cognous-open-control-stack; fetch origin main; checkout FETCH_HEAD; read-only"
+ }
+}

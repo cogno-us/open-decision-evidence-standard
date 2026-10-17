@@ -1,0 +1,1671 @@
+{
+ "repo": "cogno-us/cognous-replay-bundle",
+ "commit": "8eaf3a429251c37b4bba9a9b4679c15f7bf4ad75",
+ "revision_notes": "Inspected the clone's HEAD = 8eaf3a42 (origin/main of /home/claude/rem-replay3, #38 squash). The prescribed 'git fetch origin main' resolved the local checkout's *local* branch main, which is f3e81cfd1f4878e0870359e64e3156ba6ca311d4 (pre-squash PR commit, identical tree: git diff empty, same tree hash). No network fetch was performed (origin is a local path); fetch worked locally. Work copy: <work-dir>/work-c/replay",
+ "produces": [
+  {
+   "name": "Reconstruction Bundle",
+   "version": "0.2.0",
+   "defined_in": [
+    "src/agent_replay_bundle/reconstruction.py:20 (RECONSTRUCTION_BUNDLE_VERSION), 146-162 (model)",
+    "schemas/reconstruction_bundle_0_2.schema.json:8-17 (const 0.2.0, status enum)",
+    "docs/reconstruction_import.md"
+   ],
+   "envelope_fields": "bundle_id, bundle_version, run_id, status{reconstruction_complete|partial|incomplete|redacted}, generated_at, producer_profiles, records, links, commitments, import_reports, semantics, derivation, integrity, metadata (reconstruction.py:146-162)",
+   "record_types_defined_only_in_code": {
+    "note": "schema declares record_type as free string (schemas/reconstruction_bundle_0_2.schema.json:50); the vocabulary exists only in importer code",
+    "legacy_control_plane": "run_frame (importers.py:290), action_proposal, policy_decision, policy_trace, authority_record, reliance_record, blocked_action (295-302), final_output (319)",
+    "bounded_control_plane": "runtime_proposal (548), runtime_decision (599), control_plane_attempt_transition (665), effect_observation and reconciliation (673-694)",
+    "typed_refusal_and_authority": "effect_time_refusal, resolution_check, attempt_closeout, input_time_floors (refusal_evidence.py:102-103), resolution_check_event, reason_vocabulary_change (refusal_evidence.py:99)",
+    "executor": "execution_envelope (862), executor_control_plane_evidence and rejected_executor_observation (893-896), execution_result (916), destination_attempt (934), destination_attempt_event (944), moltbot_attributed_control_plane_attempt (990), destination_effect (1102), executor_recovery_report (1139), executor_observation (1152)",
+    "w3_atomic": "atomic_attempt, atomic_failure, atomic_observation (w3_atomic_import.py:71,105,136)",
+    "w3_c8": "one record type per source table name (execution_claims_v1, authority_grants_v1, authority_approvals_v1, authority_policies_v1, ...) plus local_stop_event (w3_c8_lineage.py:93,99)"
+   },
+   "producer_profile_ids": "control-plane-legacy-replay@28350065, control-plane-bounded-run@{28350065,2ea9528e,248d8996,d3dadee7}, control-plane-bounded-refusal@c7f122ba, control-plane-runtime-authority@2a17b2ba, control-plane-security-runtime@{996baeb4,a34c3dc2}, moltbot-safe-envelope-0.2.0@6b0ba118, moltbot-safe-executor-producer-{1.0.0@1d308faf, 2.0.0@177354e9|c3c3ee71|309e194c|a9a4f75a|fd6b76fa|4a83b175}, local-atomic-w2-failure-history@bd398f16, c8-retained-sqlite-and-explicit-stop/0.1 (importers.py:29-73; w3_atomic_import.py:17; w3_c8_lineage.py:88)",
+   "metadata_keys_consumed_downstream": "control_plane_revision, moltbot_safe_revision, moltbot_producer_contract, manifest_revision, effect_observation_history, executor_failure_reference_verification, alvorada_revision (importers.py:790-799); consumed by Evidence Pack importer.py:99-101,529,645-647,903,1235",
+   "import_finding_codes": "L001, B001-B006, B020, M001-M004, M020, M021, R001, W3A01-W3A04, C8-CLAIM, C8-AUTH, C8-STOP",
+   "integrity": "content-digest and HMAC-SHA256 integrity metadata (reconstruction.py:136-143,186-245); redacted derivative (248-293)"
+  },
+  {
+   "name": "Legacy Replay Bundle (agent_replay_bundle schema)",
+   "version": "0.1 (default)",
+   "defined_in": [
+    "src/agent_replay_bundle/models.py:204-208",
+    "schemas/agent_replay_bundle.schema.json",
+    "schemas/signed_replay_bundle.schema.json",
+    "docs/bundle_format.md"
+   ],
+   "record_types": "run_frame, action_proposal, policy_decision, policy_evaluation_trace, authority_record, reliance_record, blocked_action, redaction_metadata, signature_metadata (schemas/*.json)"
+  },
+  {
+   "name": "Recovery inspection native artifact",
+   "version": "cognous-replay-recovery-inspection/0.1",
+   "defined_in": [
+    "src/agent_replay_bundle/recovery_inspection.py:16,226-235",
+    "docs/recovery-inspection.md"
+   ],
+   "record_types": "inspection_format, runtime_revision, expected_identity, source, source_content_sha256, event_checks, loss_report, assurance"
+  },
+  {
+   "name": "Validation report (legacy)",
+   "version": "n/a",
+   "defined_in": [
+    "src/agent_replay_bundle/models.py:165-181",
+    "schemas/validation_report.schema.json",
+    "schemas/validation_issue.schema.json"
+   ]
+  }
+ ],
+ "consumes": [
+  {
+   "artifact": "Control Plane BoundedRunRecord (decisions, attempts, observations, reconciliations; typed-refusal collections refusals/resolution_checks/closeouts/input_time_floors; authority collections check_events/vocabulary_changes) - the control-plane journal",
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "where": "importers.py:464-800 (import_bounded_workflow); refusal_evidence.py:106-196",
+   "validated_by": "revision-pinned decoder selected by caller-supplied control_plane_revision (importers.py:472-483); _validate_repaired_run (1241-1301); refusal_evidence.validate_run with pydantic strict models; no schema in repo"
+  },
+  {
+   "artifact": "Control Plane legacy ReplayBundle",
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "where": "importers.py:247-342",
+   "validated_by": "required-key set (256-262) pinned to 28350065"
+  },
+  {
+   "artifact": "RuntimeProposal (Action Manifest runtime proposal)",
+   "peer": "Action Manifest / Control Plane",
+   "where": "importers.py:544-578",
+   "validated_by": "payload commitment sha256 (561-565); binding equality (130-143)"
+  },
+  {
+   "artifact": "Executor (Moltbot Safe / Execution Runtime) export: execution_envelope 0.2.0, execution_result, effects, attempts, attempt_events, producer_profile, repository, provenance, attempt_identity, control_plane_attempts, observations, control_plane_evidence, rejected_observations, extensions (runtime export)",
+   "peer": "cogno-us/moltbot-safe",
+   "where": "importers.py:383-462, 803-1213, 1304-1494",
+   "validated_by": "exact revision/profile allowlists, member allowlists (346-358), cross-record checks against Control Plane run and proposal, v2 strict lifecycle checks (1304-1494)"
+  },
+  {
+   "artifact": "Executor Route B recovery report (inside execution_result.observation / observations)",
+   "peer": "cogno-us/moltbot-safe",
+   "where": "importers.py:184-228",
+   "validated_by": "code only; CHANGELOG.md:7"
+  },
+  {
+   "artifact": "Runtime recovery-inspection synthetic export",
+   "peer": "Execution Runtime",
+   "where": "recovery_inspection.py:100-235",
+   "validated_by": "exact field-set equality, recomputed digests, recomputed current projection; runtime_revision must equal 8e7d634c"
+  },
+  {
+   "artifact": "Runtime W2 failure_records_v1 / attempt rows",
+   "peer": "cogno-us/cognous-execution-runtime",
+   "where": "w3_atomic_import.py:27-161",
+   "validated_by": "caller supplies runtime_revision; must equal bd398f16; code rules only"
+  },
+  {
+   "artifact": "Runtime C8 source rows (authority.generation c8-source-rows/0.1) and local stop events (c8-local-stop/0.1)",
+   "peer": "Execution Runtime (candidate)",
+   "where": "w3_c8_lineage.py:11-127",
+   "validated_by": "code rules only; revision recorded as placeholder 'candidate-c8' (L121,124)"
+  },
+  {
+   "artifact": "ODES packages",
+   "peer": "ODES",
+   "where": "not consumed; ODES is only referenced as the source of the 'extensions' contract (importers.py:361) and CHANGELOG.md:5",
+   "validated_by": "n/a"
+  },
+  {
+   "artifact": "Evidence Pack",
+   "peer": "cogno-us/cognous-governance-evidence-pack",
+   "where": "not consumed (Evidence Pack consumes Replay)",
+   "validated_by": "n/a"
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 21,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
+   "purpose": "decoder pin for legacy ReplayBundle and bounded-run v1 (default control_plane_revision)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 22,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "6b0ba1185bcd390f71df947dda349415e4105f5f",
+   "purpose": "legacy unversioned executor revision; assigned by adapter when export has no producer_profile/repository",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 23,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "1d308faf664c504b6e310db3c7a310153ef7b067",
+   "purpose": "accepted executor producer-profile 1.0.0 revision",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 26,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "default Manifest attribution written into bundle.metadata.manifest_revision",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 27,
+   "peer": "Alvorada / constitutional-governance-for-institutions",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "Alvorada attribution written into bundle.metadata.alvorada_revision",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 35,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+   "purpose": "Control Plane v2 observation-repair revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 36,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "248d899634d9db3518e831bc7ab568a48733f825",
+   "purpose": "Control Plane v2 persistence-repair revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 41,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "d3dadee70bd319812b207389ab1e0f6efe511916",
+   "purpose": "Control Plane merged-producers revision (exact pin, paired with executor at line 42)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 42,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "c3c3ee7188b9367cf70b08074b9c40a5c70c94ac",
+   "purpose": "executor merged-producers revision (exact pin, paired with CP at line 41)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 45,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "c7f122ba3a6e39f9268a7163c99be3ee514cd97e",
+   "purpose": "Control Plane typed-refusal revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 46,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "309e194c1b0a3de23e11e20133e6eaf88875e48a",
+   "purpose": "executor typed-refusal revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 49,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "2a17b2ba147462a592d9b1882aad09d8a3eb7904",
+   "purpose": "Control Plane runtime-authority revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 50,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "a9a4f75a9a880ba0ae2c3b5a01fcee0ae904e127",
+   "purpose": "executor runtime-authority revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 54,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "996baeb476c8745b1a58ddc968b9eecc6a39b76b",
+   "purpose": "Control Plane security-runtime revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 55,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1",
+   "purpose": "executor security-runtime revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 56,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "e385f8c19b4444817a8b84b72ed6edbc37deb807",
+   "purpose": "Manifest attribution for security generation (metadata.manifest_revision, L795-796)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 61,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
+   "purpose": "Control Plane F5b revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 62,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+   "purpose": "executor F5b revision (exact pin)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 63,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
+   "purpose": "Manifest attribution for F5b generation (metadata.manifest_revision, L795-796)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 70,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+   "purpose": "executor producer-2.0.0 baseline revision (exact pin; observation/persistence repair pair)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/recovery_inspection.py",
+   "line": 13,
+   "peer": "Execution Runtime (cogno-us/moltbot-safe / cognous-execution-runtime; recovery export)",
+   "value": "8e7d634cf0a22b6f3c1fc6d93afe92c7414fa243",
+   "purpose": "Runtime source revision for the recovery inspection export; import_recovery_inspection rejects any other runtime_revision (L118)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/w3_atomic_import.py",
+   "line": 16,
+   "peer": "cogno-us/cognous-execution-runtime (W2 atomic)",
+   "value": "bd398f16c4cee329d2d0213afc3236ca9232d29e",
+   "purpose": "W2 Runtime revision; import_w2_atomic_failure_history rejects any other runtime_revision (L40)",
+   "kind": "code_constant"
+  },
+  {
+   "file": ".github/workflows/merged-producer.yml",
+   "line": 21,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/merged-producer.yml",
+   "line": 24,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/recovery-inspection.yml",
+   "line": 22,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/recovery-inspection.yml",
+   "line": 25,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/tests.yml",
+   "line": 25,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/tests.yml",
+   "line": 28,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/typed-refusal.yml",
+   "line": 12,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/typed-refusal.yml",
+   "line": 15,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 4,
+   "peer": "hub (cognous stack hub)",
+   "value": "6ad8f6a409d3140aa65af19d5c850dd8e58f8a7d",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 5,
+   "peer": "cogno-us/cognous-replay-bundle (self, historical main)",
+   "value": "d758db92e5d7b1109a001d92077036d80cc87a19",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 6,
+   "peer": "cogno-us/cognous-governance-evidence-pack",
+   "value": "97316b9170e4bef8310612a2f5823795a097c81d",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 10,
+   "peer": "cogno-us/cognous-replay-bundle (self, historical)",
+   "value": "459e4ba62fca49364aebb0050cd5fb2dd5a71bfa",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 12,
+   "peer": "cogno-us/cognous-governance-evidence-pack",
+   "value": "b4baccd823d2a73be276c1de745b19cf7c56a0d6",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 19,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 20,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "6b0ba1185bcd390f71df947dda349415e4105f5f",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 28,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 29,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "1d308faf664c504b6e310db3c7a310153ef7b067",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 37,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 38,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 46,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "248d899634d9db3518e831bc7ab568a48733f825",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 47,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 55,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 56,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "d3dadee70bd319812b207389ab1e0f6efe511916",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 57,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "c3c3ee7188b9367cf70b08074b9c40a5c70c94ac",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 59,
+   "peer": "cogno-us/cognous-replay-bundle (self, historical)",
+   "value": "459e4ba62fca49364aebb0050cd5fb2dd5a71bfa",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "qualification/w3/producer-consumer-compatibility.json",
+   "line": 61,
+   "peer": "cogno-us/cognous-governance-evidence-pack",
+   "value": "b4baccd823d2a73be276c1de745b19cf7c56a0d6",
+   "purpose": "compat-matrix data read by tests/test_w3_compatibility_matrix.py:17,22-38 (asserted equal to 5 supported pairs; refusal/runtime-authority/security/F5b pairs absent from matrix)",
+   "kind": "compat_table_data"
+  },
+  {
+   "file": "CROSS_COMPONENT_TESTS.md",
+   "line": "3,11-22",
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64 (links, 13 lines); 83fbaf2a0f6f071aca1ea0af859eb8fc6385c26a (relocation snapshot, line 3)",
+   "purpose": "documentation links to canonical qualification suite at pinned commit",
+   "kind": "doc"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 24,
+   "peer": "cogno-us/moltbot-safe",
+   "value": "urn:cognous:profiles:moltbot-safe-executor-producer",
+   "purpose": "executor producer profile id; enforced at L402 (_moltbot_contract) and L443",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 25,
+   "peer": "cogno-us/moltbot-safe",
+   "value": "1.0.0",
+   "purpose": "MOLTBOT_PRODUCER_PROFILE_VERSION",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 29,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-legacy-replay@28350065",
+   "purpose": "LEGACY_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 30,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-bounded-run@28350065",
+   "purpose": "BOUNDED_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 31,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-envelope-0.2.0@6b0ba118",
+   "purpose": "LEGACY_MOLTBOT_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 32,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-executor-producer-1.0.0@1d308faf",
+   "purpose": "MOLTBOT_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 43,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-bounded-run@d3dadee7",
+   "purpose": "BOUNDED_MERGED_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 44,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-executor-producer-2.0.0@c3c3ee71",
+   "purpose": "MOLTBOT_MERGED_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 47,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-bounded-refusal@c7f122ba",
+   "purpose": "BOUNDED_REFUSAL_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 48,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-executor-producer-2.0.0@309e194c",
+   "purpose": "MOLTBOT_REFUSAL_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 51,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-runtime-authority@2a17b2ba",
+   "purpose": "BOUNDED_RUNTIME_AUTHORITY_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 52,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-executor-producer-2.0.0@a9a4f75a",
+   "purpose": "MOLTBOT_RUNTIME_AUTHORITY_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 57,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-security-runtime@996baeb4",
+   "purpose": "BOUNDED_SECURITY_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 58,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-executor-producer-2.0.0@fd6b76fa",
+   "purpose": "MOLTBOT_SECURITY_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 64,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-security-runtime@a34c3dc2",
+   "purpose": "BOUNDED_F5B_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 65,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-executor-producer-2.0.0@4a83b175",
+   "purpose": "MOLTBOT_F5B_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 71,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-bounded-run@2ea9528e",
+   "purpose": "BOUNDED_V2_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 72,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "control-plane-bounded-run@248d8996",
+   "purpose": "BOUNDED_V2_PERSISTENCE_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 73,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot-safe-executor-producer-2.0.0@177354e9",
+   "purpose": "MOLTBOT_V2_PROFILE: Replay-minted producer profile id embedding the first 8 chars of the peer sha; compared by value at L475-483, L515-516, L1395, L75-77",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "37-40",
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "CONTROL_PLANE_V2_REVISIONS = (2ea9528e, 248d8996)",
+   "purpose": "allowlist of v2 CP revisions compatible with executor 2.0.0 baseline (used L412)",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "67-69",
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "SECURITY_RUNTIME_CP_REVISIONS / SECURITY_RUNTIME_BOUNDED_PROFILES / CONTROL_PLANE_SUPPORTED_V2_REVISIONS",
+   "purpose": "allowlists of CP revisions/profiles; gate L472 and L474, L515-516, L797, L1395",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "75-77",
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "STRICT_ACK_PROFILES = {6 executor 2.0.0 profile ids}",
+   "purpose": "per-profile switch for fail-closed dangling-acknowledgement rule (L1180)",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "78-81",
+   "peer": "executor + Control Plane",
+   "value": "PRODUCER_COMPATIBILITY = {'1.0.0': (1d308faf, 28350065, profile), '2.0.0': (177354e9, 2ea9528e, profile)}",
+   "purpose": "per-version compatibility table (used L405-412)",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "412-433",
+   "peer": "executor + Control Plane",
+   "value": "per-executor-revision branches mapping executor sha -> exactly one CP sha -> profile (merged, refusal, runtime-authority, security, F5b)",
+   "purpose": "per-revision compatibility table in code; 'unsupported executor/Control Plane revision combination' at L490-491",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "475-483",
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "bounded_profile dict: CP revision -> profile id",
+   "purpose": "per-revision profile selection",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "795-796",
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "manifest_revision dict: CP revision -> Manifest sha (security, F5b; else MANIFEST_REVISION)",
+   "purpose": "per-revision Manifest attribution emitted into bundle metadata",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": 387,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "LEGACY_MOLTBOT_SAFE_REVISION",
+   "purpose": "legacy export repository.revision must equal pinned legacy sha",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "407",
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "execution_envelope_version == '0.2.0'; envelope.version == '0.2.0' (L821)",
+   "purpose": "hard-coded executor wire version",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1021,1028",
+   "peer": "executor + Control Plane",
+   "value": "'cogno-us/moltbot-safe', 'cogno-us/cognous-agent-control-plane' (attempt_identity.owner)",
+   "purpose": "hard-coded repository names as attempt namespace owners",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "267,741",
+   "peer": "executor + Control Plane",
+   "value": "repository strings 'cogno-us/cognous-agent-control-plane', 'cogno-us/moltbot-safe' written into ProducerProfile.repository",
+   "purpose": "emitted attribution",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_replay_bundle/recovery_inspection.py",
+   "line": 14,
+   "peer": "Execution Runtime",
+   "value": "cognous-recovery-resolution/synthetic-0.1; export format cognous-recovery-inspection/synthetic-0.1 (L15); policy synthetic-structural/2 (L18); legacy profile cognous-revocation-closeout/1 (L216)",
+   "purpose": "producer profile/export/policy ids enforced exactly (L122, L160, L216)",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_replay_bundle/w3_atomic_import.py",
+   "line": 17,
+   "peer": "Execution Runtime W2",
+   "value": "local-atomic-w2-failure-history@bd398f16; format failure_records_v1 (L18)",
+   "purpose": "Replay-minted profile id embedding runtime sha",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/w3_c8_lineage.py",
+   "line": 12,
+   "peer": "Execution Runtime C8 candidate",
+   "value": "authority.generation == 'c8-source-rows/0.1'; stop.generation == 'c8-local-stop/0.1' (L64)",
+   "purpose": "hard-coded generation strings for peer exports",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_replay_bundle/w3_c8_lineage.py",
+   "line": 121,
+   "peer": "Execution Runtime C8 candidate",
+   "value": "revision='candidate-c8' (also L124)",
+   "purpose": "placeholder revision written to ProducerProfile/ImportReport; not a sha, no verification (metadata.source_revision_not_independently_verified L127)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": 75,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "reason_vocabulary_version == 'runtime-authority-reasons/0.1' (also L96, L222)",
+   "purpose": "vocabulary version literal enforced on CP data",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": 226,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "binding.runtime_authority.profile == 'runtime-authority/0.1'",
+   "purpose": "profile literal enforced on CP binding",
+   "kind": "code_check"
+  },
+  {
+   "file": "tests/test_w3_compatibility_matrix.py",
+   "line": "33-37",
+   "peer": "CP + executor",
+   "value": "imports constants: (CP 28350065, legacy 6b0ba118), (28350065, 1d308faf), (2ea9528e,177354e9), (248d8996,177354e9), (d3dadee7,c3c3ee71)",
+   "purpose": "test asserts the supported pair table",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_refusal_journal.py",
+   "line": "28-35",
+   "peer": "CP + executor",
+   "value": "imports constants: JOURNAL_REVISIONS (runtime-authority, security, F5b CP) and PAIRS (merged, refusal, runtime_authority, security, f5b_security CP/executor pairs)",
+   "purpose": "test pair table",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_audit_defect_detection.py",
+   "line": "19-20",
+   "peer": "CP + executor",
+   "value": "REVISION=CONTROL_PLANE_F5B_REVISION; EXECUTOR_REVISION=MOLTBOT_F5B_REVISION",
+   "purpose": "test pair",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/fixtures/route_b_post_commit/*/executor.json",
+   "line": "repository.revision",
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+   "purpose": "captured real peer export fixtures (3); carry F5b executor sha; drive CONTROL_PLANE_F5B_REVISION in tests/test_route_b_recovery_import.py:39",
+   "kind": "fixture"
+  },
+  {
+   "file": "tests/fixtures/security_runtime_valid/executor.json",
+   "line": "repository.revision",
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1",
+   "purpose": "captured peer export fixture",
+   "kind": "fixture"
+  },
+  {
+   "file": "CHANGELOG.md",
+   "line": "10,18",
+   "peer": "various",
+   "value": "2 line(s) with 40-hex shas; short ids: 248d8996,4a83b175",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "README.md",
+   "line": "152",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: 39f03843",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/executor_producer_migration.md",
+   "line": "26,40,42",
+   "peer": "various",
+   "value": "3 line(s) with 40-hex shas; short ids: 054e92d1,1d308faf,6b0ba118",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/migration_0_2.md",
+   "line": "28",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: 28350065",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/reconstruction_import.md",
+   "line": "20,22,25,26,202,203,204,205,323",
+   "peer": "various",
+   "value": "9 line(s) with 40-hex shas; short ids: 177354e9,1d308faf,248d8996,28350065,2ea9528e,46c950be,6b0ba118,fb3d9793",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/recovery-inspection.md",
+   "line": "7",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: 8e7d634c",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/runtime-authority-profile.md",
+   "line": "4,5",
+   "peer": "various",
+   "value": "2 line(s) with 40-hex shas; short ids: 2a17b2ba,a9a4f75a",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/security-runtime-f5b-profile-20261016.md",
+   "line": "3",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: 2c36bcd0,4a83b175,a34c3dc2",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/security-runtime-profile-20261016.md",
+   "line": "3",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: 996baeb4,e385f8c1,fd6b76fa",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/typed-refusal-profile.md",
+   "line": "4,5",
+   "peer": "various",
+   "value": "2 line(s) with 40-hex shas; short ids: 309e194c,c7f122ba",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/w0-c8-compatibility-contract.md",
+   "line": "5",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: 459e4ba6",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/merged-producer-compatibility.md",
+   "line": "5,9,10,24",
+   "peer": "various",
+   "value": "4 line(s) with 40-hex shas; short ids: 440e32df,b717bf23,c3c3ee71,d3dadee7",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/producer_v2_results.json",
+   "line": "3,4,5",
+   "peer": "various",
+   "value": "3 line(s) with 40-hex shas; short ids: 177354e9,2ea9528e,46c950be",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "docs/workstreams/replay-control-plane-persistence-checkpoint.md",
+   "line": "6,11,12,19,24,25,54,55,77,78,84,107",
+   "peer": "various",
+   "value": "12 line(s) with 40-hex shas; short ids: 177354e9,1afcc0c4,248d8996,25c4bff8,274543f1,2ea9528e",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/replay-producer-v2-checkpoint.md",
+   "line": "5,17,18,19,97",
+   "peer": "various",
+   "value": "5 line(s) with 40-hex shas; short ids: 177354e9,2ea9528e,46c950be,4e364f5e,f63ce914",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/w3-evidence-compatibility.md",
+   "line": "5,6,7,10,13",
+   "peer": "various",
+   "value": "5 line(s) with 40-hex shas; short ids: 459e4ba6,6ad8f6a4,97316b91,b4baccd8,d758db92",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "examples/bounded_lost_ack_reconstruction_v0_2.json",
+   "line": "12,22,499,547,548,549,550",
+   "peer": "various",
+   "value": "7 line(s) with 40-hex shas; short ids: 28350065,46c950be,6b0ba118,fb3d9793",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/bounded_success_reconstruction_v0_2.json",
+   "line": "12,22,527,567,568,569,570",
+   "peer": "various",
+   "value": "7 line(s) with 40-hex shas; short ids: 28350065,46c950be,6b0ba118,fb3d9793",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/producer_v2_prior_absence.json",
+   "line": "12,22,664,750,751,754,755,761,769,770",
+   "peer": "various",
+   "value": "10 line(s) with 40-hex shas; short ids: 177354e9,2ea9528e,46c950be,fb3d9793",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/producer_v2_rejected_wrong_effect.json",
+   "line": "12,22,792,901,902,905,906,912,920,921",
+   "peer": "various",
+   "value": "10 line(s) with 40-hex shas; short ids: 177354e9,2ea9528e,46c950be,fb3d9793",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/producer_v2_restart.json",
+   "line": "12,22,832,961,962,965,966,972,980,981",
+   "peer": "various",
+   "value": "10 line(s) with 40-hex shas; short ids: 177354e9,2ea9528e,46c950be,fb3d9793",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/producer_v2_success.json",
+   "line": "12,22,836,947,948,951,952,958,966,967",
+   "peer": "various",
+   "value": "10 line(s) with 40-hex shas; short ids: 177354e9,2ea9528e,46c950be,fb3d9793",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/producer_v2_unavailable.json",
+   "line": "12,22,713,822,823,826,827,833,841,842",
+   "peer": "various",
+   "value": "10 line(s) with 40-hex shas; short ids: 177354e9,2ea9528e,46c950be,fb3d9793",
+   "purpose": "embedded revisions in generated example/result artifact (not read by code)",
+   "kind": "generated_artifact"
+  }
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "id": "R01",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "256-262,323-329",
+   "peer": "Control Plane legacy ReplayBundle",
+   "rule": "legacy ReplayBundle must carry 10 named top-level keys; extras become L001 warnings and force partial",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:30-45 lists the field mapping but not the required-key set; docs/bundle_format.md describes legacy 0.1 bundle only"
+  },
+  {
+   "id": "R02",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "496-502",
+   "peer": "Control Plane BoundedRunRecord",
+   "rule": "record must contain run_id (non-empty string), decisions, attempts, observations, reconciliations",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:50-59 describes mapping; no schema for BoundedRunRecord exists in this repo"
+  },
+  {
+   "id": "R03",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "546-547",
+   "peer": "RuntimeProposal vs CP run",
+   "rule": "proposal.run_id, if present, must equal the CP run_id",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R04",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "582-587,112-118",
+   "peer": "Control Plane",
+   "rule": "each decision needs non-empty string decision_id; same decision_id with different content rejected",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:152-153 (immutable identity) but not decision_id presence"
+  },
+  {
+   "id": "R05",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "130-143",
+   "peer": "Control Plane binding vs RuntimeProposal",
+   "rule": "decision.binding must equal proposal on 14 named fields (manifest_id, manifest_version, manifest_digest, actor, principal, action_id, adapter_id, target, payload_commitment, requested_permissions, amount, unit, effects, requirement_id) plus proposal_commitment=sha256(proposal)",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:130-132 says applicable proposal fields must equal binding; field list only in code"
+  },
+  {
+   "id": "R06",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "659-664",
+   "peer": "Control Plane attempts",
+   "rule": "attempt.decision_id must exist among decisions; attempt.effect_id must equal that decision's effect_id; (attempt_id,effect_id,decision_id,started_at) immutable across lifecycle rows",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:140 covers dangling execution-result attempt IDs, not CP attempt->decision binding"
+  },
+  {
+   "id": "R07",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "680-681",
+   "peer": "Control Plane observations/reconciliations",
+   "rule": "every observation/reconciliation effect_id must be a known decision effect_id",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R08",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "682-689",
+   "peer": "Control Plane (legacy revision 28350065 only)",
+   "rule": "reconciliation.observation required object; observation.effect_id == enclosing effect_id; result 'applied' needs observation.state 'applied'; result 'safe_to_retry' needs 'absent'",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:153-154 (generic 'checked against enclosing effect/state contracts')"
+  },
+  {
+   "id": "R09",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1248-1249",
+   "peer": "Control Plane reconciliation (repaired profiles)",
+   "rule": "observation_accepted must be a real bool (type check)",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R10",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1250-1252",
+   "peer": "Control Plane reconciliation",
+   "rule": "reasons must be a list of non-empty strings",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R11",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1254-1261",
+   "peer": "Control Plane reconciliation",
+   "rule": "rejected/unavailable observation: result must be 'hold' with non-empty reasons; observation null or object",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:234-236 describes retention of rejection (B020) not the hold requirement"
+  },
+  {
+   "id": "R12",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1216-1228,1262-1263",
+   "peer": "Control Plane accepted observation",
+   "rule": "accepted observation: effect_id == reconciliation.effect_id; state in {applied,partial,absent}; destination_state.effect_id and .state match for applied/partial; destination_state == {} for absent",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R13",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1264-1265",
+   "peer": "Control Plane reconciliation",
+   "rule": "accepted observation must have empty reasons",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R14",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1266-1269",
+   "peer": "Control Plane reconciliation",
+   "rule": "observation_max_age_seconds must be int>0 and observation_clock_tolerance_seconds int>=0 (bool excluded)",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R15",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1231-1238,1270-1272",
+   "peer": "Control Plane reconciliation",
+   "rule": "evaluation_time and observed_at must be timezone-aware ISO times ('Z' accepted); age within [-tolerance, max_age]",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:250-251 'satisfy the recorded temporal policy'"
+  },
+  {
+   "id": "R16",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1273-1275",
+   "peer": "Control Plane reconciliation",
+   "rule": "result map: applied->applied, absent->observed_absent, partial->hold",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:253-254,284-285 mention observed_absent and retry_eligible=false only"
+  },
+  {
+   "id": "R18",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1277-1278",
+   "peer": "Control Plane run",
+   "rule": "cp.observations must equal, in order, the accepted reconciliation observations",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R19",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1289-1294",
+   "peer": "Control Plane attempts",
+   "rule": "reconciled_existing key allowed only as whole acknowledgement {reconciled_existing: true} of a lone non-'attempted' row, else reject",
+   "status": "changelog_only",
+   "nearest_doc": "CHANGELOG.md:5; docs/executor_producer_migration.md:74 documents only the positive shape"
+  },
+  {
+   "id": "R20",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "9-96",
+   "peer": "Control Plane typed-refusal/authority evidence",
+   "rule": "pydantic models (extra='forbid', strict) define the exact field sets/enums of Horizon, Input, Changed, Refusal, Check, Closeout, AuthorityInput, AuthorityRefusal, AuthorityCheck, JournalEvent; no schema file exists",
+   "status": "partial",
+   "nearest_doc": "docs/typed-refusal-profile.md:9-16 says supported typed fields validated and unknown fields fail closed; field-level contract exists only in code"
+  },
+  {
+   "id": "R21",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "112-115",
+   "peer": "Control Plane resolution inputs",
+   "rule": "record_commitment must match sha256:[0-9a-f]{64} or null; missing=true cannot carry a commitment; previous_observed_at must be timezone-aware",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R22",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "117-123",
+   "peer": "Control Plane operation horizon",
+   "rule": "horizon.proposal_commitment format; original horizon commitment must equal original binding.proposal_commitment",
+   "status": "partial",
+   "nearest_doc": "docs/typed-refusal-profile.md:11-12"
+  },
+  {
+   "id": "R23",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "130-135",
+   "peer": "Control Plane run",
+   "rule": "refusals, resolution_checks, closeouts, input_time_floors must all be present; input_time_floors is an object of non-empty keys to timezone-aware times",
+   "status": "partial",
+   "nearest_doc": "docs/typed-refusal-profile.md:9-10,17-18"
+  },
+  {
+   "id": "R24",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "140,151",
+   "peer": "Control Plane",
+   "rule": "refusal_id and check_id non-empty and unique",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R25",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "143-148",
+   "peer": "Control Plane refusal",
+   "rule": "refusal must reference an existing decision with same effect_id, original result 'authorized' with binding, original horizon equal to decision horizon, non-empty reasons, tz-aware recorded_at; every changed_input needs a matching resolution_input (actual read attribution)",
+   "status": "partial",
+   "nearest_doc": "docs/typed-refusal-profile.md:11-12; the changed-input attribution rule (L148) is unwritten"
+  },
+  {
+   "id": "R26",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "170",
+   "peer": "Control Plane (runtime-authority generations)",
+   "rule": "check_events must be a non-empty list",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R27",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "172-173,193-195",
+   "peer": "Control Plane journal",
+   "rule": "completed journal matches a resolution check by stage, inputs (ignoring previous_observed_at) and reasons subset (event.reasons subset of check.reasons)",
+   "status": "partial",
+   "nearest_doc": "docs/runtime-authority-profile.md:11-15 (stage, inputs, reasons); previous_observed_at exclusion and subset semantics unwritten"
+  },
+  {
+   "id": "R28",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "176-198",
+   "peer": "Control Plane journal",
+   "rule": "proposal_commitment sha256:[a-f0-9]{64}; opening unique; later events need an open check; owner/stage/proposal_commitment/decision_id/effect_id/action_class unchanged since opening; input events carry input; decision/effect lineage matches decisions",
+   "status": "partial",
+   "nearest_doc": "docs/runtime-authority-profile.md:11-12 (opening, ownership, single closure, original bindings)"
+  },
+  {
+   "id": "R29",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "75,96,222",
+   "peer": "Control Plane",
+   "rule": "reason_vocabulary_version must equal literal 'runtime-authority-reasons/0.1' on refusals, journal events and every decision",
+   "status": "unwritten",
+   "nearest_doc": "docs/runtime-authority-profile.md:8-9 says vocabulary retained, no literal"
+  },
+  {
+   "id": "R30",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "224-230",
+   "peer": "Control Plane binding",
+   "rule": "binding.runtime_authority must be an object with profile 'runtime-authority/0.1', exactly the keys {profile, approval_commitment, required_inputs_digest, catalogue_digest, expected_effective_grant_digest, effective_grant_derivation_version}; three commitments sha256:[a-f0-9]{64}",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R31",
+   "file": "src/agent_replay_bundle/refusal_evidence.py",
+   "line": "231-236,520-522",
+   "peer": "Control Plane vocabulary changes",
+   "rule": "vocabulary_changes: exact 9-key set, previous_version != version, non-empty acknowledged_by, tz-aware acknowledged_at; missing field defaulted to [] by importer (L520-522)",
+   "status": "unwritten",
+   "nearest_doc": "docs/runtime-authority-profile.md:8-9 mentions vocabulary change retention only"
+  },
+  {
+   "id": "R32",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1395-1431",
+   "peer": "Control Plane typed-refusal evidence in executor export",
+   "rule": "executor control_plane_evidence keys limited to {attempt, reconciliation, refusal} (+failure_record_id for security/F5b profiles; +failure_record_id,failure_class with a recovery report); failure_record_id non-empty string <=200 chars on a non-attempted denial (or unknown/non-ack/non-new for recovery report); failure_class <=100 chars; refusal must equal retained effect_time_refusal and result denied; retained refusal + denied result requires evidence.refusal",
+   "status": "partial",
+   "nearest_doc": "docs/security-runtime-profile-20261016.md:5 ('bounded nonempty reference'), CHANGELOG.md:7; numeric bounds unwritten"
+  },
+  {
+   "id": "R33",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "346-351",
+   "peer": "executor export",
+   "rule": "top-level allowed members include 'extensions'",
+   "status": "changelog_only",
+   "nearest_doc": "docs/reconstruction_import.md:72-78 list omits 'extensions'; CHANGELOG.md:5"
+  },
+  {
+   "id": "R34",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "352-355,1357",
+   "peer": "executor execution_result",
+   "rule": "execution_result member allowlist (12 names)",
+   "status": "changelog_only",
+   "nearest_doc": "CHANGELOG.md:5 states rejection, names only in code"
+  },
+  {
+   "id": "R35",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "360-372,1358-1361",
+   "peer": "executor export",
+   "rule": "'extensions' must be an object whose names start with 'x-' and are longer than 2 chars; allowed at export top level, execution_result, execution_result.observation",
+   "status": "changelog_only",
+   "nearest_doc": "CHANGELOG.md:5; the governing ODES contract is outside this repo"
+  },
+  {
+   "id": "R36",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "434-435",
+   "peer": "executor export",
+   "rule": "repository.revision_status must be in {source_asserted, unavailable}",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:77 names the member only"
+  },
+  {
+   "id": "R37",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "436-448",
+   "peer": "executor export",
+   "rule": "provenance.source_asserted must be an object with producer_profile_id, producer_profile_version, repository_revision equal to the declared profile/revision; independently_established must be an array",
+   "status": "partial",
+   "nearest_doc": "docs/executor_producer_migration.md:13-19"
+  },
+  {
+   "id": "R38",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "843-844",
+   "peer": "executor envelope",
+   "rule": "envelope import requires the corresponding RuntimeProposal (cross-record validation)",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:130-135 describe chain, not this requirement"
+  },
+  {
+   "id": "R39",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "930-932",
+   "peer": "executor attempts",
+   "rule": "attempt.operation_digest must equal sha256(envelope.operation) or the literal 'legacy:unknown'",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R40",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "939-943",
+   "peer": "executor attempt_events",
+   "rule": "every event attempt_id must be a known attempt",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:351 covers the reverse (attempt without events)"
+  },
+  {
+   "id": "R41",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1074-1077",
+   "peer": "executor export (versioned)",
+   "rule": "attempt_identity supplied while execution_result.attempt_id absent is rejected",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R42",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1096,172-181",
+   "peer": "executor effects",
+   "rule": "effect row payload_json must be canonical JSON text that decodes to an object equal to envelope.operation.payload",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:133-135 ('decoded payload')"
+  },
+  {
+   "id": "R43",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1119-1126",
+   "peer": "executor result",
+   "rule": "executed/reconciled/partial result with applied|partial observed_state, and observed result with applied|partial, require retained effect rows",
+   "status": "partial",
+   "nearest_doc": "docs/executor_producer_migration.md:65-67"
+  },
+  {
+   "id": "R44",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1129-1132",
+   "peer": "executor result",
+   "rule": "observed result with absent|unknown observed_state and any retained effect row is rejected",
+   "status": "unwritten",
+   "nearest_doc": "docs/executor_producer_migration.md:65-66 says absent/unknown 'may contain no effect row'"
+  },
+  {
+   "id": "R45",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1146-1151",
+   "peer": "executor observations",
+   "rule": "absent/unknown observation must not carry a non-empty destination_state",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R46",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1180-1181,75-77",
+   "peer": "executor/Control Plane acknowledgement",
+   "rule": "explicit acknowledgement.attempt_id must resolve to exactly one executor attempt; fail closed for all 2.0.0 profile ids, warning M001 otherwise",
+   "status": "changelog_only",
+   "nearest_doc": "CHANGELOG.md:15"
+  },
+  {
+   "id": "R47",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1321-1327",
+   "peer": "executor attempt_events",
+   "rule": "event_id must be int (bool excluded) strictly increasing across whole export; created_at numeric (bool excluded) non-decreasing",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:351 states the ordering; type constraints unwritten"
+  },
+  {
+   "id": "R48",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1339-1351",
+   "peer": "executor result vs terminal event",
+   "rule": "unresolved-ack exemption (terminal 'executed' with result 'unknown') also allowed when observation is a recovery report whose status matches observed_state",
+   "status": "partial",
+   "nearest_doc": "docs/executor_producer_migration.md:73 documents the null-observation case only"
+  },
+  {
+   "id": "R49",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1366-1367",
+   "peer": "executor export",
+   "rule": "result.control_plane_evidence must equal export.control_plane_evidence",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R50",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1371-1375",
+   "peer": "executor export",
+   "rule": "export.observations must equal [result.observation] (or [] when null); null observation requires observed_state 'unknown'",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:232-234 (null observation unknown)"
+  },
+  {
+   "id": "R51",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1379-1383",
+   "peer": "executor result",
+   "rule": "observed_state must equal observation.state; applied/partial accepted observation needs destination_state.effect_id and .state",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:249-250"
+  },
+  {
+   "id": "R52",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1384-1385",
+   "peer": "executor result",
+   "rule": "attempted result without validated observation must have status 'unknown'",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R53",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1386-1387",
+   "peer": "executor result",
+   "rule": "newly_executed requires at least one effect row",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:353 states only the inverse (acknowledged new effect)"
+  },
+  {
+   "id": "R54",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1388-1390",
+   "peer": "executor effects",
+   "rule": "when observed_state is applied|partial every effect row's 'state' field must equal observed_state",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "R55",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1391-1394",
+   "peer": "Control Plane observations vs executor operation",
+   "rule": "every CP effect_observation must bind to the executor operation (effect_id, destination_state fields, payload)",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:249-250"
+  },
+  {
+   "id": "R56",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1432-1458",
+   "peer": "executor control_plane_evidence.reconciliation",
+   "rule": "evidence.reconciliation must equal a retained CP reconciliation; rejected_observations == [rec.observation] iff not accepted and non-null else []; promoted/substituted observation rejected; rejected observation forces observed_state unknown; rejected evidence without reconciliation rejected",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:237-244"
+  },
+  {
+   "id": "R57",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1437-1438",
+   "peer": "executor export",
+   "rule": "control_plane_attempts must equal [evidence.attempt] (or [] when none)",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:245-247 says supplied CP attempts must match retained records"
+  },
+  {
+   "id": "R58",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1459-1466",
+   "peer": "executor result",
+   "rule": "attempted requires owning attempt+reconciliation+attempt_id, except Route B shape (recovery report, no attempt/reconciliation); non-attempted cannot acknowledge or execute",
+   "status": "partial",
+   "nearest_doc": "CHANGELOG.md:7 for Route B; docs/reconstruction_import.md:353"
+  },
+  {
+   "id": "R59",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1467-1468",
+   "peer": "executor result",
+   "rule": "status 'observed' with any control_plane_evidence rejected",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:252 (M020)"
+  },
+  {
+   "id": "R60",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "1469-1494",
+   "peer": "executor/Control Plane attempt",
+   "rule": "attempt enclosing identity; acknowledged flag iff attempt.status in {acknowledged,partial} (exception for control_plane namespace partial); newly_executed needs ack.newly_executed true; ack.newly_executed true contradicts result.newly_executed false (executor namespace); ack.attempt_id equals primary attempt",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:353 documents only the last clause"
+  },
+  {
+   "id": "R61",
+   "file": "src/agent_replay_bundle/importers.py",
+   "line": "187-228,904-907",
+   "peer": "executor Route B recovery report",
+   "rule": "recovery report keys {status,claim_state,retry_eligible,effect_id,operation_digest,reason}; status in {applied,partial,hold,unknown}; retry_eligible False; applied/partial require claim_state, effect_id, operation_digest; hold/unknown require non-empty reason; observed_state mapping; result unknown or observed; observed => no attempt/ack/new effect",
+   "status": "changelog_only",
+   "nearest_doc": "CHANGELOG.md:7"
+  },
+  {
+   "id": "R62",
+   "file": "src/agent_replay_bundle/recovery_inspection.py",
+   "line": "119-131,149-159,184-185,214-221",
+   "peer": "Execution Runtime synthetic recovery export",
+   "rule": "exact (set-equality) field sets for outer export, original, disposition, event, receipt, admission envelope and legacy record",
+   "status": "partial",
+   "nearest_doc": "docs/recovery-inspection.md:32 (unknown field sets rejected); sets themselves only in code"
+  },
+  {
+   "id": "R63",
+   "file": "src/agent_replay_bundle/recovery_inspection.py",
+   "line": "63-79",
+   "peer": "Execution Runtime recovery observation",
+   "rule": "all 14 text fields non-blank; state in {unknown,absent,partial,applied}; order int in [0,2^63); final/complete_coverage bool; observation_digest 64 lowercase hex; observed_at in canonical isoformat",
+   "status": "partial",
+   "nearest_doc": "docs/recovery-inspection.md:39 ('available observation structure')"
+  },
+  {
+   "id": "R64",
+   "file": "src/agent_replay_bundle/recovery_inspection.py",
+   "line": "164-171,193",
+   "peer": "Execution Runtime admission receipt",
+   "rule": "checks dict must equal a fixed 8-key literal; freshness_age_seconds numeric in [0,86400] and equal to recorded_at-observed_at",
+   "status": "partial",
+   "nearest_doc": "docs/recovery-inspection.md:36-39 mention freshness arithmetic and limits; the 86400 limit and literal checks dict unwritten"
+  },
+  {
+   "id": "R65",
+   "file": "src/agent_replay_bundle/recovery_inspection.py",
+   "line": "25-28,81-97,194",
+   "peer": "Execution Runtime conflict reasons",
+   "rule": "9-reason vocabulary and derivation rules (adapter_id/client_reference/ordering_domain change, order not increasing, applied/partial -> unknown/absent, applied->partial, finality/coverage regression)",
+   "status": "partial",
+   "nearest_doc": "docs/recovery-inspection.md:40 (conflict reasons against prior observations)"
+  },
+  {
+   "id": "R66",
+   "file": "src/agent_replay_bundle/recovery_inspection.py",
+   "line": "20-22,125,216-218",
+   "peer": "Execution Runtime",
+   "rule": "limitations list exact literal; legacy profile 'cognous-revocation-closeout/1', assurance 'legacy_unverified', LEGACY_GAPS exact list",
+   "status": "partial",
+   "nearest_doc": "docs/recovery-inspection.md:42"
+  },
+  {
+   "id": "R67",
+   "file": "src/agent_replay_bundle/w3_atomic_import.py",
+   "line": "19-20,91-103,132-135",
+   "peer": "Execution Runtime W2 failure_records_v1",
+   "rule": "failure_class in {policy_denial,authority_hold,evaluation_error,dispatch_error}; stage in {pre_dispatch,post_dispatch}; reason_code non-empty; pre_dispatch has no attempt_id; post_dispatch requires attempt_id; effect/decision lineage; observation.effect_id match; observation.retry_eligible True rejected",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:329-335 documents limits; docs/w0-c8-compatibility-contract.md:11-18 names fields generically"
+  },
+  {
+   "id": "R68",
+   "file": "src/agent_replay_bundle/w3_c8_lineage.py",
+   "line": "8-9,12-61",
+   "peer": "Execution Runtime C8 source rows",
+   "rule": "authority.generation 'c8-source-rows/0.1'; <=1 claim and claim_id match; grant/approval/policy tables required when a claim exists; tenant_id and grant_id match across rows; claim_json decodes with matching claim_id/tenant/grant/grant_revision and non-empty operation_commitment; approval/policy coverage; approvals share one non-empty proposal_commitment",
+   "status": "partial",
+   "nearest_doc": "docs/reconstruction_import.md:336-341 (limitations only)"
+  },
+  {
+   "id": "R69",
+   "file": "src/agent_replay_bundle/w3_c8_lineage.py",
+   "line": "63-86",
+   "peer": "Execution Runtime C8 stop events",
+   "rule": "stop.generation 'c8-local-stop/0.1'; unique string event ids; integer strictly increasing sequence; kinds in fixed 5-step order strictly advancing; one lifecycle_id; single effect_id",
+   "status": "unwritten",
+   "nearest_doc": "docs/reconstruction_import.md:339-341 notes stop events are not bound to the claim"
+  },
+  {
+   "documented_rules_not_listed": "Rules whose full content is stated in docs/reconstruction_import.md, docs/executor_producer_migration.md, docs/runtime-authority-profile.md or docs/typed-refusal-profile.md are omitted: unique effect identity (L603-614), payload commitment (L561-565,874-877), single binding (L636-639), attempt lifecycle start/repeat (L1279-1301), executor attempt-row/effect-row uniqueness and event completeness (L1312-1336), CP attempt exact-match (L959-986), attempt_identity namespaces/owners (L1012-1035), denied-with-effects (L1127-1128), unknown top-level fields B001 (L532-537), closeout uniqueness and uncertain-attempt closeout (RF L156-168), journal order and single-use (RF L195-217)."
+  }
+ ],
+ "unwritten_consumer_rules_method": "Read importers.py, refusal_evidence.py, recovery_inspection.py, w3_atomic_import.py, w3_c8_lineage.py, reconstruction.py in full; enumerated every raise/require on peer data. For each, grepped docs/**, README.md, CHANGELOG.md, CROSS_COMPONENT_TESTS.md, schemas/*.json and collateral/ for distinguishing tokens (field names, literals, error strings) and read docs/reconstruction_import.md, executor_producer_migration.md, runtime-authority-profile.md, typed-refusal-profile.md, security-runtime*.md, recovery-inspection.md, w0-c8-compatibility-contract.md, workstreams/*.md. Status: unwritten = no doc/schema/changelog statement; changelog_only = only in CHANGELOG.md; partial = doc states the intent or part of the rule, code adds specifics. Test files (test_importers, test_audit_defect_detection, test_replay_shape_regressions, test_route_b_recovery_import, test_refusal_journal, test_w3_*) were inventoried by test names and parametrized mutate/match strings: they exercise importer rules, no test-only validators exist and no additional peer rules were found there; test bodies were not read line-by-line. tests/fixtures/* are captured peer exports (executor revision 4a83b175 x3, fd6b76fa x1) acting as de facto shape specs.",
+ "external_deps": [
+  "pydantic>=2.0 (pyproject.toml:13-15)",
+  "pytest, pytest-cov (dev)",
+  "GitHub Actions: actions/checkout and actions/setup-python pinned by sha (.github/workflows/tests.yml:13,16)",
+  "GitHub-hosted runners / Python 3.11,3.12 CI",
+  "SQLite is referenced only as the executor's retained destination store (data format), not accessed",
+  "hmac/hashlib stdlib for integrity"
+ ],
+ "notes": [
+  "Replay hard-codes 8 Control Plane revisions and 8 executor revisions (legacy, 1.0.0, v2, persistence, merged, refusal, runtime-authority, security, F5b) with one-to-one pairing logic inside _moltbot_contract (importers.py:405-433, 472-491); adding or retiring any producer revision requires editing Replay code and republishing it. This is the primary decoupling blocker.",
+  "No schema for any peer artifact (BoundedRunRecord, executor export, typed-refusal collections, journal events, W2/C8 rows) exists in this repo; the contract is encoded imperatively in importers.py/refusal_evidence.py. 30 of 68 listed rules are fully unwritten, 32 partial, 6 changelog_only (see statuses).",
+  "Replay is the single place that defines Reconstruction Bundle record_type vocabulary (schema leaves record_type a free string).",
+  "Evidence Pack re-runs Replay's import_bounded_workflow as a library (evidence importer.py:609-661) and requires byte-equal records/links/commitments/profiles/status/import_reports/semantics; therefore any Replay behavior change (e.g. new rules at 8eaf3a42, Route B record type executor_recovery_report) breaks Evidence Pack round-trips unless Evidence is updated in lockstep. Verified empirically: with Replay 8eaf3a42 on the path and Evidence 505a359, all three route_b_post_commit fixtures import in Replay but Evidence's _run_pinned_replay_validator fails with 'accepted executor observations differ from result'.",
+  "The control_plane_revision argument is caller-selected and never verified against the data (docs/reconstruction_import.md:215-218); the same string selects the decoder. Decoupling needs the producer to self-declare a profile/version in-band (the executor already does via producer_profile; the Control Plane BoundedRunRecord carries none, importers.py:727 format_version=None).",
+  "qualification/w3/producer-consumer-compatibility.json lists only 5 supported pairs while importers.py supports 4 further generations (refusal, runtime-authority, security, F5b); the matrix test (tests/test_w3_compatibility_matrix.py:22-38) therefore guards a stale subset.",
+  "Cross-component tests live in cognous-stack-qualification pinned at 39f03843 (4 workflows; CROSS_COMPONENT_TESTS.md); scripts/generate_producer_v2_examples.py and qualification/test_merged_producer.py referenced by .github/workflows/merged-producer.yml:6-8 are not in this checkout, and tests/test_pinned_integration.py etc. were relocated, so producer-side integration cannot run from this repo alone.",
+  "Repo naming is inconsistent across code: executor is 'cogno-us/moltbot-safe' (importers.py:741,1021) but 'cogno-us/cognous-execution-runtime' in w3_atomic_import.py:153 and w3_c8_lineage.py:121; Replay itself appears as cognous-replay-bundle (task) / cognous-agent-replay-bundle (Evidence code).",
+  "Git tracks build artifacts: src/agent_replay_bundle.egg-info/* and __pycache__/*.pyc and tests/__pycache__ are committed.",
+  "docs/workstreams/producer_v2_results.json and examples/*.json embed peer shas (generated); not read by code but pin the examples to specific peer revisions.",
+  "ODES is not consumed; it is referenced only as the source of the 'extensions' x- prefix rule (importers.py:361) and CHANGELOG.md:5. The ODES lifecycle contract conformance added at f3e81cf/8eaf3a4 lives in CHANGELOG only (R19, R33-R35)."
+ ],
+ "rule_status_counts": {
+  "partial": 32,
+  "unwritten": 30,
+  "changelog_only": 6
+ }
+}

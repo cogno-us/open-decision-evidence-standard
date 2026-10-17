@@ -1,0 +1,497 @@
+{
+ "repo": "cogno-us/cognous-evidence-registry (The Index)",
+ "commit": {
+  "sha": "703ff3cd2adea70ef9496c3c19ba6c6a44d9c0e3",
+  "subject": "fix: verify link attestations (BitRep v1) and count distinct sources for independence",
+  "branch": "fix/issues-23-24-link-attestation-independence (NOT main; parent is merge 711a07c of PR #21)",
+  "copy": "<work-dir>/work-d/index",
+  "note": "Own clone of /home/claude/cognous-evidence-registry. 'git fetch origin main' FAILED ('couldn't find remote ref main': the local origin has only the fix branch), so the clone is at the local checkout's HEAD above, a feature-branch commit, not main. No network fetch attempted."
+ },
+ "produces": [
+  {
+   "name": "Index chain: claim registration",
+   "record_types": [
+    "Registered event / claims[id] {author, content, parent, lifecycle, successor}"
+   ],
+   "version": "policy index-lifecycle/1; domain index-domain/1",
+   "defined": [
+    "chain/contracts/IndexProtocol.sol:10-16,27,39-50",
+    "chain/PROTOCOL.md:55-71"
+   ],
+   "notes": "Claim id = keccak256(abi.encode(DOMAIN,'claim',sender,contentSHA256,parent)) (IndexProtocol.sol:40; PROTOCOL.md:67). Content is a commitment only."
+  },
+  {
+   "name": "Index chain: evidence entry / assertion",
+   "record_types": [
+    "EvidenceSubmitted event / evidence[id] {submitter, claim, content, manifest, statement, relation(1 support,2 challenge)}"
+   ],
+   "version": "index-lifecycle/1",
+   "defined": [
+    "chain/contracts/IndexProtocol.sol:17-24,28-29,51-60",
+    "chain/PROTOCOL.md:73-80"
+   ],
+   "notes": "'statement' = BitRep statement digest commitment, may be zero; nonzero = unverified commitment (PROTOCOL.md:75-77; contract never checks it, IndexProtocol.sol:51-60)."
+  },
+  {
+   "name": "Index chain: lifecycle transition",
+   "record_types": [
+    "LifecycleChanged {id, lifecycle (Withdrawn|Superseded), successor, reason}"
+   ],
+   "version": "index-lifecycle/1",
+   "defined": [
+    "chain/contracts/IndexProtocol.sol:9,30,61-80",
+    "chain/PROTOCOL.md:81-88"
+   ],
+   "notes": ""
+  },
+  {
+   "name": "Reconstructed graph view",
+   "record_types": [
+    "{claims, evidence, history[], blockNumber, blockHash, finality}"
+   ],
+   "version": "unversioned (JS object)",
+   "defined": [
+    "chain/reconstruct.mjs:6-37"
+   ],
+   "notes": "finality string is 'provisional' or 'depth:N;not-consensus-finality' (reconstruct.mjs:36). Read-only derived view."
+  },
+  {
+   "name": "Chain identifiers for BitRep binding",
+   "record_types": [
+    "audience",
+    "subject"
+   ],
+   "version": "index:eip155:<chainId>:<lowercase addr>:v1 ; <audience>:claim:<hex>",
+   "defined": [
+    "chain/client.mjs:13-19 (audience/subject)",
+    "chain/PROTOCOL.md:177-180"
+   ],
+   "notes": "Relation 1 -> statement_type index-support/1, relation 2 -> index-challenge/1 stated at PROTOCOL.md:179 but NOT enforced by any code in the repo."
+  },
+  {
+   "name": "Legacy API Link (attested relationship)",
+   "record_types": [
+    "Link {id, claim_id, evidence_id|claim_id_2, relation_type, strength, attested_by, attestation_id, attestation_statement_digest, timestamp}"
+   ],
+   "version": "unversioned; link attestation profile 'index.link.v1' (provisional)",
+   "defined": [
+    "app/core/models.py:153-212 (LinkBase/LinkCreate/Link)",
+    "app/core/models.py:39-48 (RelationType)",
+    "app/evidence/link_attestation.py:33,46-59",
+    "docs/BITREP_LINK_ATTESTATION.md:28-40",
+    "schema/link.schema.json (legacy shape; uses source_id/target_id/weight/attestor_id - differs from app model)"
+   ],
+   "notes": "Link canonical bytes: compact sorted-key ASCII JSON of {claim_id,claim_id_2,evidence_id,relation_type,strength} (link_attestation.py:46-55). In-memory only (evidence/service.py:40-46)."
+  },
+  {
+   "name": "Legacy API Evidence record",
+   "record_types": [
+    "Evidence {id,type,source_identifier,metadata,submitted_by,quality_score,...}"
+   ],
+   "version": "unversioned",
+   "defined": [
+    "app/core/models.py:28-37,106-150",
+    "schema/evidence.schema.json",
+    "api/evidence_layer.py:236-266 (checksum)"
+   ],
+   "notes": "schema README says shape-only, not an authenticity gate (schema/README.md:17-28)."
+  },
+  {
+   "name": "Legacy API Claim record",
+   "record_types": [
+    "Claim"
+   ],
+   "version": "unversioned",
+   "defined": [
+    "app/core/models.py:18-100",
+    "schema/claim.schema.json",
+    "api/claim_layer.py:19-232"
+   ],
+   "notes": "PUT/DELETE return 409 (CHANGELOG.md:'decentralized reference slice')."
+  },
+  {
+   "name": "EpistemicStatus (derived)",
+   "record_types": [
+    "EpistemicStatus {status, supporting_weight, contradicting_weight, independence_score, robustness_score}"
+   ],
+   "version": "unversioned",
+   "defined": [
+    "app/core/models.py:215-229",
+    "app/evidence/service.py:199-248"
+   ],
+   "notes": "independence_score=min(distinct normalized source_identifier/5,1) (service.py:215-218, _source_key 246-248; docs/BITREP_LINK_ATTESTATION.md:60-66). Local score, explicitly not assurance (PROTOCOL.md:23, 155)."
+  },
+  {
+   "name": "Adapter verification result",
+   "record_types": [
+    "BitRep verification result dict (bitrep-verification/1)"
+   ],
+   "version": "bitrep-verification/1 (peer-defined)",
+   "defined": [
+    "chain/python/bitrep_adapter.py:35-69",
+    "chain/README.md:28-43"
+   ],
+   "notes": "Unsigned, observer-specific, not a portable receipt (chain/README.md:41-42)."
+  },
+  {
+   "name": "Governance proposals/votes (legacy)",
+   "record_types": [
+    "Proposal",
+    "Vote"
+   ],
+   "version": "unversioned",
+   "defined": [
+    "app/governance/models.py",
+    "app/api/governance.py"
+   ],
+   "notes": "Caller-supplied reputation; not authority (PROTOCOL.md:24)."
+  },
+  {
+   "name": "Index Operations catalog",
+   "record_types": [
+    "IIO-CANON, IIO-DRIFT, IIO-LINEAGE, IIO-PARITY, IIO-REBIND, IIO-TRAVERSE entries"
+   ],
+   "version": "entry Version 1.0",
+   "defined": [
+    "docs/operations/README.md:1-30",
+    "docs/operations/IIO-*.md:1-10"
+   ],
+   "notes": "Documentation records only; no code emitter found."
+  },
+  {
+   "name": "Proposed evidence manifest",
+   "record_types": [
+    "index-evidence-manifest/1"
+   ],
+   "version": "proposed only",
+   "defined": [
+    "chain/PROTOCOL.md:98-104"
+   ],
+   "notes": "Not contract-enforced and no schema file or code exists."
+  }
+ ],
+ "consumes": [
+  {
+   "peer": "BitRep (cognous-evidence-attestation, vendored as cogno-us/bitrep)",
+   "artifacts": "AttestationEnvelope {statement{protocol_version,algorithm,attestation_id,issuer,key_id,subject,statement_type,audience,content_digest,issued_at,not_before,expires_at}, signature}; TrustRegistry bitrep-trust/1; VerificationResult bitrep-verification/1",
+   "how": "(a) legacy API: vendored verifier modules call verify_attestation under operator snapshot named by env BITREP_TRUST_REGISTRY, re-read per request; then Index-side binding checks. (b) chain adapter: separate process loads clean BitRep checkout at pin, compares content/subject/type/audience/statement digest to independently derived expectations.",
+   "lines": [
+    "app/evidence/link_attestation.py:62-111",
+    "app/bitrep_verify/models.py:17-51",
+    "app/bitrep_verify/trust.py:55-80",
+    "app/bitrep_verify/verification.py:14-15,30-78",
+    "chain/python/bitrep_adapter.py:19-69",
+    "docs/BITREP_LINK_ATTESTATION.md:7-58"
+   ]
+  },
+  {
+   "peer": "BitRep published test vector",
+   "artifacts": "tests/fixtures/bitrep-verification-v1.json",
+   "how": "vendored-verifier conformance test",
+   "lines": [
+    "tests/test_link_attestation.py:52-55"
+   ]
+  },
+  {
+   "peer": "Operator trust snapshot (operator-supplied, not a Cognous component)",
+   "artifacts": "bitrep-trust/1 JSON file",
+   "how": "file read each request; missing/invalid/non-current => 503 trust_unavailable",
+   "lines": [
+    "app/bitrep_verify/trust.py:73-80",
+    "app/bitrep_verify/verification.py:32-33",
+    "app/evidence/link_attestation.py:83,85-88"
+   ]
+  },
+  {
+   "peer": "EVM node (chain)",
+   "artifacts": "eth logs for IndexProtocol events",
+   "how": "reconstruct.mjs reads getLogs from block 0; hard-fails on removed log, unknown event, incomplete history, reorg during scan",
+   "lines": [
+    "chain/reconstruct.mjs:6-37"
+   ]
+  },
+  {
+   "peer": "Other Cognous components (Exchange, Control Plane, Replay, ODES, Evidence Pack)",
+   "artifacts": "none",
+   "how": "No code or doc in this repo consumes artifacts from them (grep for exchange/replay/odes/control-plane found only hub/collateral references).",
+   "lines": [
+    "README.md:104 (stack table, links only)",
+    "collateral/business-collateral.md:33"
+   ]
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "chain/python/bitrep_adapter.py",
+   "line": 16,
+   "peer": "BitRep",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "PIN constant; adapter refuses any checkout whose HEAD != PIN or that is dirty (lines 20-26)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "app/bitrep_verify/models.py",
+   "line": 1,
+   "peer": "BitRep (cogno-us/bitrep)",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "vendored-verbatim provenance header; 'do not edit, re-vendor from new pin' (also lines 2-3)",
+   "kind": "vendored_source"
+  },
+  {
+   "file": "app/bitrep_verify/trust.py",
+   "line": 1,
+   "peer": "BitRep (cogno-us/bitrep)",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "vendored-verbatim header",
+   "kind": "vendored_source"
+  },
+  {
+   "file": "app/bitrep_verify/verification.py",
+   "line": 1,
+   "peer": "BitRep (cogno-us/bitrep)",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "vendored-verbatim header",
+   "kind": "vendored_source"
+  },
+  {
+   "file": "app/bitrep_verify/verification.py",
+   "line": 14,
+   "peer": "BitRep attestation protocol id",
+   "value": "bitrep-attestation/1",
+   "purpose": "PROTOCOL_VERSION enforced in verify (line 46); also DOMAIN separator b'BitRep attestation v1\\n' at line 15; algorithm 'Ed25519' (line 48)",
+   "kind": "vendored_source"
+  },
+  {
+   "file": "app/bitrep_verify/trust.py",
+   "line": 55,
+   "peer": "BitRep trust snapshot version",
+   "value": "bitrep-trust/1",
+   "purpose": "registry_version regex",
+   "kind": "vendored_source"
+  },
+  {
+   "file": "app/bitrep_verify/models.py",
+   "line": 44,
+   "peer": "BitRep verification result version",
+   "value": "bitrep-verification/1",
+   "purpose": "VerificationResult literal; Index re-checks it at app/evidence/link_attestation.py:90-92 and chain/python/bitrep_adapter.py:68",
+   "kind": "vendored_source"
+  },
+  {
+   "file": "app/evidence/link_attestation.py",
+   "line": 33,
+   "peer": "Index link statement type (own profile, provisional)",
+   "value": "index.link.v1",
+   "purpose": "LINK_STATEMENT_TYPE required of every BitRep statement; not defined by BitRep (BitRep treats statement_type as opaque, lines 8-9)",
+   "kind": "own_profile"
+  },
+  {
+   "file": "docs/BITREP_LINK_ATTESTATION.md",
+   "line": 18,
+   "peer": "BitRep",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "doc",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/PROTOCOL.md",
+   "line": 165,
+   "peer": "BitRep (named cogno-us/cognous-evidence-attestation)",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "doc; repo name differs from vendored headers (cogno-us/bitrep)",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/README.md",
+   "line": 12,
+   "peer": "BitRep",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "doc; workflow pin",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/VALIDATION.md",
+   "line": 5,
+   "peer": "BitRep",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "validation record",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/PROTOCOL.md",
+   "line": 179,
+   "peer": "Index statement types for BitRep",
+   "value": "index-support/1 (relation 1), index-challenge/1 (relation 2)",
+   "purpose": "documented required values; not enforced in code",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/PROTOCOL.md",
+   "line": 177,
+   "peer": "Index audience/subject grammar",
+   "value": "index:eip155:<chainId>:<lowercase address>:v1 ; ...:claim:<hex>",
+   "purpose": "produced by chain/client.mjs:13-19; compared by adapter (bitrep_adapter.py:60-65)",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/PROTOCOL.md",
+   "line": 11,
+   "peer": "Index (self baseline)",
+   "value": "3abba683c707ae95c7834036231ac55463cf1586",
+   "purpose": "audit baseline (also chain/VALIDATION.md:4)",
+   "kind": "doc"
+  },
+  {
+   "file": ".github/workflows/chain-qualification.yml",
+   "line": 19,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable workflow ref (also line 22)",
+   "kind": "ci"
+  },
+  {
+   "file": "CROSS_COMPONENT_TESTS.md",
+   "line": 3,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "suite location (also lines 9,10; and 650903fd6db1d68810dd377ba09e801a76682935 at line 3)",
+   "kind": "doc"
+  },
+  {
+   "file": "README.md",
+   "line": 129,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "suite location",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/README.md",
+   "line": 14,
+   "peer": "cognous-stack-qualification",
+   "value": "43fb81dc3ec0da17402bef274dcec1831cc5e160",
+   "purpose": "suite location - DIFFERENT commit from the 39f03843 used in workflow/README (stale pin)",
+   "kind": "doc"
+  },
+  {
+   "file": "collateral/one-page-overview.md",
+   "line": 26,
+   "peer": "hub component-lock (cognous-open-control-stack) and this repo",
+   "value": "5737267d94d2b445735c95e8480a31de73a2abe8 / d5e45d275cb301d9684b543e93b05997991d1cf2",
+   "purpose": "selected-revision statement (also collateral/business-collateral.md:33,39,41,65 incl. bbde8a598c7502ca08a7126c093e1cdfaa28bca1)",
+   "kind": "doc"
+  },
+  {
+   "file": "chain/package.json",
+   "line": "n/a (not inspected line-by-line)",
+   "peer": "toolchain",
+   "value": "solc 0.8.30, ethers 6.16.0, Ganache 7.9.2 (chain/PROTOCOL.md:220; contract pragma IndexProtocol.sol:2)",
+   "purpose": "external toolchain, not Cognous",
+   "kind": "toolchain"
+  }
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "file": "app/evidence/link_attestation.py",
+   "line": 90,
+   "rule": "Accept only when VerificationResult.outcome=='verified' AND reason=='ok' AND result_version=='bitrep-verification/1' (lines 90-92); any other outcome returns 422 with BitRep's reason.",
+   "peer": "BitRep",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked. doc lists reasons (BITREP_LINK_ATTESTATION.md:50) but not the result_version/reason=='ok' conjunction; chain/PROTOCOL.md:185-186 states the result_version rule for the chain adapter only.",
+   "documented": "partial"
+  },
+  {
+   "file": "chain/python/bitrep_adapter.py",
+   "line": 49,
+   "rule": "Adapter rejects attestation input larger than 16384 bytes (input_too_large).",
+   "peer": "BitRep envelope",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "no"
+  },
+  {
+   "file": "chain/python/bitrep_adapter.py",
+   "line": 25,
+   "rule": "Adapter requires BitRep checkout HEAD == PIN and clean status including untracked files; imports top-level 'models.verification','utils.trust','utils.verification' from BITREP_ROOT (lines 20-31).",
+   "peer": "BitRep (module layout)",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked. chain/README.md:12 says 'clean pinned checkout'; module paths named at PROTOCOL.md:166-167.",
+   "documented": "yes"
+  },
+  {
+   "file": "chain/python/bitrep_adapter.py",
+   "line": 57,
+   "rule": "Content check: sha256(content) must equal BOTH expected['content_digest'] and statement.content_digest; also statement digest, subject, statement_type, audience equal expected and registry.audience == expected audience; snapshot fingerprint == operator-supplied digest (lines 52-65).",
+   "peer": "BitRep",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "yes (chain/README.md:28-37, PROTOCOL.md:170-176)"
+  },
+  {
+   "file": "app/evidence/link_attestation.py",
+   "line": 98,
+   "rule": "Index-side binding: statement_type=='index.link.v1', subject==link.claim_id, issuer==link.attested_by, content_digest==sha256(link canonical bytes) (lines 98-110).",
+   "peer": "BitRep",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "yes (BITREP_LINK_ATTESTATION.md:28-40)"
+  },
+  {
+   "file": "app/evidence/link_attestation.py",
+   "line": 84,
+   "rule": "Verification time is the server clock int(time.time()); no skew allowance; non-current snapshot raises TrustUnavailable => 503 (verification.py:32-33).",
+   "peer": "BitRep / operator snapshot",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "yes (BITREP_LINK_ATTESTATION.md:25)"
+  },
+  {
+   "file": "app/evidence/link_attestation.py",
+   "line": 74,
+   "rule": "Attestation parsed with strict_json (duplicate members/constants rejected) from json.dumps(link.attestation), i.e. after the framework already resolved duplicate keys (last wins).",
+   "peer": "BitRep",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "yes (BITREP_LINK_ATTESTATION.md:57-58)"
+  },
+  {
+   "file": "app/evidence/service.py",
+   "line": 145,
+   "rule": "Replay/idempotency index keyed (issuer, attestation_id) -> statement_digest; resubmission same digest returns 200, different digest 409 (api/evidence.py:98-110). In-memory only.",
+   "peer": "BitRep attestation_id uniqueness",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "yes (BITREP_LINK_ATTESTATION.md:47,52,55)"
+  },
+  {
+   "file": "chain/PROTOCOL.md",
+   "line": 179,
+   "rule": "Relation 1 requires statement_type index-support/1 and relation 2 index-challenge/1; Index app uses a different type (index.link.v1) and subject (claim_id) than the chain profile (subject = audience:claim:<hex>). No code enforces the PROTOCOL.md:179 mapping: adapter takes expected values from the caller.",
+   "peer": "BitRep statement profile",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "doc-only (not enforced)"
+  },
+  {
+   "file": "app/evidence/link_attestation.py",
+   "line": 90,
+   "rule": "App path does not check statement.audience itself beyond BitRep's equality with the operator snapshot audience; Index defines no fixed audience for the legacy API (BITREP_LINK_ATTESTATION.md:34-35).",
+   "peer": "BitRep trust snapshot",
+   "how_checked": "Searched README.md, docs/BITREP_LINK_ATTESTATION.md, chain/PROTOCOL.md, chain/README.md, CHANGELOG.md, schema/README.md for the field/behaviour. BitRep's own docs/VERIFICATION_CONTRACT_V1.md is in the BitRep repo and was NOT available/checked.",
+   "documented": "yes (documented as 'the trust snapshot's audience')"
+  }
+ ],
+ "external_deps": [
+  "BitRep (Cognous, cogno-us/bitrep @5b5077d; vendored in app/bitrep_verify/, MIT licence in LICENSE.bitrep) - in scope as a peer",
+  "cryptography (Ed25519, app/bitrep_verify/verification.py:5-7), pydantic>=2 (strict models), FastAPI app (app/main.py), Python >=3.10 (docs/BITREP_LINK_ATTESTATION.md:74)",
+  "Solidity 0.8.30, ethers 6.16.0, Ganache 7.9.2, Node 24, npm lock (chain/PROTOCOL.md:220; chain/VALIDATION.md:8-14)",
+  "EVM JSON-RPC (eth_blockNumber, getLogs, getBlock) - untrusted third-party RPC acknowledged (PROTOCOL.md:37,139-143); no public chain deployed",
+  "Named, not implemented: IPFS/HTTPS replicas (PROTOCOL.md:96,107-110), Solana Ed25519 precompile (PROTOCOL.md:203,227,240), Ethereum PoS references (PROTOCOL.md:239-241)",
+  "clarity-index.github.io schema $id URLs in schema/*.json (legacy identifiers, not fetched)",
+  "Reusable workflows in cogno-us/cognous-stack-qualification (Cognous)",
+  "app/core/security.py: RSA/JWT/password utilities and ZK placeholder, not an integrated gate (PROTOCOL.md:25)"
+ ],
+ "notes": [
+  "Revision inspected is a feature branch (fix/issues-23-24-...), not main; the BitRep link-attestation code (app/bitrep_verify, app/evidence/link_attestation.py) exists only there. Re-run P0 against main after merge if the contract boundary should reflect main.",
+  "Two disjoint BitRep profiles inside one repo: legacy API (statement_type index.link.v1, subject=claim_id, audience=operator-chosen, vendored verifier, in-memory) vs chain (index-support/1|index-challenge/1, audience index:eip155:..., out-of-process adapter at pinned checkout, content bytes bound). Neither is registered as a shared contract; PROTOCOL.md:274-275 says strings await Governor approval.",
+  "chain/PROTOCOL.md:168 says no BitRep source is copied into the Index, but app/bitrep_verify vendors three BitRep modules (BITREP_LINK_ATTESTATION.md:15-22): stale statement. BitRep repo named cogno-us/cognous-evidence-attestation in PROTOCOL.md:164 but cogno-us/bitrep in vendored headers.",
+  "BitRep contract doc (VERIFICATION_CONTRACT_V1.md) is referenced but not in this repo, and BITREP_LINK_ATTESTATION.md:3-5 calls cross-component adoption 'proposed pending Governor review'; vendoring pins BitRep code, so any BitRep change is a re-vendor (explicit rule at models.py:3).",
+  "Blocked boundary: contract-enforced BitRep issuer validity (no Ed25519 verifier on chain); evidence 'statement' field is only an unverified commitment (PROTOCOL.md:208-213).",
+  "F-19 (copied evidence): the label 'F-19' does not appear in this repo. Relevant text, as it bears on the Index/BitRep contract boundary: PROTOCOL.md:77-79 and 156-160 (copies under other IDs remain visible; same content hash is a duplicate signal; differing bytes do not prove independence; signatures/issuer ids do not multiply weight), VALIDATION.md:110 (copied-support test row), BITREP_LINK_ATTESTATION.md:60-66 (independence counts distinct source_identifier; duplicate links/records still add weight, 'known limit'). Boundary consequence: BitRep attests issuer signature only (assurance 'issuer_signature_only', models.py:51), so a relayed/copied genuine statement verifies (PROTOCOL.md:181-183); independence/copy detection lives entirely on the Index side and is a free-text source_identifier heuristic, not an attested field.",
+  "Index produces no artifact that any other Cognous component in this repo set consumes; Exchange explicitly does not consume Index/BitRep (reference README.md:66, mapping.md:47). Interface to Index is therefore currently the Link/Evidence JSON + chain events, with no versioned schema matching app models (schema/*.json describe a different legacy shape: source_id/target_id/weight/attestor_id vs claim_id/evidence_id/strength/attested_by).",
+  "Legacy services are in-memory, unauthenticated, loopback-only (CHANGELOG.md F5b entry); migration doc says previously stored links are not re-verified (BITREP_LINK_ATTESTATION.md:73).",
+  "Test drivers for the chain/BitRep boundary live in cognous-stack-qualification (CROSS_COMPONENT_TESTS.md:3-10); only app unit tests and tests/fixtures/bitrep-verification-v1.json stay here.",
+  "chain/package.json line pin entry has line 'n/a'; toolchain versions come from PROTOCOL.md:220, package.json not read line-by-line."
+ ]
+}

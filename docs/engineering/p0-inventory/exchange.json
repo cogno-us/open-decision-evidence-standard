@@ -1,0 +1,1082 @@
+{
+ "repo": "cogno-us/cognous-governed-exchange",
+ "commit": {
+  "sha": "ec6ba5bdaaf3a53db312790de5e60e90c3b92fe4",
+  "subject": "Repin F5b peers to Replay def0ee0f, ODES 5675f1b9 and Evidence Pack 505a3590 (#34)",
+  "copy": "<work-dir>/work-d/exchange",
+  "note": "Own clone of the pinned local copy. 'git fetch origin main' FAILED ('couldn't find remote ref main': the local origin has no main branch), so the clone was left on the cloned HEAD (detached) = the revision above. No network fetch attempted; the revision is the local pinned copy, not verified against GitHub main."
+ },
+ "produces": [
+  {
+   "name": "Governed message (ODEX-GAX/IMX refund exchange)",
+   "record_types": [
+    "PROPOSE",
+    "REQUEST",
+    "REPORT",
+    "REFUSE",
+    "NOT_UNDERSTOOD"
+   ],
+   "version": "profile urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0 / protocol_version 0.1.0",
+   "defined": [
+    "experiments/odex_gax_imx_reference/gax_ref.py:15-18",
+    "experiments/odex_gax_imx_reference/gax_ref.py:228-231 (make_message)",
+    "experiments/odex_gax_imx_reference/gax_ref.py:238 (required fields)",
+    "experiments/odex_gax_imx_reference/profile.md:17-33"
+   ],
+   "notes": "Message digest = sha256 over canonical JSON of all fields except message_digest (gax_ref.py:231, 241). Message type set is code-defined; profile.md lists required fields but not requested_action/purpose subfields."
+  },
+  {
+   "name": "IMX successor packet",
+   "record_types": [
+    "successor packet (packet_id succ-<source>-<n>)"
+   ],
+   "version": "profile/schema_version same as exchange 0.1.0; state_version 'state-<n>'",
+   "defined": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:1313-1318 (make_successor_packet)",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:1246-1308 (accept_successor, consumer-side head/lineage rules)",
+    "experiments/odex_gax_imx_reference/gax_ref.py:321-322 (legacy)"
+   ],
+   "notes": "Fields: packet_id, profile, schema_version, conversation_id, source_packet_id, source_commitment, predecessor_packet_id, state_version, relevant_decisions, pending_effects, attempts, unresolved_delivery, missing_evidence, next_proposed_work, packet_digest (field list seen in gax_ref.py:322; runtime variant at gax_ref_runtime.py:1316 truncated in view, same shape plus predecessor linkage)."
+  },
+  {
+   "name": "GAX retained-artifact export",
+   "record_types": [
+    "state: original_complete | regenerated_derivative | recovery_denied_derivative | reconciled_derivative"
+   ],
+   "version": "profile urn:cognous:profiles:gax-retained-artifacts, export_version 1.1.0 (1.0.0 readable)",
+   "defined": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:40-41",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:584-625 (_retained_artifact_export)",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:628-665 (validator)",
+    "docs/gax-runtime-artifact-interface.md:27-63, 73-83"
+   ],
+   "notes": "Embeds Replay reconstruction bundle, ODES package + recipient_validation, successor packet, producer_refs and content_commitments (RT:615-625). Recovery state names: 'recovery_required' and 'historical_artifacts_unavailable' are transport-level (transport.py:969-971)."
+  },
+  {
+   "name": "Recipient result",
+   "record_types": [
+    "recipient result (result_state mirrors artifact export state or unavailable/recovery_required/historical_artifacts_unavailable)"
+   ],
+   "version": "profile urn:cognous:profiles:governed-message-recipient-result, version 1.0.0",
+   "defined": [
+    "experiments/governed_message_transport/transport.py:15-16",
+    "experiments/governed_message_transport/transport.py:184-200 (RecipientOutcome.as_dict)",
+    "experiments/governed_message_transport/transport.py:1256-1279 (retained_result / retained_artifacts)",
+    "docs/gax-runtime-artifact-interface.md:40-48"
+   ],
+   "notes": ""
+  },
+  {
+   "name": "Governed message transport envelope",
+   "record_types": [
+    "envelope",
+    "acknowledgement DURABLE_RECEIPT",
+    "DURABLE_RECEIPT_UNRESOLVED",
+    "TERMINAL_REJECTION"
+   ],
+   "version": "profile urn:cognous:profiles:governed-message-transport:0.1.0, transport_version 0.1.0, canonicalization json-sort-keys-compact-v1",
+   "defined": [
+    "experiments/governed_message_transport/transport.py:13-20",
+    "experiments/governed_message_transport/transport.py:718-746 (make_transport_envelope)",
+    "experiments/governed_message_transport/transport.py:827-846 (_ack)",
+    "experiments/governed_message_transport/profile.md:5-33"
+   ],
+   "notes": ""
+  },
+  {
+   "name": "Transport evidence summary",
+   "record_types": [
+    "evidence() dict"
+   ],
+   "version": "transport_version 0.1.0",
+   "defined": [
+    "experiments/governed_message_transport/transport.py:1281-1360"
+   ],
+   "notes": "Lists unsupported: cryptographically_authenticated_network_identity, distributed_exactly_once_delivery, independent_effect_verification (TR:1353-1357)."
+  },
+  {
+   "name": "Lineage generation-fence refusal records",
+   "record_types": [
+    "generation_refusals rows",
+    "generation_refusal_counters"
+   ],
+   "version": "profile urn:cognous:profiles:gax-lineage-generation-fence 0.1.0",
+   "defined": [
+    "experiments/odex_gax_imx_reference/generation_fence.py:11-12",
+    "generation_fence.py:293-313",
+    "docs/generation-fence.md:1-62"
+   ],
+   "notes": "Local SQLite only; no cross-component consumer found in repo."
+  },
+  {
+   "name": "Synthesized reconstruction bundle (HISTORICAL legacy path)",
+   "record_types": [
+    "runtime_proposal",
+    "runtime_decision",
+    "control_plane_attempt_transition",
+    "execution_envelope",
+    "destination_attempt",
+    "execution_result",
+    "destination_effect",
+    "effect_observation"
+   ],
+   "version": "reconstruction_bundle_version 0.2.0; execution_envelope version 0.2.0",
+   "defined": [
+    "experiments/odex_gax_imx_reference/gax_ref.py:275-282"
+   ],
+   "notes": "Exchange itself hand-builds a Replay-shaped bundle in the legacy gax_ref.py path (marked historical/unsupported for store/successor, README.md of reference:57-58); current runtime obtains the bundle from Replay import (RT:402-405) instead."
+  },
+  {
+   "name": "Recovery artifact files",
+   "record_types": [
+    "recovery-<digest>.json (artifact export)"
+   ],
+   "version": "artifact export 1.1.0",
+   "defined": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:1045-1046",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:1065-1066"
+   ],
+   "notes": "Written next to the exchange sqlite store."
+  }
+ ],
+ "consumes": [
+  {
+   "peer": "Control Plane (agent_control_plane.bounded)",
+   "artifacts": "RuntimeProposal, RuntimeDecision (+binding), BoundedRunRecord/BoundedRecordStore JSON, ObservationPolicy, runtime_authority_profile, GrantStatus etc.",
+   "how": "in-process Python import of peer module; constructs BoundedAuthorizationWorkflow and calls decide()",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:311",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:824-835",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:993-1002",
+    "experiments/odex_gax_imx_reference/gax_ref.py:76-82"
+   ]
+  },
+  {
+   "peer": "Moltbot Safe / Execution runtime (engine.producer_contract)",
+   "artifacts": "ExecutionEnvelope, ExecutionOperation, LocalExecutionPolicy, PinnedControlPlaneExecutor, DurableRefundDestination, export_execution_artifacts() producer export (execution_envelope, execution_result, attempts, control_plane_attempts, effects, attempt_identity, producer_profile, repository)",
+   "how": "in-process import; profile id/version equality check; constructs peer dataclasses with 20 named fields",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:310",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:312-326",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:386-395",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:495-520",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:870-877",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:556-581"
+   ]
+  },
+  {
+   "peer": "Replay Bundle (agent_replay_bundle.importers.import_bounded_workflow)",
+   "artifacts": "reconstruction bundle (model_dump)",
+   "how": "import_bounded_workflow(cp_record, proposal=, moltbot_export=, control_plane_revision=CP_REVISION); result dumped to dict",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:402-409",
+    "experiments/odex_gax_imx_reference/gax_ref.py:289-295"
+   ]
+  },
+  {
+   "peer": "ODES (odes.export_cognous_stack_package, odes.evaluate_recipient_package)",
+   "artifacts": "ODES package incl. provenance.execution_facts, recipient validation result",
+   "how": "calls exporter with fixed relying_party/purpose/expiry and evaluates with a locally built policy; reads package['profile']['implementation_profile'] and package['provenance']['execution_facts'] (destination_effects, destination_observed, control_plane_attempt_transitions, execution_results, effect_observation_history)",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:412-435",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:438-464",
+    "experiments/odex_gax_imx_reference/gax_ref.py:298-300"
+   ]
+  },
+  {
+   "peer": "Agent Action Manifest",
+   "artifacts": "refund_integration_v1_1.manifest.json example",
+   "how": "JSON read from env UPSTREAM_MANIFEST_EXAMPLE; in strict profiles git HEAD of manifest checkout compared to MANIFEST_REVISION",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:278-286",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:372-374"
+   ]
+  },
+  {
+   "peer": "Governance Evidence Pack (agent_governance_evidence_pack.importer)",
+   "artifacts": "module only",
+   "how": "imported solely inside _verify_refusal_profile_sources for source-identity check; no Evidence Pack artifact is consumed in runtime code",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:242",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:293"
+   ]
+  },
+  {
+   "peer": "Replay example bundle",
+   "artifacts": "bounded_success_reconstruction_v0_2.json (fixture)",
+   "how": "read via env UPSTREAM_REPLAY_SUCCESS_EXAMPLE as the incoming bundle in run_actual_outcome / demo",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:1329-1331",
+    "experiments/odex_gax_imx_reference/README.md:72-75"
+   ]
+  },
+  {
+   "peer": "Authority Context (Alvorada) interface",
+   "artifacts": "context_id urn:cognous:alvorada:public-stack-profile:0.1.0 shape (institution, requirement, grant, approvals, evidence obligations); consumed through Control Plane resolver",
+   "how": "synthetic fixture only (SyntheticResolver); production caller must supply trusted resolver",
+   "lines": [
+    "experiments/odex_gax_imx_reference/gax_ref.py:19",
+    "experiments/odex_gax_imx_reference/gax_ref.py:215-225",
+    "experiments/odex_gax_imx_reference/gax_ref_runtime.py:490-492"
+   ]
+  },
+  {
+   "peer": "Index / BitRep",
+   "artifacts": "none",
+   "how": "NOT consumed or produced; only stated as optional evidence interfaces / out of scope (reference README:66, mapping.md:47)",
+   "lines": [
+    "experiments/odex_gax_imx_reference/README.md:66",
+    "experiments/odex_gax_imx_reference/mapping.md:47"
+   ]
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 31,
+   "peer": "Control Plane (cogno-us/cognous-control-plane)",
+   "value": "248d899634d9db3518e831bc7ab568a48733f825",
+   "purpose": "persistence-v1 default: control_plane_revision passed to Replay (RT:405); strict-verified only in strict profiles (RT:238)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 32,
+   "peer": "Execution runtime (Moltbot Safe)",
+   "value": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+   "purpose": "persistence-v1: stamped as repository_revision in producer export (RT:390)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 33,
+   "peer": "Action Manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "strict profiles compare manifest checkout HEAD (RT:285)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 34,
+   "peer": "Replay Bundle",
+   "value": "043830b56595cecddfa65c064afd1c0b95e64792",
+   "purpose": "persistence-v1; strict check RT:240",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 35,
+   "peer": "ODES",
+   "value": "0486b645e99c46d9cd16ca34b1ba7c653a6b3024",
+   "purpose": "persistence-v1; strict check RT:241",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 36,
+   "peer": "Governance Evidence Pack",
+   "value": "de6b9e071df49fc3e0c1254d39b5c94cced554f0",
+   "purpose": "persistence-v1; strict check RT:242",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 37,
+   "peer": "Authority Context (Alvorada: cogno-us/constitutional-governance-for-institutions per docs)",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "ALVORADA_REVISION defined but never referenced anywhere in code (grep)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 38,
+   "peer": "Execution runtime producer profile id",
+   "value": "urn:cognous:profiles:moltbot-safe-executor-producer",
+   "purpose": "equality check on loaded module EXECUTOR_PRODUCER_PROFILE_ID (RT:312); recovery paths RT:768, 978 gate on version",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 39,
+   "peer": "Execution runtime producer profile version",
+   "value": "2.0.0",
+   "purpose": "equality check RT:314; refuses recovery for other versions RT:768, RT:978",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 50,
+   "peer": "Control Plane",
+   "value": "d3dadee70bd319812b207389ab1e0f6efe511916",
+   "purpose": "profile merged-producers-v1 label",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 51,
+   "peer": "Execution runtime",
+   "value": "c3c3ee7188b9367cf70b08074b9c40a5c70c94ac",
+   "purpose": "merged-producers-v1 label",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 52,
+   "peer": "Replay Bundle",
+   "value": "459e4ba62fca49364aebb0050cd5fb2dd5a71bfa",
+   "purpose": "merged-producers-v1 label",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 53,
+   "peer": "ODES",
+   "value": "c5e9a0f3695ae836b803be06c46d2c669642ee03",
+   "purpose": "merged-producers-v1 label",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 54,
+   "peer": "Governance Evidence Pack",
+   "value": "b4baccd823d2a73be276c1de745b19cf7c56a0d6",
+   "purpose": "merged-producers-v1 label",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 56,
+   "peer": "Control Plane",
+   "value": "c7f122ba3a6e39f9268a7163c99be3ee514cd97e",
+   "purpose": "typed-refusal-candidate-20261015; strict-verified against checkout HEAD",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 57,
+   "peer": "Execution runtime",
+   "value": "309e194c1b0a3de23e11e20133e6eaf88875e48a",
+   "purpose": "typed-refusal-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 58,
+   "peer": "Replay Bundle",
+   "value": "83fbaf2a0f6f071aca1ea0af859eb8fc6385c26a",
+   "purpose": "typed-refusal-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 59,
+   "peer": "ODES",
+   "value": "25c7ad608c2e6fd9f450e075db6bbf3ee4091a49",
+   "purpose": "typed-refusal-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 60,
+   "peer": "Governance Evidence Pack",
+   "value": "1e789c7d67a897097445faef1813fb0cd22d55e5",
+   "purpose": "typed-refusal-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 62,
+   "peer": "Control Plane",
+   "value": "996baeb476c8745b1a58ddc968b9eecc6a39b76b",
+   "purpose": "security-runtime-candidate-20261016; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 63,
+   "peer": "Execution runtime",
+   "value": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1",
+   "purpose": "security-runtime-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 64,
+   "peer": "Action Manifest",
+   "value": "e385f8c19b4444817a8b84b72ed6edbc37deb807",
+   "purpose": "security-runtime-candidate; manifest HEAD check",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 65,
+   "peer": "Replay Bundle",
+   "value": "3601fb218d5c02f5d86e55d2cf33983e5e130ac3",
+   "purpose": "security-runtime-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 66,
+   "peer": "ODES",
+   "value": "dd2dc7e8f3fe74263917a0c67a40875daf3b0ce0",
+   "purpose": "security-runtime-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 67,
+   "peer": "Governance Evidence Pack",
+   "value": "8aba5a106ad119330950ccff97c55fa8492bc287",
+   "purpose": "security-runtime-candidate; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 71,
+   "peer": "Control Plane",
+   "value": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
+   "purpose": "security-runtime-f5b-20261016; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 72,
+   "peer": "Execution runtime",
+   "value": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+   "purpose": "f5b; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 73,
+   "peer": "Action Manifest",
+   "value": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
+   "purpose": "f5b; manifest HEAD check",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 74,
+   "peer": "Replay Bundle",
+   "value": "def0ee0f3af713283ea3cd13f0caf79e1607b651",
+   "purpose": "f5b; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 75,
+   "peer": "ODES",
+   "value": "5675f1b96d95ba69510656bf73b1006110ef5b57",
+   "purpose": "f5b; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 76,
+   "peer": "Governance Evidence Pack",
+   "value": "505a3590114705b7ebf736b92dd189f338134635",
+   "purpose": "f5b; strict-verified",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 237,
+   "peer": "Peer module names + checkout layout",
+   "value": "agent_control_plane.bounded @ <cp_root>/src/agent_control_plane; engine.producer_contract @ <molt_root>/engine; agent_replay_bundle.importers; odes.exporter; agent_governance_evidence_pack.importer",
+   "purpose": "structural pin: module/package paths that must exist and be git-tracked at the pinned HEAD (RT:237-243)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 299,
+   "peer": "Default checkout paths",
+   "value": "upstream/control-plane, upstream/moltbot-safe (env MOLTBOT_SAFE_CONTROL_PLANE_ROOT, MOLTBOT_SAFE_ROOT)",
+   "purpose": "where peers are loaded from (RT:299-300); manifest default upstream/manifest/examples/refund_integration_v1_1.manifest.json at RT:373",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 19,
+   "peer": "Authority Context profile (Alvorada)",
+   "value": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+   "purpose": "PROFILE_AUTH_CONTEXT: default authority_context_ref and context_id; also checked in assess_message (GR:261)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 217,
+   "peer": "Authority Context schema",
+   "value": "schema_version 0.1.0, interface_status 'proposed_pending_governor_review'",
+   "purpose": "synthetic context literal",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 221,
+   "peer": "Control Plane status versions",
+   "value": "GrantStatus version 'status-v1'; RoleMappingStatus version 'roles-v1' (GR:224)",
+   "purpose": "synthetic resolver fixture constants",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 282,
+   "peer": "Control Plane (legacy name cogno-us/cognous-agent-control-plane)",
+   "value": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
+   "purpose": "hard-coded producer_profiles entry in Exchange-synthesized reconstruction bundle (legacy path)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 282,
+   "peer": "Moltbot Safe (cogno-us/moltbot-safe)",
+   "value": "6b0ba1185bcd390f71df947dda349415e4105f5f",
+   "purpose": "same bundle; revision does not match any other pin in the repo",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 282,
+   "peer": "Replay reconstruction bundle schema",
+   "value": "reconstruction_bundle_version 0.2.0",
+   "purpose": "literal in synthesized bundle",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 279,
+   "peer": "Moltbot execution_envelope schema",
+   "value": "version 0.2.0",
+   "purpose": "literal in synthesized envelope record",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 300,
+   "peer": "ODES implementation profile",
+   "value": "odes_cognous_stack_export_0_1",
+   "purpose": "supported_profiles in recipient policy (legacy path); runtime path uses the package's own declared profile (RT:427)",
+   "kind": "runtime_code"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 330,
+   "peer": "peer",
+   "value": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
+   "purpose": "expected F5B pin per slot (CP)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 331,
+   "peer": "peer",
+   "value": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+   "purpose": "expected F5B pin per slot (Execution runtime)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 332,
+   "peer": "peer",
+   "value": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
+   "purpose": "expected F5B pin per slot (Manifest)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 333,
+   "peer": "peer",
+   "value": "def0ee0f3af713283ea3cd13f0caf79e1607b651",
+   "purpose": "expected F5B pin per slot (Replay)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 334,
+   "peer": "peer",
+   "value": "5675f1b96d95ba69510656bf73b1006110ef5b57",
+   "purpose": "expected F5B pin per slot (ODES)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 335,
+   "peer": "peer",
+   "value": "505a3590114705b7ebf736b92dd189f338134635",
+   "purpose": "expected F5B pin per slot (Evidence Pack)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 338,
+   "peer": "peer",
+   "value": "996baeb476c8745b1a58ddc968b9eecc6a39b76b",
+   "purpose": "expected retained security-candidate pin (CP)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 339,
+   "peer": "peer",
+   "value": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1",
+   "purpose": "expected retained security-candidate pin (Execution runtime)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 340,
+   "peer": "peer",
+   "value": "e385f8c19b4444817a8b84b72ed6edbc37deb807",
+   "purpose": "expected retained security-candidate pin (Manifest)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 341,
+   "peer": "peer",
+   "value": "3601fb218d5c02f5d86e55d2cf33983e5e130ac3",
+   "purpose": "expected retained security-candidate pin (Replay)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 342,
+   "peer": "peer",
+   "value": "dd2dc7e8f3fe74263917a0c67a40875daf3b0ce0",
+   "purpose": "expected retained security-candidate pin (ODES)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 343,
+   "peer": "peer",
+   "value": "8aba5a106ad119330950ccff97c55fa8492bc287",
+   "purpose": "expected retained security-candidate pin (Evidence Pack)",
+   "kind": "test"
+  },
+  {
+   "file": "tests/test_exchange_input_and_source_repairs.py",
+   "line": 176,
+   "peer": "Execution runtime producer profile",
+   "value": "id urn:cognous:profiles:moltbot-safe-executor-producer, version 2.0.0",
+   "purpose": "fake peer checkout fixture mirrors the pinned profile",
+   "kind": "test"
+  },
+  {
+   "file": "experiments/governed_message_transport/profile.md",
+   "line": 11,
+   "peer": "Governed Exchange (self, historical)",
+   "value": "9ad378145d326799e3209136e47e82d66c6f69af",
+   "purpose": "accepted GAX/IMX baseline statement",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 5,
+   "peer": "Governed Exchange (self, historical)",
+   "value": "9ad378145d326799e3209136e47e82d66c6f69af",
+   "purpose": "transport baseline",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 9,
+   "peer": "Action Manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "historical workbench pin",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 10,
+   "peer": "Authority Context (cognous-institutional-governance)",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "historical pin",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 11,
+   "peer": "Control Plane",
+   "value": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
+   "purpose": "historical pin",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 12,
+   "peer": "Execution runtime",
+   "value": "1d308faf664c504b6e310db3c7a310153ef7b067",
+   "purpose": "historical pin",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 13,
+   "peer": "Replay Bundle",
+   "value": "f63ce914504dd06813c4ccd199b0570dbd8dd427",
+   "purpose": "historical pin",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 14,
+   "peer": "Governance Evidence Pack",
+   "value": "f1a76187b72d5b7c9fded12580ba081cb9cba338",
+   "purpose": "historical pin",
+   "kind": "doc"
+  },
+  {
+   "file": "experiments/governed_message_transport/mapping.md",
+   "line": 15,
+   "peer": "ODES",
+   "value": "cba83a1c06f718a8afd76178f36e5cc15896347d",
+   "purpose": "historical pin",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/gax-runtime-artifact-interface.md",
+   "line": 13,
+   "peer": "Execution runtime",
+   "value": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+   "purpose": "accepted Moltbot revision",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/gax-runtime-artifact-interface.md",
+   "line": 91,
+   "peer": "Control Plane",
+   "value": "248d899634d9db3518e831bc7ab568a48733f825",
+   "purpose": "persistence-adoption candidate",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/gax-runtime-artifact-interface.md",
+   "line": 93,
+   "peer": "Replay Bundle",
+   "value": "043830b56595cecddfa65c064afd1c0b95e64792",
+   "purpose": "persistence-adoption candidate",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/gax-runtime-artifact-interface.md",
+   "line": 95,
+   "peer": "Execution runtime",
+   "value": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+   "purpose": "executor remains",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/gax-runtime-artifact-interface.md",
+   "line": 105,
+   "peer": "Control Plane / Replay (historical pair)",
+   "value": "2ea9528eeb87e14ff10f05de06473122b9df540f / 274543f1cd7171784a923a8e37015017a0d8bc9d",
+   "purpose": "historical compatibility evidence (lines 105-106)",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/gax-runtime-artifact-interface.md",
+   "line": 110,
+   "peer": "ODES",
+   "value": "0486b645e99c46d9cd16ca34b1ba7c653a6b3024",
+   "purpose": "Phase B",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/gax-runtime-artifact-interface.md",
+   "line": 112,
+   "peer": "Governance Evidence Pack",
+   "value": "de6b9e071df49fc3e0c1254d39b5c94cced554f0",
+   "purpose": "Phase B",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/merged-consumer-chain.md",
+   "line": 13,
+   "peer": "Action Manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "merged-producers-v1 table (lines 13-18: manifest, CP d3dadee7, runtime c3c3ee71, Replay 459e4ba6, Pack b4baccd8, ODES c5e9a0f3)",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/merged-consumer-chain.md",
+   "line": 3,
+   "peer": "Governed Exchange (self)",
+   "value": "11782e8de182f80e7c8d761db2f8fe3e9641a498",
+   "purpose": "starting revision",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/typed-refusal-profile.md",
+   "line": 19,
+   "peer": "typed-refusal candidate pins",
+   "value": "runtime 309e194c, Replay 83fbaf2a, ODES 25c7ad60, Pack 1e789c7d, CP c7f122ba (line 23), Manifest 46c950be (line 23)",
+   "purpose": "lines 19-23",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/security-runtime-f5b-profile-20261016.md",
+   "line": 7,
+   "peer": "six-peer table (candidate vs f5b)",
+   "value": "CP 996baeb4/a34c3dc2; runtime fd6b76fa/4a83b175; Manifest e385f8c1/2c36bcd0; Replay 3601fb21/def0ee0f; ODES dd2dc7e8/5675f1b9; Pack 8aba5a10/505a3590",
+   "purpose": "lines 7-12",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/gax-control-plane-store-adoption-checkpoint.md",
+   "line": 24,
+   "peer": "adoption table",
+   "value": "CP 248d8996; runtime 177354e9; Replay 043830b5; ODES 0486b645; Pack de6b9e07; Manifest 46c950be; Authority Context fb3d9793",
+   "purpose": "lines 24-30; also historical 37-41 (CP 2ea9528e, Replay 274543f1, ODES 226adb0e, Pack 812194b9), 142-143, 197-198",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/gax-producer-v2-checkpoint.md",
+   "line": 10,
+   "peer": "producer-v2 table",
+   "value": "CP 2ea9528e, runtime 177354e9, Replay 274543f1, ODES 226adb0e, Pack 812194b9, Manifest 46c950be, Authority Context fb3d9793",
+   "purpose": "lines 10-16",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/recovery-export-separation-checkpoint.md",
+   "line": 123,
+   "peer": "unchanged-peers list",
+   "value": "Replay 274543f1, runtime 177354e9, CP 2ea9528e, ODES 226adb0e, Pack 812194b9",
+   "purpose": "lines 123-127; also hub PR ref 07c250ed.. at line 11",
+   "kind": "doc"
+  },
+  {
+   "file": "CHANGELOG.md",
+   "line": 35,
+   "peer": "Control Plane / Replay / executor / ODES / Pack",
+   "value": "248d8996 (l35), 043830b5 (l36), 177354e9 (l37), 0486b645 (l45), de6b9e07 (l46)",
+   "purpose": "change history",
+   "kind": "doc"
+  },
+  {
+   "file": "README.md",
+   "line": 146,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "suite location (also CROSS_COMPONENT_TESTS.md:3,11-25)",
+   "kind": "doc"
+  },
+  {
+   "file": "collateral/one-page-overview.md",
+   "line": 26,
+   "peer": "hub component-lock (cognous-open-control-stack) + this repo",
+   "value": "5737267d94d2b445735c95e8480a31de73a2abe8 / 9984d9011568ccdf3d562fa9760ad41368947b34",
+   "purpose": "also collateral/business-collateral.md:33,39,41,65",
+   "kind": "doc"
+  },
+  {
+   "file": ".github/workflows/tests.yml",
+   "line": 29,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable workflow ref (also line 32)",
+   "kind": "ci"
+  },
+  {
+   "file": ".github/workflows/typed-refusal.yml",
+   "line": 12,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable workflow ref (also line 15)",
+   "kind": "ci"
+  },
+  {
+   "file": ".github/workflows/merged-consumer-chain.yml",
+   "line": 10,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable workflow ref (also line 13)",
+   "kind": "ci"
+  }
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 540,
+   "rule": "Stored Moltbot export must carry envelope.decision_id/effect_id and execution_result.decision_id/effect_id equal to the association's; otherwise refuse (stored_envelope_identity_mismatch / stored_result_identity_mismatch). Lines 540-543.",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. Strings 'stored_envelope' absent from docs.",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 545,
+   "rule": "moltbot.execution_envelope.operation.proposal_commitment must equal peer commitment(proposal) (stored_operation_proposal_commitment_mismatch).",
+   "peer": "Execution runtime / Control Plane (commitment fn)",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 547,
+   "rule": "Every moltbot.effects[] row must have effect_id == association effect_id; every moltbot.attempts[] row must match effect_id AND decision_id (lines 547-552).",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 459,
+   "rule": "Pending-effect rule: an attempted/observed effect is 'pending' unless ODES execution_facts.effect_observation_history[effect_id].latest_supported_destination_state (fallback destination_observed) == 'applied'; so 'partial','absent','unknown' all stay pending/unresolved (lines 447-463). Consumes ODES provenance.execution_facts keys destination_effects, destination_observed, control_plane_attempt_transitions, execution_results[].attempted, effect_observation_history.",
+   "peer": "ODES (execution_facts) ",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. docs/gax-runtime-artifact-interface.md:83 states the semantics in prose ('Pending/unresolved state follows validated destination evidence') but not the key names or the != 'applied' predicate; the keys appear only in results JSON docs/workstreams/gax-observation-repair-results.json (output, not spec).",
+   "documented": "partial"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 427,
+   "rule": "Recipient policy trusts the ODES package's own declared profile: supported_profiles=[package['profile']['implementation_profile']]; i.e. profile support is self-asserted by the peer output (self-validation).",
+   "peer": "ODES",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 981,
+   "rule": "resume_original requires the retained cp_record.attempts to contain an attempt with effect_id == association.effect_id (lines 981-982).",
+   "peer": "Control Plane",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. docs say 'retained owning CP attempt' (gax-runtime-artifact-interface.md:77) - partially stated.",
+   "documented": "partial"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 984,
+   "rule": "Owning Control Plane store is located by globbing '<store_dir>/control-plane-*.json' and matching run_id, equal decisions, and attempts/observations/reconciliations being prefix-extensions of the original; exactly one candidate required (lines 984-992). Relies on the Control Plane store file layout/append-only property and on Exchange's own file naming (RT:830).",
+   "peer": "Control Plane (BoundedRunRecord layout)",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. docs only say 'unambiguous owning store' (gax-runtime-artifact-interface.md:77).",
+   "documented": "partial"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 1006,
+   "rule": "After peer executor.execute in recovery, result.newly_executed must be falsy else RuntimeError 'upstream invariant failure: recovery dispatched an effect'.",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 1023,
+   "rule": "Recovery denial branch selected iff result.status=='denied' and result.control_plane_evidence.reconciliation absent.",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "yes (docs/gax-runtime-artifact-interface.md:79)"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 768,
+   "rule": "Recovery/redelivery trust gate: association.moltbot.producer_profile.profile_version must equal '2.0.0' else 'historical_generation_requires_revision_pinned_recovery' (also 978).",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "yes (docs interface.md:81, profile 2.0.0 line 9-13)"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 312,
+   "rule": "Loaded executor module must expose EXECUTOR_PRODUCER_PROFILE_ID/VERSION equal to pinned constants; also reads producer.EXECUTION_ENVELOPE_VERSION (RT:520) and attribute names PinnedControlPlaneExecutor, DurableRefundDestination, ExecutionEnvelope, ExecutionOperation, LocalExecutionPolicy, commitment, export_execution_artifacts (RT:316-326).",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. docs interface.md:5-13 name the adapter module as engine.control_plane_adapter.PinnedControlPlaneExecutor but code reads it from engine.producer_contract (RT:319) - doc/code mismatch.",
+   "documented": "partial"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 495,
+   "rule": "Exchange constructs peer ExecutionOperation with 20 named keyword fields (actor...effective_max_effects) and ExecutionEnvelope(version, decision_id, effect_id, operation) positionally; rehydrates stored dicts with ExecutionOperation(**d)/ExecutionEnvelope(**d) (RT:997-998). Peer constructor signature is an implicit contract.",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 832,
+   "rule": "Control Plane API surface relied on: BoundedAuthorizationWorkflow(manifest, resolver, destination, records, observation_policy, runtime_authority_profile, allow_test_time), workflow.decide(proposal, now), RuntimeProposal/RuntimeDecision.model_validate, BoundedRecordStore.load().model_dump; runtime_authority_profile only for security-runtime profiles (RT:90-98).",
+   "peer": "Control Plane",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. docs/security-runtime-profile-20261016.md:5 states the profile requirement but not the constructor contract.",
+   "documented": "partial"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 705,
+   "rule": "Execution response reads duck-typed fields from the executor result: attempted, newly_executed, observed_state, effect_id, decision_id, attempt_id, acknowledged, observation, control_plane_evidence, status (RT:698-717, 752-758).",
+   "peer": "Execution runtime",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 631,
+   "rule": "Retained export accepted if export_version in {'1.0.0','1.1.0'}; profile exact match; digests/commitments cross-checked (RT:628-665). Self-owned format, so not a peer rule, listed for boundary completeness.",
+   "peer": "self (retained artifact)",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "yes (interface.md:25-38, 81)"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref_runtime.py",
+   "line": 1254,
+   "rule": "Successor acceptance rules (digest, profile==PROFILE, schema_version, conversation_id, source id/commitment, head/parent linkage, state_version monotonic) and documented limitation that first packet trusts caller-supplied predecessor.",
+   "peer": "IMX successor producer (self-owned)",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "partial (README.md of reference:47-58 lists continuity semantics, limitation at 57)"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 261,
+   "rule": "assess_message requires message.authority_refs to contain {ref == proposal.authority_context_ref}; bundle evidence_refs of type 'replay_bundle' must carry digest == digest(bundle).",
+   "peer": "Authority Context ref / Replay bundle digest",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. reference profile.md lists required fields but not these ref rules (profile.md:17-35).",
+   "documented": "no"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 253,
+   "rule": "Message requested_action must equal a fixed 9-field projection of the Control Plane RuntimeProposal (action_id,target,payload,amount,unit,actor,principal,adapter_id,requested_permissions), and proposal_commitment/operation_commitment must equal Exchange-computed values using the Control Plane 'commitment' function (GR:85-107).",
+   "peer": "Control Plane (commitment canonicalisation)",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. mapping.md:20 mentions 'canonical SHA-256 over proposal payload/action fields' but not the field list.",
+   "documented": "partial"
+  },
+  {
+   "file": "experiments/odex_gax_imx_reference/gax_ref.py",
+   "line": 289,
+   "rule": "Legacy _run_replay regroups bundle records by record_type (runtime_decision, control_plane_attempt_transition, effect_observation, reconciliation, execution_envelope, execution_result, destination_attempt, destination_attempt_event, destination_effect) and passes moltbot only if an execution_envelope exists (first of each taken).",
+   "peer": "Replay Bundle",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked. mapping.md:18-32 documents most record types, not destination_attempt_event or first-only selection.",
+   "documented": "partial"
+  },
+  {
+   "file": "experiments/governed_message_transport/transport.py",
+   "line": 315,
+   "rule": "Transport takes result_state from artifact_export['state'] (default 'recovery_required' when no export) and treats 'recovery_required'/'historical_artifacts_unavailable' as unresolved receipts (TR:969-971, 986-1015).",
+   "peer": "GAX runtime output (intra-repo)",
+   "how_checked": "Searched docs/*.md, README.md, CHANGELOG.md, experiments/*/profile.md, mapping.md, reference README.md for the identifier/field names and the behaviour; repo has no JSON Schema or spec file for peer outputs (git ls-files shows none), so 'not written' = absent from every doc in this repo; peer-owned specs live in other repos and were NOT checked.",
+   "documented": "yes (interface.md:50-63)"
+  }
+ ],
+ "external_deps": [
+  "Python >=3.11 stdlib incl. sqlite3 (pyproject.toml:10) - all stores are local SQLite",
+  "git CLI executed via subprocess for source-identity checks (RT:101-125, 252-286)",
+  "pydantic (indirectly, Control Plane RuntimeProposal.model_dump/model_validate) - peer-owned",
+  "pytest>=8.0 (dev) pyproject.toml; GitHub Actions actions/checkout@11bd7190..., actions/setup-python@a26af69b... (.github/workflows/tests.yml:17,20)",
+  "Reusable GitHub workflows in cogno-us/cognous-stack-qualification (Cognous, listed above)",
+  "README.md:102-104 cites SSRN paper and OWASP report (documentation only, no runtime dependency)",
+  "No network, HTTP, blockchain, BitRep or Index calls in code (grep)"
+ ],
+ "notes": [
+  "Runtime coupling to peers is by in-process Python import of peer source checkouts (RT:299-326), not by wire/schema contract; there is no schema/spec directory in the repo. Decoupling needs the peer-output contract (Replay bundle, ODES execution_facts, Moltbot producer export, CP record) written down as schemas.",
+  "Pins are duplicated across 6 profile blocks in RT:31-76 (5 generations incl. default), tests:330-343, 11+ docs, 3 workflows; ALVORADA_REVISION (RT:37) is dead; PROFILE_AUTH_CONTEXT/legacy bundle pins in gax_ref.py (:19,:282) are stale and inconsistent with RT pins (283500652d.. and 6b0ba118.. match no other pin).",
+  "Pins in persistence-v1 and merged-producers-v1 are labels, not measured (docs/merged-consumer-chain.md:204; RT:44-47). Only STRICT_SOURCE_PROFILES (typed-refusal, security-runtime-candidate, f5b) verify git HEAD (RT:81-83, 308-309).",
+  "Strict verification expects specific module names and checkout layout (RT:237-243) and env vars UPSTREAM_MANIFEST_EXAMPLE, MOLTBOT_SAFE_ROOT, MOLTBOT_SAFE_CONTROL_PLANE_ROOT, UPSTREAM_REPLAY_SUCCESS_EXAMPLE (RT:278, 299-300, 373, 1330).",
+  "Doc/code mismatch: docs name engine.control_plane_adapter.PinnedControlPlaneExecutor (interface.md:7) while code imports it from engine.producer_contract (RT:310, 319). Repo-name drift: docs use cognous-control-plane etc.; code strings use cogno-us/cognous-agent-control-plane and cogno-us/moltbot-safe (GR:282, RT:392).",
+  "Transport adapters do not pass runtime_authority_profile, so they fail under security-runtime profiles (transport profile.md:41) - blocker for adopting V1 security profile through transport.",
+  "Cross-component tests live in cognous-stack-qualification (CROSS_COMPONENT_TESTS.md); only component-local tests remain, so contract tests for decoupling do not exist in this repo.",
+  "Exchange has no Index/BitRep dependency, so it is not a blocker for Index decoupling; no Index/ODES-authored 'observation records' are produced by Exchange itself (it embeds ODES/Replay outputs).",
+  "Peer-owned specs (Replay, ODES, Moltbot, Control Plane) were not inspected in this task; 'unwritten' is relative to this repo only.",
+  "Line numbers: several RT/GR lines are very long single-line statements; cited line is where the statement begins."
+ ]
+}
