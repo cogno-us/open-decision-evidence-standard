@@ -20,7 +20,9 @@ The shapes are modelled on the real producer records (SQLite `attempts` and `att
 3. Every declared object may carry `extensions`, an object whose member names match `^x-[a-z0-9][a-z0-9._-]*$`. Consumers ignore extension members for lifecycle logic, must preserve them when re-emitting, and must include them in any digest. Producers never emit undeclared members; new data goes in a declared member or in `extensions`.
 4. Adding an optional declared member is a minor bump. Adding a required member, or changing the meaning of a status, is a major bump.
 
-PROPOSAL: the exact extension namespace form (`extensions` object with `x-` names, as here, versus another shape) is awaiting an owner decision.
+DECIDED (owner, André de Lima, 2026-10-17): the extension namespace is a reserved `extensions` object with `x-` prefixed names, consumers must preserve it and include it in digests, and undeclared members elsewhere stay refused.
+
+Placement (owner decision, 2026-10-17): this contract is intended to become an optional extension profile of the ODES core (a declared, versioned behavioural profile with its own fixtures), not a companion interface spec. See section 4.1 of the design document. The spike remains outside `src/odes`.
 
 ## Rules
 
@@ -28,7 +30,9 @@ Executor rows (`attempts`, `attempt_events`, `execution_result`):
 
 - `attempt_id` is unique across `attempts`. Every attempt has events. Events start with exactly one `attempted` event (`missing_start_event`, `repeated_start_event`, `attempt_without_events`).
 - `event_id` strictly increases and `created_at` does not decrease across the event sequence (`event_order`).
-- Result status `unknown` requires `observation` null and `observed_state` `unknown` (`unknown_with_observation`).
+- Observation kinds. An `execution_result.observation` is null, a validated Control Plane observation (it has `state`), or a typed recovery observation (it has `status` and `retry_eligible`, and no `state`; closed member set). They are different evidence. A recovery observation is destination-side recovery output (the runtime `reconcile_claim` record, or the `reconciliation_unavailable` placeholder). It is never validated evidence of effect, and consumers must not treat it as one.
+- Result status `unknown` means no validated observation exists. It may carry observation null or a recovery observation, and must not carry a validated observation (`unknown_with_validated_observation`). `observed_state` is `unknown`, except that it equals the recovery record's `status` when that is `applied` or `partial` (`unknown_state_mismatch`). On an `unknown` result, `applied`/`partial` means "recovery reports", not "validated". `attempted`/`acknowledged` are not constrained by this rule.
+- A recovery observation is carried only by results `unknown` (post-commit recovery) or `observed` (effect-free reconcile) (`recovery_observation_status`).
 - For a result whose attempt is in `attempts` and whose status is not `observed`: the last event must not be `attempted` (`terminal_event_missing`) and must equal the result status (`status_terminal_mismatch`). The single exception is terminal `executed` with result `unknown`, which is an acknowledged but unobserved delivery.
 
 Control Plane attempts (`control_plane_attempts`):
@@ -46,9 +50,9 @@ Resolution journal and checks (`resolution_journal`, `resolution_checks`):
 
 Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, [expected_refusal], document}`. `fixtures/valid/` must be accepted. `fixtures/invalid/` must be refused with `expected_refusal` as the only violation.
 
-Valid: `executor-unknown-ack-unobserved`, `control-plane-reconciled-existing-acknowledged`, `control-plane-reconciled-existing-partial`, `resolution-checks-overlap-a-completes-first`, `resolution-checks-overlap-b-completes-first-listed-open-order`, `resolution-checks-overlap-b-completes-first-listed-completion-order`, `executor-normal-attempted-executed-observed`, `control-plane-normal-attempted-acknowledged`, `extension-namespace-member-preserved`.
+Valid: `executor-unknown-ack-unobserved`, `executor-unknown-recovery-observation-route-b`, `executor-unknown-recovery-unavailable-route-b`, `control-plane-reconciled-existing-acknowledged`, `control-plane-reconciled-existing-partial`, `resolution-checks-overlap-a-completes-first`, `resolution-checks-overlap-b-completes-first-listed-open-order`, `resolution-checks-overlap-b-completes-first-listed-completion-order`, `executor-normal-attempted-executed-observed`, `control-plane-normal-attempted-acknowledged`, `extension-namespace-member-preserved`.
 
-Invalid: `control-plane-dropped-start-record`, `executor-dropped-start-event`, `executor-unknown-with-observation`, `executor-terminal-failed-vs-status`, `executor-dropped-terminal-event`, `resolution-checks-sequential-reorder`, `undeclared-member-outside-extensions`, `control-plane-start-row-reconciled-existing-false`, `extension-key-without-x-prefix`.
+Invalid: `control-plane-dropped-start-record`, `executor-dropped-start-event`, `executor-unknown-with-validated-observation`, `executor-unknown-recovery-state-contradiction`, `executor-terminal-failed-vs-status`, `executor-dropped-terminal-event`, `resolution-checks-sequential-reorder`, `undeclared-member-outside-extensions`, `control-plane-start-row-reconciled-existing-false`, `extension-key-without-x-prefix`.
 
 ## Run
 

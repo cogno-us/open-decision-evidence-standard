@@ -51,14 +51,16 @@ def test_required_valid_cases_exist():
     ids = {f["fixture_id"] for f in VALID}
     assert {"executor-unknown-ack-unobserved", "control-plane-reconciled-existing-acknowledged",
             "control-plane-reconciled-existing-partial", "executor-normal-attempted-executed-observed",
-            "extension-namespace-member-preserved"} <= ids
+            "extension-namespace-member-preserved", "executor-unknown-recovery-observation-route-b",
+            "executor-unknown-recovery-unavailable-route-b"} <= ids
     assert sum(i.startswith("resolution-checks-overlap") for i in ids) >= 2
 
 
 def test_required_invalid_cases_exist():
     codes = {f["expected_refusal"] for f in INVALID}
-    assert {"missing_start_record", "unknown_with_observation", "status_terminal_mismatch", "terminal_event_missing",
-            "resolution_checks_out_of_order", "undeclared_member", "invalid_reconciled_marker"} <= codes
+    assert {"missing_start_record", "unknown_with_validated_observation", "status_terminal_mismatch", "terminal_event_missing",
+            "resolution_checks_out_of_order", "undeclared_member", "invalid_reconciled_marker",
+            "unknown_state_mismatch"} <= codes
 
 
 def test_f10_protection_unknown_member_is_refused_not_dropped():
@@ -77,6 +79,32 @@ def test_extensions_are_preserved_and_bound_into_the_digest():
     # Ignore-but-preserve: contract logic never reads extensions, so the verdict does not depend on them.
     assert eal.validate(stripped) == []
     assert "extensions" not in eal.known_view(doc)
+
+
+def _route_b():
+    return json.loads(json.dumps(next(f for f in VALID if f["fixture_id"] == "executor-unknown-recovery-observation-route-b")["document"]))
+
+
+def test_recovery_observation_is_not_validated_evidence():
+    doc = _route_b()
+    assert eal.observation_kind(doc["execution_result"]["observation"]) == "recovery"
+    assert eal.validate(doc) == []
+    # The same record may not ride on a result that claims execution or reconciliation.
+    doc["execution_result"]["status"] = "executed"
+    codes = [v.code for v in eal.validate(doc)]
+    assert codes == ["recovery_observation_status"]
+
+
+def test_recovery_record_is_closed_and_typed():
+    doc = _route_b()
+    doc["execution_result"]["observation"]["surprise"] = 1
+    assert [v.code for v in eal.validate(doc)] == ["schema_violation"]
+
+
+def test_unknown_with_null_observation_still_requires_unknown_state():
+    doc = json.loads(json.dumps(next(f for f in VALID if f["fixture_id"] == "executor-unknown-ack-unobserved")["document"]))
+    doc["execution_result"]["observed_state"] = "applied"
+    assert [v.code for v in eal.validate(doc)] == ["unknown_state_mismatch"]
 
 
 def test_removing_an_optional_declared_member_stays_valid():

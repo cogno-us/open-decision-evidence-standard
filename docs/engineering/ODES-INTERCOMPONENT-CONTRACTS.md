@@ -2,9 +2,9 @@
 
 Status: engineering proposal for team review. Post-V1 work. Nothing in this document changes `src/odes` behaviour, any existing test, or any pinned tuple, and none of it applies until V1 closes.
 
-Direction owner: André de Lima (owner directive, 2026-10-17). Document revision: 0.1 (draft). Spike: `contracts/execution-attempt-lifecycle/` (contract `0.1.0-draft`).
+Direction owner: André de Lima (owner directive, 2026-10-17). Document revision: 0.2 (draft). Spike: `contracts/execution-attempt-lifecycle/` (contract `0.1.0-draft`).
 
-Two points need an owner decision and are flagged where they occur: the exact form of the extension namespace (section 6), and whether behavioural boundaries are carried by ODES itself or by a companion interface spec (section 12).
+Owner decisions recorded 2026-10-17 (section 12): the extension namespace form (section 6) and the placement of behavioural contracts as optional extensions of the ODES core (sections 3, 4.1, 9). One owner item (status `unknown` and observation) was explored and refined (section 10, section 12 item 3). Document revision 0.2.
 
 ## 1. Purpose and problem
 
@@ -50,7 +50,7 @@ This section states real producers and consumers as read from the checkouts in t
 
 Two observations that shape the plan:
 
-- The riskiest boundaries (B1 to B3) are not ODES boundaries today. They carry behaviour (lifecycle rows, status semantics, journal ordering) rather than decision evidence. See section 12.
+- The riskiest boundaries (B1 to B3) are not ODES boundaries today. They carry behaviour (lifecycle rows, status semantics, journal ordering) rather than decision evidence. By owner decision (2026-10-17) ODES carries those behavioural contracts itself, as optional extension profiles of the ODES core, one per boundary. See section 4.1.
 - Several boundaries have an in-process Python call as well as a JSON artifact. A contract must cover the artifact first. The in-process call is a coupling to remove, not to standardise.
 
 ## 4. Contract anatomy
@@ -59,7 +59,7 @@ A contract for one boundary consists of:
 
 1. Identity and version: `contract` name and `contract_version` (semver) in every conforming document. Pre-1.0 versions carry a `-draft` suffix and promise nothing.
 2. Versioned schema: JSON Schema draft 2020-12 for members, types and enumerations, with closed member sets (`additionalProperties: false`) and one reserved extension member (section 6).
-3. Status semantics: the meaning of each status value and the cross-record rules that schema cannot express (for example "result `unknown` implies no observation"; "a lifecycle starts with `attempted` unless it is a single reconciled row"). Each rule has a stable refusal code.
+3. Status semantics: the meaning of each status value and the cross-record rules that schema cannot express (for example "result `unknown` never carries a validated observation, though it may carry a typed recovery observation"; "a lifecycle starts with `attempted` unless it is a single reconciled row"). Each rule has a stable refusal code.
 4. Golden fixtures: `fixtures/valid/*.json` and `fixtures/invalid/*.json`. Each fixture states `expected_outcome`, a `reason`, and for invalid fixtures the `expected_refusal` code. Fixtures are small and synthetic.
 5. Conformance levels:
    - Level S (structural): schema valid.
@@ -71,13 +71,27 @@ A contract for one boundary consists of:
 
 Where a contract lives: `contracts/<boundary>/` in this repository for the spike. Whether contracts live here permanently or in a dedicated repository is an open question (section 12).
 
+### 4.1 Behavioural contracts as optional extension profiles of ODES
+
+Owner decision (André de Lima, 2026-10-17): ODES carries the behavioural contracts (lifecycle rows, status semantics, journal ordering) itself, as optional extensions of the ODES core. There is no companion interface spec.
+
+What this means for the design:
+
+- The ODES core stays what it is: the decision-evidence record, export package and recipient validation. It does not change and does not require any behavioural profile. A core-only implementation remains conformant to the core.
+- A behavioural contract is a declared optional extension profile, one per boundary (for example the execution-attempt lifecycle profile for B2 and B3). A profile is versioned on its own line, has its own schema, status semantics, valid and invalid fixtures and reference validator, and is declared by a document that opts in (the `contract` and `contract_version` members in the spike). A consumer or producer claims the profiles it supports and the conformance level (S, L, P) per profile.
+- The extension model of section 6 applies to the profile and to the core alike: closed member sets, one reserved `extensions` object with `x-` names, preserve and digest, undeclared members refused.
+- Profiles are optional for the core, mandatory for the boundary they describe. Once two components agree to exchange boundary B under profile P at version vN, P is the contract between them, and a change to either component that keeps its documents conformant at vN does not need the other to move.
+- Profile versions are independent of the core version, so a behavioural change (for example refining the `unknown` rule) bumps the profile, not the core. A profile may not weaken a core refusal.
+- Consequence for scope: ODES remit grows from decision evidence to decision evidence plus declared behavioural profiles. The decision-evidence standard is protected by keeping profiles strictly optional extensions, in separate directories and documents, with no profile content in the core schema.
+- This remains post-V1 work (section 10). The spike lives in `contracts/` and does not touch `src/odes`.
+
 ## 5. What "frozen per boundary" means
 
 Freezing a contract version freezes its schema, its rules and its fixtures. It does not freeze either component. A component may change in any way that keeps its produced and consumed documents conformant at the contract versions it declares. Breaking a boundary means releasing a new contract version first, then changing producers and consumers one at a time, consumers first for additive changes (they accept both versions), producers first for none.
 
 ## 6. Optional-field extension model
 
-This section is a proposal. The exact extension namespace form needs an owner decision. The spike uses an `extensions` object whose member names match `^x-[a-z0-9][a-z0-9._-]*$` and which any declared object may carry.
+DECIDED (André de Lima, 2026-10-17): the extension namespace is a reserved `extensions` object, with `x-` prefixed member names matching `^x-[a-z0-9][a-z0-9._-]*$`, which any declared object may carry. Consumers must preserve extension members and include them in digests. Undeclared members elsewhere stay refused. The rest of this section states how that decision works.
 
 ### 6.1 The tension
 
@@ -157,7 +171,7 @@ No hard-coded pin is removed before V1 closes. Phases are sequential, one bounda
 
 | Phase | Work | Exit criteria |
 |---|---|---|
-| P0 Contract freeze for one boundary | Choose one boundary (proposed: the execution-attempt lifecycle, B2 and B3 into Replay). Resolve the open decisions in section 12 for it. Freeze the contract at `1.0.0`: schema, rules, valid and invalid fixtures, reference validator, owner sign-off. | Contract `1.0.0` published; every rule has a valid and an invalid fixture; all producers and the consumer have read it; no code changed. |
+| P0 Contract freeze for one boundary | Choose one boundary (proposed: the execution-attempt lifecycle, B2 and B3 into Replay). Resolve the open decisions in section 12 for it. Freeze the contract at `1.0.0` as an optional ODES extension profile: schema, rules, valid and invalid fixtures, reference validator, owner sign-off. Declare the profile identifier and its relation to the ODES core (optional, no core change). | Profile `1.0.0` published as an optional extension of ODES; every rule has a valid and an invalid fixture; all producers and the consumer have read it; no code changed. |
 | P1 Conformance suites | Add a producer conformance test in each producer repository and a consumer conformance test in the consumer repository, one repository per pull request. Each test declares the contract version it targets. Findings are filed against the diverging side. | Each side passes fixtures alone in its own CI; known divergences are recorded as findings with owners; no pin removed. |
 | P2 Remove hard pins repo by repo | After V1 closes: in one repository, replace its hard-coded pins of that boundary's peer by "conforms to contract vN" (a contract-version check plus the fixture suite). One component changes per pull request and each is qualified before the next. | The repository builds and qualifies with no peer sha for that boundary; the V1 tuple remains reproducible from retained history; the next repository starts only after this one is green. |
 | P3 Qualification switches | Qualification consumes component contract manifests and the matrix; the e2e smoke replaces the exact-tuple run for that boundary. The hub lock records contract versions alongside shas. | A release candidate is described by a contract matrix; a change to one component qualifies without repinning others; the e2e smoke passes. |
@@ -166,11 +180,15 @@ Repeat P0 to P3 for the next boundary only after the first completes. Starting o
 
 ## 10. Risks and open questions
 
-- Scope of ODES. ODES is designed for decision evidence (the `pder-v0.1` record, export package and recipient validation). Behavioural boundaries (lifecycle rows, status semantics, journal ordering) are about producer record behaviour, not decision evidence. Either ODES grows to carry them, or a companion interface spec with the same anatomy does. See section 12.
+- Scope of ODES. Decided 2026-10-17: ODES carries behavioural contracts itself as optional extension profiles (section 4.1). The risk that remains is dilution of the decision-evidence standard. Mitigation: profiles are optional, versioned separately, kept in separate documents and directories, and add nothing to the core schema or to `pder-v0.1`.
 - V1 decision D4, "no extension families in V1". This proposal is post-V1 and is not an extension family in the V1 sense. It adds no V1 behaviour. It must not be started or merged into any V1 path until V1 closes. The spike lives in `contracts/` and `tests/` only.
 - No hard-coded pin removal until V1 closes. P2 and P3 are blocked on that, by design.
 - Consumers that validate more than the contract states. Today Replay validators check rules nobody wrote down. The first conformance runs will surface these. Each is a decision: add it to the contract, or remove it from the consumer.
-- The contract may encode a producer's current accident. The spike takes the shapes from today's code. A frozen contract should be reviewed for whether each rule is intended, not merely observed (for example, the runtime adapter derives `status` from the local result when present, which could yield `unknown` alongside a Control Plane observation; the spike's rule says that combination is invalid. This needs confirmation from the runtime owner).
+- The contract may encode a producer's current accident. The spike takes the shapes from today's code. A frozen contract should be reviewed for whether each rule is intended, not merely observed. The first case is the `unknown` rule. The first draft said status `unknown` requires observation null. That was an accident of route C and was wrong for route B. Findings, verified by reading the code and by running it (2026-10-17):
+  - Route B (`AtomicLocalControlPlaneExecutor`, post-commit timeout, runtime PR #101, runtime `4a83b175`) returns status `unknown`, `attempted` true, `acknowledged` false, `observed_state` `applied` or `partial` when recovery reports it (else `unknown`), and `observation` set to the `reconcile_claim` record, or to the placeholder `{status: unknown, retry_eligible: false, reason: reconciliation_unavailable}` when reconciliation fails. The observation is never null on this path. The real export is in the golden fixture `executor-unknown-recovery-observation-route-b` (shape captured from the SCN-C06 route B scenario components).
+  - Route C (`control_plane_adapter.py`) sets `unknown` with observation null only when the Control Plane observation is None. When an observation exists it takes `status = local.status`, which can itself be `unknown`.
+  - Refined rule (0.1.0-draft, this revision): `unknown` means no validated observation exists. It may carry observation null or a typed recovery observation (a different record from a validated Control Plane observation: it has `status` and `retry_eligible`, no `state`). It must not carry a validated observation. A consumer must never treat an observation attached to an `unknown` result as validated evidence of effect. `observed_state` may be `unknown`, `applied` or `partial` on an `unknown` result, where `applied`/`partial` means "recovery reports", not "validated", and must equal the recovery record's own status.
+  - Residual uncertainty is listed in section 12 (items 7 to 9).
 - Content-based binding. Journal check ids and resolution check ids are separate producer UUIDs, so Replay binds them by content. A contract should probably add an explicit reference. That is a producer change and therefore a contract version.
 - Digest canonicalisation must be named per boundary and tested.
 - Fixture maintenance cost. Fixtures are the contract. Treat them as reviewed code.
@@ -187,19 +205,34 @@ Proposed, for owner confirmation:
 - Each component repository owns its own conformance tests and its `contracts.json` manifest.
 - The qualification repository owns the matrix assembly and the e2e smoke.
 
-## 12. Decisions needed from the owner
+## 12. Owner decisions and open items
 
-1. Extension namespace form. The spike: a reserved `extensions` member on every declared object, names `x-<vendor>.<name>`. Alternatives: top-level only; an `x-` prefix on member names without an `extensions` container. The spike form is proposed because a single container is easy to preserve and digest wholesale.
-2. Where behavioural contracts live. Option A: ODES carries them, extending its remit beyond decision evidence. Option B: a companion interface spec (same anatomy, same extension model) sits next to ODES, and ODES references it. Proposed: B for B1 to B3, ODES proper for B4 to B6, so the decision-evidence standard is not diluted.
-3. Whether contracts live in this repository permanently or move to a dedicated contracts repository once more than one exists.
-4. The first boundary to freeze (proposed: execution-attempt lifecycle) and the date, which must be after V1 closes.
-5. Whether `status` and similar enumerations may gain values in a minor bump with unknown-value refusal, or only in a major bump (the spike treats a new status value as a bump and refuses unknown values).
+Decided:
+
+1. DECIDED 2026-10-17 (André de Lima). Extension namespace form: adopt the proposal. A reserved `extensions` object with `x-` prefixed member names on every declared object. Consumers must preserve extension members and include them in digests. Undeclared members elsewhere stay refused with a typed refusal (F-10 protection unchanged).
+2. DECIDED 2026-10-17 (André de Lima). Where behavioural contracts live: ODES carries them itself (lifecycle rows, status semantics, journal ordering), as optional extensions of the ODES core. It is not a companion interface spec. A behavioural contract is a declared optional extension profile per boundary, versioned, with its own fixtures (section 4.1).
+
+Explored and refined (owner asked 2026-10-17 to confirm that `unknown` requires observation null unless this breaks something; if so, explore more):
+
+3. It breaks something. Runtime route B emits status `unknown` with a non-null recovery observation. The rule was refined as described in section 10 and encoded in the schema, the reference validator, the README and the fixtures (`executor-unknown-recovery-observation-route-b` and `executor-unknown-recovery-unavailable-route-b` valid; `executor-unknown-with-validated-observation` and `executor-unknown-recovery-state-contradiction` invalid). Owner confirmation of the refined rule is still needed, because it is a contract semantic and not only an observed shape.
+
+Still needed from the owner:
+
+4. Whether contracts live in this repository permanently or move to a dedicated contracts repository once more than one exists. (Note: with item 2 decided, the question is now where the optional ODES extension profiles are kept.)
+5. The first boundary to freeze (proposed: execution-attempt lifecycle) and the date, which must be after V1 closes.
+6. Whether `status` and similar enumerations may gain values in a minor bump with unknown-value refusal, or only in a major bump (the spike treats a new status value as a bump and refuses unknown values).
+
+Open questions raised by item 3 (for the runtime and Replay owners):
+
+7. Does the runtime need a typed recovery-observation record of its own? Today the recovery observation is an untyped dict from `reconcile_claim`, and `export_execution_artifacts` copies it into the export's `observations` list beside genuine observations. A consumer that reads `observations` as validated evidence would be misled. The contract types the record on the result (closed member set, no `state`), but the export member `observations` mixes kinds. Options: a separate export member for recovery observations, or a marker member. This is a producer change and therefore a contract version.
+8. Can route C emit `unknown` together with a validated Control Plane observation (`status = local.status` with local `unknown` and an observation present)? The contract treats that combination as invalid (`unknown_with_validated_observation`). If route C can produce it, the runtime owner decides whether the adapter should report `reconciled` or `partial` there instead, or whether the contract must allow it. Not exercised in this run.
+9. Recovery status `hold` (the destination refuses to resolve a claim: binding mismatch, claim unavailable, no durable effect) is allowed by the recovery record schema but has no golden fixture and no verified path through the executor. Confirm the intended `observed_state` and result status for it.
 
 ## Appendix A. F-20 to F-23 as the first golden cases
 
 | Finding | Mismatch | Golden fixture(s) in `contracts/execution-attempt-lifecycle/fixtures/` |
 |---|---|---|
-| F-20 | Result `unknown` with terminal `executed`, observation null and `observed_state` `unknown`, emitted by runtime route C when the observation is unavailable. Consumer rejected it. | valid: `executor-unknown-ack-unobserved`. invalid (guard against over-correction): `executor-unknown-with-observation`, `executor-terminal-failed-vs-status`, `executor-dropped-terminal-event`. |
+| F-20 | Result `unknown` with terminal `executed`, observation null and `observed_state` `unknown`, emitted by runtime route C when the observation is unavailable. Consumer rejected it. | valid: `executor-unknown-ack-unobserved`, `executor-unknown-recovery-observation-route-b`, `executor-unknown-recovery-unavailable-route-b` (the route B shapes, added 2026-10-17). invalid (guard against over-correction): `executor-unknown-with-validated-observation`, `executor-unknown-recovery-state-contradiction`, `executor-terminal-failed-vs-status`, `executor-dropped-terminal-event`. |
 | F-21 | Control Plane single-row `acknowledged` or `partial` attempt with `acknowledgement = {reconciled_existing: true}` and no `attempted` row. Consumer required a start row. | valid: `control-plane-reconciled-existing-acknowledged`, `control-plane-reconciled-existing-partial`, `control-plane-normal-attempted-acknowledged`. invalid: `control-plane-dropped-start-record`, `control-plane-start-row-reconciled-existing-false`, `executor-dropped-start-event`. |
 | F-22 | Overlapping resolution checks may complete in either order; consumer's journal-order rule assumed one. | valid: `resolution-checks-overlap-a-completes-first`, `resolution-checks-overlap-b-completes-first-listed-open-order`, `resolution-checks-overlap-b-completes-first-listed-completion-order`. invalid: `resolution-checks-sequential-reorder`. |
 | F-23 | Test-only: two skipped tests made two requirement rows inconclusive. Not a boundary mismatch; no fixture. | none |
@@ -209,18 +242,21 @@ The valid fixtures show what the consumer must accept so the F-20 to F-22 regres
 
 ## Appendix B. Initial local consumer-conformance run (not a qualification)
 
-This appendix records a single local run on 2026-10-17. It is a first finding, not qualification evidence, and it has not been repeated in CI. No Replay code was modified or committed; the run used a throwaway adapter script kept outside every repository.
+This appendix records local runs on 2026-10-17 (the first, then a re-run after the `unknown` rule was refined; both against Replay `def0ee0f`). It is a first finding, not qualification evidence, and it has not been repeated in CI. No Replay code was modified or committed; the run used a throwaway adapter script kept outside every repository.
 
 Method. Replay at `def0ee0f` (main, `src/agent_replay_bundle`) was called through the functions that map onto the contract: `importers._validate_v2_executor_rows` for executor rows and results, `importers._validate_repaired_run` for Control Plane attempts, and `refusal_evidence.validate_run(..., runtime_authority=True)` for the journal and checks. Fixture documents were translated to those call shapes with no content changes (empty reconciliations and observations, an `executor` attempt-identity namespace, empty decisions and refusals). These are private helper functions, not Replay's public import entry point, so this tests Replay's lifecycle rules but not the full import path.
 
-Result at `def0ee0f`:
+Result at `def0ee0f` (re-run after the refinement of the `unknown` rule; 11 valid and 11 invalid fixtures):
 
 | Fixture | Expected | Replay |
 |---|---|---|
-| all 9 valid fixtures | accept | accepted (9 of 9) |
+| the 9 original valid fixtures | accept | accepted (9 of 9) |
+| `executor-unknown-recovery-observation-route-b` (new, real route B shape) | accept | rejected (mismatch): "execution result status 'unknown' contradicts the terminal attempt event 'executed'" |
+| `executor-unknown-recovery-unavailable-route-b` (new, real route B shape) | accept | rejected (mismatch): same message |
 | `control-plane-dropped-start-record` | reject | rejected ("lifecycle lacks its attempted start record") |
 | `executor-dropped-start-event` | reject | rejected ("events do not start with attempted") |
-| `executor-unknown-with-observation` | reject | rejected ("contradicts the terminal attempt event") |
+| `executor-unknown-with-validated-observation` (replaces `executor-unknown-with-observation`) | reject | rejected, but by the terminal-event rule, not for the observation: Replay's exemption for `unknown` after `executed` requires observation null, so it refuses every non-null observation alike |
+| `executor-unknown-recovery-state-contradiction` (new) | reject | rejected, same reason |
 | `executor-terminal-failed-vs-status` | reject | rejected |
 | `executor-dropped-terminal-event` | reject | rejected |
 | `resolution-checks-sequential-reorder` | reject | rejected ("out of journal order") |
@@ -230,10 +266,14 @@ Result at `def0ee0f`:
 
 Findings:
 
+0. New finding from the refinement. Replay `_validate_v2_executor_rows` accepts result `unknown` after terminal `executed` only when `observation is None` and `observed_state == 'unknown'` (the F-20 fix in #36 covered route C only). Runtime route B legitimately emits `unknown` with a recovery observation and `observed_state` `applied` (or an `unknown` placeholder observation), so Replay at `def0ee0f` refuses legitimate route B output at the helper level, the same class of failure as F-20. This is a finding against the consumer (or a contract decision if the owners disagree with the refined rule), not fixed here. The two invalid `unknown` fixtures are refused by the same rule, so Replay currently cannot tell them apart from the valid route B shapes. Whether the full public import path refuses the real route B export (the producer export also copies the recovery record into `observations`) was not tested here and should be.
+
 1. A start row (`attempted`) carrying `acknowledgement = {reconciled_existing: false}` is accepted. Replay only checks the marker to excuse a missing start row, so a wrong marker value on a normal row is never examined. Whether this is a consumer gap or a contract over-reach (the contract rule is a proposal) is a decision for the Control Plane and Replay owners.
 2. An undeclared member inside `execution_result` is accepted by the helper function. These helper functions read specific fields and do not check member sets. F-10 protection in Replay lives in other checks (`_reject_unknown_members` for the top-level, producer profile and repository records); whether the full public import path refuses an undeclared member inside `execution_result` or a lifecycle row was not tested here and should be.
 3. Replay has no extension namespace, so `extensions` members are neither preserved nor refused at this layer, and the key-form refusal does not exist. Consumer-side preservation (level P) is entirely unimplemented there and is untested.
 
 Regression check. The same adapter was run against Replay `0cfe7a63` (the revision before #36), also outside the repository. It rejected `executor-unknown-ack-unobserved` (F-20), `control-plane-reconciled-existing-acknowledged` and `-partial` (F-21), and `resolution-checks-overlap-b-completes-first-listed-open-order` (F-22), and accepted everything else that `def0ee0f` accepts. So the golden fixtures reproduce the three V1 boundary failures at the old revision and pass at the fixed one. The two other overlap fixtures pass at both revisions, so only one fixture exercises the F-22 regression.
 
-Limits. One local run, helper-level functions only, fixtures synthetic, shapes read from the working checkouts, which may not be the revisions of any qualified tuple.
+Route B capture. The route B shape in the new fixtures was captured by running the runtime's own component test (`tests/test_atomic_post_commit_unresolved.py`, 5 passed) and the qualification scenarios SCN-C06 route B (2 passed) against pristine pinned components (runtime `4a83b175`, Control Plane `a34c3dc2`, Replay `def0ee0f`, ODES `5675f1b9`), then calling the runtime `export_execution_artifacts` on the real post-commit failure. The real result was status `unknown`, `attempted` true, `acknowledged` false, `newly_executed` false, `observed_state` `applied`, `observation` `{claim_state: consumed, effect_id, operation_digest, retry_eligible: false, status: applied}`, with attempt events `attempted` then `executed`; the export's `observations` list carried the same recovery record. Fixture ids, digests and times are synthetic.
+
+Limits. Local runs, helper-level functions only, fixtures synthetic, shapes read from the working checkouts, which may not be the revisions of any qualified tuple.

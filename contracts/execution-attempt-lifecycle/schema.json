@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/execution-attempt-lifecycle/schema.json",
   "title": "Execution-attempt lifecycle contract 0.1.0-draft",
-  "description": "Structural half of the contract. Cross-record rules are defined in README.md and implemented by validate.py. Every declared object closes its member set (additionalProperties false) except through the reserved `extensions` member, whose keys must be `x-` prefixed. PROPOSAL: the exact extension namespace form needs an owner decision.",
+  "description": "Structural half of the contract. Cross-record rules are defined in README.md and implemented by validate.py. Every declared object closes its member set (additionalProperties false) except through the reserved `extensions` member, whose keys must be `x-` prefixed (DECIDED by the owner, 2026-10-17).",
   "type": "object",
   "additionalProperties": false,
   "required": ["contract", "contract_version"],
@@ -62,7 +62,14 @@
         "status": {"enum": ["denied", "failed", "partial", "unknown", "executed", "observed", "reconciled"]},
         "attempt_id": {"type": ["string", "null"]},
         "observed_state": {"type": "string"},
-        "observation": {"type": ["object", "null"], "description": "Opaque here; owned by the bounded-workflow observation contract."},
+        "observation": {
+          "description": "Null, a validated Control Plane observation (has `state`), or a recovery observation (has `status`, no `state`). The two kinds are different evidence: a recovery observation is never validated evidence of effect.",
+          "anyOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/validated_observation"},
+            {"$ref": "#/$defs/recovery_observation"}
+          ]
+        },
         "decision_id": {"type": "string"},
         "effect_id": {"type": "string"},
         "attempted": {"type": "boolean"},
@@ -70,6 +77,32 @@
         "newly_executed": {"type": "boolean"},
         "error": {"type": ["string", "null"]},
         "control_plane_evidence": {"type": "object"},
+        "extensions": {"$ref": "#/$defs/extensions"}
+      }
+    },
+    "validated_observation": {
+      "type": "object",
+      "description": "Control Plane EffectObservation as validated by the bounded workflow. Other members stay owned by the bounded-workflow observation contract.",
+      "required": ["effect_id", "state"],
+      "properties": {
+        "effect_id": {"type": "string", "minLength": 1},
+        "state": {"enum": ["absent", "applied", "partial", "unknown"]},
+        "observed_at": {"type": ["string", "null"]},
+        "destination_state": {"type": "object"}
+      }
+    },
+    "recovery_observation": {
+      "type": "object",
+      "description": "Destination-side recovery report (runtime reconcile_claim result, or the unavailable placeholder). Not validated by the Control Plane. Never evidence of effect on its own.",
+      "additionalProperties": false,
+      "required": ["status", "retry_eligible"],
+      "properties": {
+        "status": {"enum": ["applied", "partial", "hold", "unknown"]},
+        "retry_eligible": {"type": "boolean"},
+        "claim_state": {"type": "string"},
+        "effect_id": {"type": "string", "minLength": 1},
+        "operation_digest": {"type": "string"},
+        "reason": {"type": "string"},
         "extensions": {"$ref": "#/$defs/extensions"}
       }
     },

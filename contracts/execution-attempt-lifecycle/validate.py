@@ -150,6 +150,13 @@ def validate_structure(doc: Any) -> list[Violation]:
 
 # --------------------------------------------------------------------------- lifecycle rules
 
+def observation_kind(obs: Any) -> str:
+    """Classify a result observation by shape: 'none', 'validated' (has `state`) or 'recovery' (has `status`)."""
+    if obs is None:
+        return "none"
+    return "validated" if "state" in obs else "recovery"
+
+
 def _executor_rules(doc: dict[str, Any]) -> list[Violation]:
     out: list[Violation] = []
     rows = doc.get("attempts")
@@ -186,10 +193,28 @@ def _executor_rules(doc: dict[str, Any]) -> list[Violation]:
     result = doc.get("execution_result")
     if result is None:
         return out
-    if result["status"] == "unknown" and (result["observation"] is not None or result["observed_state"] != "unknown"):
-        out.append(Violation("unknown_with_observation", "$.execution_result",
-                             "status 'unknown' requires observation null and observed_state 'unknown'"))
+    obs = result["observation"]
+    kind = observation_kind(obs)
+    if kind == "recovery" and result["status"] not in {"unknown", "observed"}:
+        out.append(Violation("recovery_observation_status", "$.execution_result.observation",
+                             "a recovery observation is only carried by results 'unknown' (post-commit recovery) "
+                             "or 'observed' (effect-free reconcile)"))
         return out
+    if result["status"] == "unknown":
+        if kind == "validated":
+            out.append(Violation("unknown_with_validated_observation", "$.execution_result.observation",
+                                 "status 'unknown' asserts that no validated observation exists; it cannot carry a "
+                                 "validated Control Plane observation"))
+            return out
+        expected = "unknown"
+        if kind == "recovery" and obs["status"] in {"applied", "partial"}:
+            expected = obs["status"]
+        if result["observed_state"] != expected:
+            out.append(Violation("unknown_state_mismatch", "$.execution_result.observed_state",
+                                 f"status 'unknown' with {'a recovery observation' if kind == 'recovery' else 'no observation'} "
+                                 f"requires observed_state {expected!r}; 'applied'/'partial' is only what recovery "
+                                 "reports, and 'unknown' otherwise"))
+            return out
     seq = per_attempt.get(result["attempt_id"])
     if result["attempt_id"] in ids and seq and result["status"] != "observed":
         terminal = seq[-1]["status"]

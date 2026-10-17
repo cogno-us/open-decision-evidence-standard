@@ -1,9 +1,8 @@
 {
-  "fixture_id": "executor-unknown-with-observation",
+  "fixture_id": "executor-unknown-recovery-unavailable-route-b",
   "synthetic": true,
-  "expected_outcome": "reject",
-  "reason": "Result status 'unknown' while an observation is present. 'unknown' means no validated observation exists; the unobserved-ack exception does not cover it.",
-  "expected_refusal": "unknown_with_observation",
+  "expected_outcome": "accept",
+  "reason": "Real runtime route B shape when reconciliation itself is unavailable (lost acknowledgement, reconcile read fails): result 'unknown', observed_state 'unknown', observation = the reconciliation_unavailable placeholder {status unknown, retry_eligible false, reason}. The placeholder is a typed recovery record, not null.",
   "document": {
     "contract": "execution-attempt-lifecycle",
     "contract_version": "0.1.0-draft",
@@ -28,17 +27,21 @@
         "attempt_id": "syn-attempt-1",
         "status": "executed",
         "error": null,
-        "created_at": 1001.0
+        "created_at": 1000.0
       }
     ],
     "execution_result": {
       "status": "unknown",
       "attempt_id": "syn-attempt-1",
-      "observed_state": "applied",
+      "attempted": true,
+      "acknowledged": false,
+      "newly_executed": false,
+      "error": "synthetic acknowledgement unavailable after atomic commit",
+      "observed_state": "unknown",
       "observation": {
-        "effect_id": "syn-effect-1",
-        "state": "applied",
-        "observed_at": "2026-01-01T00:00:05Z"
+        "status": "unknown",
+        "retry_eligible": false,
+        "reason": "reconciliation_unavailable"
       }
     }
   }
