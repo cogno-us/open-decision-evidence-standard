@@ -1,0 +1,56 @@
+{
+  "fixture_id": "release-after-failure-ignored",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "The first response decides. A resolver fails first and releases afterwards, both before the deadline: the failure stands, the outcome is refused.",
+  "document": {
+    "contract": "bounded-deferral",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "evaluated_at": "2026-10-05T19:00:30+00:00",
+    "deferrals": [
+      {
+        "deferral_id": "syn-deferral-1",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "action_class_id": "synthetic-irreversible",
+        "policy": {
+          "policy_verdict": "defer",
+          "policy_ref": "syn-policy-1",
+          "deferred_reasons": [
+            "required_input_not_read",
+            "status_unreadable"
+          ],
+          "refusal_reasons": []
+        },
+        "opened_at": "2026-10-05T19:00:00+00:00",
+        "max_age_seconds": 60,
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "outcome": "refused",
+        "responses": [
+          {
+            "response_id": "syn-resp-1",
+            "resolver_id": "syn-resolver-1",
+            "received_at": "2026-10-05T19:00:10+00:00",
+            "kind": "timeout"
+          },
+          {
+            "response_id": "syn-resp-2",
+            "resolver_id": "syn-resolver-1",
+            "received_at": "2026-10-05T19:00:20+00:00",
+            "kind": "release"
+          }
+        ],
+        "resolved_at": "2026-10-05T19:00:10+00:00",
+        "refusal_reason": "resolver_timeout",
+        "released_decision_id": null,
+        "effect": {
+          "observable": false,
+          "first_observable_at": null
+        }
+      }
+    ]
+  }
+}

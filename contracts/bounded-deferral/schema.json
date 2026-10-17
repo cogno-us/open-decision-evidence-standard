@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/bounded-deferral/schema.json",
+  "title": "Bounded deferral extension profile 0.1.0-draft",
+  "description": "Optional extension profile layered on the control-plane-journal contract. A deferral is a bounded hold: a held decision plus a deadline derived from the action class max_status_age_seconds. Closed member sets; x- extensions on declared extensible objects (not on the refusal notice). Cross-record and cross-document rules are in validate.py and README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "run_id",
+    "evaluated_at",
+    "deferrals"
+  ],
+  "properties": {
+    "contract": {
+      "const": "bounded-deferral"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluated_at": {
+      "type": "string",
+      "description": "The time this snapshot was taken; an open deferral past its deadline at this time is invalid."
+    },
+    "deferrals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/deferral"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_verdict",
+        "deferred_reasons",
+        "refusal_reasons"
+      ],
+      "properties": {
+        "policy_verdict": {
+          "enum": [
+            "defer",
+            "refuse"
+          ]
+        },
+        "policy_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deferred_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          }
+        },
+        "refusal_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "response_id",
+        "resolver_id",
+        "received_at",
+        "kind"
+      ],
+      "properties": {
+        "response_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolver_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "received_at": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "release",
+            "refuse",
+            "timeout",
+            "unparseable",
+            "error"
+          ]
+        },
+        "payload_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "effect_observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observable",
+        "first_observable_at"
+      ],
+      "properties": {
+        "observable": {
+          "type": "boolean"
+        },
+        "first_observable_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "alternative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alternative_id",
+        "description"
+      ],
+      "properties": {
+        "alternative_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "refusal_notice": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Structured refusal notice (optional). Closed set, no extensions: nothing private can ride along.",
+      "required": [
+        "effect_withheld",
+        "effect_id",
+        "constraint_failed",
+        "admissible_alternatives",
+        "effect_did_not_occur",
+        "statement"
+      ],
+      "properties": {
+        "effect_withheld": {
+          "const": true
+        },
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraint_failed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "code",
+            "description"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "admissible_alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/alternative"
+          }
+        },
+        "effect_did_not_occur": {
+          "const": true
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "deferral": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deferral_id",
+        "decision_id",
+        "effect_id",
+        "proposal_commitment",
+        "action_class_id",
+        "policy",
+        "opened_at",
+        "max_age_seconds",
+        "deadline",
+        "outcome",
+        "responses",
+        "resolved_at",
+        "refusal_reason",
+        "released_decision_id",
+        "effect"
+      ],
+      "properties": {
+        "deferral_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposal_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "action_class_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy": {
+          "$ref": "#/$defs/policy"
+        },
+        "opened_at": {
+          "type": "string"
+        },
+        "max_age_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "deferred",
+            "released",
+            "refused"
+          ]
+        },
+        "responses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/response"
+          }
+        },
+        "resolved_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "refusal_reason": {
+          "oneOf": [
+            {
+              "enum": [
+                "policy_refused",
+                "resolver_refused",
+                "deadline_expired",
+                "resolver_timeout",
+                "resolver_unparseable",
+                "resolver_error"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "released_decision_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effect": {
+          "$ref": "#/$defs/effect_observability"
+        },
+        "refusal_notice": {
+          "$ref": "#/$defs/refusal_notice"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}

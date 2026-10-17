@@ -1,0 +1,14 @@
+{
+  "fixture_id": "no-deferrals",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "A run with no deferral: an empty list is valid.",
+  "document": {
+    "contract": "bounded-deferral",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "evaluated_at": "2026-10-05T19:00:30+00:00",
+    "deferrals": []
+  }
+}
