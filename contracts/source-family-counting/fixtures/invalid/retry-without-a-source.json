@@ -1,0 +1,27 @@
+{
+  "fixture_id": "retry-without-a-source",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A retry names no source record: it cannot inherit a family.",
+  "expected_refusal": "origin_inconsistent",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1-r1",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": null
+      }
+    ],
+    "claims": []
+  }
+}

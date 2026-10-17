@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/source-family-counting/schema.json",
+  "title": "Source-family counting contract 0.1.0-draft",
+  "description": "Draft optional ODES extension profile: confirmations and evidence are counted by source family, not by record. Retries, re-sends and derived records inherit the original's family. Closed member sets; x- extensions allowed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "profile",
+    "records",
+    "claims"
+  ],
+  "properties": {
+    "contract": {
+      "const": "source-family-counting"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "profile": {
+      "const": "source-family-counting/0.1"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_id",
+        "kind",
+        "family_id",
+        "derived_from"
+      ],
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "original",
+            "retry",
+            "resend",
+            "derived"
+          ]
+        },
+        "family_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "derived_from": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "required_families",
+        "confirmations",
+        "counted_families",
+        "satisfied"
+      ],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_families": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "confirmations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "counted_families": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "satisfied": {
+          "type": "boolean"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "fixture_id": "original-with-a-source",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "An original names a source record.",
+  "expected_refusal": "origin_inconsistent",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-2",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      }
+    ],
+    "claims": []
+  }
+}

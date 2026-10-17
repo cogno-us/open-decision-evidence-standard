@@ -1,0 +1,21 @@
+{
+  "fixture_id": "unknown-record-kind",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Record kinds are closed (original, retry, resend, derived).",
+  "expected_refusal": "unknown_enum_value",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "forward",
+        "family_id": "fam-a",
+        "derived_from": null
+      }
+    ],
+    "claims": []
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "fixture_id": "two-originals-of-one-family-count-one",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Two distinct originals from the same source family are still one family.",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-2",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 2,
+        "confirmations": [
+          "m-1",
+          "m-2"
+        ],
+        "counted_families": 1,
+        "satisfied": false
+      }
+    ]
+  }
+}

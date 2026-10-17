@@ -1,0 +1,22 @@
+{
+  "fixture_id": "undeclared-member-outside-extensions",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A member neither declared nor inside extensions is refused, never dropped.",
+  "expected_refusal": "undeclared_member",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null,
+        "weight": 2
+      }
+    ],
+    "claims": []
+  }
+}

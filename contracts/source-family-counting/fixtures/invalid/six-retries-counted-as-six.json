@@ -1,0 +1,66 @@
+{
+  "fixture_id": "six-retries-counted-as-six",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Counting by record: six records of one family stated as six confirmations.",
+  "expected_refusal": "family_count_mismatch",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1-r1",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-r2",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-r3",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-r4",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-r5",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 2,
+        "confirmations": [
+          "m-1",
+          "m-1-r1",
+          "m-1-r2",
+          "m-1-r3",
+          "m-1-r4",
+          "m-1-r5"
+        ],
+        "counted_families": 6,
+        "satisfied": true
+      }
+    ]
+  }
+}

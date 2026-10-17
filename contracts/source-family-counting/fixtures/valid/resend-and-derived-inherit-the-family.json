@@ -1,0 +1,44 @@
+{
+  "fixture_id": "resend-and-derived-inherit-the-family",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "A re-send and a record derived from a retry both carry the original's family.",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1-rs",
+        "kind": "resend",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-d",
+        "kind": "derived",
+        "family_id": "fam-a",
+        "derived_from": "m-1-rs"
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 1,
+        "confirmations": [
+          "m-1",
+          "m-1-rs",
+          "m-1-d"
+        ],
+        "counted_families": 1,
+        "satisfied": true
+      }
+    ]
+  }
+}
