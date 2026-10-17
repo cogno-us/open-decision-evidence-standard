@@ -1,0 +1,50 @@
+{
+  "fixture_id": "grant-delegation-delegation-effect",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "grant -> delegation -> delegation -> effect, each hop referencing the previous by hop_hash.",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612"
+      },
+      {
+        "hop_id": "h-del-1",
+        "kind": "delegation",
+        "subject_ref": "urn:grant:child",
+        "previous_hop_id": "h-grant",
+        "previous_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612",
+        "content_digest": "sha256:4401627a4c8e2814fb4edd19a1e995e263a0008d52b03d11935fe17212a080aa",
+        "hop_hash": "sha256:d28888e5d6d56c90b0b88b4f2b42398f1be3a3a86ba34f25f06a32a9aebdfeea"
+      },
+      {
+        "hop_id": "h-del-2",
+        "kind": "delegation",
+        "subject_ref": "urn:grant:grandchild",
+        "previous_hop_id": "h-del-1",
+        "previous_hash": "sha256:d28888e5d6d56c90b0b88b4f2b42398f1be3a3a86ba34f25f06a32a9aebdfeea",
+        "content_digest": "sha256:385c7aab69a5120ca4a46d1c671d4bc35fdee3f0d4d2272f86585589e9c1f86d",
+        "hop_hash": "sha256:65ef93f2cf18c94547d0e4fb64afbb437612fa5831dd02b76c2b71d1242769c6"
+      },
+      {
+        "hop_id": "h-eff-chain",
+        "kind": "effect",
+        "subject_ref": "sha256:effect-chain",
+        "previous_hop_id": "h-del-2",
+        "previous_hash": "sha256:65ef93f2cf18c94547d0e4fb64afbb437612fa5831dd02b76c2b71d1242769c6",
+        "content_digest": "sha256:f4bffe1ca737c316b42c82e6396a89eb5384ba967ffdaf2d3b2f361dcf412f1c",
+        "hop_hash": "sha256:84843526ca336ecbf8d2c86f29876095235ed9b3fb103661efc5a382526cac3c"
+      }
+    ],
+    "lineage_discontinuities": []
+  }
+}

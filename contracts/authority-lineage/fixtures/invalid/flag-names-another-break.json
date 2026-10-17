@@ -1,0 +1,58 @@
+{
+  "fixture_id": "flag-names-another-break",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The flag names the effect hop as the break, but the break is the stale delegation.",
+  "expected_refusal": "discontinuity_flag_mismatch",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612"
+      },
+      {
+        "hop_id": "h-del-1",
+        "kind": "delegation",
+        "subject_ref": "urn:grant:child",
+        "previous_hop_id": "h-grant",
+        "previous_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612",
+        "content_digest": "sha256:4401627a4c8e2814fb4edd19a1e995e263a0008d52b03d11935fe17212a080aa",
+        "hop_hash": "sha256:d28888e5d6d56c90b0b88b4f2b42398f1be3a3a86ba34f25f06a32a9aebdfeea"
+      },
+      {
+        "hop_id": "h-del-2b",
+        "kind": "delegation",
+        "subject_ref": "urn:grant:grandchild-b",
+        "previous_hop_id": "h-del-1",
+        "previous_hash": "sha256:83c504d3b78312680f759ae5935730d409490cdc2070e834294383de170d0dcf",
+        "content_digest": "sha256:99f678277f989d985b67aafdad1bd6bf554f1a26052f77480cdb1017eb330b96",
+        "hop_hash": "sha256:40d25150b5a2bcdb0c0d0290d7043d7ea61494f55be851cb67da572ddd8c9b83"
+      },
+      {
+        "hop_id": "h-eff-deep",
+        "kind": "effect",
+        "subject_ref": "sha256:effect-deep",
+        "previous_hop_id": "h-del-2b",
+        "previous_hash": "sha256:40d25150b5a2bcdb0c0d0290d7043d7ea61494f55be851cb67da572ddd8c9b83",
+        "content_digest": "sha256:861af7da4a625acaaf2eefe814688b6066bdcdd6d3c276406ea95a5010707b51",
+        "hop_hash": "sha256:4890b7e4afc27ed0dc42d08ce3923b26900f7808b37abed444c2eb2db91a4514"
+      }
+    ],
+    "lineage_discontinuities": [
+      {
+        "flag": "lineage_discontinuity",
+        "effect_hop_id": "h-eff-deep",
+        "break_hop_id": "h-eff-deep",
+        "reason": "previous_hash_mismatch"
+      }
+    ]
+  }
+}

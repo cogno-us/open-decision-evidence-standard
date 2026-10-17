@@ -1,0 +1,24 @@
+{
+  "fixture_id": "malformed-hop-hash",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "hop_hash is sha256: plus 64 lowercase hex.",
+  "expected_refusal": "schema_violation",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "abc"
+      }
+    ],
+    "lineage_discontinuities": []
+  }
+}

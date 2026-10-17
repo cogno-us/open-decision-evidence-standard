@@ -1,0 +1,48 @@
+{
+  "fixture_id": "extension-namespace-members-preserved",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "x- members on the document, a hop and a flag are accepted and preserved.",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612",
+        "extensions": {
+          "x-note": 1
+        }
+      },
+      {
+        "hop_id": "h-eff-orphan",
+        "kind": "effect",
+        "subject_ref": "sha256:effect-orphan",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:31c5ed30fe0e1103c23063dcd2b24c61a6dc3e3b7400741e466430999b4f17a7",
+        "hop_hash": "sha256:9afee679d34fda6ee0206ef2e443e4ab731fe951bc00a73aabf3aa55c5788a9a"
+      }
+    ],
+    "lineage_discontinuities": [
+      {
+        "flag": "lineage_discontinuity",
+        "effect_hop_id": "h-eff-orphan",
+        "break_hop_id": "h-eff-orphan",
+        "reason": "no_origin",
+        "extensions": {
+          "x-n": 2
+        }
+      }
+    ],
+    "extensions": {
+      "x-origin": "synthetic"
+    }
+  }
+}

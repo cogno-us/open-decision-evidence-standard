@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/authority-lineage/schema.json",
+  "title": "Authority lineage contract 0.1.0-draft",
+  "description": "Draft optional ODES extension profile: a hash-linked record from grant through delegation to terminal effect. Every terminal effect resolves to a grant or is flagged lineage_discontinuity. Closed member sets; x- extensions allowed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "profile",
+    "hops",
+    "lineage_discontinuities"
+  ],
+  "properties": {
+    "contract": {
+      "const": "authority-lineage"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "profile": {
+      "const": "authority-lineage/0.1"
+    },
+    "hops": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hop"
+      }
+    },
+    "lineage_discontinuities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/discontinuity"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "hop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hop_id",
+        "kind",
+        "subject_ref",
+        "previous_hop_id",
+        "previous_hash",
+        "content_digest",
+        "hop_hash"
+      ],
+      "properties": {
+        "hop_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "grant",
+            "delegation",
+            "effect"
+          ]
+        },
+        "subject_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "previous_hop_id": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previous_hash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "content_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "hop_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "discontinuity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "flag",
+        "effect_hop_id",
+        "break_hop_id",
+        "reason"
+      ],
+      "properties": {
+        "flag": {
+          "enum": [
+            "lineage_discontinuity"
+          ]
+        },
+        "effect_hop_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "break_hop_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "enum": [
+            "previous_missing",
+            "previous_hash_mismatch",
+            "no_origin"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}
