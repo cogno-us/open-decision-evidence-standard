@@ -1,0 +1,48 @@
+{
+  "fixture_id": "result-recovery-required-evidence-export-failed",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "An effect was dispatched but the evidence export failed: result_state recovery_required, no export, producer refs keep the identities.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "recipient_result": {
+      "artifact_export": null,
+      "assessment": {
+        "errors": [],
+        "message_received": true,
+        "message_understood": true,
+        "permitted_handling": "ACCEPT_FOR_ASSESSMENT",
+        "stages": {
+          "authority_reference": "present_not_authorizing",
+          "communicative_act": "assessment_required",
+          "evidence_digest": "verified",
+          "freshness": "passed",
+          "identity_binding": "passed",
+          "profile": "passed",
+          "purpose": "passed",
+          "reference_resolution": "passed",
+          "structure": "passed"
+        }
+      },
+      "execution": {
+        "attempted": true,
+        "attempt_status": "evidence_export_failed",
+        "newly_executed": true,
+        "effect_id": "syn-effect-1",
+        "decision_id": "syn-decision-1",
+        "attempt_id": "syn-attempt-1",
+        "reason": "replay_odes_export_failed_after_dispatch"
+      },
+      "producer_refs": {
+        "decision_id": "syn-decision-1",
+        "effect_id": "syn-effect-1",
+        "executor_attempt_id": "syn-attempt-1"
+      },
+      "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+      "result_state": "recovery_required",
+      "result_version": "1.0.0"
+    }
+  }
+}

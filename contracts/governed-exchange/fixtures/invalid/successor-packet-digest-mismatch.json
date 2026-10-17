@@ -1,0 +1,38 @@
+{
+  "fixture_id": "successor-packet-digest-mismatch",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A member changed without recomputing packet_digest.",
+  "expected_refusal": "packet_digest_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "successor_packet": {
+      "attempts": {
+        "control_plane": [
+          "syn-cp-attempt-1"
+        ],
+        "executor": [
+          "syn-attempt-1"
+        ]
+      },
+      "conversation_id": "conv-refund-001",
+      "missing_evidence": [],
+      "next_proposed_work": "tampered",
+      "packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+      "packet_id": "succ-syn-msg-1-1",
+      "pending_effects": [],
+      "predecessor_packet_id": null,
+      "profile": "urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0",
+      "relevant_decisions": [
+        "syn-decision-1"
+      ],
+      "schema_version": "0.1.0",
+      "source_commitment": "sha256:744a204fed8a68f8df99113c20d8387ddfcd4b475f02a6390ad3bd97a5c9dd72",
+      "source_packet_id": "syn-msg-1",
+      "state_version": "state-1",
+      "unresolved_delivery": false
+    }
+  }
+}

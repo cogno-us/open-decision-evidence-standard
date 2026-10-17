@@ -1,0 +1,19 @@
+{
+  "fixture_id": "delivery-result-delivered-without-acknowledgement",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "DELIVERED with no received acknowledgement.",
+  "expected_refusal": "delivery_state_ack_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "message_id": "syn-msg-1",
+      "delivery_attempt_id": "syn-delivery-1",
+      "transport_state": "DELIVERED",
+      "attempted": true,
+      "acknowledgement_received": false
+    }
+  }
+}

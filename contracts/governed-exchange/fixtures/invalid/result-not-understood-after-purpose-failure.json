@@ -1,0 +1,42 @@
+{
+  "fixture_id": "result-not-understood-after-purpose-failure",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "NOT_UNDERSTOOD is the handling only when the structure or profile stage failed; a purpose failure is REFUSE.",
+  "expected_refusal": "not_understood_stage_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "recipient_result": {
+      "artifact_export": null,
+      "assessment": {
+        "errors": [
+          "GAX-PURPOSE-UNSUPPORTED"
+        ],
+        "message_received": true,
+        "message_understood": true,
+        "permitted_handling": "NOT_UNDERSTOOD",
+        "stages": {
+          "authority_reference": "present_not_authorizing",
+          "communicative_act": "informational_no_effect",
+          "evidence_digest": "verified",
+          "freshness": "passed",
+          "identity_binding": "passed",
+          "profile": "passed",
+          "purpose": "failed",
+          "reference_resolution": "passed",
+          "structure": "passed"
+        }
+      },
+      "execution": {
+        "attempted": false,
+        "reason": "informational_message_type"
+      },
+      "producer_refs": {},
+      "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+      "result_state": "complete",
+      "result_version": "1.0.0"
+    }
+  }
+}

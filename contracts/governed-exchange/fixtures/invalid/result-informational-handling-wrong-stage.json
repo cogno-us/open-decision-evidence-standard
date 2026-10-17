@@ -1,0 +1,40 @@
+{
+  "fixture_id": "result-informational-handling-wrong-stage",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "INFORMATIONAL_ONLY handling with communicative_act assessment_required.",
+  "expected_refusal": "informational_stage_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "recipient_result": {
+      "artifact_export": null,
+      "assessment": {
+        "errors": [],
+        "message_received": true,
+        "message_understood": true,
+        "permitted_handling": "INFORMATIONAL_ONLY",
+        "stages": {
+          "authority_reference": "present_not_authorizing",
+          "communicative_act": "assessment_required",
+          "evidence_digest": "verified",
+          "freshness": "passed",
+          "identity_binding": "passed",
+          "profile": "passed",
+          "purpose": "passed",
+          "reference_resolution": "passed",
+          "structure": "passed"
+        }
+      },
+      "execution": {
+        "attempted": false,
+        "reason": "informational_message_type"
+      },
+      "producer_refs": {},
+      "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+      "result_state": "complete",
+      "result_version": "1.0.0"
+    }
+  }
+}

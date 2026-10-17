@@ -1,0 +1,83 @@
+{
+  "fixture_id": "envelope-transport-version-unsupported",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Unsupported transport version.",
+  "expected_refusal": "unsupported_transport_version",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "transport_envelope": {
+      "acknowledgement_for_attempt_id": null,
+      "canonicalization_version": "json-sort-keys-compact-v1",
+      "content_commitment": "sha256:8516f1f9e7b20c3dbd72faa93e5083d812f84493c26e47168b5c77b367c87832",
+      "conversation_id": "conv-refund-001",
+      "correlation_id": "syn-corr-1",
+      "created_at": "2026-10-06T12:00:00Z",
+      "delivery_attempt_id": "syn-delivery-1",
+      "expires_at": "2026-10-07T00:00:00Z",
+      "governed_message": {
+        "acknowledgement_requested": true,
+        "authority_refs": [
+          {
+            "ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+            "type": "authority_context"
+          },
+          {
+            "ref": "re-resolve-before-effect",
+            "type": "control_plane_current_authorization_required"
+          }
+        ],
+        "content": {
+          "note": "Narrative content is not authority.",
+          "summary": "Bounded synthetic refund proposal"
+        },
+        "content_digest": "sha256:d7cdf80daa89eeea4523a1007212e3ceac4fb416843a08c3e94b2c9f05919d24",
+        "conversation_id": "conv-refund-001",
+        "created_at": "2026-10-06T11:59:00Z",
+        "evidence_refs": [
+          {
+            "digest": "sha256:cf26b6e25e7b52756f5923999d54bbe11e827c00116d205ae1263126386c3113",
+            "ref": "syn-bundle-1",
+            "type": "replay_bundle"
+          }
+        ],
+        "expires_at": "2026-10-07T00:00:00Z",
+        "message_digest": "sha256:8516f1f9e7b20c3dbd72faa93e5083d812f84493c26e47168b5c77b367c87832",
+        "message_id": "syn-msg-1",
+        "message_type": "PROPOSE",
+        "operation_commitment": "sha256:e1a58656c0f3f4a329f455af3dfde8782551c259b954c20951eb37b9b411d37a",
+        "profile": "urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0",
+        "proposal_commitment": "sha256:c56ad132b83916fc6367b37d72032353223cfd0631b6715123439ba4ae1fbb0d",
+        "protocol_version": "0.1.0",
+        "purpose": "refund_execution_assessment",
+        "recipient": "refund-recipient",
+        "requested_action": {
+          "action_id": "syn.refund",
+          "actor": "syn-actor",
+          "adapter_id": "syn-adapter",
+          "amount": 10.0,
+          "payload": {
+            "k": 1
+          },
+          "principal": "syn-principal",
+          "requested_permissions": [
+            "syn.permission"
+          ],
+          "target": "syn-target",
+          "unit": "USD"
+        },
+        "sender": "refund-sender"
+      },
+      "message_id": "syn-msg-1",
+      "recipient_endpoint_ref": "local://syn-recipient",
+      "recipient_identity_ref": "urn:syn:identity:recipient",
+      "retry_of_attempt_id": null,
+      "sender_endpoint_ref": "local://syn-sender",
+      "sender_identity_ref": "urn:syn:identity:sender",
+      "transport_profile": "urn:cognous:profiles:governed-message-transport:0.1.0",
+      "transport_version": "9.9.9"
+    }
+  }
+}

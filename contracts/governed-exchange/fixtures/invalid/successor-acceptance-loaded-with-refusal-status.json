@@ -1,0 +1,17 @@
+{
+  "fixture_id": "successor-acceptance-loaded-with-refusal-status",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "loaded true with a refusal status.",
+  "expected_refusal": "successor_loaded_status_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "successor_acceptance": {
+      "loaded": true,
+      "effect_created": false,
+      "status": "stale_or_rollback"
+    }
+  }
+}

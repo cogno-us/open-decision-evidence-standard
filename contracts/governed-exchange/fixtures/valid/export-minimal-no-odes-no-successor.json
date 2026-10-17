@@ -1,0 +1,51 @@
+{
+  "fixture_id": "export-minimal-no-odes-no-successor",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "An export with no ODES package, no validation and no successor packet: the optional artifacts are null and their commitments absent.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "retained_artifact_export": {
+      "content_commitments": {
+        "reconstruction_bundle": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e"
+      },
+      "export_profile": "urn:cognous:profiles:gax-retained-artifacts",
+      "export_version": "1.1.0",
+      "lineage": {
+        "relationship": "original"
+      },
+      "odes": {
+        "exchange_metadata": {},
+        "odes_package": null,
+        "recipient_validation": null
+      },
+      "producer_refs": {
+        "control_plane_attempt_ids": [
+          "syn-cp-attempt-1"
+        ],
+        "decision_id": "syn-decision-1",
+        "effect_id": "syn-effect-1",
+        "executor_attempt_ids": [
+          "syn-attempt-1"
+        ],
+        "odes_package_digest": null,
+        "odes_validation_digest": null,
+        "reconstruction_bundle_id": "syn-reconstruction-1",
+        "reconstruction_digest": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+        "successor_packet_digest": null,
+        "successor_packet_id": null
+      },
+      "reconstruction_bundle": {
+        "bundle_id": "syn-reconstruction-1",
+        "producer_profiles": [],
+        "reconstruction_bundle_version": "0.2.0",
+        "records": [],
+        "run_id": "syn-run"
+      },
+      "state": "original_complete",
+      "successor_packet": null
+    }
+  }
+}

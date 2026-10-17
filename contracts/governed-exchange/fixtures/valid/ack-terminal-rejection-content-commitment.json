@@ -1,0 +1,26 @@
+{
+  "fixture_id": "ack-terminal-rejection-content-commitment",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "TERMINAL_REJECTION for a content commitment that does not match the message. Authorization is not_evaluated_by_transport.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "acknowledgement": {
+      "acknowledgement_id": "syn-ack-a-3",
+      "acknowledgement_kind": "TERMINAL_REJECTION",
+      "content_commitment": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "created_at": "2026-10-06T12:00:04Z",
+      "delivery_attempt_id": "syn-delivery-1",
+      "detail": {
+        "authorization": "not_evaluated_by_transport",
+        "external_effect": "not_established",
+        "reason": "content_commitment_mismatch",
+        "transport_status": "rejected"
+      },
+      "message_id": "syn-msg-1",
+      "recipient_endpoint_ref": "local://syn-recipient"
+    }
+  }
+}

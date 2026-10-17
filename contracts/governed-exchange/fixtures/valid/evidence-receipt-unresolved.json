@@ -1,0 +1,56 @@
+{
+  "fixture_id": "evidence-receipt-unresolved",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Evidence summary while the recipient result is unresolved; outbox PENDING_RETRY.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "transport_evidence": {
+      "content_commitment": "sha256:8516f1f9e7b20c3dbd72faa93e5083d812f84493c26e47168b5c77b367c87832",
+      "delivery_attempts": [
+        {
+          "acknowledgement_id": "syn-ack-b-1",
+          "ordinal": 1,
+          "reason": "recipient_artifact_retention_incomplete",
+          "retry_of_transport_attempt_id": null,
+          "state": "RECEIPT_UNRESOLVED",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "inbox_received_at": "2026-10-06T12:00:01Z",
+      "message_id": "syn-msg-1",
+      "namespace_rule": "transport_attempt_id is transport-owned; decision_id, effect_id and executor_attempt_id are linked only when returned by the recipient producer",
+      "outbox_state": "PENDING_RETRY",
+      "producer_refs": {
+        "decision_id": "syn-decision-1",
+        "effect_id": "syn-effect-1",
+        "executor_attempt_id": "syn-attempt-1"
+      },
+      "recipient_acknowledgements": [
+        {
+          "acknowledgement_id": "syn-ack-b-1",
+          "kind": "DURABLE_RECEIPT_UNRESOLVED",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "recipient_processing_status": "retained",
+      "retained_artifact_summary": null,
+      "sender_acknowledgements": [
+        {
+          "acknowledgement_id": "syn-ack-b-1",
+          "kind": "DURABLE_RECEIPT_UNRESOLVED",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "transport_profile": "urn:cognous:profiles:governed-message-transport:0.1.0",
+      "transport_version": "0.1.0",
+      "unsupported": [
+        "cryptographically_authenticated_network_identity",
+        "distributed_exactly_once_delivery",
+        "independent_effect_verification"
+      ]
+    }
+  }
+}

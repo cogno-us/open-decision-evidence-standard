@@ -1,0 +1,19 @@
+{
+  "fixture_id": "delivery-result-not-attempted-with-attempt-id",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "attempted false but an attempt id is named.",
+  "expected_refusal": "delivery_result_inconsistent",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "message_id": "syn-msg-1",
+      "delivery_attempt_id": "syn-delivery-1",
+      "transport_state": "UNRESOLVED",
+      "attempted": false,
+      "reason": "retry_exhausted_without_sender_ack"
+    }
+  }
+}

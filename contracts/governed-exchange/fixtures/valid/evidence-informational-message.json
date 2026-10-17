@@ -1,0 +1,52 @@
+{
+  "fixture_id": "evidence-informational-message",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Evidence summary for an informational message.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "transport_evidence": {
+      "content_commitment": "sha256:63163a18cf39df683bcb22b2da187daaf1698b1d984a547cfd142bbaecc6907d",
+      "delivery_attempts": [
+        {
+          "acknowledgement_id": "syn-ack-c-1",
+          "ordinal": 1,
+          "reason": null,
+          "retry_of_transport_attempt_id": null,
+          "state": "ACKNOWLEDGED",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "inbox_received_at": "2026-10-06T12:00:01Z",
+      "message_id": "syn-msg-2",
+      "namespace_rule": "transport_attempt_id is transport-owned; decision_id, effect_id and executor_attempt_id are linked only when returned by the recipient producer",
+      "outbox_state": "DELIVERED",
+      "producer_refs": {},
+      "recipient_acknowledgements": [
+        {
+          "acknowledgement_id": "syn-ack-c-1",
+          "kind": "DURABLE_RECEIPT",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "recipient_processing_status": "retained",
+      "retained_artifact_summary": null,
+      "sender_acknowledgements": [
+        {
+          "acknowledgement_id": "syn-ack-c-1",
+          "kind": "DURABLE_RECEIPT",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "transport_profile": "urn:cognous:profiles:governed-message-transport:0.1.0",
+      "transport_version": "0.1.0",
+      "unsupported": [
+        "cryptographically_authenticated_network_identity",
+        "distributed_exactly_once_delivery",
+        "independent_effect_verification"
+      ]
+    }
+  }
+}

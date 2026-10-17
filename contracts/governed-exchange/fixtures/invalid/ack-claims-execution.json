@@ -1,0 +1,48 @@
+{
+  "fixture_id": "ack-claims-execution",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A receipt whose detail says execution happened. An acknowledgement never implies execution, authorization, observation or verification.",
+  "expected_refusal": "schema_violation",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "acknowledgement": {
+      "acknowledgement_id": "syn-ack-a-1",
+      "acknowledgement_kind": "DURABLE_RECEIPT",
+      "content_commitment": "sha256:8516f1f9e7b20c3dbd72faa93e5083d812f84493c26e47168b5c77b367c87832",
+      "created_at": "2026-10-06T12:00:01Z",
+      "delivery_attempt_id": "syn-delivery-1",
+      "detail": {
+        "acknowledged_object": "durable_inbox_receipt",
+        "authorization": "not_implied_by_acknowledgement",
+        "destination_observation": "not_implied_by_acknowledgement",
+        "duplicate_suppressed": false,
+        "execution": "executed",
+        "independent_verification": "not_implied_by_acknowledgement",
+        "producer_refs": {
+          "control_plane_attempt_ids": [
+            "syn-cp-attempt-1"
+          ],
+          "decision_id": "syn-decision-1",
+          "effect_id": "syn-effect-1",
+          "executor_attempt_id": "syn-attempt-1",
+          "executor_attempt_ids": [
+            "syn-attempt-1"
+          ],
+          "odes_package_digest": "sha256:64469ac97b792821398f5876dfc3c34b5f0c1c70186ff9f9fca94bd41e118455",
+          "odes_validation_digest": "sha256:25b83dbda8b2339b9c61882ce6b87508faabf06190bc7664bd77aaff1b3de5c8",
+          "reconstruction_bundle_id": "syn-reconstruction-1",
+          "reconstruction_digest": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+          "successor_packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+          "successor_packet_id": "succ-syn-msg-1-1"
+        },
+        "recipient_assessment_handling": "ACCEPT_FOR_ASSESSMENT",
+        "recipient_processing_status": "retained"
+      },
+      "message_id": "syn-msg-1",
+      "recipient_endpoint_ref": "local://syn-recipient"
+    }
+  }
+}

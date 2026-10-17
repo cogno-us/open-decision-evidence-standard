@@ -1,0 +1,1583 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/governed-exchange/schema.json",
+  "title": "Governed exchange contract 0.1.0-draft",
+  "description": "Structural half of the contract. Cross-record rules are defined in README.md and implemented by validate.py. Every declared object closes its member set (additionalProperties false) except through the reserved `extensions` member, whose keys must be `x-` prefixed (DECIDED by the owner, 2026-10-17). Three members are deliberately open because the exchange carries them opaquely: the message `content`, the transport envelope's `governed_message` (validated by the recipient, not by transport) and the Replay/ODES artifacts retained inside an export.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "message"
+      ]
+    },
+    {
+      "required": [
+        "transport_envelope"
+      ]
+    },
+    {
+      "required": [
+        "acknowledgement"
+      ]
+    },
+    {
+      "required": [
+        "recipient_result"
+      ]
+    },
+    {
+      "required": [
+        "retained_artifact_export"
+      ]
+    },
+    {
+      "required": [
+        "successor_packet"
+      ]
+    },
+    {
+      "required": [
+        "successor_acceptance"
+      ]
+    },
+    {
+      "required": [
+        "transport_evidence"
+      ]
+    },
+    {
+      "required": [
+        "delivery_result"
+      ]
+    }
+  ],
+  "properties": {
+    "contract": {
+      "const": "governed-exchange"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "producer": {
+      "enum": [
+        "exchange-runtime",
+        "exchange-transport"
+      ]
+    },
+    "message": {
+      "$ref": "#/$defs/message"
+    },
+    "transport_envelope": {
+      "$ref": "#/$defs/transport_envelope"
+    },
+    "acknowledgement": {
+      "$ref": "#/$defs/acknowledgement"
+    },
+    "recipient_result": {
+      "$ref": "#/$defs/recipient_result"
+    },
+    "retained_artifact_export": {
+      "$ref": "#/$defs/retained_artifact_export"
+    },
+    "successor_packet": {
+      "$ref": "#/$defs/successor_packet"
+    },
+    "successor_acceptance": {
+      "$ref": "#/$defs/successor_acceptance"
+    },
+    "transport_evidence": {
+      "$ref": "#/$defs/transport_evidence"
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    },
+    "delivery_result": {
+      "$ref": "#/$defs/delivery_result"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "message_id": {
+      "type": "string",
+      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "authority_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "ref"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/text"
+        },
+        "ref": {
+          "$ref": "#/$defs/text"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "ref"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/text"
+        },
+        "ref": {
+          "$ref": "#/$defs/text"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "requested_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "target",
+        "payload",
+        "amount",
+        "unit",
+        "actor",
+        "principal",
+        "adapter_id",
+        "requested_permissions"
+      ],
+      "properties": {
+        "action_id": {
+          "$ref": "#/$defs/text"
+        },
+        "target": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "principal": {
+          "type": "string"
+        },
+        "adapter_id": {
+          "type": "string"
+        },
+        "requested_permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "message": {
+      "type": "object",
+      "description": "ODEX-GAX/IMX refund-exchange governed message (profile urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0). Required members are those gax_ref.assess_message requires; profile.md lists fewer.",
+      "additionalProperties": false,
+      "required": [
+        "message_id",
+        "conversation_id",
+        "profile",
+        "protocol_version",
+        "message_type",
+        "created_at",
+        "expires_at",
+        "sender",
+        "recipient",
+        "purpose",
+        "requested_action",
+        "operation_commitment",
+        "proposal_commitment",
+        "authority_refs",
+        "evidence_refs",
+        "content",
+        "content_digest",
+        "message_digest"
+      ],
+      "properties": {
+        "message_id": {
+          "$ref": "#/$defs/message_id"
+        },
+        "conversation_id": {
+          "$ref": "#/$defs/text"
+        },
+        "profile": {
+          "const": "urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0"
+        },
+        "protocol_version": {
+          "const": "0.1.0"
+        },
+        "message_type": {
+          "enum": [
+            "PROPOSE",
+            "REQUEST",
+            "REPORT",
+            "REFUSE",
+            "NOT_UNDERSTOOD"
+          ]
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "sender": {
+          "$ref": "#/$defs/text"
+        },
+        "recipient": {
+          "$ref": "#/$defs/text"
+        },
+        "purpose": {
+          "$ref": "#/$defs/text"
+        },
+        "requested_action": {
+          "$ref": "#/$defs/requested_action"
+        },
+        "operation_commitment": {
+          "$ref": "#/$defs/digest"
+        },
+        "proposal_commitment": {
+          "$ref": "#/$defs/digest"
+        },
+        "authority_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authority_ref"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_ref"
+          }
+        },
+        "content": {
+          "type": "object",
+          "description": "Untrusted narrative payload. Opaque to the contract: free members, never read for authority, covered by content_digest and message_digest."
+        },
+        "content_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "acknowledgement_requested": {
+          "type": "boolean"
+        },
+        "message_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "transport_message": {
+      "type": "object",
+      "description": "The governed message as the transport carries it: verbatim, opaque beyond the members the transport itself reads (identity, claims, time, digests). Profile validation is the recipient's job, not the transport's.",
+      "required": [
+        "message_id",
+        "conversation_id",
+        "message_type",
+        "created_at",
+        "expires_at",
+        "sender",
+        "recipient",
+        "message_digest"
+      ],
+      "properties": {
+        "message_id": {
+          "type": "string"
+        },
+        "conversation_id": {
+          "type": "string"
+        },
+        "message_type": {
+          "type": "string"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "recipient": {
+          "type": "string"
+        },
+        "message_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "content_digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "transport_envelope": {
+      "type": "object",
+      "description": "Transport envelope (profile urn:cognous:profiles:governed-message-transport:0.1.0), versioned separately from the governed message.",
+      "additionalProperties": false,
+      "required": [
+        "transport_profile",
+        "transport_version",
+        "canonicalization_version",
+        "message_id",
+        "delivery_attempt_id",
+        "sender_endpoint_ref",
+        "sender_identity_ref",
+        "recipient_endpoint_ref",
+        "recipient_identity_ref",
+        "conversation_id",
+        "correlation_id",
+        "content_commitment",
+        "created_at",
+        "expires_at",
+        "retry_of_attempt_id",
+        "acknowledgement_for_attempt_id",
+        "governed_message"
+      ],
+      "properties": {
+        "transport_profile": {
+          "const": "urn:cognous:profiles:governed-message-transport:0.1.0"
+        },
+        "transport_version": {
+          "const": "0.1.0"
+        },
+        "canonicalization_version": {
+          "const": "json-sort-keys-compact-v1"
+        },
+        "message_id": {
+          "$ref": "#/$defs/text"
+        },
+        "delivery_attempt_id": {
+          "$ref": "#/$defs/text"
+        },
+        "sender_endpoint_ref": {
+          "$ref": "#/$defs/text"
+        },
+        "sender_identity_ref": {
+          "$ref": "#/$defs/text"
+        },
+        "recipient_endpoint_ref": {
+          "$ref": "#/$defs/text"
+        },
+        "recipient_identity_ref": {
+          "$ref": "#/$defs/text"
+        },
+        "conversation_id": {
+          "$ref": "#/$defs/text"
+        },
+        "correlation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_commitment": {
+          "$ref": "#/$defs/digest"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "retry_of_attempt_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "acknowledgement_for_attempt_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "governed_message": {
+          "$ref": "#/$defs/transport_message"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "producer_refs": {
+      "type": "object",
+      "description": "Identity references the recipient producer returned. Namespaces stay separate: transport attempt ids never appear here. Members are present only when the producer supplied them.",
+      "additionalProperties": false,
+      "properties": {
+        "decision_id": {
+          "$ref": "#/$defs/text"
+        },
+        "effect_id": {
+          "$ref": "#/$defs/text"
+        },
+        "executor_attempt_id": {
+          "$ref": "#/$defs/text"
+        },
+        "attempt_identity": {
+          "type": "object"
+        },
+        "executor_attempt_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "control_plane_attempt_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "executor_producer_profile": {
+          "type": "object"
+        },
+        "executor_repository": {
+          "type": "object"
+        },
+        "reconstruction_bundle_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reconstruction_digest": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "odes_package_digest": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "odes_validation_digest": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "successor_packet_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "successor_packet_digest": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "ack_detail_rejection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport_status",
+        "reason",
+        "authorization",
+        "external_effect"
+      ],
+      "properties": {
+        "transport_status": {
+          "const": "rejected"
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        },
+        "authorization": {
+          "const": "not_evaluated_by_transport"
+        },
+        "external_effect": {
+          "const": "not_established"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "ack_detail_unresolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledged_object",
+        "recipient_processing_status",
+        "reason",
+        "recoverable",
+        "authorization",
+        "execution",
+        "destination_observation",
+        "independent_verification"
+      ],
+      "properties": {
+        "acknowledged_object": {
+          "const": "durable_inbox_receipt"
+        },
+        "recipient_processing_status": {
+          "const": "unresolved"
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        },
+        "recoverable": {
+          "type": "boolean"
+        },
+        "authorization": {
+          "const": "not_established"
+        },
+        "execution": {
+          "const": "not_established"
+        },
+        "destination_observation": {
+          "const": "not_established"
+        },
+        "independent_verification": {
+          "const": "not_established"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "ack_detail_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledged_object",
+        "duplicate_suppressed",
+        "recipient_processing_status",
+        "recipient_assessment_handling",
+        "authorization",
+        "execution",
+        "destination_observation",
+        "independent_verification",
+        "producer_refs"
+      ],
+      "properties": {
+        "acknowledged_object": {
+          "const": "durable_inbox_receipt"
+        },
+        "duplicate_suppressed": {
+          "type": "boolean"
+        },
+        "recipient_processing_status": {
+          "const": "retained"
+        },
+        "recipient_assessment_handling": {
+          "enum": [
+            "ACCEPT_FOR_ASSESSMENT",
+            "INFORMATIONAL_ONLY",
+            "REFUSE",
+            "NOT_UNDERSTOOD",
+            null
+          ]
+        },
+        "authorization": {
+          "const": "not_implied_by_acknowledgement"
+        },
+        "execution": {
+          "const": "not_implied_by_acknowledgement"
+        },
+        "destination_observation": {
+          "const": "not_implied_by_acknowledgement"
+        },
+        "independent_verification": {
+          "const": "not_implied_by_acknowledgement"
+        },
+        "producer_refs": {
+          "$ref": "#/$defs/producer_refs"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "acknowledgement": {
+      "type": "object",
+      "description": "Transport acknowledgement as returned by the recipient. The echoed envelope fields are null only on a TERMINAL_REJECTION of an envelope that lacked them.",
+      "additionalProperties": false,
+      "required": [
+        "acknowledgement_id",
+        "acknowledgement_kind",
+        "message_id",
+        "delivery_attempt_id",
+        "content_commitment",
+        "recipient_endpoint_ref",
+        "created_at",
+        "detail"
+      ],
+      "properties": {
+        "acknowledgement_id": {
+          "$ref": "#/$defs/text"
+        },
+        "acknowledgement_kind": {
+          "enum": [
+            "DURABLE_RECEIPT",
+            "DURABLE_RECEIPT_UNRESOLVED",
+            "TERMINAL_REJECTION"
+          ]
+        },
+        "message_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "delivery_attempt_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_commitment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "recipient_endpoint_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "object"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "acknowledgement_kind": {
+                "const": "DURABLE_RECEIPT"
+              }
+            },
+            "required": [
+              "acknowledgement_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "detail": {
+                "$ref": "#/$defs/ack_detail_receipt"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "acknowledgement_kind": {
+                "const": "DURABLE_RECEIPT_UNRESOLVED"
+              }
+            },
+            "required": [
+              "acknowledgement_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "detail": {
+                "$ref": "#/$defs/ack_detail_unresolved"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "acknowledgement_kind": {
+                "const": "TERMINAL_REJECTION"
+              }
+            },
+            "required": [
+              "acknowledgement_kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "detail": {
+                "$ref": "#/$defs/ack_detail_rejection"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "structure": {
+          "type": "string"
+        },
+        "profile": {
+          "type": "string"
+        },
+        "identity_binding": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "freshness": {
+          "type": "string"
+        },
+        "evidence_digest": {
+          "type": "string"
+        },
+        "reference_resolution": {
+          "type": "string"
+        },
+        "authority_reference": {
+          "type": "string"
+        },
+        "communicative_act": {
+          "type": "string"
+        },
+        "authority": {
+          "type": "string"
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stages",
+        "errors"
+      ],
+      "properties": {
+        "permitted_handling": {
+          "enum": [
+            "ACCEPT_FOR_ASSESSMENT",
+            "INFORMATIONAL_ONLY",
+            "REFUSE",
+            "NOT_UNDERSTOOD"
+          ]
+        },
+        "stages": {
+          "$ref": "#/$defs/stages"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "message_received": {
+          "type": "boolean"
+        },
+        "message_understood": {
+          "type": "boolean"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "description": "The recipient's execution summary. Executor-level semantics (status, observation) follow the execution-attempt-lifecycle contract; `observation` and `control_plane_evidence` are opaque here.",
+      "additionalProperties": false,
+      "required": [
+        "attempted"
+      ],
+      "properties": {
+        "attempted": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "attempt_status": {
+          "enum": [
+            "denied",
+            "failed",
+            "partial",
+            "unknown",
+            "executed",
+            "observed",
+            "reconciled",
+            "deny",
+            "hold",
+            "interrupted_after_dispatch",
+            "evidence_export_failed",
+            "unresolved_duplicate"
+          ]
+        },
+        "newly_executed": {
+          "type": "boolean"
+        },
+        "destination_observed": {
+          "enum": [
+            "applied",
+            "partial",
+            "absent",
+            "unknown",
+            "unavailable",
+            null
+          ]
+        },
+        "effect_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decision_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attempt_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "acknowledged": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "observation": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "control_plane_evidence": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "owner_message_id": {
+          "type": "string"
+        },
+        "retry_eligible": {
+          "type": "boolean"
+        },
+        "recovery_route": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relationship"
+      ],
+      "properties": {
+        "relationship": {
+          "enum": [
+            "original",
+            "regenerated_derivative",
+            "recovery_denial_derivative",
+            "observation_reconciliation_derivative"
+          ]
+        },
+        "original_artifacts": {
+          "enum": [
+            "retained",
+            "unavailable"
+          ]
+        },
+        "source_checkpoint_commitment": {
+          "$ref": "#/$defs/digest"
+        },
+        "source_artifact_commitment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "effect_reexecution": {
+          "type": "boolean"
+        },
+        "recovery_evaluated_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "recovery_scope": {
+          "type": "string"
+        },
+        "recovery_status": {
+          "const": "denied"
+        },
+        "recovery_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "recovery_result": {
+          "type": "object"
+        },
+        "destination_observation_performed": {
+          "type": "boolean"
+        },
+        "replacement_dispatch_performed": {
+          "type": "boolean"
+        },
+        "renewed_authorization": {
+          "type": "boolean"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "content_commitments": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reconstruction_bundle": {
+          "$ref": "#/$defs/digest"
+        },
+        "odes_package": {
+          "$ref": "#/$defs/digest"
+        },
+        "recipient_validation": {
+          "$ref": "#/$defs/digest"
+        },
+        "successor_packet": {
+          "$ref": "#/$defs/digest"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "odes_retained": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "odes_package",
+        "recipient_validation",
+        "exchange_metadata"
+      ],
+      "properties": {
+        "odes_package": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "recipient_validation": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "exchange_metadata": {
+          "type": "object"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "successor_packet": {
+      "type": "object",
+      "description": "IMX successor packet. Loading one is for reconciliation only and never creates an effect or a grant.",
+      "additionalProperties": false,
+      "required": [
+        "packet_id",
+        "profile",
+        "schema_version",
+        "conversation_id",
+        "source_packet_id",
+        "source_commitment",
+        "predecessor_packet_id",
+        "state_version",
+        "relevant_decisions",
+        "pending_effects",
+        "attempts",
+        "unresolved_delivery",
+        "missing_evidence",
+        "next_proposed_work",
+        "packet_digest"
+      ],
+      "properties": {
+        "packet_id": {
+          "$ref": "#/$defs/text"
+        },
+        "profile": {
+          "const": "urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0"
+        },
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "conversation_id": {
+          "$ref": "#/$defs/text"
+        },
+        "source_packet_id": {
+          "$ref": "#/$defs/text"
+        },
+        "source_commitment": {
+          "$ref": "#/$defs/digest"
+        },
+        "predecessor_packet_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "state_version": {
+          "type": "string",
+          "pattern": "^state-[0-9]+$"
+        },
+        "relevant_decisions": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "pending_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "attempts": {
+          "type": "object"
+        },
+        "unresolved_delivery": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "missing_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_proposed_work": {
+          "type": "string"
+        },
+        "packet_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "retained_artifact_export": {
+      "type": "object",
+      "description": "GAX retained-artifact export (profile urn:cognous:profiles:gax-retained-artifacts). Version 1.0.0 stays readable; 1.1.0 adds the reconciled_derivative state.",
+      "additionalProperties": false,
+      "required": [
+        "export_profile",
+        "export_version",
+        "state",
+        "reconstruction_bundle",
+        "odes",
+        "successor_packet",
+        "producer_refs",
+        "content_commitments",
+        "lineage"
+      ],
+      "properties": {
+        "export_profile": {
+          "const": "urn:cognous:profiles:gax-retained-artifacts"
+        },
+        "export_version": {
+          "enum": [
+            "1.0.0",
+            "1.1.0"
+          ]
+        },
+        "state": {
+          "enum": [
+            "original_complete",
+            "regenerated_derivative",
+            "recovery_denied_derivative",
+            "reconciled_derivative"
+          ]
+        },
+        "reconstruction_bundle": {
+          "type": "object",
+          "description": "Replay reconstruction bundle, retained opaquely. Owned by the Replay bundle contract."
+        },
+        "odes": {
+          "$ref": "#/$defs/odes_retained"
+        },
+        "successor_packet": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/successor_packet"
+            }
+          ]
+        },
+        "producer_refs": {
+          "$ref": "#/$defs/producer_refs"
+        },
+        "content_commitments": {
+          "$ref": "#/$defs/content_commitments"
+        },
+        "lineage": {
+          "$ref": "#/$defs/lineage"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "recipient_result": {
+      "type": "object",
+      "description": "Versioned recipient result (profile urn:cognous:profiles:governed-message-recipient-result). `unavailable` is the explicit answer when nothing is retained; it carries no assessment, execution or producer_refs.",
+      "additionalProperties": false,
+      "required": [
+        "result_profile",
+        "result_version",
+        "result_state",
+        "artifact_export"
+      ],
+      "properties": {
+        "result_profile": {
+          "const": "urn:cognous:profiles:governed-message-recipient-result"
+        },
+        "result_version": {
+          "const": "1.0.0"
+        },
+        "result_state": {
+          "enum": [
+            "complete",
+            "original_complete",
+            "recovery_required",
+            "regenerated_derivative",
+            "recovery_denied_derivative",
+            "reconciled_derivative",
+            "historical_artifacts_unavailable",
+            "unavailable"
+          ]
+        },
+        "assessment": {
+          "$ref": "#/$defs/assessment"
+        },
+        "execution": {
+          "$ref": "#/$defs/execution"
+        },
+        "producer_refs": {
+          "$ref": "#/$defs/producer_refs"
+        },
+        "artifact_export": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/retained_artifact_export"
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "successor_acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "loaded",
+        "effect_created",
+        "status"
+      ],
+      "properties": {
+        "loaded": {
+          "type": "boolean"
+        },
+        "effect_created": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "loaded_for_reconciliation",
+            "packet_digest_mismatch",
+            "unsupported_profile_or_schema",
+            "conversation_mismatch",
+            "source_identity_mismatch",
+            "source_commitment_mismatch",
+            "unsupported_state_version",
+            "missing_predecessor_packet_id",
+            "divergent_branch",
+            "source_not_accepted_head",
+            "predecessor_digest_mismatch",
+            "predecessor_content_not_accepted_head",
+            "stale_or_rollback",
+            "unknown_predecessor",
+            "divergent_history"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "evidence_delivery_attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport_attempt_id",
+        "ordinal",
+        "state",
+        "retry_of_transport_attempt_id",
+        "acknowledgement_id",
+        "reason"
+      ],
+      "properties": {
+        "transport_attempt_id": {
+          "$ref": "#/$defs/text"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "state": {
+          "enum": [
+            "DISPATCHED",
+            "INTERRUPTED",
+            "ACK_LOST",
+            "TERMINAL_REJECTED",
+            "RECEIPT_UNRESOLVED",
+            "ACKNOWLEDGED"
+          ]
+        },
+        "retry_of_transport_attempt_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "acknowledgement_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "evidence_ack_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledgement_id",
+        "transport_attempt_id",
+        "kind"
+      ],
+      "properties": {
+        "acknowledgement_id": {
+          "$ref": "#/$defs/text"
+        },
+        "transport_attempt_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "DURABLE_RECEIPT",
+            "DURABLE_RECEIPT_UNRESOLVED",
+            "TERMINAL_REJECTION"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "retained_artifact_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result_profile",
+        "result_version",
+        "state",
+        "export_profile",
+        "export_version",
+        "producer_refs",
+        "artifact_commitment"
+      ],
+      "properties": {
+        "result_profile": {
+          "const": "urn:cognous:profiles:governed-message-recipient-result"
+        },
+        "result_version": {
+          "const": "1.0.0"
+        },
+        "state": {
+          "type": "string"
+        },
+        "export_profile": {
+          "const": "urn:cognous:profiles:gax-retained-artifacts"
+        },
+        "export_version": {
+          "enum": [
+            "1.0.0",
+            "1.1.0"
+          ]
+        },
+        "producer_refs": {
+          "$ref": "#/$defs/producer_refs"
+        },
+        "artifact_commitment": {
+          "$ref": "#/$defs/digest"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "transport_evidence": {
+      "type": "object",
+      "description": "Transport evidence summary. `unsupported` is the honest-limits list and must name all three limits.",
+      "additionalProperties": false,
+      "required": [
+        "transport_profile",
+        "transport_version",
+        "message_id",
+        "content_commitment",
+        "outbox_state",
+        "inbox_received_at",
+        "recipient_processing_status",
+        "delivery_attempts",
+        "sender_acknowledgements",
+        "recipient_acknowledgements",
+        "producer_refs",
+        "retained_artifact_summary",
+        "namespace_rule",
+        "unsupported"
+      ],
+      "properties": {
+        "transport_profile": {
+          "const": "urn:cognous:profiles:governed-message-transport:0.1.0"
+        },
+        "transport_version": {
+          "const": "0.1.0"
+        },
+        "message_id": {
+          "$ref": "#/$defs/text"
+        },
+        "content_commitment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "outbox_state": {
+          "enum": [
+            "QUEUED",
+            "IN_FLIGHT",
+            "DELIVERED",
+            "PENDING_RETRY",
+            "UNRESOLVED",
+            "TERMINAL_REJECTED",
+            null
+          ]
+        },
+        "inbox_received_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "recipient_processing_status": {
+          "enum": [
+            "not_received",
+            "retained",
+            "unresolved_after_durable_receipt"
+          ]
+        },
+        "delivery_attempts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_delivery_attempt"
+          }
+        },
+        "sender_acknowledgements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_ack_row"
+          }
+        },
+        "recipient_acknowledgements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_ack_row"
+          }
+        },
+        "producer_refs": {
+          "$ref": "#/$defs/producer_refs"
+        },
+        "retained_artifact_summary": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/retained_artifact_summary"
+            }
+          ]
+        },
+        "namespace_rule": {
+          "type": "string"
+        },
+        "unsupported": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "cryptographically_authenticated_network_identity",
+              "distributed_exactly_once_delivery",
+              "independent_effect_verification"
+            ]
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "delivery_result": {
+      "type": "object",
+      "description": "Sender-side summary returned by LocalDurableTransport.deliver (and recover_due). The qualification suites read transport_state from it. DELIVERED means a DURABLE_RECEIPT was received and nothing more.",
+      "additionalProperties": false,
+      "required": [
+        "message_id",
+        "transport_state",
+        "attempted"
+      ],
+      "properties": {
+        "message_id": {
+          "$ref": "#/$defs/text"
+        },
+        "transport_state": {
+          "enum": [
+            "DELIVERED",
+            "PENDING_RETRY",
+            "UNRESOLVED",
+            "TERMINAL_REJECTED",
+            "BACKOFF"
+          ]
+        },
+        "attempted": {
+          "type": "boolean"
+        },
+        "delivery_attempt_id": {
+          "$ref": "#/$defs/text"
+        },
+        "acknowledgement_received": {
+          "type": "boolean"
+        },
+        "acknowledgement": {
+          "$ref": "#/$defs/acknowledgement"
+        },
+        "reason": {
+          "$ref": "#/$defs/text"
+        },
+        "next_attempt_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "interruption": {
+          "$ref": "#/$defs/text"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}

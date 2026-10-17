@@ -1,0 +1,17 @@
+{
+  "fixture_id": "successor-acceptance-creates-effect",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Loading a successor packet never creates an effect.",
+  "expected_refusal": "successor_creates_effect",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "successor_acceptance": {
+      "loaded": true,
+      "effect_created": true,
+      "status": "loaded_for_reconciliation"
+    }
+  }
+}

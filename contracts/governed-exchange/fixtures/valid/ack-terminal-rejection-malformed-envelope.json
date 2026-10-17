@@ -1,0 +1,26 @@
+{
+  "fixture_id": "ack-terminal-rejection-malformed-envelope",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "A rejection of an envelope that lacked every member: the echoed fields are null, which is allowed only for TERMINAL_REJECTION.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "acknowledgement": {
+      "acknowledgement_id": "syn-ack-d-2",
+      "acknowledgement_kind": "TERMINAL_REJECTION",
+      "content_commitment": null,
+      "created_at": "2026-10-06T12:00:09Z",
+      "delivery_attempt_id": null,
+      "detail": {
+        "authorization": "not_evaluated_by_transport",
+        "external_effect": "not_established",
+        "reason": "unsupported_transport_profile",
+        "transport_status": "rejected"
+      },
+      "message_id": null,
+      "recipient_endpoint_ref": null
+    }
+  }
+}

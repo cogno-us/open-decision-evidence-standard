@@ -1,0 +1,66 @@
+{
+  "fixture_id": "message-authority-ref-undeclared-member",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "An undeclared member inside an authority reference.",
+  "expected_refusal": "undeclared_member",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "message": {
+      "acknowledgement_requested": true,
+      "authority_refs": [
+        {
+          "ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+          "type": "authority_context",
+          "grant": "syn"
+        },
+        {
+          "ref": "re-resolve-before-effect",
+          "type": "control_plane_current_authorization_required"
+        }
+      ],
+      "content": {
+        "note": "Narrative content is not authority.",
+        "summary": "Bounded synthetic refund proposal"
+      },
+      "content_digest": "sha256:d7cdf80daa89eeea4523a1007212e3ceac4fb416843a08c3e94b2c9f05919d24",
+      "conversation_id": "conv-refund-001",
+      "created_at": "2026-10-06T11:59:00Z",
+      "evidence_refs": [
+        {
+          "digest": "sha256:cf26b6e25e7b52756f5923999d54bbe11e827c00116d205ae1263126386c3113",
+          "ref": "syn-bundle-1",
+          "type": "replay_bundle"
+        }
+      ],
+      "expires_at": "2026-10-07T00:00:00Z",
+      "message_id": "syn-msg-1",
+      "message_type": "PROPOSE",
+      "operation_commitment": "sha256:e1a58656c0f3f4a329f455af3dfde8782551c259b954c20951eb37b9b411d37a",
+      "profile": "urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0",
+      "proposal_commitment": "sha256:c56ad132b83916fc6367b37d72032353223cfd0631b6715123439ba4ae1fbb0d",
+      "protocol_version": "0.1.0",
+      "purpose": "refund_execution_assessment",
+      "recipient": "refund-recipient",
+      "requested_action": {
+        "action_id": "syn.refund",
+        "actor": "syn-actor",
+        "adapter_id": "syn-adapter",
+        "amount": 10.0,
+        "payload": {
+          "k": 1
+        },
+        "principal": "syn-principal",
+        "requested_permissions": [
+          "syn.permission"
+        ],
+        "target": "syn-target",
+        "unit": "USD"
+      },
+      "sender": "refund-sender",
+      "message_digest": "sha256:071b08d01d67b7b02d0173266b68ab0ce69c2b6ced3299cd0ceb22ccde57d66b"
+    }
+  }
+}

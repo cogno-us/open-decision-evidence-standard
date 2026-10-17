@@ -1,0 +1,17 @@
+{
+  "fixture_id": "result-unavailable-nothing-retained",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "LocalDurableTransport.retained_artifacts for an unknown message: the explicit unavailable state with no assessment, execution or producer_refs.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "recipient_result": {
+      "artifact_export": null,
+      "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+      "result_state": "unavailable",
+      "result_version": "1.0.0"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "fixture_id": "delivery-result-backoff-without-due-time",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "BACKOFF without next_attempt_at.",
+  "expected_refusal": "delivery_result_inconsistent",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "message_id": "syn-msg-1",
+      "transport_state": "BACKOFF",
+      "attempted": false
+    }
+  }
+}

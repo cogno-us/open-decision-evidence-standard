@@ -1,0 +1,21 @@
+{
+  "fixture_id": "result-unavailable-carries-execution",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "An unavailable result carries no execution summary.",
+  "expected_refusal": "unavailable_result_carries_content",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "recipient_result": {
+      "artifact_export": null,
+      "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+      "result_state": "unavailable",
+      "result_version": "1.0.0",
+      "execution": {
+        "attempted": false
+      }
+    }
+  }
+}

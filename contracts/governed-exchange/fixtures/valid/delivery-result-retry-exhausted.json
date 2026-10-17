@@ -1,0 +1,17 @@
+{
+  "fixture_id": "delivery-result-retry-exhausted",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Attempts exhausted without a sender-side acknowledgement: UNRESOLVED, nothing attempted this call.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "message_id": "syn-msg-1",
+      "transport_state": "UNRESOLVED",
+      "attempted": false,
+      "reason": "retry_exhausted_without_sender_ack"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "fixture_id": "delivery-result-backoff-not-due",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "deliver called before next_attempt_at: nothing attempted, BACKOFF with the due time.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "message_id": "syn-msg-1",
+      "transport_state": "BACKOFF",
+      "attempted": false,
+      "next_attempt_at": "2026-10-06T12:00:03Z"
+    }
+  }
+}
