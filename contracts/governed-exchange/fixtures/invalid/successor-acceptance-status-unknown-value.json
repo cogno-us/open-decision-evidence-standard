@@ -1,0 +1,17 @@
+{
+  "fixture_id": "successor-acceptance-status-unknown-value",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A status outside the closed set.",
+  "expected_refusal": "unknown_enum_value",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "successor_acceptance": {
+      "loaded": false,
+      "effect_created": false,
+      "status": "accepted_with_warnings"
+    }
+  }
+}

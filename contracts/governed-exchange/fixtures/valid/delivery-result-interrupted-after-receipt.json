@@ -1,0 +1,19 @@
+{
+  "fixture_id": "delivery-result-interrupted-after-receipt",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "A synthetic interruption after receipt: attempted, no acknowledgement, interruption named.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "message_id": "syn-msg-1",
+      "delivery_attempt_id": "syn-delivery-1",
+      "transport_state": "PENDING_RETRY",
+      "attempted": true,
+      "acknowledgement_received": false,
+      "interruption": "after_receipt_before_recipient_processing"
+    }
+  }
+}

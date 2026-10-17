@@ -1,0 +1,40 @@
+{
+  "fixture_id": "result-informational-attempted",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "An informational message cannot have an attempted effect.",
+  "expected_refusal": "execution_without_eligible_assessment",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "recipient_result": {
+      "artifact_export": null,
+      "assessment": {
+        "errors": [],
+        "message_received": true,
+        "message_understood": true,
+        "permitted_handling": "INFORMATIONAL_ONLY",
+        "stages": {
+          "authority_reference": "present_not_authorizing",
+          "communicative_act": "informational_no_effect",
+          "evidence_digest": "verified",
+          "freshness": "passed",
+          "identity_binding": "passed",
+          "profile": "passed",
+          "purpose": "passed",
+          "reference_resolution": "passed",
+          "structure": "passed"
+        }
+      },
+      "execution": {
+        "attempted": true,
+        "reason": "informational_message_type"
+      },
+      "producer_refs": {},
+      "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+      "result_state": "complete",
+      "result_version": "1.0.0"
+    }
+  }
+}

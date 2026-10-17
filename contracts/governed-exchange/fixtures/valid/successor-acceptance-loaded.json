@@ -1,0 +1,16 @@
+{
+  "fixture_id": "successor-acceptance-loaded",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "accept_successor on a fresh conversation: loaded for reconciliation, no effect created.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "successor_acceptance": {
+      "effect_created": false,
+      "loaded": true,
+      "status": "loaded_for_reconciliation"
+    }
+  }
+}

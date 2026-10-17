@@ -1,0 +1,16 @@
+{
+  "fixture_id": "successor-acceptance-refused-missing-predecessor",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "A refused packet: loaded false, effect_created false, a typed status.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "successor_acceptance": {
+      "effect_created": false,
+      "loaded": false,
+      "status": "missing_predecessor_packet_id"
+    }
+  }
+}

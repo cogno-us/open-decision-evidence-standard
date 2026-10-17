@@ -1,0 +1,38 @@
+{
+  "fixture_id": "successor-profile-downgrade",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A successor packet of another profile is refused (unsupported_profile_or_schema).",
+  "expected_refusal": "unsupported_profile_or_schema",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "successor_packet": {
+      "attempts": {
+        "control_plane": [
+          "syn-cp-attempt-1"
+        ],
+        "executor": [
+          "syn-attempt-1"
+        ]
+      },
+      "conversation_id": "conv-refund-001",
+      "missing_evidence": [],
+      "next_proposed_work": "reconcile before any further execution",
+      "packet_id": "succ-syn-msg-1-1",
+      "pending_effects": [],
+      "predecessor_packet_id": null,
+      "profile": "urn:cognous:profiles:other",
+      "relevant_decisions": [
+        "syn-decision-1"
+      ],
+      "schema_version": "0.1.0",
+      "source_commitment": "sha256:744a204fed8a68f8df99113c20d8387ddfcd4b475f02a6390ad3bd97a5c9dd72",
+      "source_packet_id": "syn-msg-1",
+      "state_version": "state-1",
+      "unresolved_delivery": false,
+      "packet_digest": "sha256:6bcacb179e961ba9e8d3820f8a470595799b379912df775762cfcf722ae83433"
+    }
+  }
+}

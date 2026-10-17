@@ -1,0 +1,18 @@
+{
+  "fixture_id": "delivery-result-ack-lost",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "The acknowledgement was lost: the attempt happened, no acknowledgement came back, the message awaits retry.",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "message_id": "syn-msg-1",
+      "delivery_attempt_id": "syn-delivery-1",
+      "transport_state": "PENDING_RETRY",
+      "attempted": true,
+      "acknowledgement_received": false
+    }
+  }
+}

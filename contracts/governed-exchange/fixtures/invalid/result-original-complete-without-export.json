@@ -1,0 +1,67 @@
+{
+  "fixture_id": "result-original-complete-without-export",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "result_state original_complete must mirror a retained export.",
+  "expected_refusal": "result_state_export_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "recipient_result": {
+      "artifact_export": null,
+      "assessment": {
+        "errors": [],
+        "message_received": true,
+        "message_understood": true,
+        "permitted_handling": "ACCEPT_FOR_ASSESSMENT",
+        "stages": {
+          "authority_reference": "present_not_authorizing",
+          "communicative_act": "assessment_required",
+          "evidence_digest": "verified",
+          "freshness": "passed",
+          "identity_binding": "passed",
+          "profile": "passed",
+          "purpose": "passed",
+          "reference_resolution": "passed",
+          "structure": "passed"
+        }
+      },
+      "execution": {
+        "acknowledged": true,
+        "attempt_id": "syn-attempt-1",
+        "attempt_status": "executed",
+        "attempted": true,
+        "control_plane_evidence": null,
+        "decision_id": "syn-decision-1",
+        "destination_observed": "applied",
+        "effect_id": "syn-effect-1",
+        "newly_executed": true,
+        "observation": {
+          "effect_id": "syn-effect-1",
+          "state": "applied"
+        }
+      },
+      "producer_refs": {
+        "control_plane_attempt_ids": [
+          "syn-cp-attempt-1"
+        ],
+        "decision_id": "syn-decision-1",
+        "effect_id": "syn-effect-1",
+        "executor_attempt_id": "syn-attempt-1",
+        "executor_attempt_ids": [
+          "syn-attempt-1"
+        ],
+        "odes_package_digest": "sha256:64469ac97b792821398f5876dfc3c34b5f0c1c70186ff9f9fca94bd41e118455",
+        "odes_validation_digest": "sha256:25b83dbda8b2339b9c61882ce6b87508faabf06190bc7664bd77aaff1b3de5c8",
+        "reconstruction_bundle_id": "syn-reconstruction-1",
+        "reconstruction_digest": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+        "successor_packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+        "successor_packet_id": "succ-syn-msg-1-1"
+      },
+      "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+      "result_state": "original_complete",
+      "result_version": "1.0.0"
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "fixture_id": "export-reconstruction-digest-mismatch",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The retained bundle was altered after the digest was recorded.",
+  "expected_refusal": "retained_reconstruction_digest_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-runtime",
+    "retained_artifact_export": {
+      "content_commitments": {
+        "odes_package": "sha256:64469ac97b792821398f5876dfc3c34b5f0c1c70186ff9f9fca94bd41e118455",
+        "recipient_validation": "sha256:25b83dbda8b2339b9c61882ce6b87508faabf06190bc7664bd77aaff1b3de5c8",
+        "reconstruction_bundle": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+        "successor_packet": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9"
+      },
+      "export_profile": "urn:cognous:profiles:gax-retained-artifacts",
+      "export_version": "1.1.0",
+      "lineage": {
+        "effect_reexecution": false,
+        "relationship": "original"
+      },
+      "odes": {
+        "exchange_metadata": {},
+        "odes_package": {
+          "profile": {
+            "implementation_profile": "syn-profile"
+          },
+          "provenance": {
+            "execution_facts": {
+              "attempts": {
+                "control_plane": [
+                  "syn-cp-attempt-1"
+                ],
+                "executor": [
+                  "syn-attempt-1"
+                ]
+              },
+              "decision_id": "syn-decision-1",
+              "destination_observed": "applied",
+              "effect_id": "syn-effect-1",
+              "pending_effects": [],
+              "unresolved_delivery": false
+            }
+          }
+        },
+        "recipient_validation": {
+          "outcome": "syn-synthetic"
+        }
+      },
+      "producer_refs": {
+        "control_plane_attempt_ids": [
+          "syn-cp-attempt-1"
+        ],
+        "decision_id": "syn-decision-1",
+        "effect_id": "syn-effect-1",
+        "executor_attempt_ids": [
+          "syn-attempt-1"
+        ],
+        "odes_package_digest": "sha256:64469ac97b792821398f5876dfc3c34b5f0c1c70186ff9f9fca94bd41e118455",
+        "odes_validation_digest": "sha256:25b83dbda8b2339b9c61882ce6b87508faabf06190bc7664bd77aaff1b3de5c8",
+        "reconstruction_bundle_id": "syn-reconstruction-1",
+        "reconstruction_digest": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+        "successor_packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+        "successor_packet_id": "succ-syn-msg-1-1"
+      },
+      "reconstruction_bundle": {
+        "bundle_id": "syn-reconstruction-1",
+        "producer_profiles": [],
+        "reconstruction_bundle_version": "0.2.0",
+        "records": [],
+        "run_id": "syn-tampered"
+      },
+      "state": "original_complete",
+      "successor_packet": {
+        "attempts": {
+          "control_plane": [
+            "syn-cp-attempt-1"
+          ],
+          "executor": [
+            "syn-attempt-1"
+          ]
+        },
+        "conversation_id": "conv-refund-001",
+        "missing_evidence": [],
+        "next_proposed_work": "reconcile before any further execution",
+        "packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+        "packet_id": "succ-syn-msg-1-1",
+        "pending_effects": [],
+        "predecessor_packet_id": null,
+        "profile": "urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0",
+        "relevant_decisions": [
+          "syn-decision-1"
+        ],
+        "schema_version": "0.1.0",
+        "source_commitment": "sha256:744a204fed8a68f8df99113c20d8387ddfcd4b475f02a6390ad3bd97a5c9dd72",
+        "source_packet_id": "syn-msg-1",
+        "state_version": "state-1",
+        "unresolved_delivery": false
+      }
+    }
+  }
+}

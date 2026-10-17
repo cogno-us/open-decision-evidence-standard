@@ -1,0 +1,92 @@
+{
+  "fixture_id": "evidence-outbox-state-unknown-value",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "An outbox state outside the closed set.",
+  "expected_refusal": "unknown_enum_value",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "transport_evidence": {
+      "content_commitment": "sha256:8516f1f9e7b20c3dbd72faa93e5083d812f84493c26e47168b5c77b367c87832",
+      "delivery_attempts": [
+        {
+          "acknowledgement_id": "syn-ack-a-1",
+          "ordinal": 1,
+          "reason": null,
+          "retry_of_transport_attempt_id": null,
+          "state": "ACKNOWLEDGED",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "inbox_received_at": "2026-10-06T12:00:01Z",
+      "message_id": "syn-msg-1",
+      "namespace_rule": "transport_attempt_id is transport-owned; decision_id, effect_id and executor_attempt_id are linked only when returned by the recipient producer",
+      "outbox_state": "SENT",
+      "producer_refs": {
+        "control_plane_attempt_ids": [
+          "syn-cp-attempt-1"
+        ],
+        "decision_id": "syn-decision-1",
+        "effect_id": "syn-effect-1",
+        "executor_attempt_id": "syn-attempt-1",
+        "executor_attempt_ids": [
+          "syn-attempt-1"
+        ],
+        "odes_package_digest": "sha256:64469ac97b792821398f5876dfc3c34b5f0c1c70186ff9f9fca94bd41e118455",
+        "odes_validation_digest": "sha256:25b83dbda8b2339b9c61882ce6b87508faabf06190bc7664bd77aaff1b3de5c8",
+        "reconstruction_bundle_id": "syn-reconstruction-1",
+        "reconstruction_digest": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+        "successor_packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+        "successor_packet_id": "succ-syn-msg-1-1"
+      },
+      "recipient_acknowledgements": [
+        {
+          "acknowledgement_id": "syn-ack-a-1",
+          "kind": "DURABLE_RECEIPT",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "recipient_processing_status": "retained",
+      "retained_artifact_summary": {
+        "artifact_commitment": "sha256:e0c835c0c48950a85e40d56ffdbb811e9fb741f95bccfa80a61331b20946a6d6",
+        "export_profile": "urn:cognous:profiles:gax-retained-artifacts",
+        "export_version": "1.1.0",
+        "producer_refs": {
+          "control_plane_attempt_ids": [
+            "syn-cp-attempt-1"
+          ],
+          "decision_id": "syn-decision-1",
+          "effect_id": "syn-effect-1",
+          "executor_attempt_ids": [
+            "syn-attempt-1"
+          ],
+          "odes_package_digest": "sha256:64469ac97b792821398f5876dfc3c34b5f0c1c70186ff9f9fca94bd41e118455",
+          "odes_validation_digest": "sha256:25b83dbda8b2339b9c61882ce6b87508faabf06190bc7664bd77aaff1b3de5c8",
+          "reconstruction_bundle_id": "syn-reconstruction-1",
+          "reconstruction_digest": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+          "successor_packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+          "successor_packet_id": "succ-syn-msg-1-1"
+        },
+        "result_profile": "urn:cognous:profiles:governed-message-recipient-result",
+        "result_version": "1.0.0",
+        "state": "original_complete"
+      },
+      "sender_acknowledgements": [
+        {
+          "acknowledgement_id": "syn-ack-a-1",
+          "kind": "DURABLE_RECEIPT",
+          "transport_attempt_id": "syn-delivery-1"
+        }
+      ],
+      "transport_profile": "urn:cognous:profiles:governed-message-transport:0.1.0",
+      "transport_version": "0.1.0",
+      "unsupported": [
+        "cryptographically_authenticated_network_identity",
+        "distributed_exactly_once_delivery",
+        "independent_effect_verification"
+      ]
+    }
+  }
+}
