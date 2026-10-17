@@ -183,11 +183,12 @@ def test_recipient_cli_non_object_policy_exits_nonzero_with_json(tmp_path, capsy
 # F3R (2026-10-16): F5b merged security-runtime generation is added beside the
 # retained security generation; each generation is an exact tuple.
 from odes.common import (SECURITY_REVISIONS, SECURITY_PROFILE_VERSION, F5B_REVISIONS, F5B_PROFILE_VERSION,
-    SECURITY_RUNTIME_GENERATIONS, ALL_V2_CONTROL_PLANE_REVISIONS)
+    P4_REVISIONS, P4_PROFILE_VERSION, SECURITY_RUNTIME_GENERATIONS, ALL_V2_CONTROL_PLANE_REVISIONS)
 from odes.exporter import _selected_v2_pins
 from odes.recipient_validator import _evaluate_profile, _normalized_replay_material
 
-GENERATIONS = [(SECURITY_PROFILE_VERSION, SECURITY_REVISIONS), (F5B_PROFILE_VERSION, F5B_REVISIONS)]
+GENERATIONS = [(SECURITY_PROFILE_VERSION, SECURITY_REVISIONS), (F5B_PROFILE_VERSION, F5B_REVISIONS),
+               (P4_PROFILE_VERSION, P4_REVISIONS)]
 
 
 def test_retained_security_generation_unchanged_and_f5b_added():
@@ -226,12 +227,14 @@ def test_generation_profile_version_accepted_for_own_control_plane(version, pins
     assert _evaluate_profile(_package(version, pins), [PROFILE_V2_ID])['status'] == 'pass'
 
 
-@pytest.mark.parametrize('version,pins', [(SECURITY_PROFILE_VERSION, F5B_REVISIONS), (F5B_PROFILE_VERSION, SECURITY_REVISIONS)])
+@pytest.mark.parametrize('version,pins', [(SECURITY_PROFILE_VERSION, F5B_REVISIONS), (F5B_PROFILE_VERSION, SECURITY_REVISIONS),
+                                          (P4_PROFILE_VERSION, F5B_REVISIONS), (F5B_PROFILE_VERSION, P4_REVISIONS)])
 def test_cross_generation_profile_version_rejected(version, pins):
     assert _evaluate_profile(_package(version, pins), [PROFILE_V2_ID])['status'] == 'unsupported'
 
 
-@pytest.mark.parametrize('pins,replay', [(F5B_REVISIONS, SECURITY_REVISIONS['replay']), (SECURITY_REVISIONS, F5B_REVISIONS['replay'])])
+@pytest.mark.parametrize('pins,replay', [(F5B_REVISIONS, SECURITY_REVISIONS['replay']), (SECURITY_REVISIONS, F5B_REVISIONS['replay']),
+                                         (P4_REVISIONS, F5B_REVISIONS['replay']), (F5B_REVISIONS, P4_REVISIONS['replay'])])
 def test_cross_generation_replay_pin_rejected(pins, replay):
     version = SECURITY_RUNTIME_GENERATIONS[pins['control_plane']][0]
     with pytest.raises(ValueError, match='exact qualified Replay revision'):
@@ -252,3 +255,17 @@ def test_cross_generation_component_pin_differs_from_reexport(component):
     expected = _package(F5B_PROFILE_VERSION, _selected_v2_pins(F5B_REVISIONS['control_plane']))
     left, right = _normalized_replay_material(mixed, expected)
     assert left != right
+
+
+def test_p4_generation_is_added_beside_f5b_and_exactly_paired():
+    assert P4_REVISIONS == {'manifest': '2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e',
+        'replay': P4_REVISIONS['replay'],
+        'control_plane': '26a7e6594eb535827ccc248cbca36a7d119d613b',
+        'moltbot_safe': '3024ef6e6ecf7da22e5f4fdf90d873f93b2a55c9'}
+    assert len(P4_REVISIONS['replay']) == 40
+    assert P4_PROFILE_VERSION not in {SECURITY_PROFILE_VERSION, F5B_PROFILE_VERSION}
+    # The P4 tuple keeps the F5b Manifest but shares no Control Plane, runtime or Replay revision with F5b.
+    for key in ('replay', 'control_plane', 'moltbot_safe'):
+        assert P4_REVISIONS[key] != F5B_REVISIONS[key]
+    assert P4_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
+    assert F5B_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS

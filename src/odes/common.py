@@ -69,12 +69,22 @@ F5B_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
     "replay": "def0ee0f3af713283ea3cd13f0caf79e1607b651",
     "control_plane": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
     "moltbot_safe": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f"}
+# P4 generation (alpha decoupling, qualification P4): Control Plane 26a7e659 / runtime 3024ef6e / Manifest 2c36bcd0
+# with the Replay revision below, the producers after the execution-attempt lifecycle contract work. Added beside
+# F5b (retained F5b evidence stays accepted); an exact tuple keyed by its Control Plane revision, never mixed.
+# Alpha scaffolding: removed with the other hard pins at end-of-alpha (P5).
+P4_PROFILE_VERSION = "odes-cognous-stack-export-0.2.5-security-runtime-p4-candidate"
+P4_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
+    "replay": "7c6888fb0bf3218b3e315bc22714c4406f6d3908",
+    "control_plane": "26a7e6594eb535827ccc248cbca36a7d119d613b",
+    "moltbot_safe": "3024ef6e6ecf7da22e5f4fdf90d873f93b2a55c9"}
 SECURITY_RUNTIME_GENERATIONS = {
     SECURITY_REVISIONS["control_plane"]: (SECURITY_PROFILE_VERSION, SECURITY_REVISIONS),
     F5B_REVISIONS["control_plane"]: (F5B_PROFILE_VERSION, F5B_REVISIONS),
+    P4_REVISIONS["control_plane"]: (P4_PROFILE_VERSION, P4_REVISIONS),
 }
 SECURITY_RUNTIME_CP_REVISIONS = frozenset(SECURITY_RUNTIME_GENERATIONS)
-ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"], SECURITY_REVISIONS["control_plane"], F5B_REVISIONS["control_plane"])
+ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"], SECURITY_REVISIONS["control_plane"], F5B_REVISIONS["control_plane"], P4_REVISIONS["control_plane"])
 
 
 def canonical_bytes(value: Any) -> bytes:
