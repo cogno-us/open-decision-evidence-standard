@@ -255,7 +255,17 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
     return cp, proposal, moltbot
 
 
+SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS = ("0.2.0",)
+
+
+def _require_supported_bundle_version(bundle: dict[str, Any]) -> None:
+    version = bundle.get("bundle_version")
+    if version not in SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS:
+        raise ExportError(f"unsupported Reconstruction Bundle version {version!r}; supported: {', '.join(SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS)}")
+
+
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
+    _require_supported_bundle_version(bundle)
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
     try:
         from agent_replay_bundle.importers import ImportContractError as ReplayImportContractError
