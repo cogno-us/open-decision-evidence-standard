@@ -1,0 +1,20 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "epistemic_status": {
+      "claim_id": "syn-claim-1",
+      "contradicting_weight": 0.0,
+      "independence_score": 0.2,
+      "last_computed_at": "2026-10-17T12:00:00",
+      "robustness_score": 0.45,
+      "status": "supported",
+      "supporting_weight": 4.5
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "epistemic-five-records-one-source",
+  "reason": "Captured: five evidence records citing one source identifier give independence 0.2, not 1.0 (#24). The score counts distinct source identifiers only; it does not establish independence of origin (F-19).",
+  "synthetic": true
+}

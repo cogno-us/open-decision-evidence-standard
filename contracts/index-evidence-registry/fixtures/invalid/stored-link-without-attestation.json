@@ -1,0 +1,24 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "producer": "index-api",
+    "stored_link": {
+      "attestation_id": null,
+      "attestation_statement_digest": null,
+      "attested_by": "issuer:legacy",
+      "claim_id": "syn-claim-1",
+      "claim_id_2": null,
+      "evidence_id": "syn-evidence-2",
+      "id": "link_000000000099",
+      "relation_type": "supports",
+      "strength": 1.0,
+      "timestamp": "2026-10-17T12:00:00"
+    }
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "link_without_attestation",
+  "fixture_id": "stored-link-without-attestation",
+  "reason": "Captured from EvidenceService.create_link called directly with no attestation (the service allows it; the route never does). A stored link must name its verified attestation.",
+  "synthetic": true
+}

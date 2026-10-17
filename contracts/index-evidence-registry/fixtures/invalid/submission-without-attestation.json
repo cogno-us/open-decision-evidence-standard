@@ -1,0 +1,19 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_submission": {
+      "attested_by": "issuer:alice",
+      "claim_id": "syn-claim-1",
+      "evidence_id": "syn-evidence-1",
+      "relation_type": "supports",
+      "strength": 0.9
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "attestation_required",
+  "fixture_id": "submission-without-attestation",
+  "reason": "No attestation: the route answers 401 attestation_required.",
+  "synthetic": true
+}

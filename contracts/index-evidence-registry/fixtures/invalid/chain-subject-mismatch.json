@@ -1,0 +1,34 @@
+{
+  "document": {
+    "chain_attestation_check": {
+      "chain_id": 1337,
+      "claim_id": "0x1212121212121212121212121212121212121212121212121212121212121212",
+      "contract_address": "0xabababababababababababababababababababab",
+      "evidence_content_digest": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+      "relation": 1,
+      "statement": {
+        "algorithm": "Ed25519",
+        "attestation_id": "chain-att-1",
+        "audience": "index:eip155:1337:0xabababababababababababababababababababab:v1",
+        "content_digest": "sha256:cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "expires_at": 1800003600,
+        "issued_at": 1799999940,
+        "issuer": "issuer:alice",
+        "key_id": "key:1",
+        "not_before": 1799999940,
+        "protocol_version": "bitrep-attestation/1",
+        "statement_type": "index-support/1",
+        "subject": "index:eip155:1337:0xabababababababababababababababababababab:v1:claim:3434343434343434343434343434343434343434343434343434343434343434"
+      },
+      "statement_digest": "sha256:966e931b7a3863cae64a6bb73bd0ef70a507e476cc8d3dc6ca23d2db668a2aae"
+    },
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "producer": "index-chain-client"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "chain_subject_mismatch",
+  "fixture_id": "chain-subject-mismatch",
+  "reason": "A statement whose subject is another claim.",
+  "synthetic": true
+}

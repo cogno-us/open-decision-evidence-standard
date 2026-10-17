@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 409,
+      "message": "Attestation id already used by this issuer for a different statement.",
+      "reason": "attestation_id_conflict"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "outcome-409-attestation-id-conflict",
+  "reason": "Written from the route code, not captured against a store: an attestation id reused by the same issuer for a different statement.",
+  "synthetic": true
+}

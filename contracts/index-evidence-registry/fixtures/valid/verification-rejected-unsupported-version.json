@@ -1,0 +1,40 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "producer": "index-api",
+    "verification_result": {
+      "envelope": {
+        "signature": "ZLOoX56HQ0k2kXsHy8WPcBhojgOwQfjMQMpM9bYYjce+/KkTszz7NXzt6tf1yjLoF0iXB4ZhGYpHBk8n8kXrAg==",
+        "statement": {
+          "algorithm": "Ed25519",
+          "attestation_id": "att-1",
+          "audience": "index:test",
+          "content_digest": "sha256:ef5c440e3a71eaa22f6b2aaccd2390e9d3ae43e5d3a10d5d9d1cd3150719cb9b",
+          "expires_at": 1800003600,
+          "issued_at": 1799999940,
+          "issuer": "issuer:alice",
+          "key_id": "key:1",
+          "not_before": 1799999940,
+          "protocol_version": "bitrep-attestation/2",
+          "statement_type": "index.link.v1",
+          "subject": "syn-claim-1"
+        }
+      },
+      "result": {
+        "assurance": "none",
+        "evaluated_at": 1800000000,
+        "key_status_at": 1800000000,
+        "outcome": "rejected",
+        "reason": "unsupported_version",
+        "result_version": "bitrep-verification/1",
+        "statement_digest": "sha256:9f78648bb7b610d6a2c19e53c0e8e25cf1846a3aaafab9b48cd2b3f146945dd3",
+        "trust_snapshot": "sha256:a1a6f0c528be4df254df32f55273f6762eeb07f090cbce9e10341fe3d8d00919"
+      }
+    }
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "verification-rejected-unsupported-version",
+  "reason": "Captured rejection: statement another protocol version. outcome rejected, assurance none.",
+  "synthetic": true
+}

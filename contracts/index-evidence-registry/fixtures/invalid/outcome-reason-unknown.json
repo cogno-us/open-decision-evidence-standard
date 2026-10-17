@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 422,
+      "reason": "issuer_not_authoritative"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "unknown_enum_value",
+  "fixture_id": "outcome-reason-unknown",
+  "reason": "A reason outside the closed set.",
+  "synthetic": true
+}

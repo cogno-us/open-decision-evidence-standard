@@ -1,0 +1,41 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "producer": "index-api",
+    "verification_result": {
+      "envelope": {
+        "signature": "i2xH/lneHSmvKAGpWEbhV7GT3Ks3lgYPUSPSbI9mPL95dVJDVM/V0ljwFxtpY1hyy8eFhT52Ji00NbkuyqbFBg==",
+        "statement": {
+          "algorithm": "Ed25519",
+          "attestation_id": "att-1",
+          "audience": "index:test",
+          "content_digest": "sha256:ef5c440e3a71eaa22f6b2aaccd2390e9d3ae43e5d3a10d5d9d1cd3150719cb9b",
+          "expires_at": 1800003600,
+          "issued_at": 1799999940,
+          "issuer": "issuer:alice",
+          "key_id": "key:1",
+          "not_before": 1799999940,
+          "protocol_version": "bitrep-attestation/1",
+          "statement_type": "index.link.v1",
+          "subject": "syn-claim-1"
+        }
+      },
+      "result": {
+        "assurance": "none",
+        "evaluated_at": 1800000000,
+        "key_status_at": 1800000000,
+        "outcome": "verified",
+        "reason": "ok",
+        "result_version": "bitrep-verification/1",
+        "statement_digest": "sha256:7036eb4adfbddfac9c4681a84a535a5ef3f732a8c1abfaf70c53ac98a1dcd269",
+        "trust_snapshot": "sha256:a1a6f0c528be4df254df32f55273f6762eeb07f090cbce9e10341fe3d8d00919"
+      }
+    }
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "verification_result_inconsistent",
+  "fixture_id": "verification-verified-assurance-none",
+  "reason": "outcome verified with assurance none.",
+  "synthetic": true
+}

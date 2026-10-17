@@ -1,0 +1,21 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "epistemic_status": {
+      "claim_id": "syn-claim-1",
+      "contradicting_weight": 0.0,
+      "independence_score": 0.5,
+      "last_computed_at": "2026-10-17T12:00:00",
+      "robustness_score": 0.45,
+      "status": "supported",
+      "supporting_weight": 4.5
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "independence_not_distinct_source_count",
+  "fixture_id": "epistemic-independence-not-a-source-count",
+  "reason": "independence 0.5: not min(k/5, 1) for an integer k.",
+  "synthetic": true
+}

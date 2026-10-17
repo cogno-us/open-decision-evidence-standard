@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 401,
+      "reason": "invalid_signature"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "outcome_status_reason_mismatch",
+  "fixture_id": "outcome-401-wrong-reason",
+  "reason": "401 with a reason other than attestation_required.",
+  "synthetic": true
+}
