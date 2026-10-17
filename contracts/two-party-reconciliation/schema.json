@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/two-party-reconciliation/schema.json",
+  "title": "Two-party reconciliation contract 0.1.0-draft",
+  "description": "Draft optional ODES extension profile: where both sender and receiver record the same event, a mismatch is detected before commit and surfaces as a mismatch, never as two valid records. Closed member sets; x- extensions allowed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "profile",
+    "reconciliations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "two-party-reconciliation"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "profile": {
+      "const": "two-party-reconciliation/0.1"
+    },
+    "reconciliations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reconciliation"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_id",
+        "event_ref",
+        "party_id",
+        "event_digest",
+        "recorded_at"
+      ],
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "party_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "recorded_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "mismatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "differing_members",
+        "disposition"
+      ],
+      "properties": {
+        "differing_members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "disposition": {
+          "enum": [
+            "hold",
+            "escalate"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "commit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "committed_at",
+        "record_ids"
+      ],
+      "properties": {
+        "committed_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reconciliation_id",
+        "event_ref",
+        "sender",
+        "receiver",
+        "outcome",
+        "compared_at",
+        "mismatch",
+        "commit"
+      ],
+      "properties": {
+        "reconciliation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sender": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/record"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receiver": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/record"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "matched",
+            "mismatch",
+            "awaiting_peer"
+          ]
+        },
+        "compared_at": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mismatch": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/mismatch"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "commit": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/commit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}
