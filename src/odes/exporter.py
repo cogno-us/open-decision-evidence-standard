@@ -255,7 +255,17 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
     return cp, proposal, moltbot
 
 
+SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS = ("0.2.0",)
+
+
+def _require_supported_bundle_version(bundle: dict[str, Any]) -> None:
+    version = bundle.get("bundle_version")
+    if version not in SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS:
+        raise ExportError(f"unsupported Reconstruction Bundle version {version!r}; supported: {', '.join(SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS)}")
+
+
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
+    _require_supported_bundle_version(bundle)
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
     try:
         from agent_replay_bundle.importers import ImportContractError as ReplayImportContractError
@@ -324,6 +334,18 @@ def _validate_manifest_binding(manifest: dict[str, Any], proposal: dict[str, Any
 def _check_decision_execution_consistency(bundle: dict[str, Any]) -> tuple[dict[str, Any], str]:
     grouped = _group(bundle)
     decisions = [_data(record) for record in grouped.get("runtime_decision", [])]
+    if len(decisions) > 1:
+        # A shared journal may retain decisions for unrelated proposals (for example a held, unauthorized request).
+        # Select the flow only when retained execution evidence names exactly one of the decisions; any other
+        # situation stays ambiguous and fails closed.
+        referenced = {
+            _data(record).get("decision_id")
+            for kind in ("execution_envelope", "execution_result", "destination_attempt", "control_plane_attempt_transition")
+            for record in grouped.get(kind, [])
+        } - {None}
+        linked = [item for item in decisions if item.get("decision_id") in referenced]
+        if len(linked) == 1:
+            decisions = linked
     if len(decisions) != 1:
         raise ExportError("export supports exactly one retained runtime_decision")
     decision = decisions[0]
