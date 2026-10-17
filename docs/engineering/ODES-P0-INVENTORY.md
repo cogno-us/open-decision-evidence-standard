@@ -72,10 +72,10 @@ Replay, evidence pack and exchange carry most of the pins and unwritten rules. R
 - **P4, qualification.** Remove the private reach-ins (section 3.5) by moving what they need into public entry points or fixtures.
 - **Hygiene.** Dead pin constants, stale repository names, mismatched shas in docs (N-8), the Alvorada pin in the manifest example (N-7).
 
-## 7. Decisions this needs from the owner
+## 7. Owner decisions (2026-10-17)
 
-1. **N-1 direction.** Two options: (a) the contract allows `unknown` with a validated observation and consumers treat status, `observed_state` and observation separately; (b) the runtime reports `reconciled` or `partial` when a validated observation exists. Recommendation: (a). Status describes the delivery attempt, observation describes what is known, and (b) changes runtime behaviour that the existing route-A and OpenShell paths rely on.
-2. **F-25 handling.** Fix the evidence pack now (small change: map one record type back) or leave it to P3. Recommendation: P3, with the other pack changes.
+1. **N-1 direction: change the runtime.** The contract stays strict (`unknown` with a validated observation is invalid). The runtime reports `reconciled` or `partial` when a validated observation exists. Recommendation was to allow it in the contract; the owner chose the runtime change instead. Scheduled for P3, with a reproducing probe first, because the existing route-A and OpenShell paths currently rely on the `unknown` result.
+2. **F-25 timing: P3.** The evidence pack fix lands with the other pack changes. F-25 stays OPEN until then.
 
 ## 8. External dependencies (appendix, no contracts planned)
 
