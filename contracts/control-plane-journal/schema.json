@@ -1,0 +1,1068 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/control-plane-journal/schema.json",
+  "title": "Control Plane journal (bounded run record) contract 0.1.0-draft",
+  "description": "Draft boundary contract for the Control Plane run record (BoundedRunRecord) as consumed by Replay (import_bounded_workflow, refusal_evidence) and by the Exchange reference runtime. Closed member sets; the reserved extensions object accepts x- names on declared extensible objects. Cross-record rules are in validate.py and README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "run_id",
+    "decisions",
+    "attempts",
+    "observations",
+    "reconciliations",
+    "refusals",
+    "resolution_checks",
+    "closeouts",
+    "input_time_floors"
+  ],
+  "properties": {
+    "contract": {
+      "const": "control-plane-journal"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "producer": {
+      "enum": [
+        "control-plane"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/decision"
+      }
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/control_plane_attempt"
+      }
+    },
+    "observations": {
+      "type": "array",
+      "description": "Accepted (validated) destination observations only; see rule observations_mismatch.",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "reconciliations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reconciliation"
+      }
+    },
+    "refusals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/refusal"
+      }
+    },
+    "resolution_checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/resolution_check"
+      }
+    },
+    "closeouts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/closeout"
+      }
+    },
+    "input_time_floors": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "check_events": {
+      "type": "array",
+      "description": "Resolution journal (write-ahead). Present, non-empty, in journal mode; the producer omits it when empty.",
+      "items": {
+        "$ref": "#/$defs/journal_event"
+      }
+    },
+    "vocabulary_changes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/vocabulary_change"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "resolution_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_type",
+        "input_id",
+        "expected",
+        "observed",
+        "record_commitment",
+        "missing",
+        "previous_observed_at"
+      ],
+      "properties": {
+        "input_type": {
+          "enum": [
+            "manifest",
+            "authority_context",
+            "grant",
+            "policy",
+            "approval",
+            "evidence",
+            "role_mapping",
+            "identity",
+            "mandate",
+            "conflict",
+            "purpose"
+          ]
+        },
+        "input_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "observed": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "record_commitment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "missing": {
+          "type": "boolean"
+        },
+        "previous_observed_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "read_state": {
+          "enum": [
+            "unreadable",
+            "cached_positive",
+            null
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "resolution_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "stage",
+        "evaluated_at",
+        "time_source",
+        "inputs",
+        "reasons"
+      ],
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stage": {
+          "enum": [
+            "decision",
+            "effect",
+            "claim"
+          ]
+        },
+        "evaluated_at": {
+          "type": "string"
+        },
+        "time_source": {
+          "enum": [
+            "control_plane",
+            "test_override"
+          ]
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resolution_input"
+          }
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "control_plane_attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_id",
+        "effect_id",
+        "decision_id",
+        "started_at",
+        "status",
+        "acknowledgement"
+      ],
+      "properties": {
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "type": "string"
+        },
+        "time_source": {
+          "enum": [
+            "unrecorded",
+            "control_plane",
+            "test_override"
+          ]
+        },
+        "status": {
+          "enum": [
+            "attempted",
+            "acknowledged",
+            "unknown",
+            "failed",
+            "partial"
+          ]
+        },
+        "acknowledgement": {
+          "type": "object"
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "journal_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "phase",
+        "stage",
+        "recorded_at",
+        "owner",
+        "proposal_commitment",
+        "decision_id",
+        "effect_id",
+        "action_class",
+        "input",
+        "reasons",
+        "reason_vocabulary_version"
+      ],
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "phase": {
+          "enum": [
+            "opened",
+            "input",
+            "completed",
+            "interrupted"
+          ]
+        },
+        "stage": {
+          "enum": [
+            "decision",
+            "effect",
+            "claim"
+          ]
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "proposal_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "decision_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effect_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "action_class": {
+          "type": "object"
+        },
+        "input": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/resolution_input"
+            }
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason_vocabulary_version": {
+          "enum": [
+            "runtime-authority-reasons/0.1"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "horizon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "proposal_commitment",
+        "not_before",
+        "expires_at"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "runtime_proposal"
+          ]
+        },
+        "proposal_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "not_before": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "expires_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "runtime_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "approval_commitment",
+        "required_inputs_digest",
+        "catalogue_digest",
+        "expected_effective_grant_digest",
+        "effective_grant_derivation_version"
+      ],
+      "properties": {
+        "profile": {
+          "enum": [
+            "runtime-authority/0.1"
+          ]
+        },
+        "approval_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "required_inputs_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "catalogue_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "expected_effective_grant_digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "effective_grant_derivation_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposal_commitment",
+        "manifest_id",
+        "manifest_version",
+        "manifest_digest",
+        "actor",
+        "principal",
+        "action_id",
+        "adapter_id",
+        "target",
+        "payload_commitment",
+        "requested_permissions",
+        "amount",
+        "unit",
+        "effects",
+        "authority_context_id",
+        "authority_context_version",
+        "authority_context_status",
+        "requirement_id",
+        "requirement_commitment",
+        "grant_id",
+        "grant_revision",
+        "policy_versions",
+        "role_mapping_version",
+        "role_mapping_digest",
+        "effective_max_effects"
+      ],
+      "properties": {
+        "runtime_authority": {
+          "$ref": "#/$defs/runtime_authority"
+        },
+        "proposal_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "manifest_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifest_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifest_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "principal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adapter_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "requested_permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "amount": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effects": {
+          "type": "integer"
+        },
+        "authority_context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority_context_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority_context_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "grant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grant_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policy_versions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "ref",
+              "version"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "role_mapping_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role_mapping_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "effective_max_effects": {
+          "type": "integer"
+        },
+        "generation": {
+          "enum": [
+            "bounded-authorization-effect/0.2"
+          ]
+        },
+        "tenant_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_id",
+        "effect_id",
+        "result",
+        "reasons",
+        "decided_at",
+        "time_source",
+        "operation_horizon",
+        "binding",
+        "resolution_inputs"
+      ],
+      "properties": {
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "result": {
+          "enum": [
+            "authorized",
+            "hold",
+            "deny"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "decided_at": {
+          "type": "string"
+        },
+        "time_source": {
+          "enum": [
+            "unrecorded",
+            "control_plane",
+            "test_override"
+          ]
+        },
+        "operation_horizon": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/horizon"
+            }
+          ]
+        },
+        "binding": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/binding"
+            }
+          ]
+        },
+        "resolution_inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resolution_input"
+          }
+        },
+        "reason_vocabulary_version": {
+          "enum": [
+            "runtime-authority-reasons/0.1"
+          ]
+        },
+        "reopen_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "changed_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_type",
+        "input_id",
+        "expected_version",
+        "observed_version"
+      ],
+      "properties": {
+        "input_type": {
+          "enum": [
+            "grant",
+            "policy",
+            "approval",
+            "evidence",
+            "role_mapping"
+          ]
+        },
+        "input_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_version": {
+          "type": "string"
+        },
+        "observed_version": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "refusal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "refusal_id",
+        "decision_id",
+        "effect_id",
+        "recorded_at",
+        "time_source",
+        "original_operation_horizon",
+        "operation_horizon",
+        "stage",
+        "reasons",
+        "changed_inputs",
+        "resolution_inputs"
+      ],
+      "properties": {
+        "refusal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "time_source": {
+          "enum": [
+            "unrecorded",
+            "control_plane",
+            "test_override"
+          ]
+        },
+        "original_operation_horizon": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/horizon"
+            }
+          ]
+        },
+        "operation_horizon": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/horizon"
+            }
+          ]
+        },
+        "stage": {
+          "enum": [
+            "effect_time_revalidation"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "changed_inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/changed_input"
+          }
+        },
+        "resolution_inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resolution_input"
+          }
+        },
+        "reason_vocabulary_version": {
+          "enum": [
+            "runtime-authority-reasons/0.1"
+          ]
+        },
+        "reopen_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect_id",
+        "state"
+      ],
+      "properties": {
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "state": {
+          "enum": [
+            "absent",
+            "applied",
+            "partial",
+            "unknown"
+          ]
+        },
+        "destination_state": {
+          "type": "object"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect_id",
+        "reconciled_at",
+        "result",
+        "observation",
+        "observation_accepted",
+        "retry_eligible",
+        "reasons",
+        "evaluation_time",
+        "observation_max_age_seconds",
+        "observation_clock_tolerance_seconds"
+      ],
+      "properties": {
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reconciled_at": {
+          "type": "string"
+        },
+        "result": {
+          "enum": [
+            "applied",
+            "observed_absent",
+            "safe_to_retry",
+            "hold"
+          ]
+        },
+        "observation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/observation"
+            }
+          ]
+        },
+        "observation_accepted": {
+          "type": "boolean"
+        },
+        "retry_eligible": {
+          "type": "boolean"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evaluation_time": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "observation_max_age_seconds": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "observation_clock_tolerance_seconds": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "closeout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_id",
+        "effect_id",
+        "original_status",
+        "observed_state",
+        "observed_at",
+        "reconciled_at"
+      ],
+      "properties": {
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_status": {
+          "enum": [
+            "attempted",
+            "unknown",
+            "failed"
+          ]
+        },
+        "observed_state": {
+          "enum": [
+            "applied",
+            "partial"
+          ]
+        },
+        "observed_at": {
+          "type": "string"
+        },
+        "reconciled_at": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "vocabulary_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "change_id",
+        "previous_version",
+        "version",
+        "registry_digest",
+        "kind",
+        "previous_codes",
+        "codes",
+        "acknowledged_by",
+        "acknowledged_at"
+      ],
+      "properties": {
+        "change_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "previous_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registry_digest": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "addition",
+            "retirement",
+            "rename",
+            "split"
+          ]
+        },
+        "previous_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acknowledged_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acknowledged_at": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}
