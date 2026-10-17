@@ -1,0 +1,42 @@
+{
+  "fixture_id": "link-to-an-effect",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A delegation hop links to an effect hop: effects are terminal.",
+  "expected_refusal": "previous_kind_invalid",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612"
+      },
+      {
+        "hop_id": "h-eff-direct",
+        "kind": "effect",
+        "subject_ref": "sha256:effect-direct",
+        "previous_hop_id": "h-grant",
+        "previous_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612",
+        "content_digest": "sha256:223c08f1116fe8ca688986280a21b54f203a9c11f61ed1987e92ea4ddb57aa15",
+        "hop_hash": "sha256:525f2734df53f3531d8fae0f3c552849f6a154ade0919d7dd623a9f8a00af2dd"
+      },
+      {
+        "hop_id": "h-del-after",
+        "kind": "delegation",
+        "subject_ref": "urn:grant:after",
+        "previous_hop_id": "h-eff-direct",
+        "previous_hash": "sha256:525f2734df53f3531d8fae0f3c552849f6a154ade0919d7dd623a9f8a00af2dd",
+        "content_digest": "sha256:2b07244cdffea631de59bf419182fdb20bd86d8603fe39de447070cd53985eaf",
+        "hop_hash": "sha256:ae629a73d4a4717e7ddc27b51397ba1dec3d90a59fe0b7edfafa942268c1d1da"
+      }
+    ],
+    "lineage_discontinuities": []
+  }
+}

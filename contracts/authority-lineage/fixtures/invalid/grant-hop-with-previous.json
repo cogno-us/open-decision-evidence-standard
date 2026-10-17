@@ -1,0 +1,33 @@
+{
+  "fixture_id": "grant-hop-with-previous",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A grant hop is the origin and links to nothing.",
+  "expected_refusal": "grant_has_previous",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612"
+      },
+      {
+        "hop_id": "h-grant-2",
+        "kind": "grant",
+        "subject_ref": "urn:grant:other",
+        "previous_hop_id": "h-grant",
+        "previous_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612",
+        "content_digest": "sha256:c08860c8ac19b4f80878664735351194aa9788e2320e6832393eafef1a92a975",
+        "hop_hash": "sha256:539751416874e2df6966a1b8a8acd8b41dd01eb4e716f0beacaef6a4bb63ca7d"
+      }
+    ],
+    "lineage_discontinuities": []
+  }
+}

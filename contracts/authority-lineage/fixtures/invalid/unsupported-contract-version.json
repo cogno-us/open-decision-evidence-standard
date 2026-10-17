@@ -1,0 +1,24 @@
+{
+  "fixture_id": "unsupported-contract-version",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Only 0.1.0-draft is implemented.",
+  "expected_refusal": "unsupported_contract_version",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "9.0.0",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612"
+      }
+    ],
+    "lineage_discontinuities": []
+  }
+}

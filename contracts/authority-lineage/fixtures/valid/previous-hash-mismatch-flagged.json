@@ -1,0 +1,48 @@
+{
+  "fixture_id": "previous-hash-mismatch-flagged",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "The previous hop exists but its hop_hash differs from the recorded previous_hash; flagged previous_hash_mismatch.",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612"
+      },
+      {
+        "hop_id": "h-del-1",
+        "kind": "delegation",
+        "subject_ref": "urn:grant:child",
+        "previous_hop_id": "h-grant",
+        "previous_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612",
+        "content_digest": "sha256:4401627a4c8e2814fb4edd19a1e995e263a0008d52b03d11935fe17212a080aa",
+        "hop_hash": "sha256:d28888e5d6d56c90b0b88b4f2b42398f1be3a3a86ba34f25f06a32a9aebdfeea"
+      },
+      {
+        "hop_id": "h-eff-badlink",
+        "kind": "effect",
+        "subject_ref": "sha256:effect-badlink",
+        "previous_hop_id": "h-del-1",
+        "previous_hash": "sha256:00de651d9d495540bb4e8ce15190c1a0214b8b9d0ee0ba8477544738d3bc33e6",
+        "content_digest": "sha256:d5f115940b9c58beb1351b0bb99169dea0db85597fa6e161acc46fcf67fad116",
+        "hop_hash": "sha256:18cb12cb358b6988aaf126a3874438eaf4b4694fca852504641cd1d0e25680c5"
+      }
+    ],
+    "lineage_discontinuities": [
+      {
+        "flag": "lineage_discontinuity",
+        "effect_hop_id": "h-eff-badlink",
+        "break_hop_id": "h-eff-badlink",
+        "reason": "previous_hash_mismatch"
+      }
+    ]
+  }
+}

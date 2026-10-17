@@ -1,0 +1,33 @@
+{
+  "fixture_id": "tampered-hop-content",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A hop's content digest changed after its hash was computed.",
+  "expected_refusal": "hop_hash_mismatch",
+  "document": {
+    "contract": "authority-lineage",
+    "contract_version": "0.1.0-draft",
+    "profile": "authority-lineage/0.1",
+    "hops": [
+      {
+        "hop_id": "h-grant",
+        "kind": "grant",
+        "subject_ref": "urn:grant:root",
+        "previous_hop_id": null,
+        "previous_hash": null,
+        "content_digest": "sha256:68f9f2dd516d436f829161f577da16a962aa7321971146fc89d6accb8f928a42",
+        "hop_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612"
+      },
+      {
+        "hop_id": "h-del-1",
+        "kind": "delegation",
+        "subject_ref": "urn:grant:child",
+        "previous_hop_id": "h-grant",
+        "previous_hash": "sha256:7cb8d2a91578302f6a9298d0f69753fde84f52a0bab98709a8892967e7500612",
+        "content_digest": "sha256:e7a8f6617aecc6aeb235ac641c9fec32c536695570b0edc23243ba124db17350",
+        "hop_hash": "sha256:d28888e5d6d56c90b0b88b4f2b42398f1be3a3a86ba34f25f06a32a9aebdfeea"
+      }
+    ],
+    "lineage_discontinuities": []
+  }
+}
