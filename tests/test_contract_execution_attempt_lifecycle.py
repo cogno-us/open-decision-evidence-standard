@@ -54,7 +54,8 @@ def test_required_valid_cases_exist():
             "extension-namespace-member-preserved", "executor-unknown-recovery-observation-route-b",
             "executor-unknown-recovery-unavailable-route-b", "executor-unknown-recovery-hold-route-b",
             "executor-observed-effect-free-reconcile-route-b",
-            "executor-unknown-recovery-separate-member-route-b", "executor-normal-observations-member"} <= ids
+            "executor-unknown-recovery-separate-member-route-b", "executor-normal-observations-member",
+            "executor-denied-attempt-event"} <= ids
     assert sum(i.startswith("resolution-checks-overlap") for i in ids) >= 2
 
 
@@ -64,7 +65,8 @@ def test_required_invalid_cases_exist():
             "resolution_checks_out_of_order", "undeclared_member", "invalid_reconciled_marker",
             "unknown_state_mismatch", "recovery_retry_eligible", "recovery_report_incomplete",
             "effect_free_reconcile_claims_attempt", "recovery_state_mismatch",
-            "recovery_observations_mismatch", "unknown_enum_value", "schema_violation"} <= codes
+            "recovery_observations_mismatch", "unknown_enum_value", "schema_violation",
+            "observed_result_claims_attempt", "executed_without_observation", "attempt_started_at_changed"} <= codes
 
 
 def test_f10_protection_unknown_member_is_refused_not_dropped():
