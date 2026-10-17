@@ -18,7 +18,7 @@ SEMANTICS = {"record_reconstruction": True, "destination_observation": "producer
 
 
 def retained():
-    return {"records": [{"record_type": "runtime_proposal", "source_sequence": 1, "data": {}}], "links": [], "commitments": [], "producer_profiles": [], "status": "reconstruction_complete",
+    return {"bundle_version": "0.2.0", "records": [{"record_type": "runtime_proposal", "source_sequence": 1, "data": {}}], "links": [], "commitments": [], "producer_profiles": [], "status": "reconstruction_complete",
             "import_reports": copy.deepcopy(REPORTS), "semantics": copy.deepcopy(SEMANTICS),
             "metadata": {"control_plane_revision": REVISION}}
 
