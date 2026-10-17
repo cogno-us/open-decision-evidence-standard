@@ -1,5 +1,7 @@
 # Typed refusal consumer candidate migration
 
+Status: nonselected candidate profile proposal; ODES remains draft. Profile version `odes-cognous-stack-export-0.2.2-refusal-candidate` is a proposed, separately versioned extension of unchanged `pder-v0.1`, not part of the core standard.
+
 Separate nonselected profile. Exact actual merged predecessors:
 CP `c7f122ba3a6e39f9268a7163c99be3ee514cd97e`, executor
 `309e194c1b0a3de23e11e20133e6eaf88875e48a` (runtime #86), Replay
