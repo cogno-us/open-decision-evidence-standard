@@ -1,0 +1,1154 @@
+{
+ "repo": "cogno-us/cognous-governance-evidence-pack",
+ "commit": "505a3590114705b7ebf736b92dd189f338134635",
+ "revision_notes": "Pinned local copy is a detached checkout with no 'main' ref; 'git fetch origin main' failed locally ('fatal: couldn't find remote ref main'); no network was attempted. Inspected revision = detached HEAD 505a3590 ('Repin F5b Replay revision to def0ee0f (#35)', 2026-10-17T11:55:18Z). Work copy: <work-dir>/work-c/evidence_pack",
+ "produces": [
+  {
+   "name": "Evidence Pack (traceable import)",
+   "version": "pack_version '0.2.0' set at importer.py:1211 (model default '0.1' at models.py:374-376; schema default '0.1' at schemas/evidence_pack.schema.json:21-25; docs/evidence_pack_format.md:25 says '0.1')",
+   "defined_in": [
+    "src/agent_governance_evidence_pack/models.py:366-438 (EvidencePack)",
+    "schemas/evidence_pack.schema.json + 13 sub-schemas in schemas/",
+    "docs/evidence_pack_format.md",
+    "docs/traceable_imports.md"
+   ],
+   "record_types": "sections: agent_overview, deployment_context, tool_inventory, action_inventory, authority_model, policy_controls, blocked_actions, reliance_summary, replay_bundles, validation_summary, redaction_exports, risk_register, review_records, metadata (models.py:385-438); metadata.traceable_import keys: transformation_version, canonicalization_profile, supported_revisions, supported_revision_sets, selected_revisions, replay_semantic_validation, replay_import_reports, replay_semantics, input_artifacts, producer_profiles, executor_producer_contract, source_record_refs, conversion_losses, derived_counts, lifecycle_summary, control_evidence_levels, redaction_state, import_findings, manual_assessments, unresolved_issues, outcomes_and_burden, retained_sources, lifecycle_records, explicit_links, reconstruction_completeness, refusal_vocabulary_summary, executor_failure_reference_verification (importer.py:1211-1253)",
+   "transformation_versions": "agep-manifest-reconstruction-import/{0.2.6 legacy, 0.3.0 v2, 0.3.1 persistence, 0.3.2 merged, 0.3.3-refusal-candidate, 0.3.4-runtime-authority-candidate, 0.3.5-security-runtime-candidate, 0.3.6-security-runtime-f5b-candidate} (importer.py:27-29,64,66,71,77,84; selection at 1206)"
+  },
+  {
+   "name": "Validation report",
+   "version": "n/a",
+   "defined_in": [
+    "models.py:441-463",
+    "schemas/validation_report.schema.json, validation_issue.schema.json, validation_summary.schema.json",
+    "validator.py:49-500 (E001-E020, W001-W020, E_TRACE_SEMANTICS, E_BUDGET)"
+   ]
+  },
+  {
+   "name": "Rendered Markdown (standard and traceable) and summaries",
+   "version": "n/a",
+   "defined_in": [
+    "renderer.py",
+    "trace_renderer.py",
+    "summary.py",
+    "templates/*.md"
+   ]
+  },
+  {
+   "name": "Recovery inspection evidence",
+   "version": "cognous-recovery-inspection-evidence/0.1 (transformation agep-recovery-inspection/0.1)",
+   "defined_in": [
+    "recovery_inspection.py:10-12,55-88",
+    "docs/recovery-inspection.md"
+   ]
+  },
+  {
+   "name": "W3 atomic failure trace",
+   "version": "agep-w3-atomic-failure-trace/0.1.0",
+   "defined_in": [
+    "w3_atomic_evidence.py:10,67-80"
+   ]
+  },
+  {
+   "name": "C8 lineage trace",
+   "version": "agep-c8-lineage/0.1",
+   "defined_in": [
+    "w3_c8_lineage.py:27-34"
+   ]
+  }
+ ],
+ "consumes": [
+  {
+   "artifact": "Action Manifest v1.1",
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "where": "importer.py:407-421,664-676",
+   "validated_by": "version string gate, alias-key discovery, digest binding to proposal.manifest_digest; no schema in this repo"
+  },
+  {
+   "artifact": "Replay Reconstruction Bundle 0.2.0 (incl. Control Plane journal-derived records and executor records)",
+   "peer": "cogno-us/cognous-replay-bundle",
+   "where": "importer.py:424-661 and validator.py:476-491",
+   "validated_by": "imports Replay as a library (agent_replay_bundle.importers.import_bounded_workflow, refusal_evidence.extend_retained_inputs) and re-runs the full import over the retained records; requires equality of records/links/commitments/producer_profiles/status/import_reports/semantics and two metadata members (L639-647); legacy CP revision path only checks that Replay does not raise (L649)"
+  },
+  {
+   "artifact": "Replay constants (CONTROL_PLANE_*_REVISION, MOLTBOT_*_REVISION, BOUNDED_*_PROFILE, MANIFEST_*_REVISION)",
+   "peer": "Replay (runtime import)",
+   "where": "importer.py:133-209",
+   "validated_by": "equality of Replay's exported constants against Evidence literals per generation"
+  },
+  {
+   "artifact": "Replay recovery inspection artifact (cognous-replay-recovery-inspection/0.1)",
+   "peer": "Replay + Execution Runtime",
+   "where": "recovery_inspection.py:29-93",
+   "validated_by": "calls agent_replay_bundle.recovery_inspection.validate_recovery_inspection; literal assurance flags"
+  },
+  {
+   "artifact": "Replay W3 atomic reconstruction (local-atomic-w2-failure-history@bd398f16)",
+   "peer": "Replay (Execution Runtime W2 data)",
+   "where": "w3_atomic_evidence.py:18-83",
+   "validated_by": "code rules only"
+  },
+  {
+   "artifact": "Replay C8 reconstruction (c8-retained-sqlite-and-explicit-stop/0.1)",
+   "peer": "Replay",
+   "where": "w3_c8_lineage.py:8-34",
+   "validated_by": "code rules only"
+  },
+  {
+   "artifact": "ODES packages / GAX-IMX exchange",
+   "peer": "ODES, GAX/IMX",
+   "where": "not consumed; ODES_REVISION, V2_REVISIONS['odes'] and GAX_IMX_REVISION are label strings emitted into trace.supported_revisions (importer.py:38,39,49,1211,1216)",
+   "validated_by": "n/a"
+  },
+  {
+   "artifact": "Control Plane journal / runtime export (direct)",
+   "peer": "Control Plane, Execution Runtime",
+   "where": "not consumed directly; only via Replay bundle records and Replay's validator",
+   "validated_by": "delegated to Replay"
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 31,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "Manifest baseline; REQUIRED_REPOS allowlist (L213), trace trusted_revision (L1225,L1234), legacy supported_revisions (L1211)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 32,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "f63ce914504dd06813c4ccd199b0570dbd8dd427",
+   "purpose": "Replay baseline label for legacy path; trace required_revision; install hint (L615); allowlist entry L214; NOT compared to the installed Replay package",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 33,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
+   "purpose": "legacy Control Plane revision; default when bundle.metadata.control_plane_revision absent (L101); allowlist L93,L215",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 34,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "6b0ba1185bcd390f71df947dda349415e4105f5f",
+   "purpose": "legacy executor revision; allowlist L94,L216",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 35,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "1d308faf664c504b6e310db3c7a310153ef7b067",
+   "purpose": "executor producer 1.0.0 revision; PRODUCER_REVISIONS L96; allowlist L94,L216; profile-id derivation L448",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 38,
+   "peer": "ODES (cogno-us ODES repo)",
+   "value": "cba83a1c06f718a8afd76178f36e5cc15896347d",
+   "purpose": "ODES label emitted into trace.supported_revisions (L1211); not consumed or verified",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 39,
+   "peer": "GAX/IMX (Alvorada exchange, experimental)",
+   "value": "6bcde026a804c7377f5e39f57ca6dd00b3c3292d",
+   "purpose": "GAX/IMX label emitted into trace.supported_revisions (L1211); not consumed",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 40,
+   "peer": "Alvorada / constitutional-governance-for-institutions",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "Alvorada label; REQUIRED_REPOS L217; trace L1211",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 46,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "274543f1cd7171784a923a8e37015017a0d8bc9d",
+   "purpose": "V2_REVISIONS['replay'] label (L92,L214,L1215-1232)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 47,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+   "purpose": "V2 baseline Control Plane revision; CONTROL_PLANE_V2_REVISIONS L53-56; Replay constant equality check L141",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 48,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "177354e959cc78c59c1a776f018cfbfbf28c927b",
+   "purpose": "V2 baseline executor revision; PRODUCER_REVISIONS['2.0.0'] L96; allowlist",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 49,
+   "peer": "ODES (cogno-us ODES repo)",
+   "value": "226adb0e3cde5377ac9db6f7e5857bfa7e65e30a",
+   "purpose": "V2_REVISIONS['odes'] label emitted into trace.supported_revisions via L1216",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 51,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "248d899634d9db3518e831bc7ab568a48733f825",
+   "purpose": "persistence-repair CP revision; equality check against Replay constant L158",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 52,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "043830b56595cecddfa65c064afd1c0b95e64792",
+   "purpose": "accepted Replay persistence revision label (L59,L92,L153 install hint, L214)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 63,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "459e4ba62fca49364aebb0050cd5fb2dd5a71bfa",
+   "purpose": "MERGED_REVISIONS dict: manifest/replay/CP/executor (equality check against Replay constants L166)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 63,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "d3dadee70bd319812b207389ab1e0f6efe511916",
+   "purpose": "MERGED_REVISIONS dict: manifest/replay/CP/executor (equality check against Replay constants L166)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 63,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "c3c3ee7188b9367cf70b08074b9c40a5c70c94ac",
+   "purpose": "MERGED_REVISIONS dict: manifest/replay/CP/executor (equality check against Replay constants L166)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 65,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "83fbaf2a0f6f071aca1ea0af859eb8fc6385c26a",
+   "purpose": "REFUSAL_REVISIONS dict (equality check L174)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 65,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "c7f122ba3a6e39f9268a7163c99be3ee514cd97e",
+   "purpose": "REFUSAL_REVISIONS dict (equality check L174)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 65,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "309e194c1b0a3de23e11e20133e6eaf88875e48a",
+   "purpose": "REFUSAL_REVISIONS dict (equality check L174)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 68,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "05345feeff343cc6195bc8f7f37a3eed25278969",
+   "purpose": "RUNTIME_AUTHORITY_REVISIONS replay label",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 69,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "2a17b2ba147462a592d9b1882aad09d8a3eb7904",
+   "purpose": "RUNTIME_AUTHORITY_REVISIONS CP (equality check L183)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 70,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "a9a4f75a9a880ba0ae2c3b5a01fcee0ae904e127",
+   "purpose": "RUNTIME_AUTHORITY_REVISIONS executor (equality check L184)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 73,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "e385f8c19b4444817a8b84b72ed6edbc37deb807",
+   "purpose": "SECURITY_REVISIONS manifest (equality check L195)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 74,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "3601fb218d5c02f5d86e55d2cf33983e5e130ac3",
+   "purpose": "SECURITY_REVISIONS replay label",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 75,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "996baeb476c8745b1a58ddc968b9eecc6a39b76b",
+   "purpose": "SECURITY_REVISIONS CP (equality check L193)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 76,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1",
+   "purpose": "SECURITY_REVISIONS executor (equality check L194)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 80,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
+   "purpose": "F5B_REVISIONS manifest (equality check L206)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 81,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "def0ee0f3af713283ea3cd13f0caf79e1607b651",
+   "purpose": "F5B_REVISIONS replay label (repinned in #35 from 0cfe7a63)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 82,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
+   "purpose": "F5B_REVISIONS CP (equality check L204)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": 83,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+   "purpose": "F5B_REVISIONS executor (equality check L205)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/recovery_inspection.py",
+   "line": 8,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "696e7bc2432fc7b5cf2d6e6c5f0b944b2d9a265f",
+   "purpose": "Replay revision: caller-supplied replay_revision must equal it (L36); not compared to installed Replay",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/recovery_inspection.py",
+   "line": 9,
+   "peer": "Execution Runtime (recovery export)",
+   "value": "8e7d634cf0a22b6f3c1fc6d93afe92c7414fa243",
+   "purpose": "Runtime revision: inspection.runtime_revision must equal it (L39)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/w3_atomic_evidence.py",
+   "line": 11,
+   "peer": "cogno-us/cognous-execution-runtime (W2 atomic)",
+   "value": "bd398f16c4cee329d2d0213afc3236ca9232d29e",
+   "purpose": "W2 Runtime revision: producer_profiles[0].revision must equal it (L29-30)",
+   "kind": "code_constant"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 15,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "e385f8c19b4444817a8b84b72ed6edbc37deb807",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 16,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "3601fb218d5c02f5d86e55d2cf33983e5e130ac3",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 17,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "996baeb476c8745b1a58ddc968b9eecc6a39b76b",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 18,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 19,
+   "peer": "cogno-us/cognous-agent-action-manifest",
+   "value": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 20,
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle)",
+   "value": "def0ee0f3af713283ea3cd13f0caf79e1607b651",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 21,
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 22,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": 23,
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "a9a4f75a9a880ba0ae2c3b5a01fcee0ae904e127",
+   "purpose": "test copy of generation tuple (literal duplicate of importer pins)",
+   "kind": "test_pin"
+  },
+  {
+   "file": ".github/workflows/merged-producers.yml",
+   "line": 13,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/merged-producers.yml",
+   "line": 16,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/recovery-inspection.yml",
+   "line": 22,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/recovery-inspection.yml",
+   "line": 25,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/tests.yml",
+   "line": 29,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "b3942698d52da47ad947259c0310603f4c29113c",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/tests.yml",
+   "line": 32,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "b3942698d52da47ad947259c0310603f4c29113c",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/typed-refusal.yml",
+   "line": 12,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/typed-refusal.yml",
+   "line": 15,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/w3-actual-producer.yml",
+   "line": 14,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/w3-actual-producer.yml",
+   "line": 17,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/w3-c8-actual.yml",
+   "line": 14,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/w3-c8-actual.yml",
+   "line": 17,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/w3-composed.yml",
+   "line": 14,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": ".github/workflows/w3-composed.yml",
+   "line": 17,
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable qualification workflow ref and qualification_revision input pinned to cognous-stack-qualification commit",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "41-42",
+   "peer": "cogno-us/cognous-agent-action-manifest / Replay",
+   "value": "SUPPORTED_MANIFEST_VERSION='1.1'; SUPPORTED_RECONSTRUCTION_VERSION='0.2.0'",
+   "purpose": "peer format-version gates (L408, L426)",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "27-29,64,66,71,77,84",
+   "peer": "own output",
+   "value": "transformation versions agep-manifest-reconstruction-import/{0.2.6,0.3.0,0.3.1,0.3.2,0.3.3-refusal-candidate,0.3.4-runtime-authority-candidate,0.3.5-security-runtime-candidate,0.3.6-security-runtime-f5b-candidate}",
+   "purpose": "per-generation selector (L1206); each tied to a peer generation",
+   "kind": "code_constant"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "44-50",
+   "peer": "Manifest/Replay/CP/executor/ODES",
+   "value": "V2_REVISIONS = {manifest 46c950be, replay 274543f1, control_plane 2ea9528e, moltbot_safe 177354e9, odes 226adb0e}",
+   "purpose": "baseline generation set copied into trace.supported_revisions (L1216)",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "53-62",
+   "peer": "CP/Replay/executor",
+   "value": "CONTROL_PLANE_V2_REVISIONS, PERSISTENCE_REVISIONS",
+   "purpose": "persistence generation sets",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "85-88",
+   "peer": "CP/executor/Manifest/Replay",
+   "value": "SECURITY_RUNTIME_GENERATIONS = {CP 996baeb4: (SECURITY_REVISIONS, 0.3.5...), CP a34c3dc2: (F5B_REVISIONS, 0.3.6...)}",
+   "purpose": "per-revision generation table; exact-set pairing (L468-481)",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "89",
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "ALL_CONTROL_PLANE_V2_REVISIONS (7 CP shas)",
+   "purpose": "allowlist deciding _is_v2 (L105), gate L618",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "90-95",
+   "peer": "all four peers",
+   "value": "SUPPORTED_REVISION_SETS: manifest[1], replay[4], control_plane[4], moltbot_safe[4]",
+   "purpose": "supported-revision allowlist copied into trace.supported_revision_sets (L1218); note it lacks refusal/runtime-authority/security/F5b entries (those use singleton sets L1218)",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "96",
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "PRODUCER_REVISIONS = {'1.0.0': 1d308faf, '2.0.0': 177354e9}",
+   "purpose": "profile-version -> revision map (L445, L444, L534)",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "133-209",
+   "peer": "cogno-us/cognous-agent-replay-bundle (Replay; name as in code, task names cogno-us/cognous-replay-bundle) (constants imported at run time)",
+   "value": "_accepted_replay_v2_profiles: imports Replay constants and asserts equality with Evidence literals per generation",
+   "purpose": "dynamic coupling: Replay's CONTROL_PLANE_*_REVISION / MOLTBOT_*_REVISION / BOUNDED_*_PROFILE must match literals; mismatch raises ImportContractError",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "212-218",
+   "peer": "Manifest/Replay/CP/executor/Alvorada",
+   "value": "REQUIRED_REPOS = {action-manifest, replay-bundle, control-plane, moltbot-safe, constitutional-governance-for-institutions: sets of shas}",
+   "purpose": "allowlist: producer_profiles[].revision must be None or in set (L442); also used for revision_check status (L944-952). Replay entry cannot fire for Replay-produced bundles: their producer_profiles never name the replay repo",
+   "kind": "allowlist"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "444-452",
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "moltbot profile_id must equal f'moltbot-safe-executor-producer-{version}@{revision[:8]}', format_version==version",
+   "purpose": "hard-coded profile-id naming convention duplicating Replay's literals",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "453-460",
+   "peer": "cogno-us/cognous-agent-control-plane",
+   "value": "CP v2 revision -> profile_id must equal Replay's BOUNDED_*_PROFILE; format_name == 'BoundedRunRecord'",
+   "purpose": "hard-coded format name + dynamic profile map",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "531,546",
+   "peer": "cogno-us/moltbot-safe (executor)",
+   "value": "MOLTBOT_PRODUCER_PROFILE_ID 'urn:cognous:profiles:moltbot-safe-executor-producer' (L36), version '1.0.0' (L37)",
+   "purpose": "metadata.moltbot_producer_contract must carry it",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "534",
+   "peer": "cogno-us/moltbot-safe (executor) / CP",
+   "value": "executor revision chosen by CP generation predicates",
+   "purpose": "per-revision branch (security > runtime-authority > refusal > merged > PRODUCER_REVISIONS)",
+   "kind": "compat_table"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "557,598,604",
+   "peer": "cogno-us/moltbot-safe (executor) / CP",
+   "value": "'cogno-us/moltbot-safe', 'cogno-us/cognous-agent-control-plane' owner strings written back into reconstructed Replay inputs",
+   "purpose": "repository names baked into re-constructed attempt_identity.owner and repository fields; must equal Replay's strings",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/recovery_inspection.py",
+   "line": "10-13",
+   "peer": "Replay / Runtime",
+   "value": "REPLAY_FORMAT cognous-replay-recovery-inspection/0.1; EVIDENCE_FORMAT; CANONICALIZATION python-json-sort-ascii-compact/1",
+   "purpose": "exact format ids enforced (L38, L45)",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/w3_atomic_evidence.py",
+   "line": "10-13",
+   "peer": "Replay / Runtime W2",
+   "value": "REPLAY_PRODUCER_PROFILE local-atomic-w2-failure-history@bd398f16; format_name 'failure_records_v1' (L31); bundle_version '0.2.0'",
+   "purpose": "exact profile id and format enforced (L23,L29,L31)",
+   "kind": "code_check"
+  },
+  {
+   "file": "src/agent_governance_evidence_pack/w3_c8_lineage.py",
+   "line": 15,
+   "peer": "Replay (C8 candidate)",
+   "value": "adapter_profile == 'c8-retained-sqlite-and-explicit-stop/0.1'; bundle_version '0.2.0' (L9)",
+   "purpose": "exact profile id enforced",
+   "kind": "code_check"
+  },
+  {
+   "file": "tests/test_f5b_generation.py",
+   "line": "15-23",
+   "peer": "Manifest/Replay/CP/executor",
+   "value": "OLD (security) and F5B tuples + RUNTIME_AUTHORITY_EXECUTOR",
+   "purpose": "literal duplicates of importer pins (not imported)",
+   "kind": "test_pin"
+  },
+  {
+   "file": ".github/workflows/tests.yml",
+   "line": "29,32",
+   "peer": "cogno-us/cognous-stack-qualification",
+   "value": "qualification workflow + qualification_revision b3942698d52da47ad947259c0310603f4c29113c (all other workflows use 39f03843...)",
+   "purpose": "tests.yml pinned to a DIFFERENT stack-qualification commit than the other 7 workflows",
+   "kind": "workflow_pin"
+  },
+  {
+   "file": "CHANGELOG.md",
+   "line": "5,6",
+   "peer": "various",
+   "value": "2 line(s) with 40-hex shas; short ids: 0cfe7a63,4a83b175,def0ee0f",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "CROSS_COMPONENT_TESTS.md",
+   "line": "3,11,12,13,14,15,16,17,18,19,20,21 ...",
+   "peer": "various",
+   "value": "22 line(s) with 40-hex shas; short ids: 1e789c7d,39f03843",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "README.md",
+   "line": "150",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: 39f03843",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/merged-producer-compatibility.md",
+   "line": "7,8,9,10",
+   "peer": "various",
+   "value": "4 line(s) with 40-hex shas; short ids: 459e4ba6,46c950be,c3c3ee71,d3dadee7",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/migration_v0_2_0.md",
+   "line": "21,22,74,77,79,83",
+   "peer": "various",
+   "value": "6 line(s) with 40-hex shas; short ids: 043830b5,177354e9,248d8996,2ea9528e,46c950be,f1264831",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/recovery-inspection.md",
+   "line": "9,10",
+   "peer": "various",
+   "value": "2 line(s) with 40-hex shas; short ids: 696e7bc2,8e7d634c",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/runtime-authority-profile.md",
+   "line": "4,5,6,7",
+   "peer": "various",
+   "value": "4 line(s) with 40-hex shas; short ids: 05345fee,2a17b2ba,46c950be,a9a4f75a",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/security-cloud-remediation-20261016.md",
+   "line": "4,27",
+   "peer": "various",
+   "value": "2 line(s) with 40-hex shas; short ids: 7f335099,814ee4ac",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/traceable_imports.md",
+   "line": "11,12,13,14,15,28,33,34,134,135,136,137 ...",
+   "peer": "various",
+   "value": "25 line(s) with 40-hex shas; short ids: 043830b5,177354e9,1d308faf,248d8996,28350065,2ea9528e,46c950be,6b0ba118,6bcde026,cba83a1c,f63ce914,fb3d9793",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/typed-refusal-profile.md",
+   "line": "4,5,6,7",
+   "peer": "various",
+   "value": "4 line(s) with 40-hex shas; short ids: 309e194c,46c950be,83fbaf2a,c7f122ba",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/w0-c8-compatibility-contract.md",
+   "line": "5",
+   "peer": "various",
+   "value": "1 line(s) with 40-hex shas; short ids: b4baccd8",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/evidence-pack-control-plane-store-checkpoint.md",
+   "line": "8,19,20,21,22,29,40,41",
+   "peer": "various",
+   "value": "8 line(s) with 40-hex shas; short ids: 043830b5,177354e9,248d8996,274543f1,2ea9528e,46c950be,812194b9",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/evidence-pack-producer-v2-checkpoint.md",
+   "line": "5,12,13,14,16",
+   "peer": "various",
+   "value": "5 line(s) with 40-hex shas; short ids: 177354e9,1d308faf,226adb0e,274543f1,28350065,2ea9528e,46c950be,6b0ba118,6bcde026,cba83a1c,ee5367b8,f63ce914",
+   "purpose": "documentation of pinned revisions",
+   "kind": "doc"
+  },
+  {
+   "file": "docs/workstreams/evidence-pack-producer-v2-results.json",
+   "line": "3,4,5,6,7",
+   "peer": "various",
+   "value": "5 line(s) with 40-hex shas; short ids: 177354e9,226adb0e,274543f1,2ea9528e,46c950be",
+   "purpose": "embedded revisions in generated example/result (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/lost_ack.pack.json",
+   "line": "130,131,132,133,134,135,137,141,147,198,208,219 ...",
+   "peer": "various",
+   "value": "44 line(s) with 40-hex shas; short ids: 177354e9,226adb0e,274543f1,2ea9528e,46c950be,6bcde026,fb3d9793",
+   "purpose": "embedded revisions in generated example/result (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/partial.pack.json",
+   "line": "130,131,132,133,134,135,137,141,147,190,200,211 ...",
+   "peer": "various",
+   "value": "44 line(s) with 40-hex shas; short ids: 177354e9,226adb0e,274543f1,2ea9528e,46c950be,6bcde026,fb3d9793",
+   "purpose": "embedded revisions in generated example/result (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/prior_absence.pack.json",
+   "line": "130,131,132,133,134,135,137,141,147,198,208,219 ...",
+   "peer": "various",
+   "value": "45 line(s) with 40-hex shas; short ids: 177354e9,226adb0e,274543f1,2ea9528e,46c950be,6bcde026,fb3d9793",
+   "purpose": "embedded revisions in generated example/result (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/rejected_wrong_effect.pack.json",
+   "line": "130,131,132,133,134,135,137,141,147,198,208,219 ...",
+   "peer": "various",
+   "value": "43 line(s) with 40-hex shas; short ids: 177354e9,226adb0e,274543f1,2ea9528e,46c950be,6bcde026,fb3d9793",
+   "purpose": "embedded revisions in generated example/result (not read by code)",
+   "kind": "generated_artifact"
+  },
+  {
+   "file": "examples/producer-v2/restart.pack.json",
+   "line": "130,131,132,133,134,135,137,141,147,198,208,219 ...",
+   "peer": "various",
+   "value": "46 line(s) with 40-hex shas; short ids: 177354e9,226adb0e,274543f1,2ea9528e,46c950be,6bcde026,fb3d9793",
+   "purpose": "embedded revisions in generated example/result (not read by code)",
+   "kind": "generated_artifact"
+  }
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "id": "E01",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "240-256",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "records must be a non-empty list; record_id unique non-empty strings; each data an object; non-empty record_type and producer_profile_id",
+   "status": "unwritten",
+   "nearest_doc": "none in Evidence docs/schemas (docs/traceable_imports.md has no record-shape statement)"
+  },
+  {
+   "id": "E02",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "266-280,283-297,408-414",
+   "peer": "Action Manifest v1.1 / Replay bundle",
+   "rule": "manifest version accepted from keys manifest_version|version|schema_version; id from manifest_id|id|name; actions discovered from actions|tool_actions|action_inventory|declared_actions|tools[].actions; at least one action required; bundle version from 4 aliases incl. metadata.*",
+   "status": "unwritten",
+   "nearest_doc": "docs/traceable_imports.md:11 names Manifest v1.1 only"
+  },
+  {
+   "id": "E03",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "429-439,462-464",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "producer_profiles non-empty list of objects with profile_id; every record.producer_profile_id must reference a declared profile",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E04",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "444-452",
+   "peer": "Replay profile naming for executor",
+   "rule": "executor revision implies version (merged/refusal/authority/security/F5b => 2.0.0), profile.format_version must equal it and profile_id must equal 'moltbot-safe-executor-producer-{version}@{revision[:8]}'",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E05",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "453-460",
+   "peer": "Replay profile naming for Control Plane",
+   "rule": "CP v2 revision requires profile_id equal to Replay's exported BOUNDED_*_PROFILE (dynamic import) and format_name 'BoundedRunRecord'",
+   "status": "partial",
+   "nearest_doc": "docs/traceable_imports.md:225-227 (CP revision/profile pair vs Replay mapping); format_name literal unwritten"
+  },
+  {
+   "id": "E06",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "99-101",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "missing metadata.control_plane_revision silently defaults to the legacy CP revision 28350065 (legacy decoder)",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E07",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "468-481",
+   "peer": "Replay/CP/executor/Manifest generation pairing",
+   "rule": "executor revision and metadata.manifest_revision must belong to the same security-runtime generation as selected CP revision",
+   "status": "changelog_only",
+   "nearest_doc": "CHANGELOG.md:8"
+  },
+  {
+   "id": "E08",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "493-507",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "at most one runtime_proposal; at least one runtime_decision; execution evidence requires exactly one execution_envelope and one execution_result and at least one authorized decision",
+   "status": "partial",
+   "nearest_doc": "docs/traceable_imports.md:126 ('one supplied proposal/envelope operation')"
+  },
+  {
+   "id": "E09",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "363-375,497-499,686-694",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "decision result read from result|decision|authorization|status with alias normalisation (allow/granted/approved->authorized; hold/escalate/pending->hold; deny/blocked/rejected->deny); non-authorized decisions must not carry binding|authorization_binding|effect_binding; authorized must carry one",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E10",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "529-549",
+   "peer": "Replay Reconstruction Bundle 0.2.0 metadata.moltbot_producer_contract",
+   "rule": "when contract present and non-legacy: interface_profile_id fixed literal, interface_profile_version in accepted map, repository_revision equal to the revision implied by CP generation, provenance.source_asserted.{repository_revision,producer_profile_id,producer_profile_version} equal; absent/legacy contract skips the block entirely",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E11",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "566-571",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "producer 2.0.0 requires exactly one executor_control_plane_evidence record; rejected_executor_observation records forwarded",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E12",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "574-605",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "result.attempt_id must be present in exactly one of destination_attempt ids or moltbot_attributed_control_plane_attempt ids; attempt_identity is re-derived (owner strings hard-coded)",
+   "status": "partial",
+   "nearest_doc": "docs/traceable_imports.md:188-191 ('rejects ambiguous or dangling attempt lineage')"
+  },
+  {
+   "id": "E13",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "631-638",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "metadata.moltbot_producer_contract.compatible_control_plane_revisions must equal the exact expected list per generation; contract.control_plane_revision must be None or the selected revision",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E14",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "617-619,654-656",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "selected CP revision must be legacy or in ALL_CONTROL_PLANE_V2_REVISIONS; Replay import result status must be complete|partial",
+   "status": "unwritten",
+   "nearest_doc": "docs/traceable_imports.md:225-227 partly"
+  },
+  {
+   "id": "E15",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "669-676",
+   "peer": "Manifest vs Replay proposal",
+   "rule": "proposal.manifest_id, manifest_version equal supplied Manifest; proposal.manifest_digest equals sha256 (sorted-key compact UTF-8 JSON) of the whole supplied Manifest; proposal.payload_commitment equals sha256(payload)",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E16",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "703-724",
+   "peer": "Replay records vs proposal",
+   "rule": "authorized decision binding must contain 16 named fields; proposal_commitment == sha256(proposal); payload_commitment and manifest_digest equal proposal; execution_envelope.operation fields equal proposal on 15 named fields",
+   "status": "unwritten",
+   "nearest_doc": "none (Replay docs/reconstruction_import.md:130-135 describe the same chain)"
+  },
+  {
+   "id": "E17",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "741-758",
+   "peer": "Replay destination_effect rows",
+   "rule": "destination_effect effect_id in authorized effect ids; operation_digest == sha256(operation); target/amount/unit equal operation; payload_json valid JSON equal to operation.payload",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E18",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "759-764",
+   "peer": "Replay commitments list",
+   "rule": "bundle.commitments must contain checked_match entries labelled payload_commitment, plus effect_id and operation_digest when destination_effect rows exist",
+   "status": "unwritten",
+   "nearest_doc": "none"
+  },
+  {
+   "id": "E19",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "793-800",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "effect_id (when effects known) and decision_id on envelope/result/attempt/event/observation/effect/reconciliation/CP attempt records must exist among decisions",
+   "status": "unwritten",
+   "nearest_doc": "docs/traceable_imports.md:190 covers attempts only"
+  },
+  {
+   "id": "E20",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "383-395,862-921",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "record state vocabularies are alias-normalised: executed/delivered/success/reconciled->applied; partial_*->partial; absent/not_found/safe_to_retry->absent; unknown/timeout/lost->unknown; state read from state|observed_state|result|destination_state_status; acknowledgement derived from acknowledgement object / status / acknowledged flag",
+   "status": "unwritten",
+   "nearest_doc": "docs/traceable_imports.md:76-87 counting rules only"
+  },
+  {
+   "id": "E21",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "903-908,1235",
+   "peer": "Replay Reconstruction Bundle 0.2.0 metadata",
+   "rule": "v2 bundles must carry metadata.effect_observation_history (histories dict with latest_supported_destination_state); security generations must carry metadata.executor_failure_reference_verification; absence raises KeyError",
+   "status": "unwritten",
+   "nearest_doc": "docs/producer-v2-migration.md:7 mentions effect_observation_history as a retained field"
+  },
+  {
+   "id": "E22",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "1203-1205",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "generated_at falls back to metadata.source_generated_at; bundle_id falls back to reconstruction_bundle_id then run_id",
+   "status": "unwritten",
+   "nearest_doc": "docs/traceable_imports.md:44-45 (time taken from bundle, not invented)"
+  },
+  {
+   "id": "E23",
+   "file": "src/agent_governance_evidence_pack/importer.py",
+   "line": "1171-1187",
+   "peer": "Replay Reconstruction Bundle 0.2.0",
+   "rule": "semantics flags policy_reevaluation, model_reexecution, external_effect_execution, independent_effect_verification expected False; deviation is a warning only",
+   "status": "partial",
+   "nearest_doc": "docs/producer-v2-migration.md, CHANGELOG.md:7 mention semantics comparison"
+  },
+  {
+   "id": "E24",
+   "file": "src/agent_governance_evidence_pack/recovery_inspection.py",
+   "line": "36-51",
+   "peer": "Replay recovery inspection",
+   "rule": "replay_revision label must equal 696e7bc2; inspection_format and runtime_revision literals; assurance flags fixed (settlement_verified False, independent_verification 'not_established', execution_authority 'none', retry_eligible False); validated by calling Replay's validate_recovery_inspection",
+   "status": "partial",
+   "nearest_doc": "docs/recovery-inspection.md:5-20,50"
+  },
+  {
+   "id": "E25",
+   "file": "src/agent_governance_evidence_pack/w3_atomic_evidence.py",
+   "line": "23-64",
+   "peer": "Replay W3 atomic reconstruction",
+   "rule": "bundle_version 0.2.0; exactly one producer profile with exact id/revision/format_name; every record type atomic_failure|atomic_attempt|atomic_observation with that profile; links only failure->attempt; semantics.external_effect_execution and independent_effect_verification False; exactly one import report",
+   "status": "unwritten",
+   "nearest_doc": "docs/w0-c8-compatibility-contract.md generic only"
+  },
+  {
+   "id": "E26",
+   "file": "src/agent_governance_evidence_pack/w3_c8_lineage.py",
+   "line": "9-25",
+   "peer": "Replay C8 reconstruction",
+   "rule": "bundle_version 0.2.0; exactly one import report with adapter_profile 'c8-retained-sqlite-and-explicit-stop/0.1'; semantics flags False; unique record ids",
+   "status": "unwritten",
+   "nearest_doc": "docs/w0-c8-compatibility-contract.md generic only"
+  },
+  {
+   "id": "E27",
+   "file": "src/agent_governance_evidence_pack/admission.py",
+   "line": "5-74",
+   "peer": "all peer JSON inputs",
+   "rule": "string <=1 MiB, dict <=4096 keys, list <=10000 items in admit_value; 8 MiB, depth 32, 100000 nodes, duplicate keys and NaN/Infinity rejected in loads",
+   "status": "partial",
+   "nearest_doc": "docs/traceable_imports.md:21-26 and CHANGELOG.md:9 document bytes/depth/nodes/duplicates/NaN; string/key/list limits unwritten"
+  },
+  {
+   "documented_rules_not_listed": "Stated in docs/traceable_imports.md or CHANGELOG.md and omitted: retained-source vs fresh Replay re-import equality on records/links/commitments/producer_profiles/status/import_reports/semantics plus effect_observation_history and moltbot_producer_contract (importer.py:639-647; docs/traceable_imports.md:242-244; CHANGELOG.md:7); validator re-import of retained_sources (validator.py:476-491); Manifest version 1.1 and bundle version 0.2.0 gates (importer.py:408,426); attempt-namespace ambiguity (see E12 partial); fixture_provenance/test_provenance consumption (importer.py:1037-1068; docs/traceable_imports.md:112,153)."
+  }
+ ],
+ "unwritten_consumer_rules_method": "Read importer.py, validator.py, admission.py, recovery_inspection.py, w3_atomic_evidence.py, w3_c8_lineage.py in full; enumerated every raise on peer data; grepped docs/**, README.md, CHANGELOG.md, schemas/*.json for distinguishing tokens (format_name, BoundedRunRecord, compatible_control_plane_revisions, checked_match, manifest_digest, executor_control_plane_evidence, effect_observation_history etc.) and read docs/traceable_imports.md, producer-v2-migration.md, merged-producer-compatibility.md, typed-refusal-profile.md, runtime-authority-profile.md, recovery-inspection.md, w0-c8-compatibility-contract.md. Status labels as in replay.json. Test files were only inventoried by file name and pins (tests/test_f5b_generation.py:15-23 read); other tests were not read in detail. Rules that Evidence re-enforces by delegating to Replay (everything inside import_bounded_workflow) are NOT repeated here; they inherit Replay's unwritten rules (see replay.json).",
+ "external_deps": [
+  "pydantic>=2.0 (pyproject.toml:13-15)",
+  "pytest, pytest-cov (dev)",
+  "GitHub Actions: actions/checkout and actions/setup-python pinned by sha (.github/workflows/tests.yml:17,20)",
+  "Replay package installed in same environment (cogno-us/cognous-replay-bundle; code message names cognous-agent-replay-bundle, importer.py:153,615) - a Cognous runtime dependency, not declared in pyproject.toml",
+  "Security Cloud / ChatGPT Codex scan referenced in docs/security-cloud-remediation-20261016.md:3 (non-Cognous, documentation only)",
+  "Python 3.11/3.12 CI"
+ ],
+ "notes": [
+  "Hard runtime coupling to Replay: importer.py:135-209,516,612-613,639 and recovery_inspection.py:42-46 import agent_replay_bundle at call time; pyproject.toml does not declare the dependency (only pydantic). Evidence output validity (validator.py:476-491) depends on the installed Replay version.",
+  "Evidence mirrors Replay's per-generation tuples as literals (importer.py:44-96,212-218) and asserts equality with Replay's constants (133-209); every new Replay/CP/executor generation requires a paired Evidence edit and transformation-version bump. The 'replay' revision values in these tuples are labels only: no code compares them to the installed Replay package, and the REQUIRED_REPOS replay entry (214) cannot fire for Replay-produced bundles.",
+  "Evidence Pack @505a359 cannot round-trip Replay's Route B recovery-report bundles (record types executor_recovery_report, M021): _retained_replay_inputs (importer.py:521-528) rebuilds executor observations only from executor_observation records and omits executor_recovery_report, so Replay's re-import raises 'accepted executor observations differ from result'. Verified by running Evidence's _run_pinned_replay_validator against Replay 8eaf3a42 on the three tests/fixtures/route_b_post_commit cases (all failed). EXECUTION_TYPES (importer.py:219) also lacks executor_recovery_report.",
+  "Evidence's F5b generation is pinned to Replay def0ee0f (importer.py:81); Replay main is now 8eaf3a42 (2 feature commits later: Route B import #37, ODES lifecycle conformance #38). Replay's added rejections (undeclared execution_result members, reconciled_existing marker rule, extensions) are consumed implicitly via the re-import with no Evidence-side pin.",
+  "A bundle without metadata.control_plane_revision silently selects the legacy decoder (importer.py:99-101); for legacy bundles no retained-vs-fresh equality check is made (importer.py:648-649).",
+  "pack_version inconsistency: traceable packs emit '0.2.0' (importer.py:1211) while models.py:374-376, schemas/evidence_pack.schema.json:21-25 and docs/evidence_pack_format.md:25 default/document '0.1'.",
+  "tests.yml pins cognous-stack-qualification at b3942698 while the other 7 workflows pin 39f03843 (tests.yml:29,32 vs e.g. typed-refusal.yml:12,15); all cross-component tests live in that external repo (CROSS_COMPONENT_TESTS.md).",
+  "Git tracks build artifacts: src/agent_governance_evidence_pack.egg-info/* and __pycache__/*.pyc (cpython-312 and -313) for src and tests.",
+  "Evidence docs call Replay 'cogno-us/cognous-replay-bundle' (docs) and 'cogno-us/cognous-agent-replay-bundle' (code, REQUIRED_REPOS importer.py:214); executor repo 'cogno-us/moltbot-safe' in code and 'cognous-execution-runtime' in docs/merged-producer-compatibility.md:3-9.",
+  "docs/traceable_imports.md:47-51 states examples/import_inputs are not importable under the current contract (kept as historical), i.e. shipped sample inputs do not exercise the importer."
+ ],
+ "rule_status_counts": {
+  "unwritten": 20,
+  "partial": 6,
+  "changelog_only": 1
+ }
+}

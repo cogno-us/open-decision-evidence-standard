@@ -1,0 +1,485 @@
+{
+ "repo": "cogno-us/cognous-execution-runtime",
+ "commit": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+ "commit_note": "Copy at work-b/runtime cloned from the local pinned copy (detached HEAD). `git fetch origin main` failed locally ('couldn't find remote ref main': the local source has no main branch), so the inspected revision is the local copy's HEAD = 4a83b175 'Document effective-grant composition limits (#99) (#103)', committed 2026-10-17. No network fetch was attempted.",
+ "produces": [
+  {
+   "name": "Executor producer export (execution export)",
+   "defined": "engine/producer_contract.py:202-291 (export_execution_artifacts); doc docs/executor-producer-profile.md",
+   "profile_id": "urn:cognous:profiles:moltbot-safe-executor-producer",
+   "profile_version": "2.0.0",
+   "envelope_version": "0.2.0",
+   "id_lines": "engine/producer_contract.py:22-24; engine/safe_executor.py:15",
+   "record_types": [
+    "producer_profile{profile_id,profile_version,execution_envelope_version} (260-265)",
+    "repository{repository:'cogno-us/moltbot-safe',revision,revision_status} (266-270)",
+    "provenance{source_asserted,independently_established:[],meaning} (271-278)",
+    "execution_envelope (279, _frozen_envelope_dict 43-54)",
+    "execution_result (280, dataclasses.asdict of ExecutionResult)",
+    "effects[] (281; rows of table effects)",
+    "attempts[] (282)",
+    "attempt_events[] (283)",
+    "attempt_identity {namespace executor|control_plane, attempt_id, owner} (284; built at 107-134)",
+    "control_plane_attempts[] (285)",
+    "observations[] (286; only a non-empty dict result.observation, 247-249)",
+    "control_plane_evidence (287)",
+    "rejected_observations[] (288-290)"
+   ],
+   "notes": "Docs say consumers named: Agent Replay Bundle, GAX/IMX, Replay, ODES, Evidence Pack, Alvorada/GAX (docs/executor-producer-profile.md:3-4, 53-54). Hub pins must be updated only after consumer migrations (:57-59). Revision is source_asserted only (PC:251-269)."
+  },
+  {
+   "name": "ExecutionResult (execution result)",
+   "defined": "engine/safe_executor.py:381-401",
+   "record_types": [
+    "status in denied|failed|partial|unknown|executed|observed|reconciled (383-391)",
+    "decision_id, effect_id, attempt_id, attempted, acknowledged, observed_state, newly_executed, observation: dict|None (default {}), error, control_plane_evidence"
+   ],
+   "profile_id": "embedded in producer export 2.0.0",
+   "profile_version": "2.0.0"
+  },
+  {
+   "name": "Execution envelope 0.2.0 (consumed form, also re-emitted)",
+   "defined": "engine/safe_executor.py:15, 35-69 (ExecutionOperation/ExecutionEnvelope), 71-144 (Frozen*), canonical_dict 103-130, digest 132-134",
+   "profile_id": null,
+   "profile_version": "0.2.0"
+  },
+  {
+   "name": "Attempt rows and events (SQLite)",
+   "defined": "engine/safe_executor.py:515-529 (attempts, attempt_events); begin_attempt 625-647; transition_attempt 649-661",
+   "record_types": [
+    "attempts(attempt_id,effect_id,decision_id,operation_digest,created_at)",
+    "attempt_events(event_id,attempt_id,status,error,created_at); status values written: attempted, denied, executed, partial, reconciled, unknown, failed, (existing state) (SE:643,827,843,858,880,897,911)"
+   ]
+  },
+  {
+   "name": "Destination effect rows",
+   "defined": "engine/safe_executor.py:455-465",
+   "record_types": [
+    "effects(effect_id,operation_digest,grant_id,target,amount,unit,payload_json,state in applied|partial)"
+   ]
+  },
+  {
+   "name": "Typed failure records (C4)",
+   "defined": "engine/safe_executor.py:530-548 (failure_records_v1), record_failure 562-610",
+   "record_types": [
+    "failure_class in policy_denial|authority_hold|malformed_input|capability_unavailable|evaluation_error|dispatch_error",
+    "stage in pre_dispatch|post_dispatch",
+    "admission_rejections_v1 (SE:556-559, reason invalid_execution_envelope)"
+   ]
+  },
+  {
+   "name": "Destination observation record",
+   "defined": "engine/safe_executor.py:671-691 (observe), 693-701 (observe_bound)",
+   "record_types": [
+    "{effect_id,state in absent|applied|partial|unknown,destination_state{effect_id,state,grant_id,target,amount,unit,payload,operation_digest}}",
+    "unknown shape: destination_state {} (OpenShell: engine/openshell_environment.py:351,359,404)"
+   ]
+  },
+  {
+   "name": "Control Plane EffectObservation (constructed by adapter for CP)",
+   "defined": "engine/control_plane_adapter.py:98-106",
+   "record_types": [
+    "EffectObservation(effect_id,observed_at,state,destination_state) built from observe_bound; type owned by agent_control_plane.bounded"
+   ]
+  },
+  {
+   "name": "Atomic authority/effect profile records (route B)",
+   "defined": "engine/local_authority_effect.py:30 (PROFILE), tables 95-197 (authority_effect_profile_v1, authority_grants_v1, authority_approvals_v1, authority_policies_v1, authority_evidence_v1, execution_claims_v1, effect_budgets_v1, authority_effect_receipts_v1)",
+   "profile_id": "urn:cognous:profiles:local-authority-effect:0.1.0-proposed",
+   "profile_version": "0.1.0-proposed",
+   "record_types": [
+    "authority_receipt {attempt_id,effect_id,decision_id,claim_id,grant_id,grant_revision,grant_status,grant_state_commitment,status_version_source,checked_at,profile} (engine/local_authority_effect.py:689-701; returned 792; exposed in ExecutionResult.control_plane_evidence engine/atomic_local_control_plane_executor.py:95)",
+    "linearized_at, local_authority_effect_profile, claim_id (AT:95)"
+   ],
+   "doc": "docs/local-authority-effect-profile.md"
+  },
+  {
+   "name": "Recovery observation (route B reconcile)",
+   "defined": "engine/local_authority_effect_recovery.py:7-24 (reconcile_claim_exact); engine/atomic_local_control_plane_executor.py:97-102",
+   "record_types": [
+    "{status: applied|partial|hold, claim_state, retry_eligible:false, effect_id, operation_digest|reason}; reasons: claim_unavailable, claim_decision_binding_mismatch, claim_effect_binding_mismatch, claim_operation_binding_mismatch, retained_effect_operation_binding_mismatch, no_durable_effect_for_claim",
+    "fallback in executor {status:'unknown',retry_eligible:False,reason:'reconciliation_unavailable'} (AT:51)"
+   ],
+   "profile_id": "urn:cognous:profiles:local-authority-effect:0.1.0-proposed (implicit)",
+   "profile_version": "0.1.0-proposed"
+  },
+  {
+   "name": "Revocation closeout",
+   "defined": "engine/revocation_closeout.py:16 (PROFILE_ID), 43-65, tables 101-140",
+   "profile_id": "cognous-revocation-closeout/1",
+   "profile_version": "1",
+   "record_types": [
+    "runtime_items_v1",
+    "revocation_dispositions_v1 (status refused_before_execution|completed_before_revocation|in_doubt)",
+    "original_attempt_closeouts_v1 (observation_state applied|partial|absent|unknown, retry_eligible, closed)",
+    "RevocationDisposition, CloseoutResult dataclasses"
+   ],
+   "doc": "docs/o6-p1d-revocation-closeout.md"
+  },
+  {
+   "name": "Synthetic recovery resolution ledger / recovery observation",
+   "defined": "engine/recovery_resolution.py:16 (PROFILE), 36-70 (SyntheticObservation), export_attempt 165-218, current 146-157, receipt 275-289",
+   "profile_id": "cognous-recovery-resolution/synthetic-0.1",
+   "profile_version": "synthetic-0.1",
+   "record_types": [
+    "export_format 'cognous-recovery-inspection/synthetic-0.1' (199)",
+    "SyntheticObservation payload (event_id,effect_id,attempt_id,adapter_id,client_reference,state,observed_at,ordering_domain,order,observation_ref,observation_digest,observer_ref,watermark_ref,provider_acceptance_ref,evidence_location_ref,complete_coverage,final)",
+    "projection work_state awaiting_observation|awaiting_finality|partial_followup|conflict_review|resolved (19-22)",
+    "receipt policy 'synthetic-structural/2' (18), canonicalization 'python-json-sort-ascii-compact/1' (17)"
+   ],
+   "notes": "Docstring says experimental, not the accepted recovery successor contract, 'not a consumer contract' (1-5,166). Not imported by any executor (4-5). export_attempt returns legacy closeout with assurance 'legacy_unverified' (203-210)."
+  },
+  {
+   "name": "C8 source rows and local stop journal",
+   "defined": "engine/c8_source_evidence.py:364-395 (export_authority_rows generation 'c8-source-rows/0.1'), 398-428 (LocalStopJournal export generation 'c8-local-stop/0.1', kinds 360-361)",
+   "profile_id": "c8-source-rows/0.1; c8-local-stop/0.1",
+   "profile_version": "0.1"
+  },
+  {
+   "name": "Operation admission / adapter conformance",
+   "defined": "engine/operation_admission.py:14 (PROFILE_ID), 22-124",
+   "profile_id": "cognous-operation-admission/1",
+   "profile_version": "1",
+   "notes": "sidecar only; docs/o6-p1a-operation-admission.md"
+  },
+  {
+   "name": "Effective grant destination capability",
+   "defined": "engine/effective_grant.py:8-9 (sqlite-effective-grant/0.1; derivation effective-grant/0.1), digest 12-18, check 64-89",
+   "profile_id": "sqlite-effective-grant/0.1",
+   "profile_version": "0.1"
+  },
+  {
+   "name": "Refund intent registry",
+   "defined": "engine/refund_intent.py:17 (synthetic-refund-intent/1), tables 89-93",
+   "profile_id": "synthetic-refund-intent/1",
+   "profile_version": "1"
+  },
+  {
+   "name": "OpenShell environment events/bindings",
+   "defined": "engine/openshell_environment.py:236-244 (environment_bindings, environment_events, dispatch_intents), ADAPTER_VERSION engine/openshell_environment.py:20 = 0.1.0",
+   "profile_id": null,
+   "profile_version": "0.1.0"
+  }
+ ],
+ "consumes": [
+  {
+   "artifact": "Control Plane RuntimeProposal",
+   "from": "agent_control_plane (cognous-agent-control-plane)",
+   "where": "engine/control_plane_adapter.py:189-262 (execute)",
+   "validation": "field-by-field equality vs frozen envelope (CA:227-247, 17 fields incl tenant_id via getattr default None); model_dump(mode=json, exclude_none=False) re-committed with agent_control_plane.bounded.commitment and compared to operation.proposal_commitment (CA:226,254-257)"
+  },
+  {
+   "artifact": "Control Plane RuntimeDecision + binding",
+   "where": "engine/control_plane_adapter.py:259-270",
+   "validation": "decision_id, effect_id equality; binding must be non-None; binding.grant_id, grant_revision, effective_max_effects equality with envelope"
+  },
+  {
+   "artifact": "Authority Context (via workflow.resolver.authority_context(proposal.authority_context_ref))",
+   "where": "engine/control_plane_adapter.py:204-222",
+   "validation": "must be dict; context['institution']['institution_id'] and ['authority_domain'] non-empty str; compared to envelope at CA:75-80 (_check_trusted_context)"
+  },
+  {
+   "artifact": "Action Manifest dict (runtime_authority_profile mode)",
+   "where": "engine/control_plane_adapter.py:204-210",
+   "validation": "workflow.manifest['actions'] looked up by action_id; action['authority_context'] used directly as context['institution'] (see unwritten rule 5)"
+  },
+  {
+   "artifact": "BoundedAuthorizationWorkflow object (execute/reconcile/records/observation_policy/*_max_age_seconds/clock_tolerance_seconds/runtime_authority_profile/allow_test_time)",
+   "where": "engine/control_plane_adapter.py:176-179, 286-318, 364-376",
+   "validation": "truthiness of workflow and workflow.resolver only; class re-instantiated with the same attributes (CA:291-305)"
+  },
+  {
+   "artifact": "CP outputs of workflow.execute: (cp_attempt, cp_observation), records.reconciliations/refusals",
+   "where": "engine/control_plane_adapter.py:318-362",
+   "validation": "no schema validation in this repo; model_dump copied into control_plane_evidence; records.reconciliations[-1] indexed without check (CA:336)"
+  },
+  {
+   "artifact": "Execution claim (LocalExecutionClaim / TenantLocalExecutionClaim) from CP provision_local_execution_claim",
+   "where": "engine/local_authority_effect.py:205-240 (_claim_model), 242+ (provision_claim), engine/atomic_local_control_plane_executor.py:19-21",
+   "validation": "pydantic model_validate, verify_local_execution_claim commitment check, profile==PROFILE, authorizing_by_possession is False, grant/approval/policy projections active, decision-critical evidence current (LA:212-239); at execute: 21-field exact match to snapshot (LA:547-569), validity interval (574), local authority rows (577-641)"
+  },
+  {
+   "artifact": "agent_control_plane.bounded.commitment / EffectObservation / _iso / DefinitiveDestinationRejection",
+   "where": "engine/control_plane_adapter.py:98,151,254; engine/local_authority_effect.py:516,688",
+   "validation": "imported lazily; private helper _iso imported (CA:98)"
+  },
+  {
+   "artifact": "Effective-grant precondition: expected digest + derivation version from CP runtime-authority/0.1 profile",
+   "where": "engine/safe_executor.py:710-736; engine/control_plane_adapter.py:108-144; engine/effective_grant.py:64-89",
+   "validation": "digest regex sha256:[a-f0-9]{64}, derivation == 'effective-grant/0.1', row principal/digest/derivation/status and stored permission subset"
+  },
+  {
+   "artifact": "OpenShell CLI/gateway JSON (non-Cognous)",
+   "where": "engine/openshell_environment.py:199-216",
+   "validation": "exact-field validation of observation (297-340)"
+  },
+  {
+   "artifact": "Test fixture: tenant execution claim v0.2",
+   "where": "tests/fixtures/w1_tenant_execution_claim_v0_2.json (profile urn:cognous:profiles:local-authority-effect:0.1.0-proposed, line 2)",
+   "validation": "test fixture only"
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "engine/safe_executor.py",
+   "line": 16,
+   "peer": "Control Plane (agent-control-plane)",
+   "value": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+   "purpose": "CONTROL_PLANE_COMMIT constant; declared but grep shows no use in code (only definition)"
+  },
+  {
+   "file": "engine/safe_executor.py",
+   "line": 17,
+   "peer": "Action Manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "MANIFEST_COMMIT constant; unused in code"
+  },
+  {
+   "file": "engine/safe_executor.py",
+   "line": 18,
+   "peer": "Alvorada / institutional governance (Authority Context)",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "ALVORADA_COMMIT constant; unused in code. Same sha as the gov qualification pin"
+  },
+  {
+   "file": "engine/safe_executor.py",
+   "line": 15,
+   "peer": "self/consumers",
+   "value": "EXECUTION_ENVELOPE_VERSION 0.2.0",
+   "purpose": "exact version enforced at engine/safe_executor.py:274 and engine/producer_contract.py:24,219"
+  },
+  {
+   "file": "engine/producer_contract.py",
+   "line": 22,
+   "peer": "consumers (Replay/ODES/Evidence Pack)",
+   "value": "urn:cognous:profiles:moltbot-safe-executor-producer 2.0.0 (line 23)",
+   "purpose": "emitted profile id/version; allowlist SUPPORTED_EXECUTION_ENVELOPE_VERSIONS=('0.2.0') line 24"
+  },
+  {
+   "file": "engine/producer_contract.py",
+   "line": 115,
+   "peer": "self repository id",
+   "value": "owner 'cogno-us/moltbot-safe' (also line 267)",
+   "purpose": "attempt_identity owner / repository name; stale repo name vs cogno-us/cognous-execution-runtime"
+  },
+  {
+   "file": "engine/producer_contract.py",
+   "line": 133,
+   "peer": "Control Plane",
+   "value": "owner 'cogno-us/cognous-agent-control-plane'",
+   "purpose": "attempt_identity namespace control_plane owner"
+  },
+  {
+   "file": "engine/local_authority_effect.py",
+   "line": 30,
+   "peer": "Control Plane (claim profile)",
+   "value": "urn:cognous:profiles:local-authority-effect:0.1.0-proposed",
+   "purpose": "claim.profile must equal this (LA:222); also AT:10"
+  },
+  {
+   "file": "engine/effective_grant.py",
+   "line": 9,
+   "peer": "Control Plane runtime-authority/0.1",
+   "value": "effective-grant/0.1 (CAPABILITY sqlite-effective-grant/0.1 line 8)",
+   "purpose": "derivation allowlist: derivation must equal this (line 71)"
+  },
+  {
+   "file": "engine/refund_intent.py",
+   "line": 35,
+   "peer": "Action Manifest action ids",
+   "value": "{'refund.issue','urn:cognous:action:refund-issue-routine-v1'}",
+   "purpose": "action_id allowlist for refund intent scope"
+  },
+  {
+   "file": "engine/openshell_environment.py",
+   "line": 21,
+   "peer": "NVIDIA OpenShell (non-Cognous)",
+   "value": "6648bd0c290efbc41ba131ee9831ee45cd431f94",
+   "purpose": "UPSTREAM_COMMIT mixed into config digest (111); also runtime version '0.1.2' required at line 200"
+  },
+  {
+   "file": ".github/workflows/python-safety.yml",
+   "line": "41,44",
+   "peer": "cognous-stack-qualification",
+   "value": "b3942698d52da47ad947259c0310603f4c29113c",
+   "purpose": "reusable workflow @sha and qualification_revision"
+  },
+  {
+   "file": ".github/workflows/{durable-refusal:20,23; live-openshell-readiness:17,20; openappa-conjunction:15,18; openappa-embedded-runtime:13,16; openappa-local-resume:16,19; openappa-trajectory:13,16; openappa-wire-fixtures:15,18; openshell-image-qualification:19,22; worker21-authority-effect:24,27}.yml",
+   "line": "see file",
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64",
+   "purpose": "reusable workflow @sha and qualification_revision"
+  },
+  {
+   "file": "CROSS_COMPONENT_TESTS.md",
+   "line": 3,
+   "peer": "cognous-stack-qualification",
+   "value": "39f038435afdd71ba162860faa5718d90d7bde64 (source snapshot 309e194c1b0a3de23e11e20133e6eaf88875e48a)",
+   "purpose": "doc-level pin; README.md:205 repeats 39f03843"
+  },
+  {
+   "file": "docs/execution-boundary.md",
+   "line": 13,
+   "peer": "Control Plane",
+   "value": "2ea9528eeb87e14ff10f05de06473122b9df540f",
+   "purpose": "doc statement of supported CP commit; docs/openshell-adapter.md:209-210 adds Manifest 46c950be"
+  },
+  {
+   "file": "docs/control-plane-refusal-capture.md",
+   "line": "18-19",
+   "peer": "Control Plane / Manifest",
+   "value": "CP c7f122ba3a6e39f9268a7163c99be3ee514cd97e; Manifest 46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "qualification pins; INCONSISTENT with code CONTROL_PLANE_COMMIT 2ea9528e"
+  },
+  {
+   "file": "docs/control-plane-interface-gap.md",
+   "line": 3,
+   "peer": "Control Plane",
+   "value": "283500652d47a692fb0b99a1172a6d5faffbd9a7",
+   "purpose": "proposal basis commit; third distinct CP sha in docs"
+  },
+  {
+   "file": "docs/local-authority-effect-profile.md",
+   "line": 86,
+   "peer": "Control Plane",
+   "value": "29337fe900d3b2da5656c77d56d70f18feb190b8",
+   "purpose": "Worker 20 PR #11 merge reference (not adopted)"
+  },
+  {
+   "file": "docs/w0-c3-c5-c7-contracts.md",
+   "line": "6-7",
+   "peer": "hub",
+   "value": "selected hub pin c3c3ee7188b9367cf70b08074b9c40a5c70c94ac",
+   "purpose": "historical doc"
+  }
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "file": "engine/control_plane_adapter.py",
+   "line": "259-270",
+   "rule": "Decision must carry decision_id==envelope.decision_id, effect_id==envelope.effect_id, a non-None binding, and binding.grant_id/grant_revision/effective_max_effects equal to envelope values. effective_max_effects binding is not described in docs/execution-boundary.md (steps 2 and 5 only say 'persisted decision identity').",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/control_plane_adapter.py",
+   "line": "226-257",
+   "rule": "proposal_commitment must equal agent_control_plane.bounded.commitment(proposal.model_dump(mode='json', exclude_none=False)); tenant_id read via getattr default None and must match envelope tenant (issue #95).",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/control_plane_adapter.py",
+   "line": "204-222",
+   "rule": "Authority Context must expose context['institution']['institution_id'] and ['authority_domain']; in runtime_authority_profile mode the Manifest action's 'authority_context' dict is assumed to have that same {institution_id, authority_domain} shape (context = {'institution': action['authority_context']}). Shape is not specified in any schema in this repo.",
+   "peer": "Control Plane / Action Manifest"
+  },
+  {
+   "file": "engine/control_plane_adapter.py",
+   "line": "333-346",
+   "rule": "After workflow.execute succeeds, records.reconciliations is assumed non-empty (index [-1]); cp_observation may be None and then status is forced to 'unknown'; local result status takes precedence otherwise (line 342), so status 'unknown' can coexist with a non-null CP observation.",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/local_authority_effect.py",
+   "line": "222-239",
+   "rule": "Claim must have profile==PROFILE, authorizing_by_possession is False, grant_status=='active', all approval_state/policy_state status 'active', and evidence_state items with required or unknown_behavior=='hold_effect' must be state 'current'. Only the active/current-projection part is in prose (docs/local-authority-effect-profile.md:27-30); authorizing_by_possession, hold_effect and profile equality are not documented anywhere.",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/local_authority_effect.py",
+   "line": "515-543",
+   "rule": "Runtime recomputes the claim operation_commitment with its own field list (excludes proposal_commitment and effective_max_effects; tenant_id only if not None) using CP's commitment(); this must match CP's algorithm/field list exactly. Not documented.",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/local_authority_effect.py",
+   "line": "547-569",
+   "rule": "21 claim fields must equal the envelope (incl. payload_commitment, requested_permissions tuple equality, float(amount)).",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/producer_contract.py",
+   "line": "138-150",
+   "rule": "If control_plane_evidence.reconciliation exists: reconciliation.effect_id==effect_id, retry_eligible must be exactly False, a non-empty observation must equal reconciliation.observation and observation_accepted must be True, rejected observation requires observed_state 'unknown'. Only the retry_eligible=false preservation is mentioned as guidance (docs/executor-producer-profile.md:54-56); the equality/accepted rules are not.",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/producer_contract.py",
+   "line": "99-136",
+   "rule": "CP attempt evidence must be a dict with decision_id, effect_id (and attempt_id when result.attempt_id is not an executor attempt) matching the envelope; 'observation.control_plane_attempt_evidence' legacy key also accepted (line 100).",
+   "peer": "Control Plane"
+  },
+  {
+   "file": "engine/safe_executor.py",
+   "line": "856-857",
+   "rule": "A destination observation with state 'unknown' is treated as terminal for the attempt (status 'unknown', no commit retried). Implied by OpenShell design, written in docs/openshell-adapter.md:153-157 only for OpenShell.",
+   "peer": "OpenShell destination"
+  },
+  {
+   "file": "engine/control_plane_adapter.py",
+   "line": "149-153",
+   "rule": "Executor error strings {effective_grant_changed_at_commit, effective_grant_precondition_required, atomic_authority_capability_unavailable, effective_grant_permissions_insufficient, effective_grant_permissions_unavailable} are mapped to CP DefinitiveDestinationRejection; CP must treat that class as definitive non-effect. Coupling by exact error text; not specified in docs.",
+   "peer": "Control Plane"
+  }
+ ],
+ "unwritten_rules_method": "For each candidate rule I grepped docs/*.md, README.md and *.md for the field/value names (hold_effect, authorizing_by_possession, grant_status, effective_max_effects, runtime_authority_profile, authority_context, observation_accepted, retry_eligible, model_dump, exclude_none, proposal_commitment, tenant). No JSON schema files exist in the repo (git ls-files | grep schema: only engine/action_schema.py, an unrelated action validator). Absence from prose was judged by grep, not by reading every workstream document; docs/workstreams/*.md/json not read in full.",
+ "external_deps": [
+  "NVIDIA OpenShell 0.1.2 CLI/gateway + Docker (engine/openshell_environment.py:21,199-216; docs/openshell-adapter.md)",
+  "SQLite (stdlib) as synthetic destination",
+  "pydantic==2.11.9 (needed by Control Plane models; .github/workflows/python-safety.yml:35)",
+  "pytest==8.3.5",
+  "Control Plane python package agent_control_plane (Cognous; lazily imported)",
+  "GitHub Actions checkout/setup-python pinned by sha (python-safety.yml:29,32)",
+  "Legacy upstream Moltbot TypeScript app (quarantined tag upstream-moltbot-quarantine-20261016; not on main)"
+ ],
+ "route_unknown_findings": {
+  "route_labels_in_repo": "Only 'route A' (PinnedControlPlaneExecutor, CA:165; tests/test_route_a_*.py, CHANGELOG.md:9,14, docs/execution-boundary.md:150) and 'route B' (atomic claim route = AtomicLocalControlPlaneExecutor; tests/test_atomic_post_commit_unresolved.py:5; CHANGELOG.md:18 'atomic claim route') are named. 'Route C' is not defined anywhere in this repo (grep route.?c over code/docs/tests). Closest candidate, treated here as route C: the OpenShell destination (OpenShellRefundDestination) run through route A. Caller should confirm the mapping.",
+  "route_A": [
+   {
+    "where": "engine/safe_executor.py:892-909 (LocalDestinationExecutor.execute_snapshot, TimeoutError from commit)",
+    "observation": "status 'unknown', attempted True, acknowledged False, newly_executed False; observation = destination.observe_bound(snapshot) result (so state applied|partial|absent|unknown with destination_state), or fallback {effect_id,state:'unknown',destination_state:{}} if that read raises (894-896); error=str(exc); attempt event 'unknown' (897). observed_state = observation['state']."
+   },
+   {
+    "where": "engine/safe_executor.py:856-869",
+    "observation": "existing destination state 'unknown' (only a destination like OpenShell returns it) -> status 'unknown', observation=existing (state unknown, destination_state {}), acknowledged True, newly_executed False."
+   },
+   {
+    "where": "engine/control_plane_adapter.py:154-156",
+    "observation": "adapter raises TimeoutError when local status is unknown, handing lost-ack handling to the Control Plane workflow."
+   },
+   {
+    "where": "engine/control_plane_adapter.py:341-362",
+    "observation": "final route-A result: state = cp_observation.state or 'unknown'; status = local.status (so 'unknown' persists even if CP later accepts an applied/partial observation, line 342); if cp_observation is None status is forced 'unknown' (345-346) and observation=None (347-349) even though acknowledged may be True and the destination may hold an effect (docs/executor-producer-profile.md:31-35). control_plane_evidence carries attempt+reconciliation (337-340). So route A can emit unknown with a null observation, and unknown with a non-null CP observation of any state (producer_contract.py:144-146 refuses to export a non-empty observation unless reconciliation.observation_accepted is True and equal; whether CP ever returns a rejected observation from workflow.execute is not visible in this repo). The local executor's own observation never reaches the result on route A because CA:347-349 always substitutes the CP one."
+   }
+  ],
+  "route_B": [
+   {
+    "where": "engine/atomic_local_control_plane_executor.py:45-79 (TimeoutError incl. PostCommitObservationUnavailable, LA:33-37,776-783,784-785)",
+    "observation": "status 'unknown', attempted True, acknowledged False, newly_executed False; observation = destination.reconcile_claim() dict {status applied|partial|hold, claim_state, retry_eligible:false, effect_id, operation_digest|reason}; fallback {'status':'unknown','retry_eligible':False,'reason':'reconciliation_unavailable'} (51); observed_state is recovery['status'] only if applied|partial else 'unknown' (71). The observation is a local claim-store reconciliation, not a Control Plane validated EffectObservation, and has no 'state' key. control_plane_evidence={failure_record_id, failure_class:'dispatch_error'} (75-78). failure_records_v1 row reason_code post_commit_observation_unavailable | acknowledgement_unavailable (55-62)."
+   }
+  ],
+  "route_C_openshell_destination": [
+   {
+    "where": "engine/openshell_environment.py:361-386 commit(): any exception after intent insert -> TimeoutError('sandbox dispatch outcome requires destination observation'); prior unresolved intent raises TimeoutError (370)",
+    "observation": "Caught by LocalDestinationExecutor.execute_snapshot (SE:892) which calls observe_bound again (894) and returns status 'unknown' with that observation."
+   },
+   {
+    "where": "engine/openshell_environment.py:342-359 observe_bound()",
+    "observation": "Validated observation: _validate_observation (297-340) runs on the sandbox result (line 347) and accepts only {effect_id,state,destination_state} with state absent|applied|partial and field-by-field agreement with the snapshot; absent + pending dispatch_intents is rewritten to synthesized {state:'unknown',destination_state:{}} (350-351); non-PermissionError failures return the same synthesized unknown (357-359); PermissionError (validation failure) is re-raised (354-356) and the executor then records 'denied' (SE:841-854) or falls back to unknown at SE:896."
+   }
+  ],
+  "route_C_unknown_with_validated_observation": "YES, as code allows. In OpenShellRefundDestination.commit, after a process acknowledgement observe_bound (line 378) can return a _validate_observation-validated state applied|partial; if the acknowledgement's 'duplicate' is not a bool (381-382) the code raises TimeoutError (385-386). execute_snapshot then catches it (SE:892), re-reads observe_bound (894), which returns the validated applied/partial row, and emits status 'unknown' with observed_state applied|partial and observation = that validated row (SE:898-909). Same path with observed state 'absent' (379-380): absent is validated, but pending dispatch_intents rewrites it to 'unknown' on the re-read. Under route A the CP wrapper then replaces observation with the CP observation (CA:341-349). Not executed; read-only inspection.",
+  "caveat": "'unknown' status can therefore co-occur with observed_state applied/partial, so an ODES lifecycle consumer cannot infer 'no known effect' from status=='unknown'; see producer_contract.py:153-160 which still requires retained effect rows for executed/reconciled/partial but not for unknown."
+ },
+ "notes": [
+  "Blocker: ExecutionResult.status vocabulary mixes attempt outcome and destination state; 'unknown' appears with observed_state applied/partial (SE:892-909, CA:342) and with observation null (CA:345-349). A decoupled lifecycle contract needs to define status vs observed_state vs observation separately.",
+  "Blocker: producer export is built from a live SQLite destination plus the in-memory result (PC:224-245); the exporter reads tables effects/attempts/attempt_events directly (PC:27-30). A consumer cannot re-derive the export from the contract alone.",
+  "Blocker: pins CONTROL_PLANE_COMMIT / MANIFEST_COMMIT / ALVORADA_COMMIT are dead constants (SE:16-18) while real coupling is via lazy imports of agent_control_plane private API (_iso at CA:98) and exact error strings (CA:149-153); docs carry three different CP shas (2ea9528e, c7f122ba, 28350065).",
+  "Blocker: repository identity strings 'cogno-us/moltbot-safe' hard-coded in the export (PC:115,267) differ from actual repo cogno-us/cognous-execution-runtime; consumers keyed on that string.",
+  "Profile 2.0.0 requires explicit consumer acceptance; docs state no consumer compatibility or hub green release is claimed (docs/executor-producer-profile.md:57-59).",
+  "Recovery resolution module is experimental and not wired to executors (engine/recovery_resolution.py:1-5); revocation closeout and operation admission are sidecars, so recovery observations for ODES come from route-specific dicts (AT:51,64-79) not a unified record.",
+  "Route B recovery observation shape differs from route A/destination observation shape (status vs state keys), and route B unknown observation is not Control Plane validated.",
+  "Doc claim 'no hub green release' and F3 requalification required for any change (CLAUDE.md:29).",
+  "Cross-component suites live in cognous-stack-qualification (CROSS_COMPONENT_TESTS.md:3) and were not inspected here; component-local tests only partly cover consumers."
+ ]
+}

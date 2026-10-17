@@ -1,0 +1,500 @@
+{
+ "repo": "cogno-us/cognous-control-plane",
+ "commit": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
+ "commit_provenance": "Inspected copy at <work-dir>/work-a/control_plane. 'git fetch origin main' FAILED: origin is the local pinned clone (detached HEAD, no 'main' ref: 'fatal: couldn't find remote ref main'), so nothing was fetched and the copy stays at the local revision. A read-only 'git ls-remote https://github.com/cogno-us/cognous-control-plane HEAD' returned the same sha, so the inspected revision equals GitHub HEAD at inspection time (not verified to be the 'main' branch tip by name). No push/network write was made.",
+ "produces": [
+  {
+   "name": "BoundedRunRecord (durable JSON record store)",
+   "format_version": "none: no schema_version/profile field in the record; the opt-in schema is titled 'runtime-authority/0.1'",
+   "record_types": [
+    "decisions: RuntimeDecision",
+    "attempts: EffectAttempt",
+    "refusals: EffectTimeRefusal",
+    "observations: EffectObservation",
+    "reconciliations: ReconciliationResult",
+    "resolution_checks: ResolutionCheck",
+    "closeouts: AttemptCloseout",
+    "check_events: CheckEvent",
+    "vocabulary_changes: VocabularyChange",
+    "input_time_floors: dict"
+   ],
+   "defined_at": [
+    "src/agent_control_plane/bounded.py:419-431 (BoundedRunRecord)",
+    "src/agent_control_plane/bounded.py:279 (RuntimeDecision)",
+    "src/agent_control_plane/bounded.py:293 (EffectAttempt)",
+    "src/agent_control_plane/bounded.py:313 (EffectTimeRefusal)",
+    "src/agent_control_plane/bounded.py:329 (EffectObservation)",
+    "src/agent_control_plane/bounded.py:343 (ReconciliationResult)",
+    "src/agent_control_plane/bounded.py:356 (ResolutionCheck)",
+    "src/agent_control_plane/bounded.py:367 (AttemptCloseout)",
+    "src/agent_control_plane/bounded.py:378-391 (CheckEvent; reason_vocabulary_version default 'runtime-authority-reasons/0.1' at ~391)",
+    "src/agent_control_plane/reason_vocabulary.py:7 (VocabularyChange)",
+    "src/agent_control_plane/bounded.py:433 (BoundedRecordStore writer)",
+    "schemas/runtime_authority_run_0_1.schema.json (title BoundedRunRecord)"
+   ],
+   "consumers_named_in_repo": "Replay Bundle / Governance Evidence Pack / hub, only in prose: docs/runtime-authority-profile.md:102-105 ('explicit new Replay/consumer mapping'), docs/durable-refusal-profile.md:80, docs/workstreams/decision-input-commitment-checkpoint.md:13-14. No consumer code in this repo."
+  },
+  {
+   "name": "AuthorizationBinding / TenantAuthorizationBinding (embedded in RuntimeDecision.binding)",
+   "format_version": "generation 'bounded-authorization-effect/0.2' for tenant variant; 0.1 implicit for AuthorizationBinding",
+   "defined_at": [
+    "src/agent_control_plane/bounded.py:202-229 (AuthorizationBinding)",
+    "src/agent_control_plane/bounded.py:231-236 (Tenant..., generation literal at 234)",
+    "docs/w0-c1-c2-c4-c6-contracts.md:9-10",
+    "schemas/runtime_authority_run_0_1.schema.json:164-194"
+   ],
+   "notes": "Consumer selection of 0.1 vs 0.2 is by Python class (isinstance at src/agent_control_plane/bounded.py:1430) not by a field on the proposal."
+  },
+  {
+   "name": "Execution call to destination adapter (apply/observe)",
+   "format_version": "none; duck-typed, no Protocol or schema",
+   "defined_at": [
+    "src/agent_control_plane/bounded.py:1064-1077 (apply kwargs: effect_id, grant_id, max_effects, target, amount, unit, payload, lose_ack, partial, optional expected_effective_grant_digest/effective_grant_derivation_version)",
+    "src/agent_control_plane/bounded.py:1109 (destination.observe(effect_id))",
+    "src/agent_control_plane/bounded.py:800-837 (reference LocalRefundDestination)"
+   ],
+   "consumers_named_in_repo": "Execution Runtime / executor (docs/bounded_authorization_effect.md 'validated execution envelope'; docs/local-authority-effect-profile.md:91-93)"
+  },
+  {
+   "name": "LocalExecutionClaim / TenantLocalExecutionClaim",
+   "format_version": "profile id urn:cognous:profiles:local-authority-effect:0.1.0-proposed; tenant variant also generation bounded-authorization-effect/0.2",
+   "defined_at": [
+    "src/agent_control_plane/local_authority_effect.py:29 (profile const)",
+    "src/agent_control_plane/local_authority_effect.py:70-129 (models)",
+    "src/agent_control_plane/local_authority_effect.py:327-464 (issuance)",
+    "src/agent_control_plane/local_authority_effect.py:526-571 (verify_local_execution_claim)",
+    "docs/local-authority-effect-profile.md:1-111"
+   ],
+   "consumers_named_in_repo": "participating local executor/SQLite sink (docs/local-authority-effect-profile.md:91-93). docs line 46 refers to 'the claim schema' but NO claim schema file exists in schemas/."
+  },
+  {
+   "name": "Runtime-authority reason vocabulary",
+   "format_version": "runtime-authority-reasons/0.1",
+   "defined_at": [
+    "schemas/runtime_authority_reasons_0_1.json:2",
+    "src/agent_control_plane/runtime_authority.py:11"
+   ],
+   "notes": "Registry entries are label-only ({reason_kind: typed_only, description: <code with spaces>}); no rule semantics."
+  },
+  {
+   "name": "Decision Input Commitment Record (spec + verifier only; NO emitter in this repo)",
+   "format_version": "profile_version 0.1.0-proposed; canonicalization json-sort-keys-compact-utf8-no-nan-python-semantics-v0.1-proposed; resolver semantics urn:cognous:resolver:required-evidence-v1",
+   "defined_at": [
+    "src/agent_control_plane/decision_input_profile.py:15-18",
+    "src/agent_control_plane/decision_input_profile.py:239-372 (verify_record)",
+    "docs/decision-input-commitment-profile.md",
+    "conformance/decision-input-commitment-vectors.json"
+   ],
+   "consumers_named_in_repo": "Replay Bundle, Governance Evidence Pack, hub: 'later' only, docs/decision-input-commitment-profile.md:180-196. Not wired into the live workflow (decision_input_profile.py:3-6); only opaque linkage fields in LocalExecutionClaim (local_authority_effect.py:116-117)."
+  },
+  {
+   "name": "RunRecord / ReplayBundle / SignedReplayBundle / ValidationReport (generic PolicyGate path)",
+   "format_version": "none (no version field); JSON Schema 2020-12",
+   "defined_at": [
+    "src/agent_control_plane/models.py:258 (RunRecord)",
+    "src/agent_control_plane/models.py:316 (ReplayBundle)",
+    "src/agent_control_plane/models.py:366 (SignedReplayBundle, HMAC-SHA256)",
+    "src/agent_control_plane/models.py:404 (ValidationReport)",
+    "src/agent_control_plane/signing.py:13-52 (HMAC over json.dumps(sort_keys, compact) with default ensure_ascii=True)",
+    "schemas/run_record.schema.json",
+    "schemas/replay_bundle.schema.json",
+    "schemas/signed_replay_bundle.schema.json",
+    "schemas/validation_report.schema.json"
+   ],
+   "consumers_named_in_repo": "Replay Bundle component implied by docs/architecture.md:20,45 and docs/workstreams/decision-input-commitment-checkpoint.md:13; no consumer code here.",
+   "notes": "Schema $id values still use the old repo slug 'cognous-agent-control-plane' (e.g. schemas/run_record.schema.json $id)."
+  },
+  {
+   "name": "MicrosoftAgtCompatibilityEvidence (optional, non-core)",
+   "format_version": "microsoft-agt-pre-tool-call/0.1",
+   "defined_at": [
+    "src/agent_control_plane/microsoft_agt.py:15",
+    "src/agent_control_plane/microsoft_agt.py:59-79"
+   ],
+   "consumers_named_in_repo": "none (docs/microsoft-agt-compatibility.md says not part of component lock)"
+  }
+ ],
+ "consumes": [
+  {
+   "name": "Agent Action Manifest (v1.1) as a plain dict",
+   "producer": "cognous-action-manifest",
+   "how_validated": "Hand-coded dict.get() checks; the manifest package is NOT imported and validate_manifest is NOT run. manifest_version must equal '1.1'; manifest_digest recomputed with local commitment() over the dict as given.",
+   "at": [
+    "src/agent_control_plane/bounded.py:27 (MANIFEST_VERSION)",
+    "src/agent_control_plane/bounded.py:884-903 (ctor takes manifest: dict)",
+    "src/agent_control_plane/bounded.py:1419-1420",
+    "src/agent_control_plane/bounded.py:1724-1800 (_manifest_mismatches)",
+    "src/agent_control_plane/bounded.py:1802-1825 (_matching_permission)",
+    "tests/fixtures/refund_integration_v1_1.manifest.json (byte-identical copy of manifest repo examples/refund_integration_v1_1.manifest.json)"
+   ]
+  },
+  {
+   "name": "RuntimeProposal / TenantRuntimeProposal (runtime-action-proposal 1.1 / 1.2 material)",
+   "producer": "cognous-action-manifest (RuntimeActionProposal, RuntimeActionProposalV12 models) / whichever runtime builds the proposal",
+   "how_validated": "CP re-declares the models (no import): Pydantic field validation, then _manifest_mismatches. CP adds amount allow_inf_nan=False and tenant_id min 1/max 128.",
+   "at": [
+    "src/agent_control_plane/bounded.py:65-95"
+   ]
+  },
+  {
+   "name": "Authority Context 0.1.0 (dict)",
+   "producer": "cognous-institutional-governance (Alvorada), via host-injected resolver",
+   "how_validated": "No schema in repo. Field-by-field dict checks: schema_version==0.1.0, interface_status==proposed_pending_governor_review, requirement_id, principal/acting_identity, institution/domain vs manifest declaration, consequence tier, grant, approvals, evidence, conflicts.",
+   "at": [
+    "src/agent_control_plane/bounded.py:28-29",
+    "src/agent_control_plane/bounded.py:189 (Resolver.authority_context)",
+    "src/agent_control_plane/bounded.py:1396-1397",
+    "src/agent_control_plane/bounded.py:1426-1457",
+    "src/agent_control_plane/bounded.py:1492-1675"
+   ]
+  },
+  {
+   "name": "Resolver status records: GrantStatus, IdentityStatus, MandateStatus, ApprovalStatus, PolicyStatus, ConflictStatus, EvidenceStatus, RoleMappingStatus",
+   "producer": "institutional status sources via host resolver (Alvorada authority model); no concrete producer component in repo (SyntheticResolver is test infra)",
+   "how_validated": "Pydantic models + explicit binding to context (institution, domain, ids, revisions, tenant) + freshness windows",
+   "at": [
+    "src/agent_control_plane/bounded.py:98-185 (models)",
+    "src/agent_control_plane/bounded.py:187-199 (Resolver Protocol)",
+    "src/agent_control_plane/bounded.py:678-787 (SyntheticResolver)",
+    "src/agent_control_plane/bounded.py:1496-1675"
+   ]
+  },
+  {
+   "name": "Signed evidence validation record (validation-record/0.1)",
+   "producer": "external validator identified by producer_id; Ed25519 public keys supplied by host RuntimeAuthorityProfile (not by evidence)",
+   "how_validated": "Exact key sets, producer key lookup, Ed25519 verify over _canonical_bytes(statement), subject/institution/tenant match, typed predicate minimum_count/exact_members",
+   "at": [
+    "src/agent_control_plane/runtime_authority.py:73-123"
+   ]
+  },
+  {
+   "name": "PurposeStatus (grant purpose_ref lifecycle)",
+   "producer": "owning system via trusted adapter resolver.purpose_status",
+   "how_validated": "Pydantic extra=forbid; system/record_id/institution/domain/tenant match; epoch match; state; age <= action class max_status_age_seconds; epoch_capability != status_only",
+   "at": [
+    "src/agent_control_plane/runtime_authority.py:34-45",
+    "src/agent_control_plane/runtime_authority.py:171-204"
+   ]
+  },
+  {
+   "name": "Destination EffectObservation and apply() acknowledgement",
+   "producer": "destination adapter / Execution Runtime (reference: LocalRefundDestination)",
+   "how_validated": "effect_id match; observed_at present, tz-aware, within ObservationPolicy age/future tolerance; for applied/partial destination_state.effect_id and .state must match; absent must carry empty destination_state. Ack dict is stored unvalidated.",
+   "at": [
+    "src/agent_control_plane/bounded.py:1109-1130",
+    "src/agent_control_plane/bounded.py:1150-1222",
+    "src/agent_control_plane/bounded.py:1064-1079"
+   ]
+  },
+  {
+   "name": "Destination capability flag",
+   "producer": "destination adapter / Execution Runtime",
+   "how_validated": "getattr(destination,'runtime_authority_capability')=='sqlite-effective-grant/0.1' required when approval carries expected_effective_grant_digest",
+   "at": [
+    "src/agent_control_plane/bounded.py:1007-1009"
+   ]
+  },
+  {
+   "name": "authority_effect_handoff / authority_effect_snapshot (coherent snapshot)",
+   "producer": "host resolver / authority store",
+   "how_validated": "Snapshot must contain context, grant_status, approvals, policies, evidence dicts; every projection re-checked against the decision binding",
+   "at": [
+    "src/agent_control_plane/bounded.py:198-199",
+    "src/agent_control_plane/local_authority_effect.py:176-324",
+    "src/agent_control_plane/local_authority_effect.py:350-366"
+   ]
+  },
+  {
+   "name": "Decision Input Commitment Record (validate-only)",
+   "producer": "not defined in this repo (docs: 'sidecar')",
+   "how_validated": "verify_record: exact profile_version, authorizing is False, canonicalization id, SHA-256 commitments, single supported classifier, field type checks",
+   "at": [
+    "src/agent_control_plane/decision_input_profile.py:239-372"
+   ]
+  },
+  {
+   "name": "Microsoft AGT pre_tool_call decision (optional)",
+   "producer": "external (microsoft/agent-governance-toolkit)",
+   "how_validated": "conjunctive restriction only",
+   "at": [
+    "src/agent_control_plane/microsoft_agt.py:22-45",
+    "src/agent_control_plane/microsoft_agt.py:101-120"
+   ]
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 30,
+   "peer": "cognous-action-manifest",
+   "value": "46c950bed37fe3812000895430bc0312d29e37ce",
+   "purpose": "MANIFEST_UPSTREAM_COMMIT: documents supported Manifest v1.1 revision. Constant is defined but never referenced (git grep: only the definition)."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 31,
+   "peer": "cognous-institutional-governance (Alvorada)",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "ALVORADA_UPSTREAM_COMMIT: Authority Context 0.1.0 baseline. Defined, never referenced."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 32,
+   "peer": "BitRep v1 (Evidence Attestation component; repo slug not verified)",
+   "value": "5b5077dafde232a7801cb425c4efddcffb468723",
+   "purpose": "BITREP_UPSTREAM_COMMIT: documentation only; no BitRep artifact is consumed anywhere in src. Defined, never referenced."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 33,
+   "peer": "cognous-evidence-registry (The Index)",
+   "value": "d5e45d275cb301d9684b543e93b05997991d1cf2",
+   "purpose": "INDEX_UPSTREAM_COMMIT: documentation only; nothing consumed. Defined, never referenced."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 27,
+   "peer": "cognous-action-manifest (format version)",
+   "value": "MANIFEST_VERSION='1.1'",
+   "purpose": "Exact-match gate on proposal.manifest_version and manifest['manifest_version'] (used at lines 1726, 1728). Single value, not a set."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 28,
+   "peer": "Alvorada Authority Context (schema version)",
+   "value": "AUTHORITY_CONTEXT_VERSION='0.1.0'",
+   "purpose": "Exact-match on context['schema_version'] (used line 1438, 1712)."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 29,
+   "peer": "Alvorada Authority Context (interface status)",
+   "value": "AUTHORITY_CONTEXT_STATUS='proposed_pending_governor_review'",
+   "purpose": "Exact-match on context['interface_status'] (used line 1440). Breaks when Alvorada promotes the interface out of 'proposed'."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 234,
+   "peer": "tenant proposal generation (Manifest runtime-action-proposal/1.2)",
+   "value": "bounded-authorization-effect/0.2",
+   "purpose": "Literal generation on TenantAuthorizationBinding; also local_authority_effect.py:126 and :452."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": 1008,
+   "peer": "Execution Runtime / destination",
+   "value": "runtime_authority_capability == 'sqlite-effective-grant/0.1'",
+   "purpose": "Capability id a destination must advertise to carry an approval-bound effective-grant digest. Written in docs/runtime-authority-profile.md:83-84."
+  },
+  {
+   "file": "src/agent_control_plane/local_authority_effect.py",
+   "line": 29,
+   "peer": "Execution Runtime / local executor",
+   "value": "urn:cognous:profiles:local-authority-effect:0.1.0-proposed",
+   "purpose": "Claim profile id; verify_local_execution_claim rejects any other (line 541)."
+  },
+  {
+   "file": "src/agent_control_plane/runtime_authority.py",
+   "line": 99,
+   "peer": "external evidence validators",
+   "value": "validation-record/0.1",
+   "purpose": "Exact statement version accepted for signed evidence."
+  },
+  {
+   "file": "src/agent_control_plane/runtime_authority.py",
+   "line": 215,
+   "peer": "approval/authority issuer",
+   "value": "effective-grant/0.1",
+   "purpose": "Only accepted effective_grant_derivation_version (also bounded.py:1075 passes it through)."
+  },
+  {
+   "file": "src/agent_control_plane/runtime_authority.py",
+   "line": 10,
+   "peer": "Alvorada authority context extension",
+   "value": "runtime-authority/0.1",
+   "purpose": "context['runtime_authority']['profile'] must equal this (line 132)."
+  },
+  {
+   "file": "src/agent_control_plane/decision_input_profile.py",
+   "line": 15,
+   "peer": "Replay Bundle / Governance Evidence Pack (future consumers)",
+   "value": "PROFILE_VERSION 0.1.0-proposed; SUPPORTED_RESOLUTION_SEMANTICS_ID urn:cognous:resolver:required-evidence-v1 (line 18); CANONICALIZATION_PROFILE (line 16)",
+   "purpose": "Exact-match profile identifiers for the sidecar record."
+  },
+  {
+   "file": "src/agent_control_plane/microsoft_agt.py",
+   "line": 14,
+   "peer": "microsoft/agent-governance-toolkit (EXTERNAL, listed for completeness)",
+   "value": "84ae67348705996a3d65e31936afb7d02853f2a0",
+   "purpose": "MICROSOFT_AGT_UPSTREAM_REVISION written into evidence (line 393). Same sha in .github/workflows/w5-microsoft-agt.yml:27 (pip install git@sha) and docs/microsoft-agt-compatibility.md:8."
+  },
+  {
+   "file": "tests/fixtures/refund_integration_v1_1.manifest.json",
+   "line": 143,
+   "peer": "Alvorada",
+   "value": "metadata.upstream_alvorada_commit = fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "Peer pin embedded inside a digest-covered manifest fixture: changing it changes manifest_digest. Same line in manifest repo example."
+  },
+  {
+   "file": "tests/fixtures/refund_integration_v1_1.manifest.json",
+   "line": 62,
+   "peer": "Alvorada",
+   "value": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+   "purpose": "authority_context.profile_ref; also line 121, tests/test_bounded_authorization.py:44, tests/test_microsoft_agt.py:34. CP uses profile_ref both as an equality gate and as the lookup key for resolver.authority_context() (bounded.py:1396,1793)."
+  },
+  {
+   "file": "docs/bounded_authorization_effect.md",
+   "line": 9,
+   "peer": "Manifest 46c950bed37fe3812000895430bc0312d29e37ce",
+   "value": "also line 13 Alvorada fb3d97938969a89e149e8ff8db2756091d1233fc; line 15 BitRep 5b5077dafde232a7801cb425c4efddcffb468723; line 19 Index d5e45d275cb301d9684b543e93b05997991d1cf2",
+   "purpose": "Prose statement of supported upstream interfaces (mirrors code constants)."
+  },
+  {
+   "file": "docs/workstreams/decision-input-commitment-checkpoint.md",
+   "line": 13,
+   "peer": "Replay Bundle 043830b56595cecddfa65c064afd1c0b95e64792; line 14 Governance Evidence Pack de6b9e071df49fc3e0c1254d39b5c94cced554f0; line 15 hub lock 5737267d94d2b445735c95e8480a31de73a2abe8; line 16 Manifest 46c950be...; line 17 Executor 177354e959cc78c59c1a776f018cfbfbf28c927b; line 18 Alvorada/GAX 9984d9011568ccdf3d562fa9760ad41368947b34",
+   "value": "see peer",
+   "purpose": "Reviewed-revision log. NOTE line 18 Alvorada/GAX 9984d901 differs from the Alvorada pin fb3d9793 used in code/docs."
+  },
+  {
+   "file": "collateral/business-collateral.md",
+   "line": 33,
+   "peer": "Open Control Stack hub lock",
+   "value": "5737267d94d2b445735c95e8480a31de73a2abe8 (also lines 41, 65; collateral/one-page-overview.md:26)",
+   "purpose": "Hard-coded hub lock blob links for 'selected lock'."
+  }
+ ],
+ "accepted_revision_allowlists": "None found. No set/tuple/list of accepted peer commits or versions exists in code, workflows or tests (searched src, tools, tests, .github, pyproject for 40-hex tokens and SUPPORTED/ALLOWED/ACCEPTED). Peer selection is delegated to the hub component-lock.json (external to this repo; referenced by URL in README.md:26,30,121 and collateral).",
+ "unwritten_consumer_rules": [
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1752-1757",
+   "peer": "cognous-action-manifest",
+   "rule": "A manifest action whose target_policy is missing OR has allow_any_target=true is treated as target_out_of_scope for every target (no allowlist match possible).",
+   "checked": "git grep -n allow_any_target over docs/ schemas/ README.md collateral/ CHANGELOG.md: 0 hits. Only reason label 'target_out_of_scope' exists (schemas/runtime_authority_reasons_0_1.json) with no rule text. Rule is written in the PEER repo (manifest docs/models.py:155, validator E020)."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1744-1749",
+   "peer": "cognous-action-manifest",
+   "rule": "Tool is found by manifest.tools[].tool_name == action.tool_name; missing tool or adapter_id != proposal.adapter_id both collapse to adapter_mismatch (no distinct unknown_tool).",
+   "checked": "grep docs for tool_name/adapter lookup: docs/microsoft-agt-compatibility.md:29 mentions 'manifest tool mapping' only as a limitation; no lookup rule stated."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1760-1772",
+   "peer": "cognous-action-manifest",
+   "rule": "Payload keys must satisfy payload_policy: required_fields subset, no forbidden_fields, and no keys outside required u optional (undeclared_payload_field); absent payload_policy => missing_payload_policy.",
+   "checked": "grep required_fields|forbidden_fields|optional_fields in docs/schemas/README: 0 hits (only reason labels in schemas/runtime_authority_reasons_0_1.json:416,476)."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1774-1780",
+   "peer": "cognous-action-manifest",
+   "rule": "effect_limits: proposal.effects <= max_effects (default 0 if key missing), amount <= max_amount when present, unit must equal limits.unit when present. If effect_limits is absent no limit is applied here.",
+   "checked": "grep effect_limits|max_amount in CP docs: 0 hits except docs/bounded_authorization_effect.md 'Manifest v1.1 max_amount and max_effects are first checked per proposal' (no unit rule, no missing-limits behavior). Manifest repo treats missing effect_limits as invalid (E022) but CP does not run that validator."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1783-1789",
+   "peer": "cognous-action-manifest",
+   "rule": "authority_required[].scope with required defaulting to TRUE must be a subset of proposal.requested_permissions.",
+   "checked": "grep authority_required in CP docs/schemas: 0 hits; default-true is in manifest models.py:90-92 only."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1791-1796",
+   "peer": "cognous-action-manifest",
+   "rule": "proposal.authority_context_ref must equal action.authority_context.profile_ref, and the same value is later used as the key for resolver.authority_context(ref) (so profile_ref doubles as the Authority Context instance reference).",
+   "checked": "grep profile_ref|authority_context_ref in CP docs/schemas: 0 hits. Manifest docs/runtime_consumption_contract.md:75 says only 'require exact supported profile' (no instance-lookup semantics)."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1732-1733",
+   "peer": "cognous-action-manifest",
+   "rule": "manifest_digest is recomputed over the caller-supplied manifest dict as-is; it only equals the Manifest package's manifest_digest if that dict is the full Pydantic dump with explicit nulls (exclude_none=False). A dict with omitted optional keys yields manifest_digest_mismatch.",
+   "checked": "CP docs say only 'SHA-256 over sorted compact UTF-8 JSON' (docs/bounded_authorization_effect.md:10-11). Explicit-nulls requirement is in manifest docs/runtime_consumption_contract.md:40-42 only. Verified experimentally: fixture dict digest equals manifest_digest() (sha256:4d1ad6c9...f6ac) only because fixture is already a full dump."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1476-1477",
+   "peer": "cognous-action-manifest",
+   "rule": "Review role resolution runs only when review_requirement.mode in {human_review, approval_required}; draft_first and none never require an approver role.",
+   "checked": "grep human_review|approval_required|draft_first in CP docs: 0 hits (only manifest docs/concepts.md:44-46)."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1466-1472",
+   "peer": "Alvorada role-mapping resolver",
+   "rule": "role mapping digest must equal commitment({'institution_id','version','aliases'}) exactly (those three keys only).",
+   "checked": "docs/bounded_authorization_effect.md:83-85 says mappings are 'institution-scoped, versioned, canonicalized' but gives no formula; no schema for RoleMappingStatus in schemas/."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1567-1572",
+   "peer": "Alvorada Authority Context grant",
+   "rule": "ANY grant.delegation.parent_grant_id != null adds delegation_profile_unsupported, so every delegated grant holds. Contradicts docs which say delegated authority is accepted when the resolver returns a valid chain.",
+   "checked": "grep parent_grant_id in docs/schemas: 0 hits. docs/bounded_authorization_effect.md ('Delegated authority is accepted only when the identity/delegation resolver returns an authenticated valid chain') suggests acceptance; only reason label exists in schemas/runtime_authority_reasons_0_1.json:96."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1651",
+   "peer": "Alvorada Authority Context requirement",
+   "rule": "requirement.approvals[].independent_of_actor=true is violated if approval.approver is the actor, the principal, or any element of identity.chain.",
+   "checked": "grep independent_of_actor|identity.chain in docs: 0 hits; docs say only 'satisfy actor-independence when requested' (docs/bounded_authorization_effect.md:86-87), not which identities."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1654-1675",
+   "peer": "Alvorada Authority Context requirement",
+   "rule": "Evidence obligations: only (required==true AND kind=='authorization') must be state 'current' and within max_age_seconds; any other obligation matters only when unknown_behavior=='hold_effect'. Value 'preserve_if_other_basis_suffices' (the one docs mention) is never read.",
+   "checked": "grep unknown_behavior|hold_effect in CP docs/schemas: 0 hits; docs/bounded_authorization_effect.md ('preserve_if_other_basis_suffices') names only the other value. Same hold_effect rule duplicated at local_authority_effect.py:291."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1186-1197",
+   "peer": "destination adapter / Execution Runtime",
+   "rule": "For applied/partial observations, observation.destination_state must contain keys 'effect_id' (== requested effect) and 'state' (== observation.state); for absent it must be empty.",
+   "checked": "docs/bounded_authorization_effect.md ('positive destination evidence names the same effect and has a state consistent') states the idea in prose; schemas/runtime_authority_run_0_1.schema.json:399-403 types destination_state as open object (additionalProperties true), so key names are unwritten."
+  },
+  {
+   "file": "src/agent_control_plane/bounded.py",
+   "line": "1064-1073",
+   "peer": "destination adapter / Execution Runtime",
+   "rule": "destination.apply() is always called with test-hook kwargs lose_ack and partial; a conforming destination must accept them (plus expected_effective_grant_digest/effective_grant_derivation_version when set).",
+   "checked": "grep lose_ack|apply( in docs/schemas/README: 0 hits. No Protocol class for the destination exists (only Resolver is a Protocol)."
+  },
+  {
+   "file": "src/agent_control_plane/runtime_authority.py",
+   "line": "93-94",
+   "peer": "external evidence validator",
+   "rule": "Ed25519 signature must be over _canonical_bytes(statement) = json.dumps(sort_keys, compact separators, ensure_ascii=False, allow_nan=False) UTF-8.",
+   "checked": "docs/runtime-authority-profile.md:65-67 says 'canonical signed statement' without naming the canonicalization; no validation-record schema in schemas/."
+  }
+ ],
+ "external_deps": [
+  "pydantic>=2.12 (pyproject.toml:13)",
+  "cryptography>=43 (Ed25519, extra runtime-authority; pyproject.toml:17)",
+  "Microsoft Agent Governance Toolkit / agent-control-specification 0.4.0b0 (optional; microsoft_agt.py:14,111; w5-microsoft-agt.yml:27)",
+  "Linux fcntl.flock + local filesystem (bounded.py:13-17, 852-857)",
+  "SQLite (same-host claim profile; destination-side, referenced docs/local-authority-effect-profile.md)",
+  "GitHub Actions (.github/workflows/*.yml)",
+  "pytest, pytest-cov, pytest-asyncio (dev)"
+ ],
+ "notes": [
+  "PEER PINS ARE DOCUMENTATION-ONLY IN CODE: the four *_UPSTREAM_COMMIT constants (bounded.py:30-33) are never read. Real runtime coupling to peers is through version/profile strings (MANIFEST_VERSION, AUTHORITY_CONTEXT_VERSION/STATUS, capability and profile ids) plus duplicated logic, not through sha checks. Actual revision selection lives in the hub component-lock.json (external).",
+  "DUPLICATED PEER LOGIC: CP re-implements Manifest proposal_mismatches (bounded.py:1724-1800) and re-declares RuntimeProposal (65-95) instead of importing the manifest package, and emits the same reason-code strings. The shared code vocabulary (e.g. manifest_digest_mismatch, adapter_mismatch, target_out_of_scope) is not specified in either repo. Divergences: CP never runs validate_manifest (no invalid_manifest/unknown_tool/missing_target_policy/unbounded_target_policy codes); CP adds not_before/expires_at checks; CP amount has allow_inf_nan=False, Manifest model does not.",
+  "AUTHORITY CONTEXT HAS NO SCHEMA IN CP: it is read as raw dicts with many field paths (context.institution.*, requirement.{approvals,evidence,consequence,permissions}, grant.*, conflicts.precedence_refs). Alvorada's real schema is not vendored or referenced by sha in code; decoupling needs a vendored/versioned Authority Context schema plus conformance vectors.",
+  "interface_status='proposed_pending_governor_review' is hard-matched (bounded.py:29,1440); any Alvorada status change fails every decision.",
+  "Resolver is a Protocol (bounded.py:187-199) but destination is duck-typed with no Protocol, and apply() receives test-hook kwargs (lose_ack, partial). Executor decoupling needs a written destination interface.",
+  "LocalExecutionClaim: docs/local-authority-effect-profile.md:46 cites a 'claim schema' that does not exist in schemas/. The commitment formulas an executor must reproduce (operation_commitment payload at local_authority_effect.py:147-168; authority_state at 396-404; budget_id default 'grant:<id>' at 440; claim_commitment = commitment(raw minus claim_commitment) at 455/540-571) appear in no doc.",
+  "No format/version field on BoundedRunRecord or on RunRecord/ReplayBundle; consumers cannot detect generation except by schema shape (docs/runtime-authority-profile.md:99-103 admits old readers silently drop new fields).",
+  "Tenant generation is chosen by caller class, not a wire field: TenantRuntimeProposal vs RuntimeProposal (bounded.py:92-95, 1430). The Manifest 1.2 schema also has no generation field and keeps manifest_version const '1.1'; the label 'runtime-action-proposal/1.2' appears only in description/docstring.",
+  "Two different Alvorada commits appear: fb3d9793 (code, docs/bounded_authorization_effect.md:13, fixture) vs 9984d901 'Alvorada/GAX' (docs/workstreams/decision-input-commitment-checkpoint.md:18).",
+  "signing.py canonicalization (ensure_ascii default True) differs from bounded.commitment canonicalization (ensure_ascii=False): two canonical JSON forms in one repo.",
+  "Evidence is not tenant-bound on the default path (docs/bounded_authorization_effect.md ~'Evidence status is not tenant-bound'); relevant to any shared-resolver decoupling.",
+  "Self-revision references (not peer pins) in docs: collateral selects CP 248d8996 (collateral/business-collateral.md:39,65), hub lock 5737267d; many docs/workstreams revisions are historical and do not match inspected HEAD a34c3dc2.",
+  "Schema $id values use old slug cognous-agent-control-plane; pyproject name agent-control-plane; renamed repo is cognous-control-plane.",
+  "Fetch limitation: see commit_provenance."
+ ]
+}

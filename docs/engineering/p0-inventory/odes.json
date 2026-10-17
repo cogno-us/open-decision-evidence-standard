@@ -1,0 +1,382 @@
+{
+ "repo": "cogno-us/open-decision-evidence-standard",
+ "commit": "9ca8ad058d33e40da9a7a8a0822229119f2e5abf",
+ "produces": [
+  {
+   "artifact": "ODES decision evidence export package",
+   "type_const": "odes_decision_evidence_export_package",
+   "package_version": "0.1.0",
+   "file": "src/odes/common.py",
+   "lines": "15-16",
+   "producer": "export_cognous_stack_package",
+   "producer_file": "src/odes/exporter.py",
+   "producer_line": 549,
+   "cli": "odes export-cognous (src/odes/cli.py:35)"
+  },
+  {
+   "artifact": "profile ids/versions emitted (selected by Control Plane revision)",
+   "file": "src/odes/common.py",
+   "detail": {
+    "odes_cognous_stack_export_0_1 / odes-cognous-stack-export-0.1.0": "13-14",
+    "odes_cognous_stack_export_0_2 / 0.2.0": "30-31",
+    "0.2.1 merged": "48",
+    "0.2.2-refusal-candidate": "55",
+    "0.2.3-security-runtime-candidate": "57",
+    "0.2.4-security-runtime-f5b-candidate": "67"
+   },
+   "selection_logic": "src/odes/exporter.py:556"
+  },
+  {
+   "artifact": "package provenance block carrying pinned_revisions, supported_revisions, selected_revisions, replay_validation.required_revision",
+   "file": "src/odes/exporter.py",
+   "lines": "630-634"
+  },
+  {
+   "artifact": "issuer fixed to organization_id cognous.synthetic.baseline / system_id cognous-stack-exporter",
+   "file": "src/odes/exporter.py",
+   "line": 604
+  },
+  {
+   "artifact": "pder-v0.1 record schema and validator",
+   "files": [
+    "schema/pder-v0.1.schema.json",
+    "src/odes/schema_validation.py"
+   ],
+   "cli": "odes validate-record (src/odes/cli.py:38-41)"
+  },
+  {
+   "artifact": "recipient reliance decision (pass/informational_only/fail)",
+   "file": "src/odes/recipient_validator.py",
+   "cli": "odes recipient-validate; exit codes src/odes/cli.py:57-58 (0 pass, 3 informational_only, 1 other)"
+  },
+  {
+   "artifact": "profile specs",
+   "files": [
+    "profiles/cognous-stack-export-0.1.md",
+    "profiles/cognous-stack-export-0.2.md",
+    "profiles/agentic-ai.md",
+    "profiles/minimal.md",
+    "profiles/regulated-enterprise.md"
+   ]
+  },
+  {
+   "artifact": "example packages",
+   "files": [
+    "examples/producer-v2/lost_ack.package.json",
+    "examples/producer-v2/partial.package.json",
+    "examples/producer-v2/prior_absence.package.json",
+    "examples/producer-v2/rejected_wrong_effect.package.json",
+    "examples/producer-v2/restart.package.json"
+   ]
+  },
+  {
+   "artifact": "contract spike execution-attempt-lifecycle 0.1.0-draft (schema + stdlib validator + fixtures), not imported by src/odes",
+   "files": [
+    "contracts/execution-attempt-lifecycle/README.md:3",
+    "contracts/execution-attempt-lifecycle/schema.json",
+    "contracts/execution-attempt-lifecycle/validate.py"
+   ]
+  }
+ ],
+ "consumes": [
+  {
+   "component": "Replay Reconstruction Bundle (JSON, bundle_version 0.2.0 only)",
+   "how": "export_cognous_stack_package(manifest, reconstruction_bundle)",
+   "files": [
+    "src/odes/exporter.py:258-264 (SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS=('0.2.0',))",
+    "src/odes/cli.py:35"
+   ]
+  },
+  {
+   "component": "Replay in-process",
+   "detail": "imports agent_replay_bundle.importers.import_bounded_workflow and ImportContractError (exporter.py:271-272) and agent_replay_bundle.refusal_evidence.extend_retained_inputs (exporter.py:159); calls import_bounded_workflow(cp, proposal=, moltbot_export=, control_plane_revision=) at exporter.py:283-288 and :305; re-derives records/links/commitments/producer_profiles/status/import_reports/semantics and metadata fields and refuses on any difference (exporter.py:289-300)",
+   "pin_dependence": "Replay revision must match the selected generation (recipient_validator.py:288-298)"
+  },
+  {
+   "component": "Action Manifest (JSON) ",
+   "detail": "manifest dict; actions read from keys / tools[].actions[] (exporter.py:92-111 _actions, :113 _find_action), bound to proposal by exporter.py:314 _validate_manifest_binding and exporter.py:566-570"
+  },
+  {
+   "component": "Control Plane records via bundle record_type",
+   "detail": "runtime_proposal, runtime_decision, control_plane_attempt_transition, effect_observation, reconciliation (exporter.py:143-157); refusal-generation kinds effect_time_refusal, resolution_check, attempt_closeout, input_time_floors (exporter.py:667) and resolution_check_event, reason_vocabulary_change (exporter.py:668)"
+  },
+  {
+   "component": "Runtime / Moltbot-safe executor records via bundle record_type",
+   "detail": "execution_envelope, execution_result, destination_attempt, destination_attempt_event, destination_effect, executor_observation, moltbot_attributed_control_plane_attempt, rejected_executor_observation, executor_control_plane_evidence (exporter.py:163-192, 217-222, 678-684); metadata.moltbot_producer_contract (exporter.py:195, 397) incl. interface_profile_id, interface_profile_version, repository_revision, provenance, legacy flag"
+  },
+  {
+   "component": "Bundle metadata keys read",
+   "detail": "control_plane_revision (exporter.py:158,276,553), moltbot_producer_contract (195,290,296,397), compatible_control_plane_revisions (298-299), effect_observation_history, moltbot_safe_revision, manifest_revision, alvorada_revision (290-291)"
+  },
+  {
+   "component": "recipient_validator re-runs the exporter",
+   "detail": "src/odes/recipient_validator.py:316-322 calls export_cognous_stack_package on package sources, so recipient validation needs Replay installed too"
+  },
+  {
+   "component": "Evidence Pack, BitRep, Index, Authority Context",
+   "detail": "Not read by the exporter code. Their revisions appear only as PINNED_REVISIONS values (src/odes/common.py:20,24,25,26) carried into provenance; no import or data read found in src/odes."
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": "src/odes/common.py",
+   "lines": "18-27",
+   "name": "PINNED_REVISIONS (v0.1 generation)",
+   "components": [
+    "manifest 46c950be (19)",
+    "authority_context fb3d9793 (20)",
+    "control_plane 28350065 (21)",
+    "moltbot_safe 1d308faf (22)",
+    "replay f63ce914 (23)",
+    "governance_evidence_pack c699c1fb (24)",
+    "bitrep 5b5077da (25)",
+    "index d5e45d27 (26)"
+   ]
+  },
+  {
+   "file": "src/odes/common.py",
+   "lines": "32-39",
+   "name": "SUPPORTED_V2_CONTROL_PLANE_REVISIONS (2ea9528e, 248d8996) and SUPPORTED_V2_REPLAY_REVISIONS (274543f1, 043830b5)"
+  },
+  {
+   "file": "src/odes/common.py",
+   "lines": "40-45",
+   "name": "PINNED_V2_REVISIONS: control_plane 248d8996, moltbot_safe 177354e9, replay 043830b5 over PINNED_REVISIONS"
+  },
+  {
+   "file": "src/odes/common.py",
+   "lines": "49-54",
+   "name": "MERGED_REVISIONS (0.2.1): control_plane d3dadee7, moltbot_safe c3c3ee71, replay 459e4ba6"
+  },
+  {
+   "file": "src/odes/common.py",
+   "line": 56,
+   "name": "REFUSAL_REVISIONS: control_plane c7f122ba, moltbot_safe 309e194c, replay 83fbaf2a (manifest reuses PINNED manifest)"
+  },
+  {
+   "file": "src/odes/common.py",
+   "lines": "58-61",
+   "name": "SECURITY_REVISIONS: manifest e385f8c1, replay 3601fb21, control_plane 996baeb4, moltbot_safe fd6b76fa"
+  },
+  {
+   "file": "src/odes/common.py",
+   "lines": "68-71",
+   "name": "F5B_REVISIONS: manifest 2c36bcd0, replay def0ee0f, control_plane a34c3dc2, moltbot_safe 4a83b175"
+  },
+  {
+   "file": "src/odes/common.py",
+   "lines": "72-77",
+   "name": "SECURITY_RUNTIME_GENERATIONS keyed by CP revision; ALL_V2_CONTROL_PLANE_REVISIONS tuple (6 CP revisions incl. v0.1 handled separately at exporter.py:277)"
+  },
+  {
+   "file": "src/odes/common.py",
+   "note": "27 distinct 40-hex literals, all in this file (grep count 27 lines, 27 unique)"
+  },
+  {
+   "file": "src/odes/exporter.py",
+   "lines": "276-278",
+   "name": "default CP revision when bundle.metadata lacks one = PINNED_REVISIONS['control_plane']; accepted set = that plus ALL_V2_CONTROL_PLANE_REVISIONS"
+  },
+  {
+   "file": "src/odes/exporter.py",
+   "lines": "539-546",
+   "name": "_selected_v2_pins: per-generation tuple chosen by CP revision"
+  },
+  {
+   "file": "src/odes/recipient_validator.py",
+   "lines": "288-298",
+   "name": "cross-revision rules: replay 274543f1 only with CP 2ea9528e; replay in SUPPORTED_V2_REPLAY not with merged CP; refusal CP requires refusal replay; security-runtime CP requires its generation's replay"
+  },
+  {
+   "file": "src/odes/exporter.py",
+   "lines": "203, 247, 253",
+   "name": "hard-coded repository/owner names cogno-us/moltbot-safe (203, 247) and cogno-us/cognous-agent-control-plane (253); hub names are cognous-execution-runtime and cognous-control-plane"
+  },
+  {
+   "file": "src/odes/exporter.py",
+   "line": 274,
+   "name": "error text names cogno-us/cognous-agent-replay-bundle (hub name is cognous-replay-bundle)"
+  },
+  {
+   "file": "docs/merged-producer-compatibility.md",
+   "lines": "9-12",
+   "name": "documented merged pins: manifest 46c950be, replay 459e4ba6, CP d3dadee7, runtime c3c3ee71"
+  },
+  {
+   "file": "docs/cognous-stack-field-mapping.md",
+   "lines": "5,15-20,74-75,93",
+   "name": "documented v0.1 pins and baselines"
+  },
+  {
+   "file": "profiles/cognous-stack-export-0.2.md",
+   "lines": "18-20,23,32,102-103",
+   "name": "documented v0.2 pin table"
+  },
+  {
+   "file": ".github/workflows/tests.yml",
+   "lines": "30,33",
+   "name": "calls cogno-us/cognous-stack-qualification workflow open-decision-evidence-standard--tests.yml@b3942698d52da47ad947259c0310603f4c29113c, qualification_revision b3942698 (lines 30,33)"
+  },
+  {
+   "file": ".github/workflows/merged-producers.yml",
+   "lines": "13,16",
+   "name": "qualification workflow pinned to b3942698d52da47ad947259c0310603f4c29113c"
+  },
+  {
+   "file": ".github/workflows/typed-refusal.yml",
+   "lines": "12,15",
+   "name": "qualification workflow pinned to 39f038435afdd71ba162860faa5718d90d7bde64"
+  },
+  {
+   "file": "README.md",
+   "line": 140,
+   "name": "link to qualification at 39f03843"
+  },
+  {
+   "file": "CROSS_COMPONENT_TESTS.md",
+   "line": 3,
+   "name": "link to qualification at 39f03843"
+  },
+  {
+   "file": "docs/engineering/ODES-INTERCOMPONENT-CONTRACTS.md",
+   "line": 1,
+   "name": "doc statement: 'about four repositories hard-code peer commit shas' (PINNED_REVISIONS, F5B_REVISIONS, supported-revision tuples in common.py; ODES_REVISION in Evidence Pack importer; component-lock.json in hub)"
+  }
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "rule": "Bundle must have a nonempty records array of objects; each record needs object-valued data; records sorted by source_sequence (default 0) and grouped by record_type string",
+   "file": "src/odes/exporter.py",
+   "lines": "42-61"
+  },
+  {
+   "rule": "At most one runtime_proposal record",
+   "file": "src/odes/exporter.py",
+   "lines": "148-150"
+  },
+  {
+   "rule": "When any execution evidence is present exactly one execution_envelope and one execution_result are required",
+   "file": "src/odes/exporter.py",
+   "lines": "173-178"
+  },
+  {
+   "rule": "Bundle bundle_version must equal 0.2.0",
+   "file": "src/odes/exporter.py",
+   "lines": "258-264"
+  },
+  {
+   "rule": "Retained Replay fields (records, links, commitments, producer_profiles, status, import_reports, semantics) and selected metadata must equal Replay's own re-derivation or export refuses; legacy CP 2ea9528e: compatible_control_plane_revisions removed from the expected value before comparing",
+   "file": "src/odes/exporter.py",
+   "lines": "279-300"
+  },
+  {
+   "rule": "Producer-contract is trusted only when metadata.moltbot_producer_contract is a dict and not legacy; source_asserted revision labelled revision_status 'source_asserted'",
+   "file": "src/odes/exporter.py",
+   "lines": "195-205"
+  },
+  {
+   "rule": "Control Plane vs executor attempt namespaces: an attempt id must be in exactly one namespace (executor vs attributed CP) else ExportError",
+   "file": "src/odes/exporter.py",
+   "lines": "236-246 (ambiguity check at 239), 401-411 (403)"
+  },
+  {
+   "rule": "Result status is normalised through ODES-side vocabularies: decision result (allow/hold/deny families) and observed state (applied/partial/absent/unknown families) are mapped by hard-coded string sets, not by a shared enum",
+   "file": "src/odes/exporter.py",
+   "lines": "120-141 (_decision_result at 120, _state at 131)"
+  },
+  {
+   "rule": "Exact decision/proposal action binding; proposal-less decisions require digest-bound Manifest; derivation is refused; risk_metadata must be an object",
+   "file": "src/odes/exporter.py",
+   "lines": "566-576"
+  },
+  {
+   "rule": "Replay package must be importable in the environment; not declared in pyproject.toml dependencies (only jsonschema>=4.21)",
+   "file": "pyproject.toml",
+   "lines": "12-14; error at src/odes/exporter.py:274"
+  },
+  {
+   "rule": "Consumer-side assumptions documented as the origin of F-20..F-22 (Replay encoded unwritten producer shapes); ODES design doc states the rule 'written down in neither place'",
+   "file": "docs/engineering/ODES-INTERCOMPONENT-CONTRACTS.md",
+   "lines": "20,151"
+  }
+ ],
+ "external_deps": [
+  {
+   "name": "jsonschema>=4.21",
+   "file": "pyproject.toml",
+   "line": 13,
+   "kind": "declared"
+  },
+  {
+   "name": "pytest>=8 (dev)",
+   "file": "pyproject.toml",
+   "line": 17,
+   "kind": "declared"
+  },
+  {
+   "name": "agent_replay_bundle (Replay, cogno-us/cognous-replay-bundle)",
+   "file": "src/odes/exporter.py",
+   "lines": "159,271-272",
+   "kind": "undeclared runtime import, required for any export"
+  },
+  {
+   "name": "engine / agent_control_plane",
+   "detail": "not imported by src/odes (grep): only in the qualification suites that exercise ODES"
+  },
+  {
+   "name": "qualification reusable workflows",
+   "files": [
+    ".github/workflows/tests.yml:30",
+    "merged-producers.yml:13",
+    "typed-refusal.yml:12"
+   ],
+   "kind": "CI dependency on cogno-us/cognous-stack-qualification"
+  }
+ ],
+ "notes": {
+  "lifecycle_contract": {
+   "path": "contracts/execution-attempt-lifecycle",
+   "version": "0.1.0-draft; status spike, proposal only; not referenced by any odes code path (README.md:3)",
+   "valid_fixtures": 13,
+   "invalid_fixtures": 15,
+   "fixture_files": "contracts/execution-attempt-lifecycle/fixtures/{valid,invalid}",
+   "readme_lists": "valid README.md:54 (13 names), invalid README.md:56 (15 names); counts match directory listing",
+   "rule_codes_in_validate_py": [
+    "attempt_without_events",
+    "duplicate_attempt_row",
+    "duplicate_check_id",
+    "effect_free_reconcile_claims_attempt",
+    "event_order",
+    "invalid_extension_key",
+    "invalid_reconciled_marker",
+    "journal_check_reused",
+    "journal_protocol",
+    "journal_unbound_completion",
+    "missing_start_event",
+    "missing_start_record",
+    "recovery_observation_status",
+    "recovery_report_incomplete",
+    "recovery_retry_eligible",
+    "recovery_state_mismatch",
+    "repeated_record",
+    "repeated_start_event",
+    "resolution_checks_out_of_order",
+    "schema_violation",
+    "status_terminal_mismatch",
+    "terminal_event_missing",
+    "undeclared_member",
+    "unknown_state_mismatch",
+    "unknown_with_validated_observation",
+    "unsupported_contract_version"
+   ],
+   "rule_code_count": 26,
+   "rule_code_note": "found by grep of Violation(...) string literals in validate.py; README.md rules section (27-48) names 24 of them (omits schema_violation, unsupported_contract_version; invalid_extension_key appears only as extension-key rule text, README says undeclared_member for undeclared members). Not independently verified by execution.",
+   "tests": "tests/test_contract_execution_attempt_lifecycle.py (14 def test_* in file, lines 28-131; docs-and-fixtures only, line 3-4)",
+   "decisions": "README.md:23 (extension namespace, owner 2026-10-17), :25 (placement as optional extension profile of ODES core)",
+   "design_doc": "docs/engineering/ODES-INTERCOMPONENT-CONTRACTS.md (280 lines); boundaries B1-B6 table lines 40-48 region; states hard-coded sha pins to be replaced 'after V1' by 'conforms to contract vN' (line 7)"
+  },
+  "divergence": "ODES main (9ca8ad05) F5B_REVISIONS replay=def0ee0f/runtime=4a83b175 (common.py:68-71) equals qualification refreeze end state, while hub profile security-runtime-f5b-candidate-20261016.json lists runtime e20f92e1 and replay 79ba16d4; hub component-lock.json selects merged generation (CP d3dadee7). ODES code supports all generations simultaneously.",
+  "ci_pins_vs_docs": "CI qualification refs: b3942698 (tests, merged-producers) vs 39f03843 (typed-refusal, README link) - ODES itself points at two different qualification commits.",
+  "inspected_via": "git clone of /home/claude/rem-odes; fetch origin main; checkout FETCH_HEAD; read-only"
+ }
+}

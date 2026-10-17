@@ -1,0 +1,240 @@
+{
+ "repo": "cogno-us/cognous-institutional-governance",
+ "commit": "bae4bce89dce6ea398f1b0b6dca821129af91163",
+ "commit_note": "Clone of /home/claude/rem-gov, then `git fetch origin main && git checkout FETCH_HEAD` succeeded (origin is the local path; no network). Inspected main = bae4bce (Merge PR #48, 2026-10-16). Qualification pin fb3d9793 resolves locally (git cat-file: commit); `git rev-list --count fb3d9793..HEAD` = 25. README.md:32 states hub selects fb3d9793 and the accepted main source is 89e4722b (ancestor of bae4bce). Pin-to-main interface delta: authority-context.schema.json is byte-identical (md5 7a542cca81effd6ced0924a955e42053 at both); fixtures untouched; changes are (a) NaN/inf hardening in testing/harness/authority_context.py and a precondition paragraph in AUTHORITY_CONTEXT.md:144-149, (b) NEW authority-lineage 0.1.0 profile (schema, README, harness, tests, workflow), (c) license/README/collateral/bootstrap-validator changes.",
+ "nature": "Specification/research repository. It has no runtime, no service and no exported runtime artifact; 'produces' are schemas, spec text, fixtures and a reference checker consumed (or intended to be consumed) by other components.",
+ "produces": [
+  {
+   "name": "Authority Context 0.1.0 (proposed interface)",
+   "defined": "process/implementation/public-stack-v0.1/authority-context.schema.json:1-12 ($id line 3, schema_version const '0.1.0' line 9, interface_status const 'proposed_pending_governor_review' line 12); spec process/implementation/public-stack-v0.1/AUTHORITY_CONTEXT.md:1-33",
+   "profile_id": "urn:cognous:alvorada:authority-context:0.1.0",
+   "profile_version": "0.1.0 (proposed, pending Governor review)",
+   "record_types": [
+    "context root (additionalProperties false, required list at schema :592-603): schema_version, interface_status, context_id, institution (:18), principal (:50), acting_identity (:54), accountable_human_role (:58), requirement (:82), conflicts (:290), supporting_evidence_refs (:539, URI/URN array), change (:549)",
+    "optional grant (:349-523): grant_id, revision, requirement_id, issuance_record_ref (:373), status_ref (:398), policy_versions (:403), permissions (:427), delegation (:480), approval_refs (:509)",
+    "requirement.evidence[].unknown_behavior enum hold_effect|preserve_if_other_basis_suffices|reconcile_no_blind_retry (:231-235)",
+    "institution.authority_mode enum principle_inspired|modular_adaptation|full_v0.1 (:35-41)"
+   ],
+   "examples": "process/implementation/public-stack-v0.1/examples/{routine,higher-consequence,requirement-only}.json (+ -reference-input.json snapshots)",
+   "notes": "Explicit statement: no runtime_decision or allowed field accepted (AUTHORITY_CONTEXT.md:28). Consumers named: Action Manifest, Control Plane, Execution component, Evidence/Replay/ODES, BitRep/Index (public-stack-v0.1/README.md:53-62, section 'Consumer mapping'); all 'proposed, pending Governor review'; 'No cross-repository interface compatibility, ODES conformance ... is established' (AUTHORITY_CONTEXT.md:156-157). Runtime repo hard-codes this component's fb3d9793 as ALVORADA_COMMIT but never reads it."
+  },
+  {
+   "name": "Authority lineage evidence profile 0.1.0 (post-pin, non-authorizing)",
+   "defined": "process/implementation/authority-lineage-v0.1/authority-lineage.schema.json ($id line 3, schema_version const line 8, interface_status const 'proposed_non_authorizing_evidence_only' line 9, top-level required line 30); process/implementation/authority-lineage-v0.1/README.md:7-16",
+   "profile_id": "urn:cognous:alvorada:authority-lineage:0.1.0",
+   "profile_version": "0.1.0",
+   "record_types": [
+    "AuthorityOriginRecord (:51-66)",
+    "DelegationEdge (:71-88)",
+    "AuthorityMutationRecord (:93-106; kinds amend|suspend|reinstate|revoke)",
+    "AuthoritySuccessionRecord (:111-124; continuity_semantics const no_automatic_permission_transfer)",
+    "AuthorityResolutionCommitment (:129-144; resolved_status active|suspended|revoked|unknown; commitment_semantics const evidence_of_resolution_not_live_permission)",
+    "AuthorityUseLink (:149-162; carries decision_id, effect_id, evidence_package_ref, resolution_commitment_id; transfers_permission const false)",
+    "bundle wrapper: portability{format,source_bundle_digest,portable_evidence_only:true,transfers_permission:false} (:16-21)"
+   ],
+   "notes": "Added after the fb3d9793 pin (first present at 89e4722, 'O6-P1: accept bounded authority-lineage evidence profile'). AuthorityUseLink is the only record that names a decision/effect of a downstream component. Fixture harness testing/harness/run_authority_lineage.py:14-26 (fixture_bundle), 150-156 (execute output {schema_id, case_count, fixture_sha256, results})."
+  },
+  {
+   "name": "Authorization-to-effect contract (semantics only, no schema)",
+   "defined": "process/AUTHORIZATION_EFFECT_CONTRACT.md (ODES section 8 at :140-152)",
+   "profile_id": null,
+   "profile_version": "unversioned proposal",
+   "notes": "States effect/attempt identities and commit-boundary semantics are 'proposed complementary concepts, not existing ODES requirements. No new field names or conformance profile are asserted' (:149-152). No machine-readable artifact."
+  },
+  {
+   "name": "Authority Context reference-check refusal codes (reference_errors output)",
+   "defined": "testing/harness/authority_context.py:43-144",
+   "profile_id": null,
+   "profile_version": "n/a",
+   "record_types": [
+    "sorted list of reason strings: untrusted_requirement_binding, missing_authority_basis, unbound_accountable_role, unresolved_precedence, conflicting_rules, unsupported_adoption_mode, unadopted_amendment, reserved_constitutional_process, missing_reserved_approval_requirement, invalid_unknown_semantics, no_issued_grant, delegation_cycle, requirement_binding, untrusted_issuer_mandate, identity_binding, invalid_validity_order, expired_or_not_yet_valid, missing_status, inactive_or_changed_grant, stale_status, duplicate_policy_ref, policy_changed, missing_governing_policy, unsupported_adopted_rule, grant_exceeds_requirement, action_out_of_scope, action_domain_binding, incompatible_roles, missing_or_stale_evidence, missing_or_invalid_approval, missing_or_malformed_parent, parent_binding, delegation_domain, delegation_issuer, delegation_not_permitted, child_exceeds_parent, delegation_validity, delegation_policy, delegation_drops_obligations, non_finite_value, invalid_action_limits, parent:<code>"
+   ],
+   "notes": "Fixture result envelope: testing/harness/run_authority_context.py:28 {status 'EXECUTED_LOCAL_REFERENCE_CHECKS', runtime_enforcement false, independently_reviewed false, fixture_count, passed, results}. Local reference only; 'A satisfied result is NOT a runtime authorization decision' (testing/harness/authority_context.py:4)."
+  },
+  {
+   "name": "Reference fixture shapes (snapshot / action / now)",
+   "defined": "testing/fixtures/authority-context/bases.json (bases routine, higher-consequence, delegation; snapshot keys authority_bases, accountable_roles, precedence_refs, unresolved_conflict, human_adoption_records, issuers, statuses, max_status_age_seconds, policies, actor_roles, evidence, approval_role_bindings, independent_reviewers, approvals, parents, requirement_bindings; action keys effect_id, action, target, data_scopes, amount, unit, effects, institution_id, authority_domain, acting_identity); testing/fixtures/authority-context/cases.json (44 cases, asserted at tests/test_authority_context.py:16)",
+   "profile_id": null,
+   "profile_version": "n/a",
+   "notes": "The snapshot/action shape has no schema; AUTHORITY_CONTEXT.md:144-146 says it 'must have the reference fixture shape'."
+  },
+  {
+   "name": "Archived synthetic experiment results",
+   "defined": "testing/results/*/results.json, manifest.json (carry repository_commit, e.g. testing/results/2026-10-05-authorization-effect-v1/results.json:6)",
+   "profile_id": null,
+   "profile_version": "n/a",
+   "notes": "Evidence archives of the repository's own synthetic harnesses; not a cross-component interface."
+  }
+ ],
+ "consumes": [
+  {
+   "artifact": "None from another Cognous component at runtime",
+   "where": "grep of *.py under testing/, tests/, tools/ for agent_control_plane|Control Plane|manifest|ODES|replay found no import or read of a peer artifact (only archive-manifest and replay-determinism hits in testing/harness/verify_*.py)",
+   "validation": "n/a"
+  },
+  {
+   "artifact": "Authority Context / lineage JSON documents (its own formats, as test inputs)",
+   "where": "testing/harness/authority_context.py:15-19; testing/harness/run_authority_lineage.py:114-123",
+   "validation": "jsonschema Draft 2020-12 with FormatChecker (schema first; semantics only on schema-valid input)"
+  },
+  {
+   "artifact": "Conceptual only: BitRep and The Index records as supporting_evidence_refs",
+   "where": "public-stack-v0.1/README.md:45-47 (BitRep 5b5077da..., Index d5e45d27... 'not retested'); schema process/implementation/public-stack-v0.1/authority-context.schema.json:539-548 (URI/URN pattern only)",
+   "validation": "URI/URN regex only; no authority derived (AUTHORITY_CONTEXT.md:25)"
+  },
+  {
+   "artifact": "Conceptual only: ODES v0.2 narrative",
+   "where": "process/AUTHORIZATION_EFFECT_CONTRACT.md:142-152",
+   "validation": "none; 'No ODES schema/profile/cryptographic conformance' (testing/harness/run_authorization_effect.py:220)"
+  },
+  {
+   "artifact": "Conceptual only: hub component-lock.json",
+   "where": "README.md:26,32,69,114 (links to cogno-us/cognous-open-control-stack main component-lock.json)",
+   "validation": "none; only the README text is asserted by .github/workflows/readme-guides.yml:26-27"
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "file": ".github/workflows/readme-guides.yml",
+   "line": 26,
+   "peer": "this repo / hub lock (Authority Context selection)",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "CI asserts the string appears in README.md"
+  },
+  {
+   "file": ".github/workflows/readme-guides.yml",
+   "line": 27,
+   "peer": "this repo accepted main",
+   "value": "89e4722b0b7b9337d47f36afd28a28b076b128fd",
+   "purpose": "CI asserts the string appears in README.md"
+  },
+  {
+   "file": "README.md",
+   "line": 32,
+   "peer": "hub (cognous-open-control-stack) lock",
+   "value": "selects fb3d97938969a89e149e8ff8db2756091d1233fc; accepted main 89e4722b0b7b9337d47f36afd28a28b076b128fd; mentions older hub link 5737267d...",
+   "purpose": "documents selection; no code reads it"
+  },
+  {
+   "file": "collateral/one-page-overview.md",
+   "line": 26,
+   "peer": "hub",
+   "value": "hub blob link at 5737267d94d2b445735c95e8480a31de73a2abe8 selecting fb3d97938969a89e149e8ff8db2756091d1233fc",
+   "purpose": "documentation"
+  },
+  {
+   "file": "collateral/business-collateral.md",
+   "line": "39,41,65",
+   "peer": "hub",
+   "value": "fb3d97938969a89e149e8ff8db2756091d1233fc (39); hub 5737267d94d2b445735c95e8480a31de73a2abe8 (41,65); repo 6ed0b34b6ef6a5732457b556c74cddbeb94922a1 (65)",
+   "purpose": "documentation"
+  },
+  {
+   "file": "process/implementation/public-stack-v0.1/README.md",
+   "line": "15, 45-46",
+   "peer": "BitRep / The Index",
+   "value": "baseline 76cdff90d0370632faa4e033749c552fd6bbd37d (15); BitRep 5b5077dafde232a7801cb425c4efddcffb468723 and Index d5e45d275cb301d9684b543e93b05997991d1cf2 (45-46)",
+   "purpose": "documentation of supplied baselines"
+  },
+  {
+   "file": "process/implementation/authority-lineage-v0.1/README.md",
+   "line": 37,
+   "peer": "this repo",
+   "value": "1386fd236f13896029e5ab47ba5b9c3127509c3d",
+   "purpose": "source branch baseline for lineage profile"
+  },
+  {
+   "file": "process/implementation/public-stack-v0.1/authority-context.schema.json",
+   "line": "3,9,12",
+   "peer": "consumers of Authority Context",
+   "value": "$id urn:cognous:alvorada:authority-context:0.1.0; schema_version const 0.1.0; interface_status const proposed_pending_governor_review",
+   "purpose": "exact-version gate: the schema rejects any other version or status (AUTHORITY_CONTEXT.md:18, public-stack README 'Exact version support is required')"
+  },
+  {
+   "file": "process/implementation/authority-lineage-v0.1/authority-lineage.schema.json",
+   "line": "3,8,9",
+   "peer": "consumers of lineage bundles",
+   "value": "urn:cognous:alvorada:authority-lineage:0.1.0; const 0.1.0; const proposed_non_authorizing_evidence_only",
+   "purpose": "exact-version gate"
+  },
+  {
+   "file": "testing/harness/requirements-authority.txt; testing/harness/requirements-authority-lineage.txt",
+   "line": "2 / 1",
+   "peer": "jsonschema (non-Cognous)",
+   "value": "jsonschema==4.26.0 (authority) ; jsonschema>=4.18,<5 (lineage)",
+   "purpose": "validator version"
+  }
+ ],
+ "hard_coded_peer_pins_note": "No Cognous peer commit sha or peer profile id is hard-coded in executable code in this repo; the only peer-related pins are in the README-assertion workflow (readme-guides.yml:26-27) and in documentation. This repo is itself pinned by peers (runtime engine/safe_executor.py:18 ALVORADA_COMMIT = fb3d9793, unused).",
+ "unwritten_consumer_rules": [
+  {
+   "file": "testing/harness/authority_context.py",
+   "line": "135",
+   "rule": "Child delegation requires parent.delegation.may_delegate true and parent.remaining_depth strictly greater than child's remaining_depth. 'bounded depth' is described (AUTHORITY_CONTEXT.md:88-91) but strict decrement is not.",
+   "peer": "grant issuer/Control Plane delegation chain"
+  },
+  {
+   "file": "testing/harness/authority_context.py",
+   "line": "87",
+   "rule": "Grant issuer must match a 5-tuple (issuer, issuer_role, issuance_record_ref, institution_id, authority_domain) present in snapshot['issuers']; tuple shape is specified only by fixtures.",
+   "peer": "authoritative resolver snapshot"
+  },
+  {
+   "file": "testing/harness/authority_context.py",
+   "line": "91-97",
+   "rule": "Status record must have grant_id==grant, revision==grant.revision, state=='active' and 0<=age<=snapshot.max_status_age_seconds (future-dated observations refused). Max age is described abstractly (AUTHORITY_CONTEXT.md:80-84, 125) but the future-timestamp refusal and exact field names are fixture-defined.",
+   "peer": "status resolver"
+  },
+  {
+   "file": "testing/harness/authority_context.py",
+   "line": "110-111",
+   "rule": "Required authorization evidence must be a snapshot fact with state=='satisfied', source_ref equal to obligation and effect_id equal to action.effect_id, age within max_age_seconds. The effect_id binding is not in AUTHORITY_CONTEXT.md.",
+   "peer": "evidence source"
+  },
+  {
+   "file": "testing/harness/authority_context.py",
+   "line": "115-121",
+   "rule": "Approval adequacy: state 'approved', role_id match, approver in approval_role_bindings, grant_id and grant_revision match, binding equals SHA-256 of sorted compact JSON of the action (AC:26-27), policy_versions equal grant's, validity window, independence via snapshot['independent_reviewers']. Binding recipe is documented as local fixture convention (AUTHORITY_CONTEXT.md:49-51), the rest is not enumerated.",
+   "peer": "approval store"
+  },
+  {
+   "file": "testing/harness/authority_context.py",
+   "line": "139",
+   "rule": "Delegated grants must carry identical requirement.approvals, requirement.evidence and conflicts as the parent (strict equality); documented as 'conservative subset' (AUTHORITY_CONTEXT.md:96-100).",
+   "peer": "parent grant"
+  },
+  {
+   "file": "testing/harness/run_authority_lineage.py",
+   "line": "33,47,69",
+   "rule": "Bundle record ids must be globally unique across all six sections ('duplicate record id'); delegation parent_revision must equal the parent's current revision; each mutation's prior_revision must equal the authority's revision at that point. None of these three is stated in authority-lineage README (invariants 1-8 at README:20-29).",
+   "peer": "lineage bundle producer"
+  },
+  {
+   "file": "testing/harness/run_authority_lineage.py",
+   "line": "105-110",
+   "rule": "AuthorityUseLink.used_at must not precede commitment.resolution_time; a commitment older than a later effective mutation is stale (README invariant 4 covers staleness; the not-before-resolution ordering is only in code).",
+   "peer": "lineage bundle producer / decision-effect record"
+  },
+  {
+   "file": "testing/harness/authority_context.py",
+   "line": "76-77",
+   "rule": "T4 consequence always refused as 'reserved_constitutional_process'; T2/T3 require non-empty requirement.approvals. Mentioned only in testing/fixtures/authority-context/README.md:47 as fixture coverage, not in AUTHORITY_CONTEXT.md.",
+   "peer": "requirement author"
+  }
+ ],
+ "unwritten_rules_method": "Read authority_context.py and run_authority_lineage.py in full; for each distinct check grepped process/, docs/, testing/fixtures/authority-context/*.md and README.md for the field name or reason code (T4, remaining_depth, prior_revision, parent_revision, 'duplicate record', max_status_age, issuance_record_ref, principle_inspired). Rules marked unwritten had no match outside schema/examples/code. Not every research/ and history/ file was read. Note: these are checks on fixture/snapshot inputs; the repo enforces nothing on a live peer's output.",
+ "external_deps": [
+  "jsonschema (4.26.0 / >=4.18,<5) Draft 2020-12 + FormatChecker (testing/harness/requirements-authority.txt:2, requirements-authority-lineage.txt:1)",
+  "Python stdlib sqlite3 (testing/harness/run_authorization_effect.py)",
+  "GitHub Actions actions/checkout@v4, actions/setup-python@v5 (.github/workflows/*.yml)",
+  "Conceptual references: BitRep, The Index, ODES v0.2 narrative (supplied inputs, not code deps)"
+ ],
+ "notes": [
+  "Gov has no machine-consumed export carrying an ODES-style lifecycle. The only artifacts a decoupled ODES plan could bind to are the Authority Context 0.1.0 schema (stable between pin and main) and the lineage 0.1.0 schema (post-pin only; AuthorityUseLink links decision_id/effect_id).",
+  "Both interfaces are labelled proposed, pending Governor review, and say no cross-repository compatibility or ODES conformance is claimed (AUTHORITY_CONTEXT.md:156-157; AUTHORIZATION_EFFECT_CONTRACT.md:149-152; authority-lineage README.md:35-39). Any decoupling plan must not cite them as conformance evidence.",
+  "Moving the pin from fb3d9793 to main adds the lineage profile but leaves the Authority Context schema byte-identical; the runtime's ALVORADA_COMMIT constant (engine/safe_executor.py:18) is unused, so the pin has no executable effect there.",
+  "The snapshot/action shape the reference checker needs is defined by fixtures and code only; no schema (AUTHORITY_CONTEXT.md:144-146 states the caller must supply 'the reference fixture shape'); reference_errors may raise on malformed input (authority_context.py:46-52).",
+  "Hub component-lock.json is referenced by URL in README.md:26,32,69,114 but not present or validated here; CI only asserts two sha strings appear in README text (readme-guides.yml:26-27).",
+  "Local main (bae4bce) differs from the README's stated accepted main 89e4722b by the commits after it (e.g. f5b governance finalization #48, Counter/symlink/non-finite fixes); not an interface change."
+ ]
+}

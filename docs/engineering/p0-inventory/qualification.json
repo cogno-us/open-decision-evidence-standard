@@ -1,0 +1,450 @@
+{
+ "repo": "cogno-us/cognous-stack-qualification",
+ "commit": "7aa2dbfb5a73ce6bbccd370b346c5c11e676386f",
+ "produces": [
+  {
+   "artifact": "single source of pins for V1 harness",
+   "file": "suites/_pins.py",
+   "lines": "1-15 (docstring), 128-147 (component_pins/pinned_sources/profile_pins), 203-233 (resolved constants)"
+  },
+  {
+   "artifact": "freeze manifest (original, never edited)",
+   "file": "process/v1-validation/v1-2026-10-16-a/freeze-manifest.json",
+   "lines": "55-98 components_subject (7), 99-124 components_lock_remainder (3), 125-140+ components_optional (3), 12 identities"
+  },
+  {
+   "artifact": "refreeze overlay log RF-1..RF-10 (all status 'APPLIED-IN-WORKFLOW (pending full controller run)')",
+   "file": "process/v1-validation/v1-2026-10-16-a/refreeze-log.json",
+   "lines": "RF-1 7, RF-2 24, RF-3 36, RF-4 51, RF-5 67, RF-6 82, RF-7 97, RF-8 115, RF-9 130, RF-10 145"
+  },
+  {
+   "artifact": "qualification profiles",
+   "files": [
+    "process/security-runtime-f5b-20261016.json",
+    "process/security-runtime-f5b-20261016-r1.json",
+    "process/security-runtime-f5b-20261016-r2.json"
+   ],
+   "note": "r2 revisions at lines 32,36,40,44,48,52,56"
+  },
+  {
+   "artifact": "reusable component workflows",
+   "files": ".github/workflows/<component>--*.yml (many); v1-validation.yml controller"
+  }
+ ],
+ "consumes": [
+  {
+   "what": "components via checkouts on sys.path",
+   "detail": "SCN_COMPONENTS_DIR/{control_plane,runtime,replay,evidence_pack,odes,exchange,manifest} (suites/v1-scenarios/_d02_d05_d09_helpers.py:13,67-69,80); sys.path insert order at :93; env MOLTBOT_SAFE_CONTROL_PLANE_ROOT/MOLTBOT_SAFE_ROOT/UPSTREAM_MANIFEST_EXAMPLE at :90-92; BitRep and Index appended to sys.path in _c_2b_helpers.py:188,333,353"
+  },
+  {
+   "what": "hub checkout SCN_HUB_DIR verified pristine at hub head",
+   "file": "suites/v1-scenarios/_d02_d05_d09_helpers.py",
+   "lines": "15,82,124 (require_pristine against FROZEN_HUB)"
+  }
+ ],
+ "hard_coded_peer_pins": [
+  {
+   "role": "DEFINED (original)",
+   "file": "process/v1-validation/v1-2026-10-16-a/freeze-manifest.json",
+   "lines": "58,64,70,76,82,88,94 (subject: CP a34c3dc2, runtime e20f92e1, replay 79ba16d4, pack 893aca8d, odes eb83220c, exchange 8be6c6b8, manifest 2c36bcd0), 102,110,118 (bitrep 5b5077da, index d5e45d27, authority fb3d9793), 128,134,140 (prp cb137f02, research 30c7274b, tfa 442d07b4)"
+  },
+  {
+   "role": "DEFINED (overlay, in force)",
+   "file": "process/v1-validation/v1-2026-10-16-a/refreeze-log.json",
+   "entries": {
+    "RF-1 the_index": "d5e45d27->d17b8ac2",
+    "RF-2 moltbot_safe": "e20f92e1->4a83b175",
+    "RF-3 replay_bundle": "79ba16d4->0cfe7a63",
+    "RF-4 odes": "eb83220c->4e6d1169",
+    "RF-5 governance_evidence_pack": "893aca8d->683246e0",
+    "RF-6 gax_imx_transport": "8be6c6b8->da953782",
+    "RF-7 replay_bundle": "0cfe7a63->def0ee0f",
+    "RF-8 odes": "4e6d1169->5675f1b9",
+    "RF-9 governance_evidence_pack": "683246e0->505a3590",
+    "RF-10 gax_imx_transport": "da953782->ec6ba5bd"
+   },
+   "effective_pins_after_overlay": {
+    "the_index": "d17b8ac2b8445d385fbf51185a35914b2d8b835c",
+    "moltbot_safe": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f",
+    "replay_bundle": "def0ee0f3af713283ea3cd13f0caf79e1607b651",
+    "governance_evidence_pack": "505a3590114705b7ebf736b92dd189f338134635",
+    "odes": "5675f1b96d95ba69510656bf73b1006110ef5b57",
+    "gax_imx_transport": "ec6ba5bdaaf3a53db312790de5e60e90c3b92fe4",
+    "control_plane": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
+    "action_manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e"
+   }
+  },
+  {
+   "role": "RESOLVER",
+   "file": "suites/_pins.py",
+   "lines": "32-50 (log-component alias map), 96-118 apply_overlay (rejects from_sha != pin in force), 183-199 select_profile (newest r<N> profile whose refreeze_ids all APPLIED), 203-233 constants FROZEN_HUB/RUNTIME/CONTROL_PLANE/REPLAY/EVIDENCE_PACK/ODES/EXCHANGE/MANIFEST_COMPONENT/BITREP/INDEX, OLD_INDEX_PIN, REFROZEN_INDEX_PIN, PROFILE_PINS, C14_PINS(231-233)",
+   "derived": "yes: all derived from manifest + log at import time; hard-coded: ORIGINAL_PROFILE/R1/R2 filenames (25-27), default validation id 'v1-2026-10-16-a' (58)"
+  },
+  {
+   "role": "PROFILES (hard-coded duplicate of overlay end state)",
+   "file": "process/security-runtime-f5b-20261016-r2.json",
+   "lines": "32,36,40,44,48,52,56",
+   "values": "CP a34c3dc2, runtime 4a83b175, replay def0ee0f, pack 505a3590, odes 5675f1b9, exchange ec6ba5bd, manifest 2c36bcd0"
+  },
+  {
+   "role": "WORKFLOW ENV (hard-coded duplicate)",
+   "file": ".github/workflows/v1-validation.yml",
+   "lines": "30-32 (MANIFEST, REFREEZE_LOG, V1_PROFILE=r2)",
+   "pins": "hub ref 8517818fbf817897aacfb6fe7898c22aea46fd95 at 63,128,190,306,403; probe matrix shas at 243-251 (index d17b8ac2, bitrep 5b5077da, runtime 4a83b175, replay def0ee0f, pack 505a3590, odes 5675f1b9, CP a34c3dc2, authority fb3d9793, manifest 2c36bcd0); checkout refs 318 (index d17b8ac2), 324 (bitrep 5b5077da), 391 (runtime 4a83b175), 397 (CP a34c3dc2)",
+   "note": "component-suite matrix is derived: plan job runs tools/v1_validation.py plan (line 44) from manifest+log; probe matrix 243-251 is NOT derived"
+  },
+  {
+   "role": "TOOL consumer",
+   "file": "tools/v1_validation.py",
+   "lines": "32 (import _pins), 63-64 (apply_overlay), 169 (check from_sha equals pin in force), 351 (pinned_sources), 626-644 (CLI --manifest/--refreeze-log)"
+  },
+  {
+   "role": "SCENARIO helpers consuming _pins",
+   "files": [
+    "suites/v1-scenarios/_c_2b_helpers.py:48-50 (FROZEN_INDEX, FROZEN_BITREP; docstring :9-10 repeats old index d5e45d27 and bitrep literals)",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:45-52,184 (PROFILE_PATH, FROZEN_HUB, FROZEN_RUNTIME, FROZEN_CONTROL_PLANE, PROFILE_RELPATH)",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:41-47",
+    "suites/v1-scenarios/test_scn_c14.py:30,40 (C14_PINS)",
+    "suites/v1-scenarios/test_asw_s.py:29,138 (PROFILE_RELPATH)",
+    "suites/v1-scenarios/test_add_test_g1.py:40,73-95,147,189 (RESOLVED_MANIFEST, ORIGINAL_MANIFEST, GENERATIONS, classify_generation)",
+    "suites/v1-scenarios/_index_signing.py:208-211 and suites/v1-probes/_index_signing.py:208-211 (OLD_INDEX_PIN, REFROZEN_INDEX_PIN)",
+    "suites/v1-probes/test_provenance_probes.py:44,66,70 (pinned_sources)",
+    "tests/test_refreeze_overlay.py (21 hex literals, unit tests of resolver)"
+   ]
+  },
+  {
+   "role": "LITERAL pins in scenario/probe code",
+   "items": [
+    "suites/v1-scenarios/test_scn_c12.py:154 HISTORICAL_CP 248d8996",
+    "suites/v1-probes/test_authority_probes.py:343 BASELINE 76cdff90",
+    "suites/security-runtime/test_security_runtime_chain.py:220 replay 83fbaf2a (refusal generation, injected into package provenance)",
+    "suites/v1-scenarios/test_add_c2c_c1doc.py:8 hub 8517818f in docstring",
+    "suites/v1-scenarios/_c_2b_helpers.py:9-10 docstring literals"
+   ]
+  },
+  {
+   "role": "ODES suite literals",
+   "files": [
+    "suites/open-decision-evidence-standard/tests/test_accepted_replay_profile.py:18-19 (MOLTBOT_REVISION 1d308faf, REPLAY_REVISION f63ce914)",
+    "suites/open-decision-evidence-standard/qualification/test_merged_producer.py:10 imports MERGED_REVISIONS, :211 SUPPORTED_V2_REPLAY_REVISIONS from odes.common",
+    "suites/open-decision-evidence-standard/qualification/test_refusal_profile.py:6 imports REFUSAL_REVISIONS from odes.common",
+    "suites/open-decision-evidence-standard/scripts/qualify_merged_producer.py:11, qualify_producer_v2.py:11 import pin constants from odes.common",
+    "suites/open-decision-evidence-standard/tests/test_accepted_replay_profile.py:13 imports PINNED_REVISIONS"
+   ]
+  },
+  {
+   "role": "COMPONENT workflows with per-component checkout refs (hard-coded)",
+   "files": {
+    ".github/workflows/open-decision-evidence-standard--tests.yml": "refs 50,56,62,68,74,80,86,92,98 and 'test ... rev-parse HEAD = sha' assertions 101-117; default source_revision cb1898f2 at 33",
+    "open-decision-evidence-standard--merged-producers.yml": "refs 56,61,66,71 (manifest 46c950be, replay 459e4ba6, CP d3dadee7, runtime c3c3ee71); source_revision default cb1898f2 at 40",
+    "open-decision-evidence-standard--typed-refusal.yml": "refs 52,57,62,67 and asserts 75-81; default source_revision 25c7ad60 at 35",
+    "cognous-governance-evidence-pack--*.yml": "merged-producers.yml 56-71, source_revision default 1e789c7d at 40"
+   },
+   "workflows_with_40hex_refs_excluding_actions": ">=30 files; top: evidence-pack--tests 23, odes--tests 19, v1-validation 18, replay--tests 15, exchange--tests 15, exchange--merged-consumer-chain 13"
+  }
+ ],
+ "unwritten_consumer_rules": [
+  {
+   "rule": "Alias table: refreeze log may name a component by manifest key or by profile name (runtime, replay, evidence_pack, exchange, manifest)",
+   "file": "suites/_pins.py",
+   "lines": "30-50"
+  },
+  {
+   "rule": "Retained evidence must be internally one pin generation or classify_generation raises",
+   "file": "suites/_pins.py",
+   "lines": "165-180"
+  },
+  {
+   "rule": "Scenario code assumes the qualification repo 'tests' package is evicted from sys.modules so Control Plane's own tests package resolves",
+   "file": "suites/v1-scenarios/_d02_d05_d09_helpers.py;_d06_d07_d08_helpers.py",
+   "lines": "98-101;100-103"
+  },
+  {
+   "rule": "Scenarios assume the Control Plane exposes bounded._now as a patchable clock and bounded._canonical_bytes as the signing canonicalisation (see reach_ins)",
+   "file": "see notes.reach_ins"
+  },
+  {
+   "rule": "Scenarios assume destination objects expose _check_commit_profile and _connect (SQLite) (see reach_ins)",
+   "file": "see notes.reach_ins"
+  }
+ ],
+ "external_deps": [
+  "pytest (55 imports in main suites), cryptography (16), fastapi (9), sqlalchemy (3), pydantic (1), yaml (1) in v1 scenario/probe suites",
+  "component checkouts (control_plane, runtime, replay, evidence_pack, odes, exchange, manifest, bitrep, index, authority) supplied via env dirs",
+  "nodejs driver suites/v1-scenarios/_c_index_chain_driver.mjs, suites/v1-probes/index_supersession_driver.mjs"
+ ],
+ "notes": {
+  "reach_ins": {
+   "definition_used": "Private (single-underscore) names imported/patched/called on a component module or object, plus imports of component test packages or non-package-root internal modules. Public status of submodules not verified against component __all__; the full submodule import list is given separately.",
+   "private_symbol_imports": [
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:376 odes.recipient_validator._evaluate_replay_semantics (called :378)",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:603 odes.recipient_validator._material_package_content and _package_core (used :605-606)",
+    "suites/security-runtime/test_security_runtime_chain.py:207,217 odes.recipient_validator._evaluate_replay_semantics (called :208,:221)",
+    "suites/v1-scenarios/test_scn_c03.py:652,665,677 agent_control_plane.bounded._canonical_bytes (used :654,668,679)",
+    "suites/v1-probes/test_authority_ra_probes.py:315 agent_control_plane.bounded._canonical_bytes (used :316)"
+   ],
+   "private_attribute_monkeypatch_agent_control_plane_bounded__now": [
+    "suites/v1-scenarios/_c_2a_helpers.py:46-47",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:311-312",
+    "suites/v1-scenarios/test_add_c2c_bi.py:200-201",
+    "suites/v1-scenarios/test_scn_d09.py:174",
+    "suites/v1-probes/test_authority_ra_probes.py:24",
+    "suites/v1-probes/test_control_plane_probes.py:111",
+    "suites/security-runtime/test_security_runtime_chain.py:37",
+    "suites/runtime-authority/test_runtime_authority_chain.py:23",
+    "suites/open-decision-evidence-standard/qualification/refusal_sources.py:24"
+   ],
+   "private_methods_on_runtime_destination_objects": [
+    "_check_commit_profile (read and replaced with a hook): suites/v1-scenarios/test_add_c2c_evid.py:228,242; test_asw_r.py:88; test_scn_c07.py:137,151; test_scn_c08.py:79; test_scn_d09.py:388,396",
+    "_connect() (raw SQLite connection): suites/v1-scenarios/test_scn_c11.py:100,116,220,367; test_scn_d09.py:485",
+    "object types inferred from construction: EffectiveGrantDestination (_c_2a_helpers.py:49), hooked atomic class (_c_2a_helpers.py:179), AtomicAuthorityEffectDestination (_c_2c_helpers.py:87); not confirmed against component source"
+   ],
+   "component_test_packages_imported": [
+    "tests.test_bounded_authorization and tests.test_runtime_authority (Control Plane repo tests): suites/v1-scenarios/_asw_helpers.py:188-189,202-203; _d02_d05_d09_helpers.py:111-112; test_scn_c03.py:666,678; suites/v1-probes/test_authority_ra_probes.py:23,28; suites/security-runtime/test_security_runtime_chain.py:12; suites/runtime-authority/test_runtime_authority_chain.py:12",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:764-765 loads suites/cognous-execution-runtime/tests/test_local_authority_effect.py by file path as module scn_c1_helpers",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:102-109 and _d06_d07_d08_helpers.py:104-106 load suites/security-runtime/test_security_runtime_chain.py by file path"
+   ],
+   "experiments_package_imports": [
+    "experiments.odex_gax_imx_reference: suites/v1-scenarios/test_add_molt_verify.py:296,326,365,366; test_scn_d06.py:332; suites/security-runtime/test_security_runtime_chain.py:226"
+   ],
+   "bitrep_index_internal_modules": [
+    "suites/v1-scenarios/_c_2b_helpers.py:189-191 (models.verification, utils.trust, utils.verification), 272-274 (db.connection.Base, api.attestations, models.attestation), 336-339 and 346 (app.claims.service, app.evidence.service, app.governance.service, app.api.*, app.main), 354 (bitrep_adapter)",
+    "suites/v1-scenarios/_index_signing.py:91-92,128-129 and suites/v1-probes/_index_signing.py:91-92,128-129 (app.bitrep_verify.models/verification)",
+    "suites/v1-scenarios/test_scn_c03.py:497 (app.bitrep_verify)",
+    "suites/v1-probes/conftest.py:54-57,64",
+    "suites/v1-probes/test_bitrep_probes.py:37-38,49-50,96,119,128,137,149",
+    "suites/v1-probes/test_index_probes.py:87",
+    "suites/v1-probes/test_index_supersession_probes.py:61-62"
+   ],
+   "qualification_helper_privates_not_component_reach_ins": "H2._flag_replay (test_scn_c12.py:58) and Observer._hook (_c_2b_helpers.py:410-417) are qualification-owned, excluded",
+   "mutation_label_strings_excluded": "odes.* strings at _d06_d07_d08_helpers.py:581-596 are mutation names, not imports",
+   "counts": {
+    "private_symbol_import_lines": 8,
+    "private_symbol_import_files": 4,
+    "bounded__now_patch_sites": 9,
+    "private_destination_method_lines": 13,
+    "component_test_package_import_files": 6,
+    "bitrep_index_internal_import_files": 7,
+    "submodule_import_lines_main_suites": 206
+   },
+   "submodule_import_list_in_v1_scenarios_probes_security_runtime_runtime_authority": [
+    "suites/v1-scenarios/_c_2a_helpers.py:46 import agent_control_plane.bounded",
+    "suites/v1-scenarios/_c_2a_helpers.py:177 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/_c_2c_helpers.py:85 from engine.local_authority_effect -> AtomicAuthorityEffectDestination",
+    "suites/v1-scenarios/_c_2c_helpers.py:85 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:311 import agent_control_plane.bounded",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:456 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:507 from engine.safe_executor -> snapshot_envelope",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:545 from engine.safe_executor -> snapshot_envelope",
+    "suites/v1-scenarios/_d02_d05_d09_helpers.py:437 from engine.local_authority_effect -> AtomicAuthorityEffectDestination",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:308 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:309 from odes -> export_cognous_stack_package",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:349 from agent_replay_bundle.importers -> import_bounded_workflow",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:360 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:361 from agent_governance_evidence_pack -> validate_evidence_pack",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:375 from odes -> evaluate_recipient_package",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:376 from odes.recipient_validator -> _evaluate_replay_semantics",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:389 from odes -> export_cognous_stack_package",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:398 from agent_governance_evidence_pack.loader -> load_evidence_pack_json",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:399 from agent_governance_evidence_pack -> validate_evidence_pack",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:603 from odes.recipient_validator -> _material_package_content",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:603 from odes.recipient_validator -> _package_core",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:604 from odes.common -> sha256",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:1006 from engine.producer_contract -> export_execution_artifacts",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:767 from engine.safe_executor -> LocalExecutionPolicy",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:768 from engine.local_authority_effect -> AtomicAuthorityEffectDestination",
+    "suites/v1-scenarios/_d06_d07_d08_helpers.py:768 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/test_add_c2c_bi.py:200 import agent_control_plane.bounded",
+    "suites/v1-scenarios/test_add_c2c_bi.py:148 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/test_add_c2c_bi.py:211 from engine.safe_executor -> snapshot_envelope",
+    "suites/v1-scenarios/test_add_c2c_bi.py:246 from engine.refund_intent -> RefundIntent",
+    "suites/v1-scenarios/test_add_c2c_bi.py:246 from engine.refund_intent -> RefundIntentRegistry",
+    "suites/v1-scenarios/test_add_c2c_bi.py:247 from engine.safe_executor -> snapshot_envelope",
+    "suites/v1-scenarios/test_add_c2c_c1doc.py:195 from engine.atomic_local_control_plane_executor -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/test_add_molt_verify.py:126 from engine.safe_executor -> ExecutionEnvelope",
+    "suites/v1-scenarios/test_add_molt_verify.py:126 from engine.safe_executor -> ExecutionOperation",
+    "suites/v1-scenarios/test_add_molt_verify.py:126 from engine.safe_executor -> LocalExecutionPolicy",
+    "suites/v1-scenarios/test_add_molt_verify.py:126 from engine.safe_executor -> FrozenEnvelope",
+    "suites/v1-scenarios/test_add_molt_verify.py:131 from agent_control_plane.bounded -> AuthorizationBinding",
+    "suites/v1-scenarios/test_add_molt_verify.py:131 from agent_control_plane.bounded -> RuntimeDecision",
+    "suites/v1-scenarios/test_add_molt_verify.py:51 from agent_control_plane.bounded -> GrantStatus",
+    "suites/v1-scenarios/test_add_molt_verify.py:314 from engine.safe_executor -> ExecutionOperation",
+    "suites/v1-scenarios/test_add_molt_verify.py:314 from engine.safe_executor -> ExecutionEnvelope",
+    "suites/v1-scenarios/test_asw_a.py:182 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/test_asw_s.py:338 from agent_control_plane.local_authority_effect -> LocalExecutionClaim",
+    "suites/v1-scenarios/test_asw_s.py:339 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/test_asw_s.py:401 from agent_governance_evidence_pack -> EvidencePack",
+    "suites/v1-scenarios/test_asw_s.py:401 from agent_governance_evidence_pack -> validate_evidence_pack",
+    "suites/v1-scenarios/test_asw_s.py:402 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/v1-scenarios/test_scn_c01.py:40 import engine",
+    "suites/v1-scenarios/test_scn_c01.py:40 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_c02.py:53 import engine",
+    "suites/v1-scenarios/test_scn_c02.py:53 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_c03.py:652 from agent_control_plane.bounded -> _canonical_bytes",
+    "suites/v1-scenarios/test_scn_c03.py:665 from agent_control_plane.bounded -> _canonical_bytes",
+    "suites/v1-scenarios/test_scn_c03.py:677 from agent_control_plane.bounded -> _canonical_bytes",
+    "suites/v1-scenarios/test_scn_c06.py:39 import engine",
+    "suites/v1-scenarios/test_scn_c06.py:39 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_c07.py:52 import engine",
+    "suites/v1-scenarios/test_scn_c07.py:52 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_c08.py:40 import engine",
+    "suites/v1-scenarios/test_scn_c08.py:40 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_c09.py:40 import engine",
+    "suites/v1-scenarios/test_scn_c09.py:40 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_c09.py:137 from engine.safe_executor -> LocalDestinationExecutor",
+    "suites/v1-scenarios/test_scn_c10.py:63 from engine.local_authority_effect -> AtomicAuthorityEffectDestination",
+    "suites/v1-scenarios/test_scn_c10.py:58 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-scenarios/test_scn_c10.py:61 from engine.effective_grant -> EffectiveGrantDestination",
+    "suites/v1-scenarios/test_scn_c11.py:182 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/test_scn_c11.py:345 from engine.safe_executor -> LocalDestinationExecutor",
+    "suites/v1-scenarios/test_scn_c12.py:53 from agent_replay_bundle.importers -> import_bounded_workflow",
+    "suites/v1-scenarios/test_scn_c12.py:64 from odes -> evaluate_recipient_package",
+    "suites/v1-scenarios/test_scn_c12.py:446 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/v1-scenarios/test_scn_c12.py:451 from odes -> export_cognous_stack_package",
+    "suites/v1-scenarios/test_scn_c13.py:49 import agent_replay_bundle",
+    "suites/v1-scenarios/test_scn_c13.py:180 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/v1-scenarios/test_scn_c13.py:181 from agent_governance_evidence_pack -> validate_evidence_pack",
+    "suites/v1-scenarios/test_scn_c13.py:182 from odes -> export_cognous_stack_package",
+    "suites/v1-scenarios/test_scn_c13.py:182 from odes -> evaluate_recipient_package",
+    "suites/v1-scenarios/test_scn_c13.py:409 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/v1-scenarios/test_scn_c13.py:410 from odes -> export_cognous_stack_package",
+    "suites/v1-scenarios/test_scn_c13.py:439 from odes -> evaluate_recipient_package",
+    "suites/v1-scenarios/test_scn_c13.py:481 from odes -> evaluate_recipient_package",
+    "suites/v1-scenarios/test_scn_c14.py:85 from odes -> evaluate_recipient_package",
+    "suites/v1-scenarios/test_scn_c14.py:210 from odes.common -> sha256",
+    "suites/v1-scenarios/test_scn_c16.py:48 import engine",
+    "suites/v1-scenarios/test_scn_c16.py:315 from engine.safe_executor -> snapshot_envelope",
+    "suites/v1-scenarios/test_scn_c17.py:60 import engine",
+    "suites/v1-scenarios/test_scn_c18.py:66 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_c18.py:66 import engine",
+    "suites/v1-scenarios/test_scn_c18.py:436 from engine -> local_authority_effect",
+    "suites/v1-scenarios/test_scn_c22.py:222 from engine.local_authority_effect -> AtomicLocalControlPlaneExecutor",
+    "suites/v1-scenarios/test_scn_c22.py:235 from engine.safe_executor -> commitment",
+    "suites/v1-scenarios/test_scn_d02.py:46 import engine",
+    "suites/v1-scenarios/test_scn_d02.py:46 import agent_control_plane",
+    "suites/v1-scenarios/test_scn_d05.py:33 import engine",
+    "suites/v1-scenarios/test_scn_d09.py:99 import engine",
+    "suites/v1-scenarios/test_scn_d09.py:281 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-scenarios/test_scn_d09.py:281 from engine.safe_executor -> LocalDestinationExecutor",
+    "suites/v1-scenarios/test_scn_d09.py:302 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-scenarios/test_scn_d09.py:302 from engine.safe_executor -> LocalDestinationExecutor",
+    "suites/v1-scenarios/test_scn_d09.py:303 from engine.refund_intent -> RefundIntentRegistry",
+    "suites/v1-scenarios/test_scn_d09.py:326 from engine.engine -> AgentEngine",
+    "suites/v1-scenarios/test_scn_d09.py:239 from engine.control_plane_adapter -> ControlPlaneRefundDestinationAdapter",
+    "suites/v1-probes/test_authority_ra_probes.py:22 import agent_control_plane.bounded",
+    "suites/v1-probes/test_authority_ra_probes.py:123 from agent_control_plane.bounded -> CheckEvent",
+    "suites/v1-probes/test_authority_ra_probes.py:218 from agent_control_plane.bounded -> BoundedRecordStore",
+    "suites/v1-probes/test_authority_ra_probes.py:218 from agent_control_plane.bounded -> CheckEvent",
+    "suites/v1-probes/test_authority_ra_probes.py:218 from agent_control_plane.bounded -> commitment",
+    "suites/v1-probes/test_authority_ra_probes.py:315 from agent_control_plane.bounded -> _canonical_bytes",
+    "suites/v1-probes/test_authority_ra_probes.py:441 from agent_control_plane.bounded -> commitment",
+    "suites/v1-probes/test_authority_ra_probes.py:505 from agent_control_plane.reason_vocabulary -> refusal_trends",
+    "suites/v1-probes/test_authority_ra_probes.py:548 from agent_control_plane.bounded -> commitment",
+    "suites/v1-probes/test_authority_ra_probes.py:560 from agent_control_plane.runtime_authority -> RuntimeAuthorityProfile",
+    "suites/v1-probes/test_authority_ra_probes.py:622 from agent_control_plane.bounded -> commitment",
+    "suites/v1-probes/test_authority_ra_probes.py:623 from agent_control_plane.reason_vocabulary -> VocabularyChange",
+    "suites/v1-probes/test_authority_ra_probes.py:661 from agent_control_plane.reason_vocabulary -> refusal_trends",
+    "suites/v1-probes/test_control_plane_probes.py:30 import agent_control_plane.bounded",
+    "suites/v1-probes/test_control_plane_probes.py:73 import agent_control_plane.bounded",
+    "suites/v1-probes/test_control_plane_probes.py:109 import agent_control_plane.bounded",
+    "suites/v1-probes/test_control_plane_probes.py:131 import agent_control_plane.bounded",
+    "suites/v1-probes/test_control_plane_probes.py:140 import agent_control_plane.bounded",
+    "suites/v1-probes/test_control_plane_probes.py:154 import agent_control_plane.bounded",
+    "suites/v1-probes/test_evidence_pack_probes.py:19 import agent_governance_evidence_pack",
+    "suites/v1-probes/test_odes_probes.py:20 import odes.common",
+    "suites/v1-probes/test_odes_probes.py:21 import odes.recipient_validator",
+    "suites/v1-probes/test_replay_probes.py:18 from agent_replay_bundle -> importers",
+    "suites/v1-probes/test_runtime_probes.py:26 from engine.safe_executor -> ExecutionOperation",
+    "suites/v1-probes/test_runtime_probes.py:26 from engine.safe_executor -> LocalExecutionPolicy",
+    "suites/v1-probes/test_runtime_probes.py:26 from engine.safe_executor -> commitment",
+    "suites/v1-probes/test_runtime_probes.py:47 from engine.safe_executor -> EXECUTION_ENVELOPE_VERSION",
+    "suites/v1-probes/test_runtime_probes.py:47 from engine.safe_executor -> ExecutionEnvelope",
+    "suites/v1-probes/test_runtime_probes.py:47 from engine.safe_executor -> snapshot_envelope",
+    "suites/v1-probes/test_runtime_probes.py:54 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:64 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:72 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:79 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:89 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:99 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:116 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:116 from engine.safe_executor -> LocalDestinationExecutor",
+    "suites/v1-probes/test_runtime_probes.py:131 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:131 from engine.safe_executor -> LocalDestinationExecutor",
+    "suites/v1-probes/test_runtime_probes.py:141 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:152 from engine.safe_executor -> DurableRefundDestination",
+    "suites/v1-probes/test_runtime_probes.py:162 from engine.engine -> AgentEngine",
+    "suites/v1-probes/test_runtime_probes.py:177 from engine.effective_grant -> DERIVATION",
+    "suites/v1-probes/test_runtime_probes.py:177 from engine.effective_grant -> EffectiveGrantDestination",
+    "suites/v1-probes/test_runtime_probes.py:195 from engine.openshell_environment -> OpenShellCLI",
+    "suites/v1-probes/test_runtime_probes.py:210 from engine.openshell_environment -> OpenShellCLI",
+    "suites/security-runtime/test_security_runtime_chain.py:13 from agent_control_plane.bounded -> commitment",
+    "suites/security-runtime/test_security_runtime_chain.py:14 from engine.effective_grant -> EffectiveGrantDestination",
+    "suites/security-runtime/test_security_runtime_chain.py:14 from engine.effective_grant -> DERIVATION",
+    "suites/security-runtime/test_security_runtime_chain.py:15 from engine.safe_executor -> ExecutionOperation",
+    "suites/security-runtime/test_security_runtime_chain.py:15 from engine.safe_executor -> ExecutionEnvelope",
+    "suites/security-runtime/test_security_runtime_chain.py:15 from engine.safe_executor -> EXECUTION_ENVELOPE_VERSION",
+    "suites/security-runtime/test_security_runtime_chain.py:15 from engine.safe_executor -> LocalExecutionPolicy",
+    "suites/security-runtime/test_security_runtime_chain.py:16 from engine.control_plane_adapter -> PinnedControlPlaneExecutor",
+    "suites/security-runtime/test_security_runtime_chain.py:17 from engine.producer_contract -> export_execution_artifacts",
+    "suites/security-runtime/test_security_runtime_chain.py:18 from agent_replay_bundle.importers -> import_bounded_workflow",
+    "suites/security-runtime/test_security_runtime_chain.py:22 from agent_replay_bundle.importers -> CONTROL_PLANE_SECURITY_REVISION",
+    "suites/security-runtime/test_security_runtime_chain.py:22 from agent_replay_bundle.importers -> MOLTBOT_SECURITY_REVISION",
+    "suites/security-runtime/test_security_runtime_chain.py:30 import odes.common",
+    "suites/security-runtime/test_security_runtime_chain.py:36 import agent_control_plane.bounded",
+    "suites/security-runtime/test_security_runtime_chain.py:115 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/security-runtime/test_security_runtime_chain.py:122 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/security-runtime/test_security_runtime_chain.py:130 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/security-runtime/test_security_runtime_chain.py:130 from agent_governance_evidence_pack.importer -> RUNTIME_AUTHORITY_TRANSFORMATION_VERSION",
+    "suites/security-runtime/test_security_runtime_chain.py:134 from agent_governance_evidence_pack -> validate_evidence_pack",
+    "suites/security-runtime/test_security_runtime_chain.py:134 from agent_governance_evidence_pack -> render_traceable_markdown",
+    "suites/security-runtime/test_security_runtime_chain.py:149 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/security-runtime/test_security_runtime_chain.py:158 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/security-runtime/test_security_runtime_chain.py:165 from agent_governance_evidence_pack -> import_manifest_reconstruction",
+    "suites/security-runtime/test_security_runtime_chain.py:165 from agent_governance_evidence_pack -> validate_evidence_pack",
+    "suites/security-runtime/test_security_runtime_chain.py:173 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/security-runtime/test_security_runtime_chain.py:173 from agent_replay_bundle.importers -> CONTROL_PLANE_RUNTIME_AUTHORITY_REVISION",
+    "suites/security-runtime/test_security_runtime_chain.py:187 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/security-runtime/test_security_runtime_chain.py:198 from odes -> export_cognous_stack_package",
+    "suites/security-runtime/test_security_runtime_chain.py:198 from odes -> evaluate_recipient_package",
+    "suites/security-runtime/test_security_runtime_chain.py:207 from odes.recipient_validator -> _evaluate_replay_semantics",
+    "suites/security-runtime/test_security_runtime_chain.py:216 from odes -> export_cognous_stack_package",
+    "suites/security-runtime/test_security_runtime_chain.py:217 from odes.recipient_validator -> _evaluate_replay_semantics",
+    "suites/security-runtime/test_security_runtime_chain.py:24 from agent_replay_bundle.importers -> CONTROL_PLANE_F5B_REVISION",
+    "suites/security-runtime/test_security_runtime_chain.py:24 from agent_replay_bundle.importers -> MOLTBOT_F5B_REVISION",
+    "suites/runtime-authority/test_runtime_authority_chain.py:13 from agent_control_plane.bounded -> commitment",
+    "suites/runtime-authority/test_runtime_authority_chain.py:14 from engine.effective_grant -> EffectiveGrantDestination",
+    "suites/runtime-authority/test_runtime_authority_chain.py:14 from engine.effective_grant -> DERIVATION",
+    "suites/runtime-authority/test_runtime_authority_chain.py:15 from engine.safe_executor -> ExecutionOperation",
+    "suites/runtime-authority/test_runtime_authority_chain.py:15 from engine.safe_executor -> ExecutionEnvelope",
+    "suites/runtime-authority/test_runtime_authority_chain.py:15 from engine.safe_executor -> EXECUTION_ENVELOPE_VERSION",
+    "suites/runtime-authority/test_runtime_authority_chain.py:15 from engine.safe_executor -> LocalExecutionPolicy",
+    "suites/runtime-authority/test_runtime_authority_chain.py:16 from engine.control_plane_adapter -> PinnedControlPlaneExecutor",
+    "suites/runtime-authority/test_runtime_authority_chain.py:17 from engine.producer_contract -> export_execution_artifacts",
+    "suites/runtime-authority/test_runtime_authority_chain.py:18 from agent_replay_bundle.importers -> import_bounded_workflow",
+    "suites/runtime-authority/test_runtime_authority_chain.py:18 from agent_replay_bundle.importers -> CONTROL_PLANE_RUNTIME_AUTHORITY_REVISION",
+    "suites/runtime-authority/test_runtime_authority_chain.py:18 from agent_replay_bundle.importers -> MOLTBOT_RUNTIME_AUTHORITY_REVISION",
+    "suites/runtime-authority/test_runtime_authority_chain.py:22 import agent_control_plane.bounded",
+    "suites/runtime-authority/test_runtime_authority_chain.py:101 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/runtime-authority/test_runtime_authority_chain.py:108 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/runtime-authority/test_runtime_authority_chain.py:116 from agent_governance_evidence_pack.importer -> import_manifest_reconstruction",
+    "suites/runtime-authority/test_runtime_authority_chain.py:116 from agent_governance_evidence_pack.importer -> RUNTIME_AUTHORITY_TRANSFORMATION_VERSION",
+    "suites/runtime-authority/test_runtime_authority_chain.py:120 from agent_governance_evidence_pack -> validate_evidence_pack",
+    "suites/runtime-authority/test_runtime_authority_chain.py:120 from agent_governance_evidence_pack -> render_traceable_markdown",
+    "suites/runtime-authority/test_runtime_authority_chain.py:135 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/runtime-authority/test_runtime_authority_chain.py:144 from agent_replay_bundle.importers -> ImportContractError",
+    "suites/runtime-authority/test_runtime_authority_chain.py:151 from agent_governance_evidence_pack -> import_manifest_reconstruction",
+    "suites/runtime-authority/test_runtime_authority_chain.py:151 from agent_governance_evidence_pack -> validate_evidence_pack"
+   ],
+   "submodule_import_totals": {
+    "engine.*": 69,
+    "agent_control_plane.*": 38,
+    "agent_replay_bundle.*": 18,
+    "odes.*": 21,
+    "agent_governance_evidence_pack.*": 18
+   },
+   "other_component_suites_private_reach_ins": "suites/cognous-execution-runtime/tests/test_openshell_worker_contract.py:27,30,47,58,76 and tools/openshell_image_qualification.py:228,237,244,249,266,274,285 call OpenShellRefundDestination._validate_observation; suites/cognous-execution-runtime/tests/test_local_authority_effect.py:159 AtomicAuthorityEffectDestination._operation_commitment (relocated component-owner tests; same-repo ownership originally)"
+  },
+  "inspected_via": "git clone of /home/claude/cognous-stack-qualification; fetch origin main; checkout FETCH_HEAD; read-only; 11538 tracked files, 10707 under results/v1-validation (not scanned for pins)",
+  "caveat": "import scan is AST-based over suites/v1-scenarios, suites/v1-probes, suites/security-runtime, suites/runtime-authority and component suites; private instance attribute access beyond the listed grep patterns may exist"
+ }
+}
