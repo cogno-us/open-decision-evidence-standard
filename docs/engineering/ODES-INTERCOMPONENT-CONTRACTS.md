@@ -227,6 +227,12 @@ Decided by delegation (owner said "decide items" on 2026-10-17; the decisions be
 
 9. DECIDED (owner confirmed 2026-10-17). Recovery status `hold` (the destination refuses to resolve a claim: binding mismatch, claim unavailable, no durable effect): result `unknown` (post-commit) or `observed` (effect-free reconcile), `observed_state` `unknown`, `retry_eligible` false, a non-empty `reason`, and no destination state established. Golden fixture `executor-unknown-recovery-hold-route-b` (planted from the runtime recovery module; no live scenario reaches it).
 
+Decided by the owner after the P2 conformance run (2026-10-17, asked one at a time; the first and third differ from the recommendations):
+
+10. DECIDED. Legacy recovery layout: new layout only. Replay refuses a recovery report inside `observations` (the contract draft already does). Sequencing in P3: the runtime moves to `recovery_observations` first, then Replay tightens, so the runtime's real exports are never rejected in between. Recommendation had been to accept both during alpha.
+11. DECIDED (recommendation). Replay's extra checks: immutable `started_at` per attempt, refusal of result `observed` with `attempted` true, and refusal of result `executed` with a null observation are written into the contract (draft changes, one PR). Replay stops requiring members the contract leaves optional, and the contract requires the members that are always present. Replay tightens the `reconciled_existing` marker to acknowledged or partial rows.
+12. DECIDED. Replay emits the contract's refusal codes (a `code` field on its import errors) instead of tests mapping message patterns. Recommendation had been to keep test-only patterns for now. This is a Replay interface change in P3.
+
 ## Appendix A. F-20 to F-23 as the first golden cases
 
 | Finding | Mismatch | Golden fixture(s) in `contracts/execution-attempt-lifecycle/fixtures/` |
