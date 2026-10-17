@@ -1,0 +1,113 @@
+"""Conformance tests for the execution-attempt lifecycle contract spike (0.1.0-draft).
+
+Docs-and-fixtures only: this exercises contracts/execution-attempt-lifecycle/validate.py against the
+golden fixtures. It does not import or alter the odes package.
+"""
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+import pytest
+
+CONTRACT_DIR = Path(__file__).resolve().parents[1] / "contracts" / "execution-attempt-lifecycle"
+_spec = importlib.util.spec_from_file_location("eal_validate", CONTRACT_DIR / "validate.py")
+eal = importlib.util.module_from_spec(_spec)
+sys.modules["eal_validate"] = eal
+_spec.loader.exec_module(eal)
+
+
+def _load(kind):
+    return [json.loads(p.read_text(encoding="utf-8")) for p in sorted((CONTRACT_DIR / "fixtures" / kind).glob("*.json"))]
+
+
+VALID = _load("valid")
+INVALID = _load("invalid")
+
+
+def test_fixture_sets_are_present_and_well_formed():
+    assert len(VALID) >= 8 and len(INVALID) >= 8
+    for fx in VALID + INVALID:
+        assert fx["synthetic"] is True and fx["reason"].strip()
+        assert fx["expected_outcome"] in {"accept", "reject"}
+    assert all(f["expected_outcome"] == "accept" for f in VALID)
+    assert all(f["expected_outcome"] == "reject" and f["expected_refusal"] for f in INVALID)
+    names = [f["fixture_id"] for f in VALID + INVALID]
+    assert len(names) == len(set(names))
+
+
+@pytest.mark.parametrize("fx", VALID, ids=lambda f: f["fixture_id"])
+def test_valid_fixture_is_accepted(fx):
+    assert eal.validate(fx["document"]) == []
+
+
+@pytest.mark.parametrize("fx", INVALID, ids=lambda f: f["fixture_id"])
+def test_invalid_fixture_is_refused_with_stated_reason(fx):
+    codes = [v.code for v in eal.validate(fx["document"])]
+    assert codes == [fx["expected_refusal"]], fx["reason"]
+
+
+def test_required_valid_cases_exist():
+    ids = {f["fixture_id"] for f in VALID}
+    assert {"executor-unknown-ack-unobserved", "control-plane-reconciled-existing-acknowledged",
+            "control-plane-reconciled-existing-partial", "executor-normal-attempted-executed-observed",
+            "extension-namespace-member-preserved"} <= ids
+    assert sum(i.startswith("resolution-checks-overlap") for i in ids) >= 2
+
+
+def test_required_invalid_cases_exist():
+    codes = {f["expected_refusal"] for f in INVALID}
+    assert {"missing_start_record", "unknown_with_observation", "status_terminal_mismatch", "terminal_event_missing",
+            "resolution_checks_out_of_order", "undeclared_member", "invalid_reconciled_marker"} <= codes
+
+
+def test_f10_protection_unknown_member_is_refused_not_dropped():
+    fx = next(f for f in INVALID if f["fixture_id"] == "undeclared-member-outside-extensions")
+    (violation,) = eal.validate(fx["document"])
+    assert violation.code == "undeclared_member" and violation.path.endswith("injected_member")
+
+
+def test_extensions_are_preserved_and_bound_into_the_digest():
+    doc = next(f for f in VALID if f["fixture_id"] == "extension-namespace-member-preserved")["document"]
+    again = eal.preserve(doc)
+    assert again == doc and again["extensions"]["x-syn-vendor.trace"] == {"span": "abc", "hops": 2}
+    stripped = json.loads(json.dumps(doc))
+    del stripped["extensions"]
+    assert eal.canonical_bytes(stripped) != eal.canonical_bytes(doc)
+    # Ignore-but-preserve: contract logic never reads extensions, so the verdict does not depend on them.
+    assert eal.validate(stripped) == []
+    assert "extensions" not in eal.known_view(doc)
+
+
+def test_removing_an_optional_declared_member_stays_valid():
+    doc = json.loads(json.dumps(next(f for f in VALID if f["fixture_id"] == "executor-unknown-ack-unobserved")["document"]))
+    for name in ("attempted", "acknowledged", "newly_executed"):
+        del doc["execution_result"][name]
+    assert eal.validate(doc) == []
+
+
+def test_missing_required_member_is_refused():
+    doc = json.loads(json.dumps(VALID[0]["document"]))
+    doc.pop("contract_version")
+    assert [v.code for v in eal.validate(doc)] == ["schema_violation"]
+
+
+def test_unsupported_contract_version_is_refused_typed():
+    doc = json.loads(json.dumps(VALID[0]["document"]))
+    doc["contract_version"] = "9.0.0"
+    assert [v.code for v in eal.validate(doc)] == ["unsupported_contract_version"]
+
+
+def test_schema_is_draft_2020_12_and_agrees_with_reference_validator():
+    jsonschema = pytest.importorskip("jsonschema")
+    schema = eal.load_schema()
+    assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+    validator_cls = jsonschema.Draft202012Validator
+    validator_cls.check_schema(schema)
+    validator = validator_cls(schema)
+    for fx in VALID:
+        assert not list(validator.iter_errors(fx["document"])), fx["fixture_id"]
+    structural = {"undeclared_member", "invalid_extension_key"}
+    for fx in INVALID:
+        errors = list(validator.iter_errors(fx["document"]))
+        assert bool(errors) == (fx["expected_refusal"] in structural), fx["fixture_id"]
