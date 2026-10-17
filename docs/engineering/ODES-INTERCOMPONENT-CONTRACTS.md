@@ -293,3 +293,12 @@ Route B capture. The route B shape in the new fixtures was captured by running t
 Update 2026-10-17 (replay #37 and #38, main 8eaf3a42). The three helper-level conformance mismatches recorded above are closed in Replay: an undeclared member inside the execution result is refused, a start row marked `reconciled_existing: false` is refused, and the reserved `extensions` object (`x-` names) is accepted at the export top level, in the result and in the observation, and retained in the record. Route B recovery reports (post-commit `unknown`, effect-free `observed`, statuses `applied|partial|hold|unknown`) import on the public path. Qualification keeps the old Replay pin until the end-of-alpha pin refresh, so qualification results still reflect `def0ee0f`.
 
 Limits. Local runs, helper-level functions only, fixtures synthetic, shapes read from the working checkouts, which may not be the revisions of any qualified tuple.
+
+## Appendix C. Boundary contract drafts (index)
+
+All drafts stay `0.1.0-draft`; none is frozen (item 5). Each directory holds `README.md`, `schema.json`, `validate.py` and golden fixtures, and a test file `tests/test_contract_<name>.py`.
+
+| Contract | Boundary | Producer | Consumers | Notes |
+|---|---|---|---|---|
+| `contracts/execution-attempt-lifecycle/` | B2 and B3 attempt rows and journal protocol | Runtime executor, Control Plane | Replay | The first draft; its attempt and journal rules are delegated to by the journal contract. |
+| `contracts/control-plane-journal/` | B3 Control Plane run record (`BoundedRunRecord`): decisions, attempts, observations, reconciliations, refusals, checks, closeouts, input time floors, journal, vocabulary changes | Control Plane bounded workflow | Replay (and through it the Evidence pack), Exchange reference runtime (append-only reliance) | Modelled on 26a7e659 and Replay 7c6888f; 13 valid (10 real producer runs) and 64 invalid fixtures; 13 open questions in its README; records which components currently diverge. |
