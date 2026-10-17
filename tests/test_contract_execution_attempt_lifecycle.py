@@ -55,7 +55,9 @@ def test_required_valid_cases_exist():
             "executor-unknown-recovery-unavailable-route-b", "executor-unknown-recovery-hold-route-b",
             "executor-observed-effect-free-reconcile-route-b",
             "executor-unknown-recovery-separate-member-route-b", "executor-normal-observations-member",
-            "executor-denied-attempt-event"} <= ids
+            "executor-denied-attempt-event", "executor-unknown-validated-absent-after-ambiguous-dispatch",
+            "executor-unknown-validated-unknown-after-ambiguous-dispatch",
+            "control-plane-attempt-extensions-preserved", "resolution-journal-checks-extensions-preserved"} <= ids
     assert sum(i.startswith("resolution-checks-overlap") for i in ids) >= 2
 
 
@@ -66,7 +68,14 @@ def test_required_invalid_cases_exist():
             "unknown_state_mismatch", "recovery_retry_eligible", "recovery_report_incomplete",
             "effect_free_reconcile_claims_attempt", "recovery_state_mismatch",
             "recovery_observations_mismatch", "unknown_enum_value", "schema_violation",
-            "observed_result_claims_attempt", "executed_without_observation", "attempt_started_at_changed"} <= codes
+            "observed_result_claims_attempt", "executed_without_observation", "attempt_started_at_changed",
+            "null_observation_state_mismatch", "observations_mismatch", "invalid_extension_key"} <= codes
+    ids = {f["fixture_id"] for f in INVALID}
+    assert {"empty-object-observation", "executor-unknown-with-validated-partial-observation",
+            "executor-unknown-validated-absent-state-mismatch", "null-observation-state-absent",
+            "mixed-layout-observations-disagree-with-result", "control-plane-attempt-undeclared-member",
+            "control-plane-attempt-extension-key-without-x-prefix", "resolution-journal-extension-key-without-x-prefix",
+            "resolution-check-undeclared-member"} <= ids
 
 
 def test_f10_protection_unknown_member_is_refused_not_dropped():
@@ -107,10 +116,27 @@ def test_recovery_record_is_closed_and_typed():
     assert [v.code for v in eal.validate(doc)] == ["schema_violation"]
 
 
-def test_unknown_with_null_observation_still_requires_unknown_state():
+def test_null_observation_requires_unknown_state_for_every_status():
     doc = json.loads(json.dumps(next(f for f in VALID if f["fixture_id"] == "executor-unknown-ack-unobserved")["document"]))
     doc["execution_result"]["observed_state"] = "applied"
-    assert [v.code for v in eal.validate(doc)] == ["unknown_state_mismatch"]
+    assert [v.code for v in eal.validate(doc)] == ["null_observation_state_mismatch"]
+
+
+def test_empty_object_observation_is_never_valid():
+    doc = json.loads(json.dumps(next(f for f in VALID if f["fixture_id"] == "executor-unknown-ack-unobserved")["document"]))
+    doc["execution_result"]["observation"] = {}
+    assert [v.code for v in eal.validate(doc)] == ["schema_violation"]
+
+
+def test_unknown_may_carry_validated_absent_or_unknown_only():
+    base = json.loads(json.dumps(next(f for f in VALID if f["fixture_id"] == "executor-unknown-ack-unobserved")["document"]))
+    for state, ok in (("absent", True), ("unknown", True), ("applied", False), ("partial", False)):
+        doc = json.loads(json.dumps(base))
+        doc["execution_result"]["observation"] = {"effect_id": "syn-effect-1", "state": state}
+        doc["execution_result"]["observed_state"] = state
+        assert ([v.code for v in eal.validate(doc)] == []) == ok, state
+        if not ok:
+            assert [v.code for v in eal.validate(doc)] == ["unknown_with_validated_observation"]
 
 
 def test_removing_an_optional_declared_member_stays_valid():
