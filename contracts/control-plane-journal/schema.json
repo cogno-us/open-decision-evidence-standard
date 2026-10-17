@@ -651,8 +651,7 @@
         "result": {
           "enum": [
             "authorized",
-            "hold",
-            "deny"
+            "hold"
           ]
         },
         "reasons": {
@@ -908,7 +907,6 @@
           "enum": [
             "applied",
             "observed_absent",
-            "safe_to_retry",
             "hold"
           ]
         },

@@ -464,6 +464,8 @@ def _input_and_time_rules(doc: dict[str, Any]) -> list[Violation]:
         h = d["operation_horizon"]
         if h:
             stamps += [(f"$.decisions[{i}].operation_horizon.{k}", h[k]) for k in ("not_before", "expires_at") if h[k] is not None]
+    stamps += [(f"$.decisions[{i}].decided_at", d["decided_at"]) for i, d in enumerate(doc["decisions"])]
+    stamps += [(f"$.attempts[{i}].started_at", a["started_at"]) for i, a in enumerate(doc["attempts"])]
     for i, r in enumerate(doc["refusals"]):
         stamps.append((f"$.refusals[{i}].recorded_at", r["recorded_at"]))
         for name in ("original_operation_horizon", "operation_horizon"):

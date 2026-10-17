@@ -2,8 +2,8 @@
   "fixture_id": "safe-to-retry-result",
   "synthetic": true,
   "expected_outcome": "reject",
-  "reason": "safe_to_retry is declared in the producer type and never emitted; with retry_eligible always false no accepted observation maps to it.",
-  "expected_refusal": "reconciliation_result_mismatch",
+  "reason": "safe_to_retry is declared by the producer type and never emitted; removed from the closed reconciliation enum while the contract is a draft (decision 18-J4).",
+  "expected_refusal": "unknown_enum_value",
   "document": {
     "contract": "control-plane-journal",
     "contract_version": "0.1.0-draft",
