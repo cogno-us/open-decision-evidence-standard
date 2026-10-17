@@ -1,0 +1,29 @@
+{
+  "fixture_id": "receiver-only-awaiting-sender",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "The receiver has a record the sender never wrote: awaiting_peer from the other side.",
+  "document": {
+    "contract": "two-party-reconciliation",
+    "contract_version": "0.1.0-draft",
+    "profile": "two-party-reconciliation/0.1",
+    "reconciliations": [
+      {
+        "reconciliation_id": "rec-1",
+        "event_ref": "evt-refund-1",
+        "sender": null,
+        "receiver": {
+          "record_id": "r-rec-1",
+          "event_ref": "evt-refund-1",
+          "party_id": "party:receiver",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "outcome": "awaiting_peer",
+        "compared_at": null,
+        "mismatch": null,
+        "commit": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "fixture_id": "mismatch-committed-as-two-valid-records",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The failure the contract exists to prevent: digests differ, yet both records were committed.",
+  "expected_refusal": "mismatch_committed",
+  "document": {
+    "contract": "two-party-reconciliation",
+    "contract_version": "0.1.0-draft",
+    "profile": "two-party-reconciliation/0.1",
+    "reconciliations": [
+      {
+        "reconciliation_id": "rec-1",
+        "event_ref": "evt-refund-1",
+        "sender": {
+          "record_id": "s-rec-1",
+          "event_ref": "evt-refund-1",
+          "party_id": "party:sender",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "receiver": {
+          "record_id": "r-rec-1",
+          "event_ref": "evt-refund-1",
+          "party_id": "party:receiver",
+          "event_digest": "sha256:20fda320a8ee261f653fec0db0a7261fa81b600b7583bedb46826e45ad13a4d6",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "outcome": "mismatch",
+        "compared_at": "2026-10-17T10:00:05+00:00",
+        "mismatch": {
+          "differing_members": [
+            "amount"
+          ],
+          "disposition": "hold"
+        },
+        "commit": {
+          "committed_at": "2026-10-17T10:00:10+00:00",
+          "record_ids": [
+            "s-rec-1",
+            "r-rec-1"
+          ]
+        }
+      }
+    ]
+  }
+}

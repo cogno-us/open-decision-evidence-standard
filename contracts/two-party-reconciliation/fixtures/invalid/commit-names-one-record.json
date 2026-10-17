@@ -1,0 +1,41 @@
+{
+  "fixture_id": "commit-names-one-record",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The commit names only one of the two compared records.",
+  "expected_refusal": "commit_records_mismatch",
+  "document": {
+    "contract": "two-party-reconciliation",
+    "contract_version": "0.1.0-draft",
+    "profile": "two-party-reconciliation/0.1",
+    "reconciliations": [
+      {
+        "reconciliation_id": "rec-1",
+        "event_ref": "evt-refund-1",
+        "sender": {
+          "record_id": "s-rec-1",
+          "event_ref": "evt-refund-1",
+          "party_id": "party:sender",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "receiver": {
+          "record_id": "r-rec-1",
+          "event_ref": "evt-refund-1",
+          "party_id": "party:receiver",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "outcome": "matched",
+        "compared_at": "2026-10-17T10:00:05+00:00",
+        "mismatch": null,
+        "commit": {
+          "committed_at": "2026-10-17T10:00:10+00:00",
+          "record_ids": [
+            "s-rec-1"
+          ]
+        }
+      }
+    ]
+  }
+}

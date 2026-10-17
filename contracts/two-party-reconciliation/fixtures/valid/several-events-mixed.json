@@ -1,0 +1,84 @@
+{
+  "fixture_id": "several-events-mixed",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Three events: one matched, one mismatch, one awaiting the peer.",
+  "document": {
+    "contract": "two-party-reconciliation",
+    "contract_version": "0.1.0-draft",
+    "profile": "two-party-reconciliation/0.1",
+    "reconciliations": [
+      {
+        "reconciliation_id": "rec-1",
+        "event_ref": "evt-1",
+        "sender": {
+          "record_id": "s-rec-1",
+          "event_ref": "evt-1",
+          "party_id": "party:sender",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "receiver": {
+          "record_id": "r-rec-1",
+          "event_ref": "evt-1",
+          "party_id": "party:receiver",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "outcome": "matched",
+        "compared_at": "2026-10-17T10:00:05+00:00",
+        "mismatch": null,
+        "commit": {
+          "committed_at": "2026-10-17T10:00:10+00:00",
+          "record_ids": [
+            "s-rec-1",
+            "r-rec-1"
+          ]
+        }
+      },
+      {
+        "reconciliation_id": "rec-2",
+        "event_ref": "evt-2",
+        "sender": {
+          "record_id": "s-rec-2",
+          "event_ref": "evt-2",
+          "party_id": "party:sender",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "receiver": {
+          "record_id": "r-rec-2",
+          "event_ref": "evt-2",
+          "party_id": "party:receiver",
+          "event_digest": "sha256:20fda320a8ee261f653fec0db0a7261fa81b600b7583bedb46826e45ad13a4d6",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "outcome": "mismatch",
+        "compared_at": "2026-10-17T10:00:05+00:00",
+        "mismatch": {
+          "differing_members": [
+            "amount"
+          ],
+          "disposition": "hold"
+        },
+        "commit": null
+      },
+      {
+        "reconciliation_id": "rec-3",
+        "event_ref": "evt-3",
+        "sender": {
+          "record_id": "s-rec-3",
+          "event_ref": "evt-3",
+          "party_id": "party:sender",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "receiver": null,
+        "outcome": "awaiting_peer",
+        "compared_at": null,
+        "mismatch": null,
+        "commit": null
+      }
+    ]
+  }
+}

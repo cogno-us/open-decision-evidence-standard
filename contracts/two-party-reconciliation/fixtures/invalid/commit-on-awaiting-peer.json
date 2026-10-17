@@ -1,0 +1,35 @@
+{
+  "fixture_id": "commit-on-awaiting-peer",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Ambiguous delivery is not a commit: one record is not agreement.",
+  "expected_refusal": "commit_without_match",
+  "document": {
+    "contract": "two-party-reconciliation",
+    "contract_version": "0.1.0-draft",
+    "profile": "two-party-reconciliation/0.1",
+    "reconciliations": [
+      {
+        "reconciliation_id": "rec-1",
+        "event_ref": "evt-refund-1",
+        "sender": {
+          "record_id": "s-rec-1",
+          "event_ref": "evt-refund-1",
+          "party_id": "party:sender",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "receiver": null,
+        "outcome": "awaiting_peer",
+        "compared_at": null,
+        "mismatch": null,
+        "commit": {
+          "committed_at": "2026-10-17T10:00:10+00:00",
+          "record_ids": [
+            "s-rec-1"
+          ]
+        }
+      }
+    ]
+  }
+}
