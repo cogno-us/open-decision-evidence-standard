@@ -1,0 +1,21 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "epistemic_status": {
+      "claim_id": "syn-claim-1",
+      "contradicting_weight": 1.8,
+      "independence_score": 0.4,
+      "last_computed_at": "2026-10-17T12:00:00",
+      "robustness_score": 0.18,
+      "status": "refuted",
+      "supporting_weight": 0.0
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "status_weights_mismatch",
+  "fixture_id": "epistemic-refuted-below-threshold",
+  "reason": "refuted with contradicting weight under 3.",
+  "synthetic": true
+}

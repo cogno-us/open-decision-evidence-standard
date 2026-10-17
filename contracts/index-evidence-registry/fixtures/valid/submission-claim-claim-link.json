@@ -1,0 +1,36 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_submission": {
+      "attestation": {
+        "signature": "kKBqm/czDFYSHhggHTA64UiDu4S2hvFZq8F2QVFvv1ueXFRkaht17yvWOykCxpTFNEd3FR7m01EfU9DLVKdzAA==",
+        "statement": {
+          "algorithm": "Ed25519",
+          "attestation_id": "att-2",
+          "audience": "index:test",
+          "content_digest": "sha256:7e4f5eea757426b5edaa715d9c80bb44b69d6543c99e480aee02b386afa3ddc6",
+          "expires_at": 1800003600,
+          "issued_at": 1799999940,
+          "issuer": "issuer:alice",
+          "key_id": "key:1",
+          "not_before": 1799999940,
+          "protocol_version": "bitrep-attestation/1",
+          "statement_type": "index.link.v1",
+          "subject": "syn-claim-1"
+        }
+      },
+      "attested_by": "issuer:alice",
+      "claim_id": "syn-claim-1",
+      "claim_id_2": "syn-claim-2",
+      "evidence_id": null,
+      "relation_type": "refines",
+      "strength": 0.9
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "submission-claim-claim-link",
+  "reason": "A claim-to-claim link (claim_id_2 instead of evidence_id); the content digest commits to evidence_id as null.",
+  "synthetic": true
+}

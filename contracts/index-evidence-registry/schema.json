@@ -1,0 +1,555 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/index-evidence-registry/schema.json",
+  "title": "Index evidence-registry contract 0.1.0-draft",
+  "description": "Structural half of the contract. Cross-record rules are defined in README.md and implemented by validate.py. Every declared object closes its member set (additionalProperties false) except through the reserved `extensions` member, whose keys must be `x-` prefixed. The BitRep envelope and statement are closed because the BitRep verifier parses them with extra=forbid; they carry no `extensions` (an extension there would change the signed statement).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "link_submission"
+      ]
+    },
+    {
+      "required": [
+        "stored_link"
+      ]
+    },
+    {
+      "required": [
+        "verification_result"
+      ]
+    },
+    {
+      "required": [
+        "link_outcome"
+      ]
+    },
+    {
+      "required": [
+        "epistemic_status"
+      ]
+    },
+    {
+      "required": [
+        "chain_attestation_check"
+      ]
+    }
+  ],
+  "properties": {
+    "contract": {
+      "const": "index-evidence-registry"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "producer": {
+      "enum": [
+        "index-api",
+        "index-chain-client"
+      ]
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    },
+    "link_submission": {
+      "$ref": "#/$defs/link_submission"
+    },
+    "stored_link": {
+      "$ref": "#/$defs/stored_link"
+    },
+    "verification_result": {
+      "$ref": "#/$defs/verification_result"
+    },
+    "link_outcome": {
+      "$ref": "#/$defs/link_outcome"
+    },
+    "epistemic_status": {
+      "$ref": "#/$defs/epistemic_status"
+    },
+    "chain_attestation_check": {
+      "$ref": "#/$defs/chain_attestation_check"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "token": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[!-~]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})?$"
+    },
+    "relation_type": {
+      "enum": [
+        "supports",
+        "contradicts",
+        "weakly_supports",
+        "refines",
+        "generalizes",
+        "depends_on",
+        "conflicts_with"
+      ]
+    },
+    "strength": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "signed_statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "algorithm",
+        "attestation_id",
+        "issuer",
+        "key_id",
+        "subject",
+        "statement_type",
+        "audience",
+        "content_digest",
+        "issued_at",
+        "not_before",
+        "expires_at"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "algorithm": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "attestation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "issuer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "statement_type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "audience": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[!-~]+$"
+        },
+        "content_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "issued_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "not_before": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expires_at": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "attestation_envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "signature"
+      ],
+      "properties": {
+        "statement": {
+          "$ref": "#/$defs/signed_statement"
+        },
+        "signature": {
+          "type": "string",
+          "minLength": 88,
+          "maxLength": 88
+        }
+      }
+    },
+    "link_submission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "relation_type",
+        "attested_by"
+      ],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "claim_id_2": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relation_type": {
+          "$ref": "#/$defs/relation_type"
+        },
+        "strength": {
+          "$ref": "#/$defs/strength"
+        },
+        "attested_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attestation": {
+          "$ref": "#/$defs/attestation_envelope"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "stored_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "claim_id",
+        "relation_type",
+        "strength",
+        "attested_by",
+        "timestamp"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "claim_id_2": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "relation_type": {
+          "$ref": "#/$defs/relation_type"
+        },
+        "strength": {
+          "$ref": "#/$defs/strength"
+        },
+        "attested_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attestation_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attestation_statement_digest": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timestamp": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "verification_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result"
+      ],
+      "properties": {
+        "envelope": {
+          "$ref": "#/$defs/attestation_envelope"
+        },
+        "result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "result_version",
+            "outcome",
+            "reason",
+            "evaluated_at",
+            "statement_digest",
+            "trust_snapshot",
+            "key_status_at",
+            "assurance"
+          ],
+          "properties": {
+            "result_version": {
+              "const": "bitrep-verification/1"
+            },
+            "outcome": {
+              "enum": [
+                "verified",
+                "rejected"
+              ]
+            },
+            "reason": {
+              "enum": [
+                "ok",
+                "unsupported_version",
+                "unsupported_algorithm",
+                "audience_mismatch",
+                "unknown_key",
+                "key_revoked",
+                "key_not_yet_valid",
+                "key_expired",
+                "issuance_outside_key_validity",
+                "not_yet_valid",
+                "attestation_expired",
+                "malformed_signature",
+                "invalid_signature"
+              ]
+            },
+            "evaluated_at": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "statement_digest": {
+              "$ref": "#/$defs/digest"
+            },
+            "trust_snapshot": {
+              "$ref": "#/$defs/digest"
+            },
+            "key_status_at": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "assurance": {
+              "enum": [
+                "issuer_signature_only",
+                "none"
+              ]
+            }
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "link_outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "http_status"
+      ],
+      "properties": {
+        "http_status": {
+          "enum": [
+            200,
+            201,
+            401,
+            409,
+            422,
+            503
+          ]
+        },
+        "reason": {
+          "enum": [
+            "attestation_required",
+            "malformed_attestation",
+            "attestation_binding_mismatch",
+            "attestation_id_conflict",
+            "trust_unavailable",
+            "unsupported_version",
+            "unsupported_algorithm",
+            "audience_mismatch",
+            "unknown_key",
+            "key_revoked",
+            "key_not_yet_valid",
+            "key_expired",
+            "issuance_outside_key_validity",
+            "not_yet_valid",
+            "attestation_expired",
+            "malformed_signature",
+            "invalid_signature"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "link": {
+          "$ref": "#/$defs/stored_link"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "epistemic_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "status",
+        "supporting_weight",
+        "contradicting_weight",
+        "independence_score",
+        "robustness_score",
+        "last_computed_at"
+      ],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "supported",
+            "contested",
+            "refuted",
+            "deprecated"
+          ]
+        },
+        "supporting_weight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "contradicting_weight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "independence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "robustness_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "last_computed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "chain_attestation_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chain_id",
+        "contract_address",
+        "claim_id",
+        "relation",
+        "evidence_content_digest",
+        "statement_digest",
+        "statement"
+      ],
+      "properties": {
+        "chain_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contract_address": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{40}$"
+        },
+        "claim_id": {
+          "type": "string",
+          "pattern": "^0x[0-9a-f]{64}$"
+        },
+        "relation": {
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "evidence_content_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "statement_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "statement": {
+          "$ref": "#/$defs/signed_statement"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}

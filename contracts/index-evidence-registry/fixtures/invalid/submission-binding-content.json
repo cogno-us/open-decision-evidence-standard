@@ -1,0 +1,36 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_submission": {
+      "attestation": {
+        "signature": "i2xH/lneHSmvKAGpWEbhV7GT3Ks3lgYPUSPSbI9mPL95dVJDVM/V0ljwFxtpY1hyy8eFhT52Ji00NbkuyqbFBg==",
+        "statement": {
+          "algorithm": "Ed25519",
+          "attestation_id": "att-1",
+          "audience": "index:test",
+          "content_digest": "sha256:ef5c440e3a71eaa22f6b2aaccd2390e9d3ae43e5d3a10d5d9d1cd3150719cb9b",
+          "expires_at": 1800003600,
+          "issued_at": 1799999940,
+          "issuer": "issuer:alice",
+          "key_id": "key:1",
+          "not_before": 1799999940,
+          "protocol_version": "bitrep-attestation/1",
+          "statement_type": "index.link.v1",
+          "subject": "syn-claim-1"
+        }
+      },
+      "attested_by": "issuer:alice",
+      "claim_id": "syn-claim-1",
+      "evidence_id": "syn-evidence-1",
+      "relation_type": "supports",
+      "strength": 0.5
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "attestation_binding_mismatch",
+  "fixture_id": "submission-binding-content",
+  "reason": "strength changed after signing: the statement no longer commits to this link (422 attestation_binding_mismatch).",
+  "synthetic": true
+}

@@ -1,0 +1,23 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "producer": "index-api",
+    "stored_link": {
+      "attestation_id": "att-2",
+      "attestation_statement_digest": "sha256:3dafe237898150a21d7dee74d79a60e034bf6d6ed12f222b2a6b06e1da8e8c8d",
+      "attested_by": "issuer:alice",
+      "claim_id": "syn-claim-1",
+      "claim_id_2": "syn-claim-2",
+      "evidence_id": null,
+      "id": "link_000000000002",
+      "relation_type": "refines",
+      "strength": 0.9,
+      "timestamp": "2026-10-17T12:00:00"
+    }
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "stored-link-claim-claim",
+  "reason": "Captured claim-to-claim stored link.",
+  "synthetic": true
+}

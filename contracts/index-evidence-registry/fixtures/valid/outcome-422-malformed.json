@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 422,
+      "message": "Attestation is not a valid BitRep v1 envelope: 1 validation error for AttestationEnvelope\nstatement.extra\n  Extra inputs are not permitted [type=extra_forbidden, input_value=1, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.13/v/extra_forbidden",
+      "reason": "malformed_attestation"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "outcome-422-malformed",
+  "reason": "Captured: the Index's refusal for a malformed envelope (422 malformed_attestation).",
+  "synthetic": true
+}

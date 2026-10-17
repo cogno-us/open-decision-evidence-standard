@@ -1,0 +1,27 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 201,
+      "link": {
+        "attestation_id": null,
+        "attestation_statement_digest": null,
+        "attested_by": "issuer:legacy",
+        "claim_id": "syn-claim-1",
+        "claim_id_2": null,
+        "evidence_id": "syn-evidence-2",
+        "id": "link_000000000099",
+        "relation_type": "supports",
+        "strength": 1.0,
+        "timestamp": "2026-10-17T12:00:00"
+      }
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "link_without_attestation",
+  "fixture_id": "outcome-201-link-unattested",
+  "reason": "A success whose link names no attestation.",
+  "synthetic": true
+}

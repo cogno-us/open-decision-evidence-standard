@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 401,
+      "message": "Links require a signed BitRep v1 attestation in the 'attestation' field; attested_by alone is not accepted.",
+      "reason": "attestation_required"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "outcome-401-attestation-required",
+  "reason": "Captured: the Index's refusal for no attestation (401 attestation_required).",
+  "synthetic": true
+}

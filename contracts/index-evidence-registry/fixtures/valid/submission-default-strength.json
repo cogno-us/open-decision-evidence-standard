@@ -1,0 +1,34 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_submission": {
+      "attestation": {
+        "signature": "EaN7TUz96LyYSvpHQU3ATZrbwB1hR+QcPUPG0RnSkf1IIpMdtPPm03AujSNpQdkKNf88m4GG4Xp55Casocy6Bg==",
+        "statement": {
+          "algorithm": "Ed25519",
+          "attestation_id": "att-3",
+          "audience": "index:test",
+          "content_digest": "sha256:c2a7a84f730d257b9ff1aebcbd494e27c5c18aeea12be89f276f17caebea7494",
+          "expires_at": 1800003600,
+          "issued_at": 1799999940,
+          "issuer": "issuer:alice",
+          "key_id": "key:1",
+          "not_before": 1799999940,
+          "protocol_version": "bitrep-attestation/1",
+          "statement_type": "index.link.v1",
+          "subject": "syn-claim-1"
+        }
+      },
+      "attested_by": "issuer:alice",
+      "claim_id": "syn-claim-1",
+      "evidence_id": "syn-evidence-1",
+      "relation_type": "supports"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "submission-default-strength",
+  "reason": "strength omitted: the Index defaults it to 1.0 and the signed content digest commits to 1.0.",
+  "synthetic": true
+}

@@ -1,0 +1,11 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "schema_violation",
+  "fixture_id": "no-member",
+  "reason": "A document naming the contract but carrying no member.",
+  "synthetic": true
+}

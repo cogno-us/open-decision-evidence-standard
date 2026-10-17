@@ -1,0 +1,20 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "epistemic_status": {
+      "claim_id": "syn-claim-none",
+      "contradicting_weight": 0.0,
+      "independence_score": 0.0,
+      "last_computed_at": "2026-10-17T12:00:00",
+      "robustness_score": 0.0,
+      "status": "proposed",
+      "supporting_weight": 0.0
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "epistemic-no-links",
+  "reason": "Captured: a claim with no links is proposed with zero weights.",
+  "synthetic": true
+}

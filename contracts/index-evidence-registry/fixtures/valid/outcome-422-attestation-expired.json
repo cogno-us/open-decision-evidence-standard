@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 422,
+      "message": "Attestation rejected by BitRep verification: attestation_expired",
+      "reason": "attestation_expired"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "outcome-422-attestation-expired",
+  "reason": "Captured: the Index's refusal for an expired statement (422 attestation_expired).",
+  "synthetic": true
+}

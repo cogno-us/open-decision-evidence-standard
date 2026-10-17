@@ -1,0 +1,15 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 201
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "outcome_link_mismatch",
+  "fixture_id": "outcome-201-without-link",
+  "reason": "A success that returns no link.",
+  "synthetic": true
+}

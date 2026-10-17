@@ -1,0 +1,26 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 201,
+      "link": {
+        "attestation_id": "att-1",
+        "attestation_statement_digest": "sha256:7036eb4adfbddfac9c4681a84a535a5ef3f732a8c1abfaf70c53ac98a1dcd269",
+        "attested_by": "issuer:alice",
+        "claim_id": "syn-claim-1",
+        "claim_id_2": null,
+        "evidence_id": "syn-evidence-1",
+        "id": "link_000000000001",
+        "relation_type": "supports",
+        "strength": 0.9,
+        "timestamp": "2026-10-17T12:00:00"
+      }
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "outcome-201-created",
+  "reason": "The route's 201 for a new attested link.",
+  "synthetic": true
+}

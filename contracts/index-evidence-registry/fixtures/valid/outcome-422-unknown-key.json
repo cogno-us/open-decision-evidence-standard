@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 422,
+      "message": "Attestation rejected by BitRep verification: unknown_key",
+      "reason": "unknown_key"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "outcome-422-unknown-key",
+  "reason": "Captured: the Index's refusal for an unknown key (422 unknown_key).",
+  "synthetic": true
+}

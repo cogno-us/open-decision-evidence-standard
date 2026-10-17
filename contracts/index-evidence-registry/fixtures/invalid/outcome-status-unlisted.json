@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 418,
+      "reason": "attestation_required"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "reject",
+  "expected_refusal": "unknown_enum_value",
+  "fixture_id": "outcome-status-unlisted",
+  "reason": "A status outside the six the route returns.",
+  "synthetic": true
+}

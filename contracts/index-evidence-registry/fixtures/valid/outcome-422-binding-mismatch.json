@@ -1,0 +1,16 @@
+{
+  "document": {
+    "contract": "index-evidence-registry",
+    "contract_version": "0.1.0-draft",
+    "link_outcome": {
+      "http_status": 422,
+      "message": "Attestation field 'issuer' does not match the submitted link.",
+      "reason": "attestation_binding_mismatch"
+    },
+    "producer": "index-api"
+  },
+  "expected_outcome": "accept",
+  "fixture_id": "outcome-422-binding-mismatch",
+  "reason": "Captured: the Index's refusal for a statement that does not bind this link (422 attestation_binding_mismatch).",
+  "synthetic": true
+}
