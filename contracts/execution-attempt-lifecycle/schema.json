@@ -21,6 +21,8 @@
     "control_plane_attempts": {"type": "array", "items": {"$ref": "#/$defs/control_plane_attempt"}},
     "resolution_journal": {"type": "array", "items": {"$ref": "#/$defs/journal_event"}},
     "resolution_checks": {"type": "array", "items": {"$ref": "#/$defs/resolution_check"}},
+    "observations": {"type": "array", "description": "Validated Control Plane observations only. Recovery reports never appear here (they use recovery_observations). Decided 2026-10-17, ODES item 7.", "items": {"$ref": "#/$defs/validated_observation"}},
+    "recovery_observations": {"type": "array", "description": "Typed recovery reports (runtime reconcile_claim records or the reconciliation_unavailable placeholder). Optional; when present it equals the recovery report carried by execution_result.observation, or is empty. Decided 2026-10-17, ODES item 7.", "items": {"$ref": "#/$defs/recovery_observation"}},
     "extensions": {"$ref": "#/$defs/extensions"}
   },
   "$defs": {

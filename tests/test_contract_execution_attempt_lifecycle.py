@@ -53,7 +53,8 @@ def test_required_valid_cases_exist():
             "control-plane-reconciled-existing-partial", "executor-normal-attempted-executed-observed",
             "extension-namespace-member-preserved", "executor-unknown-recovery-observation-route-b",
             "executor-unknown-recovery-unavailable-route-b", "executor-unknown-recovery-hold-route-b",
-            "executor-observed-effect-free-reconcile-route-b"} <= ids
+            "executor-observed-effect-free-reconcile-route-b",
+            "executor-unknown-recovery-separate-member-route-b", "executor-normal-observations-member"} <= ids
     assert sum(i.startswith("resolution-checks-overlap") for i in ids) >= 2
 
 
@@ -62,7 +63,8 @@ def test_required_invalid_cases_exist():
     assert {"missing_start_record", "unknown_with_validated_observation", "status_terminal_mismatch", "terminal_event_missing",
             "resolution_checks_out_of_order", "undeclared_member", "invalid_reconciled_marker",
             "unknown_state_mismatch", "recovery_retry_eligible", "recovery_report_incomplete",
-            "effect_free_reconcile_claims_attempt", "recovery_state_mismatch"} <= codes
+            "effect_free_reconcile_claims_attempt", "recovery_state_mismatch",
+            "recovery_observations_mismatch", "unknown_enum_value", "schema_violation"} <= codes
 
 
 def test_f10_protection_unknown_member_is_refused_not_dropped():
@@ -137,7 +139,7 @@ def test_schema_is_draft_2020_12_and_agrees_with_reference_validator():
     validator = validator_cls(schema)
     for fx in VALID:
         assert not list(validator.iter_errors(fx["document"])), fx["fixture_id"]
-    structural = {"undeclared_member", "invalid_extension_key"}
+    structural = {"undeclared_member", "invalid_extension_key", "schema_violation", "unknown_enum_value"}
     for fx in INVALID:
         errors = list(validator.iter_errors(fx["document"]))
         assert bool(errors) == (fx["expected_refusal"] in structural), fx["fixture_id"]

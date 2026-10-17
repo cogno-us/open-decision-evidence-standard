@@ -24,6 +24,33 @@ DECIDED (owner, André de Lima, 2026-10-17): the extension namespace is a reserv
 
 Placement (owner decision, 2026-10-17): this contract is intended to become an optional extension profile of the ODES core (a declared, versioned behavioural profile with its own fixtures), not a companion interface spec. See section 4.1 of the design document. The spike remains outside `src/odes`.
 
+## Producer names
+
+The contract uses the names the runtime repository defines. Qualification's route letters map to them as follows (the route C row is a qualification term the runtime repo does not define, so the runtime owner must confirm it):
+
+| Qualification term | Runtime name | Where |
+|---|---|---|
+| route A | `PinnedControlPlaneExecutor` | `engine/safe_executor.py` |
+| route B | `AtomicLocalControlPlaneExecutor` ("atomic claim route") | `engine/atomic_local_control_plane_executor.py` |
+| route C | Control Plane adapter over the safe executor | `engine/control_plane_adapter.py` |
+
+Fixture ids keep the `route-b` wording for stability; read them as the atomic local executor.
+
+## Export layout (decided 2026-10-17, ODES item 7)
+
+- `observations` carries validated Control Plane observations only. A record with `status` and no `state` is refused there.
+- `recovery_observations` carries typed recovery reports. It is optional. When present it equals the report carried by `execution_result.observation`, or is empty when the result carries none (`recovery_observations_mismatch`).
+- `execution_result.observation` still carries the report as before.
+- Legacy layout (recovery report inside `observations`): producers move to the new layout in the runtime's P3 change; consumers accept both during alpha and drop the legacy layout when the contract freezes. This draft refuses the legacy layout.
+
+## Closed enumerations (decided 2026-10-17, ODES item 6)
+
+Result status, observation state, recovery status, attempt event status and the other enumerations in `schema.json` are closed. A value outside them is refused with `unknown_enum_value` and is never coerced. Adding a value is a major bump. Where the unknown value sits inside a union (for example the observation), the refusal may surface as `schema_violation`.
+
+## Known producer non-conformance (found by the P0 inventory, finding N-1)
+
+The runtime's safe executor can return result `unknown` together with a validated observation when an OpenShell destination acknowledgement is malformed after the effect was observed as applied (`engine/safe_executor.py` timeout path, `engine/openshell_environment.py` commit). That combination is invalid here (`unknown_with_validated_observation`). Owner decision 2026-10-17: the runtime changes, and reports `reconciled` or `partial` when a validated observation exists. Until that runtime change lands, the runtime is non-conformant at this point. The change is scheduled for P3, after a probe that reproduces the path.
+
 ## Rules
 
 Executor rows (`attempts`, `attempt_events`, `execution_result`):
@@ -51,9 +78,9 @@ Resolution journal and checks (`resolution_journal`, `resolution_checks`):
 
 Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, [expected_refusal], document}`. `fixtures/valid/` must be accepted. `fixtures/invalid/` must be refused with `expected_refusal` as the only violation.
 
-Valid: `executor-unknown-ack-unobserved`, `executor-unknown-recovery-observation-route-b`, `executor-unknown-recovery-unavailable-route-b`, `executor-unknown-recovery-hold-route-b`, `executor-observed-effect-free-reconcile-route-b`, `control-plane-reconciled-existing-acknowledged`, `control-plane-reconciled-existing-partial`, `resolution-checks-overlap-a-completes-first`, `resolution-checks-overlap-b-completes-first-listed-open-order`, `resolution-checks-overlap-b-completes-first-listed-completion-order`, `executor-normal-attempted-executed-observed`, `control-plane-normal-attempted-acknowledged`, `extension-namespace-member-preserved`.
+Valid: `executor-unknown-ack-unobserved`, `executor-unknown-recovery-observation-route-b`, `executor-unknown-recovery-unavailable-route-b`, `executor-unknown-recovery-hold-route-b`, `executor-observed-effect-free-reconcile-route-b`, `executor-unknown-recovery-separate-member-route-b`, `executor-normal-observations-member`, `control-plane-reconciled-existing-acknowledged`, `control-plane-reconciled-existing-partial`, `resolution-checks-overlap-a-completes-first`, `resolution-checks-overlap-b-completes-first-listed-open-order`, `resolution-checks-overlap-b-completes-first-listed-completion-order`, `executor-normal-attempted-executed-observed`, `control-plane-normal-attempted-acknowledged`, `extension-namespace-member-preserved`.
 
-Invalid: `control-plane-dropped-start-record`, `executor-dropped-start-event`, `executor-unknown-with-validated-observation`, `executor-unknown-recovery-state-contradiction`, `executor-terminal-failed-vs-status`, `executor-dropped-terminal-event`, `resolution-checks-sequential-reorder`, `undeclared-member-outside-extensions`, `control-plane-start-row-reconciled-existing-false`, `extension-key-without-x-prefix`, `recovery-retry-eligible-true`, `recovery-applied-missing-operation-digest`, `recovery-hold-missing-reason`, `effect-free-reconcile-claims-attempt`, `effect-free-reconcile-state-mismatch`.
+Invalid: `control-plane-dropped-start-record`, `executor-dropped-start-event`, `executor-unknown-with-validated-observation`, `executor-unknown-recovery-state-contradiction`, `executor-terminal-failed-vs-status`, `executor-dropped-terminal-event`, `resolution-checks-sequential-reorder`, `undeclared-member-outside-extensions`, `control-plane-start-row-reconciled-existing-false`, `extension-key-without-x-prefix`, `recovery-report-in-observations-member`, `recovery-observations-differs-from-result`, `result-status-unknown-enum-value`, `recovery-retry-eligible-true`, `recovery-applied-missing-operation-digest`, `recovery-hold-missing-reason`, `effect-free-reconcile-claims-attempt`, `effect-free-reconcile-state-mismatch`.
 
 ## Run
 
