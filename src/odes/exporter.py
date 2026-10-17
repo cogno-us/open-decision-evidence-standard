@@ -274,7 +274,7 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
                 control_plane_revision=revision,
             )
             validated = reconstructed.model_dump(mode="json")
-            for field in ("records", "links", "commitments", "producer_profiles", "status"):
+            for field in ("records", "links", "commitments", "producer_profiles", "status", "import_reports", "semantics"):
                 if bundle.get(field) != validated.get(field):
                     raise ExportError(f"retained Replay {field} differs from accepted validator reconstruction")
             for field in ("effect_observation_history", "moltbot_producer_contract",
