@@ -59,14 +59,14 @@ SECURITY_REVISIONS = {"manifest": "e385f8c19b4444817a8b84b72ed6edbc37deb807",
     "replay": "3601fb218d5c02f5d86e55d2cf33983e5e130ac3",
     "control_plane": "996baeb476c8745b1a58ddc968b9eecc6a39b76b",
     "moltbot_safe": "fd6b76fa0e85feb5b67324114bf790d3a12fdaf1"}
-# F5b merged generation (CP a34c3dc2 / runtime 4a83b175 / Replay 0cfe7a63 /
+# F5b merged generation (CP a34c3dc2 / runtime 4a83b175 / Replay def0ee0f /
 # Manifest 2c36bcd0). Added alongside, not instead of, SECURITY_REVISIONS so
 # retained evidence from that generation stays accepted. Each generation is an
 # exact tuple keyed by its Control Plane revision; components never mix across
 # generations.
 F5B_PROFILE_VERSION = "odes-cognous-stack-export-0.2.4-security-runtime-f5b-candidate"
 F5B_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
-    "replay": "0cfe7a6319930bccad3e9027a1dfbe3d6e29d657",
+    "replay": "def0ee0f3af713283ea3cd13f0caf79e1607b651",
     "control_plane": "a34c3dc26f84a767a55f9d5c89dc0b53e63fefa5",
     "moltbot_safe": "4a83b175d2ef0e65a7ee22a0513bb94a5fdf3a6f"}
 SECURITY_RUNTIME_GENERATIONS = {
