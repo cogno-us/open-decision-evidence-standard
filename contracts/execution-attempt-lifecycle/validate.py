@@ -157,6 +157,33 @@ def observation_kind(obs: Any) -> str:
     return "validated" if "state" in obs else "recovery"
 
 
+def _recovery_rules(obs: dict[str, Any], result: dict[str, Any]) -> list[Violation]:
+    """Rules for a typed recovery observation (route B ``reconcile_claim`` report or its unavailable placeholder)."""
+    path = "$.execution_result.observation"
+    out: list[Violation] = []
+    if obs["retry_eligible"] is not False:
+        out.append(Violation("recovery_retry_eligible", path + ".retry_eligible",
+                             "a recovery report never makes an effect retry-eligible; retry_eligible must be false"))
+    status = obs["status"]
+    if status in {"applied", "partial"}:
+        missing = [f for f in ("claim_state", "effect_id", "operation_digest") if f not in obs]
+        if missing:
+            out.append(Violation("recovery_report_incomplete", path,
+                                 f"an '{status}' recovery report must carry " + ", ".join(missing)))
+    elif not obs.get("reason"):
+        out.append(Violation("recovery_report_incomplete", path,
+                             f"a '{status}' recovery report must carry a non-empty reason"))
+    if result["status"] == "observed" and not out:
+        if any(result.get(k) for k in ("attempted", "acknowledged", "newly_executed")) or result["attempt_id"] is not None:
+            out.append(Violation("effect_free_reconcile_claims_attempt", "$.execution_result",
+                                 "an effect-free reconcile makes no attempt: attempt_id null and attempted, "
+                                 "acknowledged and newly_executed false"))
+        elif result["observed_state"] != (status if status in {"applied", "partial"} else "unknown"):
+            out.append(Violation("recovery_state_mismatch", "$.execution_result.observed_state",
+                                 "observed_state equals the recovery status when it is applied/partial, else 'unknown'"))
+    return out
+
+
 def _executor_rules(doc: dict[str, Any]) -> list[Violation]:
     out: list[Violation] = []
     rows = doc.get("attempts")
@@ -200,6 +227,10 @@ def _executor_rules(doc: dict[str, Any]) -> list[Violation]:
                              "a recovery observation is only carried by results 'unknown' (post-commit recovery) "
                              "or 'observed' (effect-free reconcile)"))
         return out
+    if kind == "recovery":
+        recovery_violations = _recovery_rules(obs, result)
+        if recovery_violations:
+            return out + recovery_violations
     if result["status"] == "unknown":
         if kind == "validated":
             out.append(Violation("unknown_with_validated_observation", "$.execution_result.observation",

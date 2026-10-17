@@ -52,7 +52,8 @@ def test_required_valid_cases_exist():
     assert {"executor-unknown-ack-unobserved", "control-plane-reconciled-existing-acknowledged",
             "control-plane-reconciled-existing-partial", "executor-normal-attempted-executed-observed",
             "extension-namespace-member-preserved", "executor-unknown-recovery-observation-route-b",
-            "executor-unknown-recovery-unavailable-route-b"} <= ids
+            "executor-unknown-recovery-unavailable-route-b", "executor-unknown-recovery-hold-route-b",
+            "executor-observed-effect-free-reconcile-route-b"} <= ids
     assert sum(i.startswith("resolution-checks-overlap") for i in ids) >= 2
 
 
@@ -60,7 +61,8 @@ def test_required_invalid_cases_exist():
     codes = {f["expected_refusal"] for f in INVALID}
     assert {"missing_start_record", "unknown_with_validated_observation", "status_terminal_mismatch", "terminal_event_missing",
             "resolution_checks_out_of_order", "undeclared_member", "invalid_reconciled_marker",
-            "unknown_state_mismatch"} <= codes
+            "unknown_state_mismatch", "recovery_retry_eligible", "recovery_report_incomplete",
+            "effect_free_reconcile_claims_attempt", "recovery_state_mismatch"} <= codes
 
 
 def test_f10_protection_unknown_member_is_refused_not_dropped():
