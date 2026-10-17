@@ -75,7 +75,9 @@ def _check(value: Any, schema: dict[str, Any], root: dict[str, Any], path: str, 
         out.append(Violation("schema_violation", path, f"expected constant {schema['const']!r}"))
         return
     if "enum" in schema and not any(value == option and type(value) is type(option) for option in schema["enum"]):
-        out.append(Violation("schema_violation", path, f"value {value!r} not in declared set"))
+        # Closed enumeration: an unknown value is refused with its own typed code and never coerced. A new
+        # value in any enumeration is a major version bump (ODES item 6, decided 2026-10-17).
+        out.append(Violation("unknown_enum_value", path, f"value {value!r} not in declared set"))
         return
     if "type" in schema:
         names = schema["type"] if isinstance(schema["type"], list) else [schema["type"]]
@@ -222,6 +224,16 @@ def _executor_rules(doc: dict[str, Any]) -> list[Violation]:
         return out
     obs = result["observation"]
     kind = observation_kind(obs)
+    listed = doc.get("recovery_observations")
+    if listed is not None and listed != ([obs] if kind == "recovery" else []):
+        out.append(Violation("recovery_observations_mismatch", "$.recovery_observations",
+                             "recovery_observations equals the recovery report carried by execution_result.observation, "
+                             "or is empty when the result carries none"))
+        return out
+    if doc.get("observations") is not None and doc["observations"] != ([obs] if kind == "validated" else []):
+        out.append(Violation("observations_mismatch", "$.observations",
+                             "observations lists the validated observation the result carries, or is empty when it carries none"))
+        return out
     if kind == "recovery" and result["status"] not in {"unknown", "observed"}:
         out.append(Violation("recovery_observation_status", "$.execution_result.observation",
                              "a recovery observation is only carried by results 'unknown' (post-commit recovery) "
