@@ -1,0 +1,46 @@
+{
+  "fixture_id": "two-claims-over-one-record-set",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Two claims with different requirements over the same records are counted independently.",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "n-1",
+        "kind": "original",
+        "family_id": "fam-b",
+        "derived_from": null
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 1,
+        "confirmations": [
+          "m-1"
+        ],
+        "counted_families": 1,
+        "satisfied": true
+      },
+      {
+        "claim_id": "c-2",
+        "required_families": 2,
+        "confirmations": [
+          "m-1",
+          "n-1"
+        ],
+        "counted_families": 2,
+        "satisfied": true
+      }
+    ]
+  }
+}

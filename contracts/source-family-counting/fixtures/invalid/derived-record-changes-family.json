@@ -1,0 +1,33 @@
+{
+  "fixture_id": "derived-record-changes-family",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A derived record of a retry changes family.",
+  "expected_refusal": "family_not_inherited",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1-r1",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-d",
+        "kind": "derived",
+        "family_id": "fam-c",
+        "derived_from": "m-1-r1"
+      }
+    ],
+    "claims": []
+  }
+}

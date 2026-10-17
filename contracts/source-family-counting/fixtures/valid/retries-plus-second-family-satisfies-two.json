@@ -1,0 +1,51 @@
+{
+  "fixture_id": "retries-plus-second-family-satisfies-two",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Retries of one message plus one record from a second family reach two families.",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1-r1",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-r2",
+        "kind": "retry",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "n-1",
+        "kind": "original",
+        "family_id": "fam-b",
+        "derived_from": null
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 2,
+        "confirmations": [
+          "m-1",
+          "m-1-r1",
+          "m-1-r2",
+          "n-1"
+        ],
+        "counted_families": 2,
+        "satisfied": true
+      }
+    ]
+  }
+}

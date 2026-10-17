@@ -1,0 +1,39 @@
+{
+  "fixture_id": "extension-namespace-members-preserved",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "x- members on the document, a record and a claim are accepted and preserved.",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null,
+        "extensions": {
+          "x-source": "mail"
+        }
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 1,
+        "confirmations": [
+          "m-1"
+        ],
+        "counted_families": 1,
+        "satisfied": true,
+        "extensions": {
+          "x-n": 1
+        }
+      }
+    ],
+    "extensions": {
+      "x-origin": "synthetic"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "fixture_id": "three-resends-counted-as-three-family-count",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Three re-sends counted as three families.",
+  "expected_refusal": "family_count_mismatch",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1-a",
+        "kind": "resend",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      },
+      {
+        "record_id": "m-1-b",
+        "kind": "resend",
+        "family_id": "fam-a",
+        "derived_from": "m-1"
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 3,
+        "confirmations": [
+          "m-1",
+          "m-1-a",
+          "m-1-b"
+        ],
+        "counted_families": 3,
+        "satisfied": true
+      }
+    ]
+  }
+}

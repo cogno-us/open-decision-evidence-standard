@@ -1,0 +1,38 @@
+{
+  "fixture_id": "retry-claims-a-new-family",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A retry carries a different family than the message it retries: the retry would count as independent.",
+  "expected_refusal": "family_not_inherited",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1-r1",
+        "kind": "retry",
+        "family_id": "fam-b",
+        "derived_from": "m-1"
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "c-1",
+        "required_families": 2,
+        "confirmations": [
+          "m-1",
+          "m-1-r1"
+        ],
+        "counted_families": 2,
+        "satisfied": true
+      }
+    ]
+  }
+}

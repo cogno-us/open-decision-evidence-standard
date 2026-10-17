@@ -1,0 +1,27 @@
+{
+  "fixture_id": "duplicate-record-id",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Two records share an id.",
+  "expected_refusal": "duplicate_record_id",
+  "document": {
+    "contract": "source-family-counting",
+    "contract_version": "0.1.0-draft",
+    "profile": "source-family-counting/0.1",
+    "records": [
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      },
+      {
+        "record_id": "m-1",
+        "kind": "original",
+        "family_id": "fam-a",
+        "derived_from": null
+      }
+    ],
+    "claims": []
+  }
+}
