@@ -1,5 +1,7 @@
 # Merged producer compatibility checkpoint
 
+Status: informative implementation profile proposal; ODES remains draft. Profile version `odes-cognous-stack-export-0.2.1` is a proposed, separately versioned extension of unchanged `pder-v0.1`, not part of the core standard.
+
 This change adds `odes-cognous-stack-export-0.2.1` for the exact producer combination below. Historical mappings remain available. It consumes the existing bounded workflow export 2.0.0; it does not export atomic execution claims or refund-intent registry evidence.
 
 | Component | Exact revision |
