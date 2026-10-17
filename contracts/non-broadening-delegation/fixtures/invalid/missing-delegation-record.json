@@ -1,0 +1,38 @@
+{
+  "fixture_id": "missing-delegation-record",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A grant without its delegation record is not a delegation-profile grant.",
+  "expected_refusal": "schema_violation",
+  "document": {
+    "contract": "non-broadening-delegation",
+    "contract_version": "0.1.0-draft",
+    "profile": "non-broadening-delegation/0.1",
+    "grants": [
+      {
+        "grant_id": "urn:grant:root",
+        "revision": "1",
+        "issuer": "urn:issuer:root",
+        "grantee": "urn:principal:a",
+        "not_before": "2026-10-01T00:00:00+00:00",
+        "expires_at": "2026-10-31T00:00:00+00:00",
+        "permissions": [
+          {
+            "action": "refund_issue_routine",
+            "targets": [
+              "acct-1",
+              "acct-2"
+            ],
+            "data_scopes": [
+              "refund.read",
+              "refund.write"
+            ],
+            "max_amount": 100.0,
+            "unit": "USD",
+            "max_effects": 3
+          }
+        ]
+      }
+    ]
+  }
+}
