@@ -1,0 +1,254 @@
+{
+  "fixture_id": "mutation-report-witnessed-seed-regression",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Family H on seed fixtures: regression only, over a witnessed seed-valid clean corpus.",
+  "expected_refusal": null,
+  "document": {
+    "contract": "verification-report",
+    "contract_version": "0.1.0-draft",
+    "profile": "verification-report/0.1",
+    "report_kind": "verification_report",
+    "report_id": "rep-w1",
+    "generated_at": "2026-10-18T12:00:00+00:00",
+    "verifier": {
+      "name": "cognous-open-control-stack-verifier",
+      "version": "0.0.0-handwritten-fixture",
+      "command": "cognous-verify",
+      "source_revision": "0000000",
+      "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan-python-semantics-v0.1"
+    },
+    "subject": {
+      "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan-python-semantics-v0.1",
+      "inputs": [
+        {
+          "role": "corpus",
+          "name": "witness-digest-fixtures",
+          "digest": "sha256:906a3399c0b84903f9aa14ce38f51acf74a681b425b1c5ba5f00d5f4ea06f2ae",
+          "size_bytes": 1023
+        },
+        {
+          "role": "corpus",
+          "name": "witness-valid",
+          "digest": "sha256:6c3195bcd8b08bbfb6a513754282c691e04dd7a7e06f5867a8e107104b9ce460",
+          "size_bytes": 1013
+        },
+        {
+          "role": "operator_set",
+          "name": "operators.json",
+          "digest": "sha256:1391bd0464de487872df0b610a99d4059ded9d7718adccbda2351ecb08803682",
+          "size_bytes": 1014
+        }
+      ],
+      "inputs_digest": "sha256:0f3119cea9c092e79f31faafdfe5a0bffe831c12b5c8765ed07f3aa01753283a",
+      "pinned": {
+        "controller_revision": "87f02336",
+        "reason_registry_digest": "sha256:6f67c3c1836f72d63252e93923292bb6400e314942f3a97c40b62b36c25b9084",
+        "contract_versions": {
+          "control-plane-journal": "0.1.0-draft",
+          "execution-attempt-lifecycle": "0.1.0-draft"
+        }
+      }
+    },
+    "scope": {
+      "semantic_quality": "not_assessed",
+      "tiers_run": [
+        "V1",
+        "V2"
+      ]
+    },
+    "checks": [],
+    "summary": {
+      "checks": 0,
+      "confirmed": 0,
+      "could_not_check": 0,
+      "refuted": 0
+    },
+    "does_not_prove": [
+      {
+        "id": "relative_to_pinned_controller",
+        "statement": "The result is relative to the controller revision, contract draft versions and reason registry named in subject.pinned; it does not carry to any other revision."
+      },
+      {
+        "id": "semantic_quality_not_certified",
+        "statement": "No claim that a decision was correct, that a policy was adequate or that a grant was lawfully issued."
+      },
+      {
+        "id": "receipt_source_bounded",
+        "statement": "Destination ledger rows are executor-written, unsequenced and unsigned: no claim that the ledger is complete or unforged, or that an effect occurred in the world."
+      },
+      {
+        "id": "self_consistent_forgery_not_detected",
+        "statement": "A record rewritten with every affected commitment recomputed is accepted; no external anchor exists."
+      },
+      {
+        "id": "not_an_attestation",
+        "statement": "This is a verification report. It is not an attestation, not an Index or BitRep signature and not an authorization; it grants and denies nothing and is never an input to a grant or decision."
+      },
+      {
+        "id": "parse_strictness_is_refusal_not_repair",
+        "statement": "An input refused at the wire level is reported as refused; the verifier does not normalize it and re-run."
+      },
+      {
+        "id": "no_v1_scope_claim",
+        "statement": "Nothing here changes the V1 scope, the failure register or any qualified row."
+      },
+      {
+        "id": "differential_agreement_is_not_equivalence",
+        "statement": "Agreement between verifier and controller on a corpus is not equivalence outside that corpus."
+      },
+      {
+        "id": "no_imported_headline_numbers",
+        "statement": "No figure from any paper is a target, baseline or expectation; the only numbers are counts from the corpora named here."
+      },
+      {
+        "id": "seeds_are_regression_not_detection",
+        "statement": "Seed corpora are regression checks; detection figures come only from the generated held-out corpus."
+      },
+      {
+        "id": "witness_is_not_publication",
+        "statement": "A witness file that matches the records shows only that match: not that it was published, that it was published in time, or that any party independent of the record keeper held it."
+      }
+    ],
+    "mutation_report": {
+      "report_only": true,
+      "operator_set_digest": "sha256:1391bd0464de487872df0b610a99d4059ded9d7718adccbda2351ecb08803682",
+      "seed": 20261018,
+      "frozen_revision": "qual-0000000",
+      "family_t": [
+        {
+          "corpus_id": "t-seed-witness-digest",
+          "provenance": "seed",
+          "corpus_digest": "sha256:906a3399c0b84903f9aa14ce38f51acf74a681b425b1c5ba5f00d5f4ea06f2ae",
+          "categories": [
+            {
+              "category": "H1",
+              "expected_verdict": "reject",
+              "n_gen": 3,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 3,
+              "verdicts": {
+                "reject": 3,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": {
+                "refused_with_intended_code": {
+                  "k": 3,
+                  "n": 3
+                }
+              },
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            },
+            {
+              "category": "H2",
+              "expected_verdict": "reject",
+              "n_gen": 2,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 2,
+              "verdicts": {
+                "reject": 2,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": {
+                "refused_with_intended_code": {
+                  "k": 2,
+                  "n": 2
+                }
+              },
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            },
+            {
+              "category": "H3",
+              "expected_verdict": "reject",
+              "n_gen": 4,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 4,
+              "verdicts": {
+                "reject": 4,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": {
+                "refused_with_intended_code": {
+                  "k": 3,
+                  "n": 4
+                }
+              },
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            },
+            {
+              "category": "H4",
+              "expected_verdict": "reject",
+              "n_gen": 2,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 2,
+              "verdicts": {
+                "reject": 2,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": {
+                "refused_with_intended_code": {
+                  "k": 2,
+                  "n": 2
+                }
+              },
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            }
+          ],
+          "scenarios": null
+        }
+      ],
+      "family_s": [],
+      "clean": [
+        {
+          "corpus_id": "clean-witness-valid-fixtures",
+          "provenance": "seed_valid_fixtures",
+          "corpus_digest": "sha256:6c3195bcd8b08bbfb6a513754282c691e04dd7a7e06f5867a8e107104b9ce460",
+          "rows": [
+            {
+              "category": "H1",
+              "false_rejection": {
+                "k": 0,
+                "n": 5
+              }
+            },
+            {
+              "category": "H3",
+              "false_rejection": {
+                "k": 0,
+                "n": 5
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

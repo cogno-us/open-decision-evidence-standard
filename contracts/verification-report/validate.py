@@ -39,6 +39,12 @@ MUTATION_NON_CLAIMS = ("no_imported_headline_numbers", "seeds_are_regression_not
 # non-claim.
 V3_INPUT_ROLES = ("witness", "holder_inventory")
 V3_NON_CLAIMS = ("witness_is_not_publication",)
+# Family H (damage to the outside-held witness and holder-inventory artifacts, draft revision 2026-10-18, decision 28). Rows of these
+# categories are measured only on a witnessed population: a corpus that carries any of them carries only H rows and the two controls
+# that make sense there (B, F), and a report with such a corpus also carries a witnessed clean corpus. Denominators of a witnessed
+# population are never pooled with those of an unwitnessed one.
+WITNESS_CATEGORIES = ("H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8")
+WITNESSED_POPULATION_CATEGORIES = WITNESS_CATEGORIES + ("B", "F")
 
 
 @dataclass(frozen=True)
@@ -156,6 +162,14 @@ def _sub(value: Any, schema: dict[str, Any], root: dict[str, Any], path: str) ->
     out: list[Violation] = []
     _check(value, schema, root, path, out)
     return out
+
+
+def _has_witness_rows(m: dict[str, Any]) -> bool:
+    for c in m["family_t"]:
+        tables = [c["categories"]] + [sc["categories"] for sc in (c["scenarios"] or [])]
+        if any(r["category"] in WITNESS_CATEGORIES for t in tables for r in t):
+            return True
+    return any(r["category"] in WITNESS_CATEGORIES for c in m["clean"] for r in c["rows"])
 
 
 def validate_structure(doc: Any) -> list[Violation]:
@@ -285,8 +299,9 @@ def _document_rules(doc: dict[str, Any]) -> list[Violation]:
     ids = [n["id"] for n in doc["does_not_prove"]]
     if len(set(ids)) != len(ids):
         out.append(_v("duplicate_non_claim", "$.does_not_prove", "each non-claim appears once"))
+    witness_rows = doc["mutation_report"] is not None and _has_witness_rows(doc["mutation_report"])
     required = list(CORE_NON_CLAIMS) + (list(MUTATION_NON_CLAIMS) if doc["mutation_report"] is not None else []) \
-        + (list(V3_NON_CLAIMS) if v3_ran else [])
+        + (list(V3_NON_CLAIMS) if v3_ran or witness_rows else [])
     for need in required:
         if need not in ids:
             out.append(_v("non_claim_missing", "$.does_not_prove", f"the non-claim {need!r} is mandatory"))
@@ -388,10 +403,23 @@ def _mutation_rules(doc: dict[str, Any]) -> list[Violation]:
             out.append(_v("duplicate_corpus_id", p, "corpus ids are unique across the family S, family T and clean lists"))
         ids.add(cid)
 
+    def witnessed_population(cats: list[str], p: str) -> bool:
+        """True for a corpus with any family H row; it may then carry only H rows and the B and F controls (never pooled)."""
+        if not any(c in WITNESS_CATEGORIES for c in cats):
+            return False
+        if any(c not in WITNESSED_POPULATION_CATEGORIES for c in cats):
+            out.append(_v("witnessed_corpus_mixed", p,
+                          "a witnessed population carries only family H rows and the B and F controls; "
+                          "unwitnessed categories are measured on an unwitnessed corpus, and denominators are never pooled"))
+        return True
+
+    witnessed_t = False
     for i, c in enumerate(m["family_t"]):
         p = f"$.mutation_report.family_t[{i}]"
         corpus_id(c["corpus_id"], f"{p}.corpus_id")
         _category_rows(c["categories"], c["provenance"], f"{p}.categories", out)
+        scenario_cats = [r["category"] for sc in (c["scenarios"] or []) for r in sc["categories"]]
+        witnessed_t |= witnessed_population([r["category"] for r in c["categories"]] + scenario_cats, p)
         scenarios = c["scenarios"] or []
         seen_s: set[str] = set()
         for j, s in enumerate(scenarios):
@@ -410,9 +438,11 @@ def _mutation_rules(doc: dict[str, Any]) -> list[Violation]:
             seen_src.add(r["source_id"])
             if r["detected"] + r["survived"] + r["errored"] != r["n_cases"]:
                 out.append(_v("case_sum_mismatch", rp, "detected + survived + errored equals n_cases (control-removal cases, context only)"))
+    witnessed_clean = False
     for i, c in enumerate(m["clean"]):
         p = f"$.mutation_report.clean[{i}]"
         corpus_id(c["corpus_id"], f"{p}.corpus_id")
+        witnessed_clean |= witnessed_population([r["category"] for r in c["rows"]], p)
         seen_c: set[str] = set()
         for j, r in enumerate(c["rows"]):
             rp = f"{p}.rows[{j}]"
@@ -420,6 +450,11 @@ def _mutation_rules(doc: dict[str, Any]) -> list[Violation]:
                 out.append(_v("duplicate_category", rp, "one row per category in a clean corpus"))
             seen_c.add(r["category"])
             _fraction_range("false_rejection", r["false_rejection"], f"{rp}.false_rejection", out)
+
+    if witnessed_t and not witnessed_clean:
+        out.append(_v("witnessed_clean_corpus_missing", "$.mutation_report.clean",
+                      "family H rows need a witnessed clean corpus (false rejection of family H checks on unmutated witnessed traces), "
+                      "separate from the unwitnessed clean corpora"))
 
     by_role: dict[str, set[str]] = {}
     for i in doc["subject"]["inputs"]:

@@ -552,6 +552,14 @@
         "X1",
         "L1",
         "F",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8",
         "Q"
       ]
     },
@@ -581,6 +589,7 @@
           "enum": [
             "reject",
             "accept",
+            "abstain",
             "not_applicable"
           ]
         },
