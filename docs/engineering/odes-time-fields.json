@@ -1,0 +1,423 @@
+{
+ "table": "odes-time-fields/0.1.0-draft",
+ "normative_text": "docs/engineering/ODES-TIME-SEMANTICS.md",
+ "classes": {
+  "window": "half-open [not_before, expires_at); evaluation == expires_at is expired, evaluation == not_before is valid",
+  "deadline": "inclusive; open through the deadline itself, past only strictly after it",
+  "instant": "an RFC 3339 date-time with an explicit offset (the index-evidence-registry attestation uses integer epoch seconds, noted per field)",
+  "duration": "non-negative seconds"
+ },
+ "fields": [
+  {
+   "contract": "bounded-deferral",
+   "member": "deadline",
+   "class": "deadline",
+   "note": "opened_at plus max_age_seconds; a response at the deadline counts, evaluation at the deadline is still open"
+  },
+  {
+   "contract": "bounded-deferral",
+   "member": "opened_at",
+   "class": "instant"
+  },
+  {
+   "contract": "bounded-deferral",
+   "member": "received_at",
+   "class": "instant"
+  },
+  {
+   "contract": "bounded-deferral",
+   "member": "resolved_at",
+   "class": "instant"
+  },
+  {
+   "contract": "bounded-deferral",
+   "member": "evaluated_at",
+   "class": "instant"
+  },
+  {
+   "contract": "bounded-deferral",
+   "member": "first_observable_at",
+   "class": "instant"
+  },
+  {
+   "contract": "bounded-deferral",
+   "member": "max_age_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "not_before",
+   "class": "window",
+   "role": "start",
+   "note": "operation_horizon; inclusive start"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "expires_at",
+   "class": "window",
+   "role": "end",
+   "note": "operation_horizon; exclusive end"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "deadline",
+   "class": "deadline",
+   "note": "freshness/0.1 check deadline: opened recorded_at plus age_bound_seconds"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "age_bound_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "observation_max_age_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "observation_clock_tolerance_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "acknowledged_at",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "decided_at",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "evaluated_at",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "evaluation_time",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "observed_at",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "previous_observed_at",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "reconciled_at",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "recorded_at",
+   "class": "instant"
+  },
+  {
+   "contract": "control-plane-journal",
+   "member": "started_at",
+   "class": "instant"
+  },
+  {
+   "contract": "effect-reversibility",
+   "member": "reversible_until",
+   "class": "window",
+   "role": "end",
+   "note": "exclusive end of the reversal window; the class is irreversible from this instant"
+  },
+  {
+   "contract": "effect-reversibility",
+   "member": "max_status_age_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "effect-reversibility",
+   "member": "closed_at",
+   "class": "instant"
+  },
+  {
+   "contract": "effect-reversibility",
+   "member": "dispatched_at",
+   "class": "instant"
+  },
+  {
+   "contract": "effect-reversibility",
+   "member": "evaluated_at",
+   "class": "instant"
+  },
+  {
+   "contract": "effect-reversibility",
+   "member": "observed_at",
+   "class": "instant"
+  },
+  {
+   "contract": "effect-reversibility",
+   "member": "recorded_at",
+   "class": "instant"
+  },
+  {
+   "contract": "execution-attempt-lifecycle",
+   "member": "created_at",
+   "class": "instant",
+   "note": "created_at is a number in the producer rows (epoch seconds); the others are strings"
+  },
+  {
+   "contract": "execution-attempt-lifecycle",
+   "member": "evaluated_at",
+   "class": "instant",
+   "note": "created_at is a number in the producer rows (epoch seconds); the others are strings"
+  },
+  {
+   "contract": "execution-attempt-lifecycle",
+   "member": "observed_at",
+   "class": "instant",
+   "note": "created_at is a number in the producer rows (epoch seconds); the others are strings"
+  },
+  {
+   "contract": "execution-attempt-lifecycle",
+   "member": "previous_observed_at",
+   "class": "instant",
+   "note": "created_at is a number in the producer rows (epoch seconds); the others are strings"
+  },
+  {
+   "contract": "execution-attempt-lifecycle",
+   "member": "recorded_at",
+   "class": "instant",
+   "note": "created_at is a number in the producer rows (epoch seconds); the others are strings"
+  },
+  {
+   "contract": "execution-attempt-lifecycle",
+   "member": "started_at",
+   "class": "instant",
+   "note": "created_at is a number in the producer rows (epoch seconds); the others are strings"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "deadline",
+   "class": "deadline",
+   "note": "check deadline at opening; overdue and expired only strictly after it"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "not_before",
+   "class": "window",
+   "role": "start",
+   "note": "age_extension window; inclusive start"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "expires_at",
+   "class": "window",
+   "role": "end",
+   "note": "age_extension window; exclusive end"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "age_bound_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "from_max_age_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "to_max_age_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "oldest_open_age_seconds",
+   "class": "duration"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "as_of",
+   "class": "instant"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "evaluated_at",
+   "class": "instant"
+  },
+  {
+   "contract": "freshness-clocks",
+   "member": "recorded_at",
+   "class": "instant"
+  },
+  {
+   "contract": "governed-exchange",
+   "member": "expires_at",
+   "class": "window",
+   "role": "end",
+   "note": "window [created_at, expires_at); an empty window (expires_at <= created_at) is refused"
+  },
+  {
+   "contract": "governed-exchange",
+   "member": "created_at",
+   "class": "instant"
+  },
+  {
+   "contract": "governed-exchange",
+   "member": "inbox_received_at",
+   "class": "instant"
+  },
+  {
+   "contract": "governed-exchange",
+   "member": "next_attempt_at",
+   "class": "instant"
+  },
+  {
+   "contract": "governed-exchange",
+   "member": "recovery_evaluated_at",
+   "class": "instant"
+  },
+  {
+   "contract": "holder-inventory",
+   "member": "recorded_at",
+   "class": "instant"
+  },
+  {
+   "contract": "index-evidence-registry",
+   "member": "not_before",
+   "class": "window",
+   "role": "start",
+   "note": "BitRep attestation; integer seconds since 1970-01-01T00:00:00Z (not an RFC 3339 string); issued_at <= not_before < expires_at"
+  },
+  {
+   "contract": "index-evidence-registry",
+   "member": "expires_at",
+   "class": "window",
+   "role": "end",
+   "note": "BitRep attestation; integer epoch seconds; exclusive end"
+  },
+  {
+   "contract": "index-evidence-registry",
+   "member": "issued_at",
+   "class": "instant",
+   "note": "integer epoch seconds (not an RFC 3339 string)"
+  },
+  {
+   "contract": "index-evidence-registry",
+   "member": "evaluated_at",
+   "class": "instant",
+   "note": "integer epoch seconds (not an RFC 3339 string)"
+  },
+  {
+   "contract": "index-evidence-registry",
+   "member": "key_status_at",
+   "class": "instant",
+   "note": "integer epoch seconds (not an RFC 3339 string)"
+  },
+  {
+   "contract": "index-evidence-registry",
+   "member": "last_computed_at",
+   "class": "instant",
+   "note": "RFC 3339 string; the schema pattern makes the offset optional (recorded as a deviation in the conformance table)"
+  },
+  {
+   "contract": "index-evidence-registry",
+   "member": "timestamp",
+   "class": "instant",
+   "note": "RFC 3339 string; the schema pattern makes the offset optional (recorded as a deviation in the conformance table)"
+  },
+  {
+   "contract": "non-broadening-delegation",
+   "member": "not_before",
+   "class": "window",
+   "role": "start"
+  },
+  {
+   "contract": "non-broadening-delegation",
+   "member": "expires_at",
+   "class": "window",
+   "role": "end"
+  },
+  {
+   "contract": "operation-identity",
+   "member": "admitted_at",
+   "class": "instant"
+  },
+  {
+   "contract": "operation-identity",
+   "member": "recorded_at",
+   "class": "instant"
+  },
+  {
+   "contract": "rule-revision",
+   "member": "period_seconds",
+   "class": "duration",
+   "note": "trend report period; the reporting period is a duration, not a window of this document"
+  },
+  {
+   "contract": "rule-revision",
+   "member": "adoption_time",
+   "class": "instant"
+  },
+  {
+   "contract": "rule-revision",
+   "member": "as_of",
+   "class": "instant"
+  },
+  {
+   "contract": "rule-revision",
+   "member": "recorded_at",
+   "class": "instant"
+  },
+  {
+   "contract": "rule-revision",
+   "member": "row_time",
+   "class": "instant"
+  },
+  {
+   "contract": "two-party-reconciliation",
+   "member": "committed_at",
+   "class": "instant"
+  },
+  {
+   "contract": "two-party-reconciliation",
+   "member": "compared_at",
+   "class": "instant"
+  },
+  {
+   "contract": "two-party-reconciliation",
+   "member": "recorded_at",
+   "class": "instant"
+  },
+  {
+   "contract": "verification-report",
+   "member": "generated_at",
+   "class": "instant"
+  },
+  {
+   "contract": "recipient-validator (pder-v0.1 package)",
+   "member": "consumption_conditions.expires_at",
+   "class": "window",
+   "role": "end",
+   "note": "compared with the recipient evaluation time"
+  },
+  {
+   "contract": "recipient-validator (pder-v0.1 package)",
+   "member": "status_max_age_seconds",
+   "class": "duration",
+   "note": "recipient policy; an age equal to it is accepted"
+  },
+  {
+   "contract": "recipient-validator (pder-v0.1 package)",
+   "member": "decision_timestamp",
+   "class": "instant"
+  },
+  {
+   "contract": "recipient-validator (pder-v0.1 package)",
+   "member": "status_inputs.evaluated_at",
+   "class": "instant"
+  }
+ ]
+}
