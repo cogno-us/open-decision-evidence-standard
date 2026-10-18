@@ -1,0 +1,47 @@
+{
+  "fixture_id": "extension-key-without-x-prefix",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Extension names must carry the x- prefix.",
+  "expected_refusal": "invalid_extension_key",
+  "document": {
+    "contract": "bounded-deferral",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "evaluated_at": "2026-10-05T19:00:30+00:00",
+    "deferrals": [
+      {
+        "deferral_id": "syn-deferral-1",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "action_class_id": "synthetic-irreversible",
+        "policy": {
+          "policy_verdict": "defer",
+          "policy_ref": "syn-policy-1",
+          "deferred_reasons": [
+            "required_input_not_read",
+            "status_unreadable"
+          ],
+          "refusal_reasons": []
+        },
+        "opened_at": "2026-10-05T19:00:00+00:00",
+        "max_age_seconds": 60,
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "outcome": "deferred",
+        "responses": [],
+        "resolved_at": null,
+        "refusal_reason": null,
+        "released_decision_id": null,
+        "effect": {
+          "observable": false,
+          "first_observable_at": null
+        },
+        "extensions": {
+          "note": 1
+        }
+      }
+    ]
+  }
+}
