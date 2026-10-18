@@ -172,8 +172,15 @@ def installed_replay_checkout_dirty() -> bool | None:
                                      check=True, timeout=20).stdout
             except Exception:
                 return None
-            return bool(out.strip())
+            return any(not _generated_path(line[3:]) for line in out.splitlines() if line.strip())
     return None
+
+
+def _generated_path(path: str) -> bool:
+    """Packaging and bytecode files that an editable install or the interpreter rewrites (a checkout may track them); they are not
+    source, so rewriting them does not make the checkout run different code."""
+    path = path.strip().strip('"')
+    return ".egg-info/" in path or "/__pycache__/" in path or path.startswith("__pycache__/") or path.endswith((".pyc", ".pyo"))
 
 
 def canonical_bytes(value: Any) -> bytes:
