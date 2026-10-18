@@ -13,7 +13,7 @@ The reference validator returns separate results for:
 3. `package_content_integrity` — validates supported content-digest metadata, canonicalization profile and the complete material package digest over record, profile, integrity metadata and provenance.
 4. `integrity_authentication_checks` — evaluates issuer-authentication evidence separately from content integrity. A public hash is not issuer authentication.
 5. `historical_authority_assertions` — distinguishes record self-assertions from externally configured evidence about authority at decision time.
-6. `authority_status_and_freshness` — evaluates present authority, revocation, supersession, freshness and expiry against recipient policy inputs and an explicit recipient evaluation time.
+6. `authority_status_and_freshness` — evaluates present authority, revocation, supersession, freshness and expiry against recipient policy inputs and an explicit recipient evaluation time. A record consumption window is half-open: an evaluation time equal to `consumption_conditions.expires_at` is expired.
 7. `consumption_conditions` — checks relying party and purpose.
 8. `recipient_reliance_decision` — recipient policy result.
 

@@ -202,7 +202,7 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
     expires_at, expiry_errors = _parse_time_result(conditions.get("expires_at"), "record consumption expiry")
     if expiry_errors:
         reasons.extend(expiry_errors)
-    if expires_at and now_dt and expires_at < now_dt:
+    if expires_at and now_dt and expires_at <= now_dt:
         reasons.append("record consumption window has expired under recipient policy time")
 
     if not isinstance(status_inputs, dict) or not status_inputs:
