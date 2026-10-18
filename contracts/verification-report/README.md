@@ -182,6 +182,21 @@ A passing run shows that a report is well formed, that its verdicts and tallies 
 18. The report is unsigned and carries no signature, integrity or attestation member; integrity is the consumer's digest of the report bytes.
 19. `report_only` is a constant `true`: a mutation report never gates a scenario verdict, a profile or a pin.
 20. The non-claim `statement` text is the producer's; the contract fixes the identifiers and their presence, not the words (the design's section 5 text is a candidate wording, not applied by this contract).
+21. The verifier command's exit codes are a harness convention outside the contract (section "Harness convention: exit codes"); the document has no exit-code member and no rule depends on one.
+
+## Harness convention: exit codes (non-normative)
+
+Not part of the contract and not checked by `validate.py`: the document carries no exit-code member. This records the convention the reference verifier (`cognous-verify`) follows, so that scripts and the mutation harness read its outcomes the same way. Decision 25-B.
+
+| Exit | Outcome | Report |
+|---|---|---|
+| 0 | accept: every check confirmed | yes |
+| 1 | refuted: at least one check refuted | yes |
+| 2 | usage or input error | no |
+| 3 | abstain: none refuted and at least one check could not be made | yes |
+| 4 | crash | no |
+
+Abstain keeps its own code and is not folded into 0 or 1. Reason: a script that gates on the exit status must never read "could not check" as success (0) or as a refusal (1). With a distinct code, `if verify; then ship` cannot pass an input the verifier could not examine, and a refusal handler is not triggered by an input that was merely incomplete. The codes follow `overall_verdict(doc)` (`reject` is 1, `abstain` is 3, `accept` is 0) and the harness counts a crash (4, no report) as `error`, never as detection. Another implementation may choose other codes; a consumer should read the report's check verdicts, not the status, when it needs more than the three-way outcome.
 
 ## Versioning and change rules (0.x)
 
