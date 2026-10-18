@@ -1,0 +1,440 @@
+{
+  "fixture_id": "overdue-before-the-deadline",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "overdue_before_deadline",
+  "reason": "The recovery pass reports a live check overdue only after its deadline.",
+  "provenance": {
+    "source": "mutation of captured fixture overdue-reported-not-closed",
+    "control_plane_commit": "3f6a7668"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [
+      {
+        "check_id": "syn-check-1",
+        "phase": "opened",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "overdue",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:30+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": [
+          "check_overdue"
+        ]
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "completed",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      }
+    ],
+    "clock_rows": [
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:01:06+00:00"
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:01:06+00:00"
+      }
+    ],
+    "input_reads": [
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "authority_context",
+        "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "role_mapping",
+        "input_id": "urn:cognous:institution:synthetic-customer-service",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "identity",
+        "input_id": "urn:cognous:identity:refund-agent-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "mandate",
+        "input_id": "urn:cognous:issuance:1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "grant",
+        "input_id": "urn:cognous:grant:routine-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "conflict",
+        "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "policy",
+        "input_id": "urn:cognous:policy:refund-policy",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "approval",
+        "input_id": "urn:cognous:approval:t1-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:refund-entitlement",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:optional-context",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "authority_context",
+        "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "role_mapping",
+        "input_id": "urn:cognous:institution:synthetic-customer-service",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "identity",
+        "input_id": "urn:cognous:identity:refund-agent-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "mandate",
+        "input_id": "urn:cognous:issuance:1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "grant",
+        "input_id": "urn:cognous:grant:routine-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "conflict",
+        "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "policy",
+        "input_id": "urn:cognous:policy:refund-policy",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "approval",
+        "input_id": "urn:cognous:approval:t1-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:refund-entitlement",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:optional-context",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      }
+    ],
+    "age_extensions": [],
+    "age_extension_refusals": [],
+    "recovery_runs": [
+      {
+        "run_id": "syn-recovery-run-1",
+        "trigger": "manual",
+        "recorded_at": "2026-10-05T19:01:01+00:00",
+        "interrupted": [],
+        "overdue": [
+          "syn-check-1"
+        ],
+        "open_count": 1,
+        "oldest_open_age_seconds": 61.0
+      },
+      {
+        "run_id": "syn-recovery-run-2",
+        "trigger": "manual",
+        "recorded_at": "2026-10-05T19:01:06+00:00",
+        "interrupted": [],
+        "overdue": [
+          "syn-check-1"
+        ],
+        "open_count": 1,
+        "oldest_open_age_seconds": 66.0
+      }
+    ],
+    "freshness_reports": []
+  }
+}

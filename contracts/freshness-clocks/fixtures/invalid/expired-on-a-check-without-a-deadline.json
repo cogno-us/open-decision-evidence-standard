@@ -1,0 +1,217 @@
+{
+  "fixture_id": "expired-on-a-check-without-a-deadline",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "expired_without_deadline",
+  "reason": "An expired event needs a check opened with a deadline.",
+  "provenance": {
+    "source": "mutation of captured fixture default-path-carries-no-clock-members",
+    "control_plane_commit": "3f6a7668"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [
+      {
+        "check_id": "syn-check-3",
+        "phase": "opened",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "completed",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "opened",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "completed",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "expired",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:01:40+00:00",
+        "reasons": [
+          "check_expired_before_dispatch"
+        ]
+      }
+    ],
+    "clock_rows": [],
+    "input_reads": [],
+    "age_extensions": [],
+    "age_extension_refusals": [],
+    "recovery_runs": [],
+    "freshness_reports": []
+  }
+}

@@ -1,0 +1,619 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/freshness-clocks/schema.json",
+  "title": "Freshness clocks extension profile 0.1.0-draft",
+  "description": "Optional extension profile layered on the control-plane-journal and operation-identity contracts: three named clocks on the rows of a run, a check deadline fixed at opening with the overdue and expired phases, the age basis of a status read and its nonce, the authorised age extension and its refusals, the recovery pass rows and the freshness counts of the Control Plane freshness/0.1 profile. Closed member sets; x- extensions on declared extensible objects (not on a verbatim producer report). Cross-record and cross-document rules are in validate.py and README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "profile",
+    "run_id",
+    "check_events",
+    "clock_rows",
+    "input_reads",
+    "age_extensions",
+    "age_extension_refusals",
+    "recovery_runs",
+    "freshness_reports"
+  ],
+  "properties": {
+    "contract": {
+      "const": "freshness-clocks"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "profile": {
+      "const": "freshness/0.1"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "check_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/check_event"
+      }
+    },
+    "clock_rows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/clock_row"
+      }
+    },
+    "input_reads": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/input_read"
+      }
+    },
+    "age_extensions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/age_extension"
+      }
+    },
+    "age_extension_refusals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/age_extension_refusal"
+      }
+    },
+    "recovery_runs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/recovery_run"
+      }
+    },
+    "freshness_reports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/freshness_report"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "check_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "phase",
+        "stage",
+        "recorded_at",
+        "reasons"
+      ],
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "phase": {
+          "enum": [
+            "opened",
+            "input",
+            "completed",
+            "interrupted",
+            "overdue",
+            "expired"
+          ]
+        },
+        "stage": {
+          "enum": [
+            "decision",
+            "effect",
+            "claim"
+          ]
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "evaluated_at": {
+          "type": "string"
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "age_bound_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "extension_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "clock_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "row_type",
+        "row_id",
+        "seq",
+        "recorded_at"
+      ],
+      "properties": {
+        "row_type": {
+          "enum": [
+            "decision",
+            "attempt",
+            "refusal",
+            "resolution_check",
+            "attempt_join",
+            "operation",
+            "operation_renewal"
+          ]
+        },
+        "row_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evaluated_at": {
+          "type": "string"
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "input_read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "row_type",
+        "row_id",
+        "check_id",
+        "input_type",
+        "input_id",
+        "age_basis",
+        "read_state",
+        "expected_nonce",
+        "observed_nonce"
+      ],
+      "properties": {
+        "row_type": {
+          "enum": [
+            "decision",
+            "refusal",
+            "resolution_check"
+          ]
+        },
+        "row_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "check_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "input_type": {
+          "enum": [
+            "manifest",
+            "authority_context",
+            "grant",
+            "policy",
+            "approval",
+            "evidence",
+            "role_mapping",
+            "identity",
+            "mandate",
+            "conflict",
+            "purpose"
+          ]
+        },
+        "input_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "age_basis": {
+          "enum": [
+            "nonce_bound",
+            "source_asserted"
+          ]
+        },
+        "read_state": {
+          "enum": [
+            null,
+            "unreadable",
+            "cached_positive",
+            "nonce_mismatch"
+          ]
+        },
+        "expected_nonce": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "observed_nonce": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "age_extension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "extension_id",
+        "class_id",
+        "from_max_age_seconds",
+        "to_max_age_seconds",
+        "not_before",
+        "expires_at",
+        "outage_ref",
+        "requested_by",
+        "signer",
+        "authority_ref",
+        "recorded_at"
+      ],
+      "properties": {
+        "extension_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "from_max_age_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "to_max_age_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_before": {
+          "type": "string"
+        },
+        "expires_at": {
+          "type": "string"
+        },
+        "outage_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requested_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signer": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "authority_ref": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "evaluated_at": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "age_extension_refusal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "refusal_id",
+        "extension",
+        "reasons",
+        "recorded_at"
+      ],
+      "properties": {
+        "refusal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extension": {
+          "$ref": "#/$defs/age_extension_embedded"
+        },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "age_extension_unsigned",
+              "age_extension_self_signed",
+              "age_extension_signer_not_configured",
+              "age_extension_exceeds_limit",
+              "age_extension_invalid",
+              "age_extension_authority_unconfigured"
+            ]
+          }
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "recovery_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "trigger",
+        "recorded_at",
+        "interrupted",
+        "overdue",
+        "open_count",
+        "oldest_open_age_seconds"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trigger": {
+          "enum": [
+            "startup",
+            "interval",
+            "manual"
+          ]
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "interrupted": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "overdue": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "open_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "oldest_open_age_seconds": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "freshness_block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "open_count",
+        "abandoned_open_count",
+        "overdue_count",
+        "expired_before_dispatch_count",
+        "oldest_open_age_seconds"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string"
+        },
+        "open_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "abandoned_open_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overdue_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expired_before_dispatch_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "oldest_open_age_seconds": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        }
+      }
+    },
+    "freshness_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_id",
+        "report"
+      ],
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "report": {
+          "$ref": "#/$defs/freshness_block"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "age_extension_embedded": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "extension_id",
+        "class_id",
+        "from_max_age_seconds",
+        "to_max_age_seconds",
+        "not_before",
+        "expires_at",
+        "outage_ref",
+        "requested_by",
+        "signer",
+        "authority_ref",
+        "recorded_at"
+      ],
+      "properties": {
+        "extension_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "from_max_age_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "to_max_age_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_before": {
+          "type": "string"
+        },
+        "expires_at": {
+          "type": "string"
+        },
+        "outage_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requested_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signer": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "authority_ref": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "evaluated_at": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

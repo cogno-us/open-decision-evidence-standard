@@ -1,0 +1,159 @@
+{
+  "fixture_id": "exceeds-limit-reason-for-a-small-extension",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "extension_refusal_reason_mismatch",
+  "reason": "With the declared limit supplied, age_extension_exceeds_limit is listed if and only if the raise is above it.",
+  "provenance": {
+    "source": "mutation of captured fixture extension-refusals-kept",
+    "control_plane_commit": "3f6a7668"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [],
+    "clock_rows": [],
+    "input_reads": [],
+    "age_extensions": [],
+    "age_extension_refusals": [
+      {
+        "refusal_id": "syn-refusal-1",
+        "extension": {
+          "extension_id": "syn-extension-1",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": null,
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_unsigned"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-2",
+        "extension": {
+          "extension_id": "syn-extension-2",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:requester",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_self_signed"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-3",
+        "extension": {
+          "extension_id": "syn-extension-3",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:nobody",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_exceeds_limit"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-4",
+        "extension": {
+          "extension_id": "syn-extension-4",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 1000,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_exceeds_limit"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-5",
+        "extension": {
+          "extension_id": "syn-extension-5",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 60,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_invalid"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-6",
+        "extension": {
+          "extension_id": "syn-extension-6",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T19:00:00+00:00",
+          "outage_ref": "x",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_invalid"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "recovery_runs": [],
+    "freshness_reports": []
+  },
+  "host": {
+    "signers": [
+      "urn:cognous:principal:rule-signer",
+      "urn:cognous:principal:policy-signer"
+    ],
+    "max_age_extension_seconds": 300
+  }
+}

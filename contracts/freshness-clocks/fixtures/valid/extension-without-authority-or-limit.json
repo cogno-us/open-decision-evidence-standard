@@ -1,0 +1,84 @@
+{
+  "fixture_id": "extension-without-authority-or-limit",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real producer run (Control Plane 3f6a7668, opt-in freshness/0.1, synthetic proposals, settable service clock, throwaway store). No rule-revision profile and the default limit 0: an extension is refused for age_extension_authority_unconfigured and age_extension_exceeds_limit together. Ids, nonces and the process owner are synthetic.",
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "3f6a7668",
+    "scenario": "extension-without-authority-or-limit"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [],
+    "clock_rows": [],
+    "input_reads": [],
+    "age_extensions": [],
+    "age_extension_refusals": [
+      {
+        "refusal_id": "syn-refusal-1",
+        "extension": {
+          "extension_id": "syn-extension-1",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_authority_unconfigured",
+          "age_extension_exceeds_limit"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "recovery_runs": [],
+    "freshness_reports": []
+  },
+  "journal": {
+    "run_id": "run-1",
+    "decisions": [],
+    "attempts": [],
+    "refusals": [],
+    "resolution_checks": [],
+    "age_extensions": [],
+    "age_extension_refusals": [
+      {
+        "refusal_id": "syn-refusal-1",
+        "extension": {
+          "extension_id": "syn-extension-1",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_authority_unconfigured",
+          "age_extension_exceeds_limit"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ]
+  },
+  "host": {
+    "signers": null,
+    "max_age_extension_seconds": 0
+  }
+}
