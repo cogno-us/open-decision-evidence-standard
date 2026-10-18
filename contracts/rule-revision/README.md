@@ -24,7 +24,7 @@ A sidecar projection of one run, `contract: "rule-revision"`, `contract_version:
 | `identity_rows` | `row_type` (`decision`, `refusal`), `row_id`, `recorded_at`, `rule_identity` | one per decision or refusal row carrying the `rule_identity` member |
 | `trend_reports` | `report_id`, `report` | envelope around the verbatim output of `refusal_trends` |
 | `arity_reports` | `report_id`, `declared`, `declared_from`, `measured`, `flags` | envelope: `measured_arity` and `arity_flags` output plus the declaration it was compared with |
-| `recomputability_reports` | `report_id`, `rows_from`, `declared_kinds`, `flags` | envelope around `derive_recomputability` compared with the registry's declared kinds |
+| `recomputability_reports` | `report_id`, `rows_from`, `declared_kinds`, `flags` | envelope around `derive_recomputability` (`recomputable`, `typed_only`, `underivable`) compared with the registry's declared kinds |
 
 `rule_identity` is `{rules: {rule_ref: {digest, state, verified_through, findings}}, unknown: [rule_refs]}`. `verified_through` is one of `none`, `revision_row_present`, `signer_independent_and_configured`, `digest_matches_signed_revision`. `findings` are drawn from `no_signed_revision`, `unsigned_revision_row`, `self_signed_revision_row`, `signer_not_configured`, `digest_mismatch_with_adopted`, `observed_digest_absent`.
 
@@ -37,7 +37,7 @@ Same model as the journal contract.
 1. All declared members of a row are required, except `producer`, `extensions`, `declared_arity` and the trend annotation members (all present or all absent, `trend_annotation_incomplete`).
 2. Closed member sets. An undeclared member outside `extensions` is `undeclared_member`, never dropped. A verbatim producer report carries no `extensions`; its envelope may.
 3. `extensions` (names `^x-[a-z0-9][a-z0-9._-]*$`, else `invalid_extension_key`) on the document and on each row and envelope. Consumers ignore them for contract logic, preserve them, and include them in any digest.
-4. Closed enumerations (`unknown_enum_value`), listed above plus trend `taint_reasons` (`pre_split_count`, `row_predates_adoption`), arity flags (`measured_exceeds_declared`, `arity_undeclared`) and recomputability flags (`declared_overclaim`, `declared_underclaim`). A new value is a major bump.
+4. Closed enumerations (`unknown_enum_value`), listed above plus trend `taint_reasons` (`pre_split_count`, `row_predates_adoption`), arity flags (`measured_exceeds_declared`, `arity_undeclared`) and recomputability flags (`declared_overclaim`, `declared_underclaim`, `derivation_unavailable`). A new value is a major bump.
 5. Times are ISO-8601 with a UTC offset (`timestamp_invalid`). Digests are `sha256:` plus 64 lower-case hex.
 
 ## Resolution
@@ -82,7 +82,7 @@ Document rules need only the document. Cross-document rules need the optional ru
 | `policy_input_without_rule_identity` | every policy the row read has a rule identity entry |
 | `pre_split_without_change` | pre_split_count needs a split of this version that retires this code |
 | `recomputability_code_not_in_row` | the flagged code is one of the row's reasons |
-| `recomputability_flag_inconsistent` | a flag is raised only where declared and derived differ; declared_overclaim is declared recomputable |
+| `recomputability_flag_inconsistent` | a flag is raised only where declared and derived differ and names that pair: declared_overclaim is recomputable declared, typed_only derived (operands present); derivation_unavailable is recomputable declared, underivable derived; declared_underclaim is typed_only declared, recomputable derived |
 | `recomputability_row_missing` | the flag names a row of the run record's list |
 | `refusal_reason_mismatch` | each reason names a defect the embedded revision shows (an unsigned row is never refused for its signer) |
 | `refusal_reasons_not_canonical` | reasons are sorted and unique |
@@ -124,7 +124,7 @@ Only in this contract (no producer re-check of a stored row; a producer bug woul
 
 Divergences noted, none edited:
 
-- `derive_recomputability` classifies a row `recomputable` only when every resolution input is missing or carries a non-empty `observed`. The manifest input of every real decision row has `observed` equal to `{}`, so every real row derives `typed_only` and a real `grant_revoked` hold, whose registry kind is `recomputable`, is flagged `declared_overclaim`. Captured as the valid fixture `recomputability-declared-overclaim`. This is a producer quirk outside this stream; the contract states the producer's function and does not weaken it.
+- Finding, fixed at the producer (Control Plane `fd0d5e0`, N2b): `derive_recomputability` first derived `typed_only` for every real decision row because the retained manifest input has `observed` equal to `{}` (operands are absent), so a real `grant_revoked` hold, whose registry kind is `recomputable`, was flagged `declared_overclaim`, a false alarm. Now operands not retained derive `underivable` and the flag is `derivation_unavailable` (declared `recomputable`, derived `underivable`); `declared_overclaim` is reserved for rows whose operands are present and show the declared kind cannot hold (`recomputable` declared, `typed_only` derived). `typed_only` with operands present means every recorded expectation is met and none is missing. Captured as the valid fixture `recomputability-derivation-unavailable` (replaces `recomputability-declared-overclaim`); the false overclaim is the invalid fixture `false-overclaim-where-operands-are-absent`. A flag set from the earlier producer (`typed_only` derived for operand-absent rows) is now refused, by design.
 - Host rules do not gate: only a policy digest that is not adopted holds. A host rule with state `unknown` is recorded in `rule_identity.unknown` and the decision still authorizes (fixture `host-rule-unadopted-does-not-gate`).
 - The journal contract refuses a raw run record with the profile on (see Document model).
 - The contract is stricter than the producer on digests (`sha256:` plus 64 hex) and on timestamps (aware, ISO-8601).
@@ -133,9 +133,9 @@ Divergences noted, none edited:
 
 Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, provenance, [expected_refusal], document, [journal], [signers]}`. `fixtures/valid/` must be accepted alone and with `journal` and `signers` when present. `fixtures/invalid/` must be refused with `expected_refusal` as the only violation. `journal` holds the run record members the contract reads (`run_id`, `decisions`, `refusals`, `vocabulary_changes`); `signers` is the configured signer set.
 
-Valid (15): fourteen are captures of real runs and real producer function outputs of Control Plane `83b49b5` (synthetic proposals, fixed clock, throwaway stores, ids replaced by synthetic ones): `adopted-policy-decision-and-refusal-rows`, `unsigned-row-resolves-unknown-and-holds`, `refused-revision-attempts-kept-as-rows`, `policy-edited-in-place-held-then-readopted`, `unsigned-then-resigned-by-supersession`, `host-rule-unadopted-does-not-gate`, `identity-rows-across-a-registry-adoption`, `trend-flags-from-registry-adoption-row`, `trend-pre-split-tainted-from-vocabulary-change`, `trend-plain-without-adoption-annotation`, `arity-measured-exceeds-declared-and-undeclared`, `arity-within-declaration`, `recomputability-declared-overclaim`, `extension-namespace-members-preserved` (a capture plus `x-` members). `no-rows` is hand-built. `provenance` names the source of each. Scripts are in `provenance/`: `capture_fixtures.py` (needs a Control Plane checkout) writes the raw runs, `build_fixtures.py` normalises and projects them into the valid fixtures, `mutate_invalid_fixtures.py` regenerates the invalid ones. They are not tests and are not vendored.
+Valid (15): fourteen are captures of real runs and real producer function outputs of Control Plane `83b49b5` (synthetic proposals, fixed clock, throwaway stores, ids replaced by synthetic ones): `adopted-policy-decision-and-refusal-rows`, `unsigned-row-resolves-unknown-and-holds`, `refused-revision-attempts-kept-as-rows`, `policy-edited-in-place-held-then-readopted`, `unsigned-then-resigned-by-supersession`, `host-rule-unadopted-does-not-gate`, `identity-rows-across-a-registry-adoption`, `trend-flags-from-registry-adoption-row`, `trend-pre-split-tainted-from-vocabulary-change`, `trend-plain-without-adoption-annotation`, `arity-measured-exceeds-declared-and-undeclared`, `arity-within-declaration`, `recomputability-derivation-unavailable`, `extension-namespace-members-preserved` (a capture plus `x-` members). `no-rows` is hand-built. `provenance` names the source of each. Scripts are in `provenance/`: `capture_fixtures.py` (needs a Control Plane checkout) writes the raw runs, `build_fixtures.py` normalises and projects them into the valid fixtures, `mutate_invalid_fixtures.py` regenerates the invalid ones. They are not tests and are not vendored.
 
-Invalid (75): one or more per code above, single-defect mutations of the valid fixtures (each `provenance` names its base).
+Invalid (76): one or more per code above, single-defect mutations of the valid fixtures (each `provenance` names its base).
 
 ## Run
 
@@ -163,7 +163,7 @@ A passing run shows the document's structure and these rules over the rows given
 9. Findings are compared as sets; the producer's order is preserved in fixtures but not required.
 10. Digests are `sha256:` plus 64 lower-case hex, stricter than the producer.
 11. Only policy rules gate (`policy_status_unknown`); host rules carry state but do not gate. This states the producer's behaviour, it does not recommend it.
-12. The producer's `derive_recomputability` is stated as it is, including the empty-`observed` quirk; no fixture was adjusted to avoid it.
+12. The producer's `derive_recomputability` is stated as it is (Control Plane `fd0d5e0`: `underivable` where operands are not retained); no fixture was adjusted to avoid it. The earlier empty-`observed` quirk is fixed upstream (see Findings).
 13. Adoption time of a version is the earliest of a `reason_registry` revision row's `recorded_at` and a vocabulary change's `acknowledged_at`; a flagged row must be strictly before it.
 14. The trend annotation members are all present or all absent; a plain trend report is valid.
 15. `declared_arity` is allowed on `reason_registry` rows only.
@@ -177,5 +177,5 @@ While the version is `0.x-draft` nothing is frozen and any change may break. Enu
 
 ## Current conformance (2026-10-18, local runs, not a qualification)
 
-- Producer, Control Plane `83b49b5`: all captured real runs and function outputs pass every rule alone and with their run record and signer set. Gap: the raw run record is refused by the journal contract (see Document model); the sidecar is produced by projection, not by the Control Plane. Finding: the recomputability quirk above.
+- Producer, Control Plane `83b49b5`: all captured real runs and function outputs pass every rule alone and with their run record and signer set. Gap: the raw run record is refused by the journal contract (see Document model); the sidecar is produced by projection, not by the Control Plane. Finding: the recomputability quirk above, fixed in `fd0d5e0`; the `recomputability-derivation-unavailable` fixture is captured at that commit, the other captures remain at `83b49b5`.
 - Consumer: none. No consumer reads the sidecar.

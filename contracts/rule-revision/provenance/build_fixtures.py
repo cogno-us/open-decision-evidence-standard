@@ -116,7 +116,7 @@ fixture("arity-measured-exceeds-declared-and-undeclared", "Arity declared at sig
 fixture("arity-within-declaration", "A declaration that covers the measured shapes: no flags (declared and measured still both kept).",
         arity=[{"report_id": "arity-1", "declared": extra["arity_ok_declared"], "declared_from": None, "measured": extra["measured"], "flags": extra["arity_ok_flags"]}])
 rk = {k: v for k, v in extra["registry_kinds"].items() if k in {f["code"] for f in extra["recomputability_flags"]}}
-fixture("recomputability-declared-overclaim", "recomputability_flags over the held decisions: grant_revoked is declared recomputable but the real row derives typed_only (its manifest input records an empty observed value), so the real producer output carries a declared_overclaim flag.",
+fixture("recomputability-derivation-unavailable", "recomputability_flags over the held decisions: grant_revoked is declared recomputable and recomputable in principle, but the retained row keeps no operands (its manifest input records an empty observed value), so the real row derives underivable and the real producer output carries a derivation_unavailable flag, not a declared_overclaim.",
         recompute=[{"report_id": "recompute-1", "rows_from": "decisions", "declared_kinds": rk, "flags": extra["recomputability_flags"]}])
 # hand-built minimal document
 empty = {"fixture_id": "no-rows", "synthetic": True, "expected_outcome": "accept",

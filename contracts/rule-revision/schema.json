@@ -627,13 +627,15 @@
         "derived": {
           "enum": [
             "recomputable",
-            "typed_only"
+            "typed_only",
+            "underivable"
           ]
         },
         "flag": {
           "enum": [
             "declared_overclaim",
-            "declared_underclaim"
+            "declared_underclaim",
+            "derivation_unavailable"
           ]
         }
       }
