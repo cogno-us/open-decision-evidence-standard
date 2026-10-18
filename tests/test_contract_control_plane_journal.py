@@ -66,9 +66,43 @@ def test_valid_fixture_is_accepted(fx):
     assert cpj.validate(fx["document"]) == []
 
 
-@pytest.mark.parametrize("fx", INVALID, ids=lambda f: f["fixture_id"])
+OPERATION_IDENTITY = _load("cpj_oi_validate", ROOT / "contracts" / "operation-identity" / "validate.py")
+
+
+def oi_codes(run):
+    """Violations the operation-identity sidecar reports over a run record that carries the profile's three lists."""
+    sidecar = {"contract": "operation-identity", "contract_version": "0.1.0-draft", "profile": "operation-identity/0.1",
+               "producer": run["producer"], "run_id": run["run_id"], "operations": run.get("operations", []),
+               "operation_renewals": run.get("operation_renewals", []), "attempt_joins": run.get("attempt_joins", [])}
+    return [v.code for v in OPERATION_IDENTITY.validate(sidecar, run)]
+
+
+@pytest.mark.parametrize("fx", [f for f in INVALID if "refused_by" not in f], ids=lambda f: f["fixture_id"])
 def test_invalid_fixture_is_refused_with_stated_reason(fx):
     assert codes(fx["document"]) == [fx["expected_refusal"]], fx["reason"]
+
+
+def test_a_fixture_refused_by_a_sidecar_says_so_and_is_accepted_by_this_contract():
+    """The journal contract sees the operations rows as opaque, so a record whose ledger row disagrees with its decisions is
+    valid here and refused by the operation-identity validator; such a fixture names the validator in `refused_by`."""
+    sidecar = [f for f in INVALID if "refused_by" in f]
+    assert [f["fixture_id"] for f in sidecar] == ["profile-op-grant-mismatch-held"]
+    for fx in sidecar:
+        assert fx["refused_by"] == "operation-identity"
+        assert codes(fx["document"]) == []
+        assert oi_codes(fx["document"]) == [fx["expected_refusal"]] == ["decision_operation_binding_mismatch"]
+        assert "derived tamper" in fx["reason"].lower() and "Real producer run, unchanged" not in fx["reason"]
+
+
+def test_no_valid_journal_fixture_has_a_ledger_row_that_disagrees_with_its_decisions():
+    """Rows that carry other profiles' members are structurally outside the sidecar's closed set, so only the cross-record
+    binding rule is swept over the valid set."""
+    swept = 0
+    for fx in VALID:
+        if "operations" in fx["document"]:
+            swept += 1
+            assert "decision_operation_binding_mismatch" not in oi_codes(fx["document"]), fx["fixture_id"]
+    assert swept >= 10
 
 
 def test_required_valid_cases_exist():

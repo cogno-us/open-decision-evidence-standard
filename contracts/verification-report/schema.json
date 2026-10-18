@@ -503,7 +503,8 @@
             "differential_agreement_is_not_equivalence",
             "no_imported_headline_numbers",
             "seeds_are_regression_not_detection",
-            "witness_is_not_publication"
+            "witness_is_not_publication",
+            "profile_sidecar_semantics_only"
           ]
         },
         "statement": {
