@@ -1,0 +1,17 @@
+# P4 and P2 producer generations: non-selected candidate profiles — 18 October 2026
+
+Status: candidate, informative. Both profile versions below are candidate identifiers for qualification pin generations, not selected or frozen identifiers. They stay `0.1.0-draft` territory like the rest of the export profiles.
+
+## P4
+
+`odes-cognous-stack-export-0.2.5-security-runtime-p4-candidate` is the candidate profile version for the P4 generation: Control Plane 26a7e659 / runtime 3024ef6e / Replay 9aab3f6c / Manifest 2c36bcd0. It is added beside the F5b generation in [security-runtime-f5b-profile-20261016.md](security-runtime-f5b-profile-20261016.md) and stays accepted unchanged so retained P4 evidence still re-exports and validates.
+
+## P2
+
+`odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate` is the candidate profile version for the Programme 2 generation: Control Plane 3cd17ead / runtime 11de097c / Replay 46e8bd7c / Manifest 2c36bcd0. It is added beside P4 and does not replace it.
+
+## Rules shared with the earlier generations
+
+Each generation is an exact tuple selected by its Control Plane revision. The exporter emits the pins and profile version of that one generation; the recipient requires the matching profile version and the exact Replay revision of that generation. Mixing components across generations (for example P2 Control Plane with the P4 Replay, or the P4 profile version on P2 pins) is rejected or fails semantic re-export.
+
+These tuples are alpha scaffolding: they are removed with the other hard pins at the end of alpha. A candidate profile is not a statement that any release is selected, and nothing here freezes a contract.
