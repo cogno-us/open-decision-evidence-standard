@@ -1,0 +1,31 @@
+{
+  "fixture_id": "control-plane-acp-run-applied",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real `acp run` on the Control Plane's own examples/acp_run authorized inputs (fixed --now, throwaway store): the local destination snapshot (destination.json) unchanged. One applied row, no operation_digest, no operations member (default record).",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5",
+    "scenario": "acp-run-authorized"
+  },
+  "document": {
+    "effects": {
+      "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": {
+        "amount": 50.0,
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

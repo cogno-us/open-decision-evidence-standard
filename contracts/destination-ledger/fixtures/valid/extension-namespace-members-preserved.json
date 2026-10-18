@@ -1,0 +1,38 @@
+{
+  "fixture_id": "extension-namespace-members-preserved",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Derived from the captured acp run ledger by adding `extensions` members (document and row) with x- names: accepted, ignored by logic, preserved and part of the digest input. The verifier at 5ed1ffb has no extensions member and refuses this document (ledger_shape).",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "derived",
+    "from": "control-plane-acp-run-applied"
+  },
+  "document": {
+    "effects": {
+      "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": {
+        "amount": 50.0,
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD",
+        "extensions": {
+          "x-note": "kept"
+        }
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    },
+    "extensions": {
+      "x-exporter": {
+        "name": "example"
+      }
+    }
+  }
+}

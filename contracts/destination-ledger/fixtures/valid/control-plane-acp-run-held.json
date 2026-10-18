@@ -1,0 +1,16 @@
+{
+  "fixture_id": "control-plane-acp-run-held",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real `acp run` on the held inputs: the destination was never reached, so the snapshot is the initial empty ledger.",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5",
+    "scenario": "acp-run-held"
+  },
+  "document": {
+    "effects": {},
+    "grant_effect_counts": {}
+  }
+}

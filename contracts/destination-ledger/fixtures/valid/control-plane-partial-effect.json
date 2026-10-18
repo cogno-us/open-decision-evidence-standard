@@ -1,0 +1,31 @@
+{
+  "fixture_id": "control-plane-partial-effect",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real LocalRefundDestination.apply(partial=True) in a throwaway store. The row state is `partial`; effect id is a placeholder chosen by the capture script.",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5",
+    "scenario": "destination-partial"
+  },
+  "document": {
+    "effects": {
+      "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+        "amount": 50.0,
+        "effect_id": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "partial",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

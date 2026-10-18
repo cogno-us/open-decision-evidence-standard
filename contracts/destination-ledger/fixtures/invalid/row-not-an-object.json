@@ -1,0 +1,18 @@
+{
+  "fixture_id": "row-not-an-object",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A row is a string.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": {
+    "effects": {
+      "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": "applied"
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

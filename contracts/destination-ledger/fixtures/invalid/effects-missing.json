@@ -1,0 +1,15 @@
+{
+  "fixture_id": "effects-missing",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Required member `effects` is absent.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": {
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

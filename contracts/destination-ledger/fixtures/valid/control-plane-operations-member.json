@@ -1,0 +1,34 @@
+{
+  "fixture_id": "control-plane-operations-member",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real LocalRefundDestination.apply with an operation_id (opt-in operation-identity/0.1): the snapshot gains the optional `operations` member mapping the operation id to the effect id. Rows still carry no operation_digest. Effect id is a placeholder chosen by the capture script.",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5",
+    "scenario": "destination-operations"
+  },
+  "document": {
+    "effects": {
+      "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": {
+        "amount": 50.0,
+        "effect_id": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    },
+    "operations": {
+      "op-order-100/refund-1": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "fixture_id": "row-missing-target",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Required row member `target` is absent.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": {
+    "effects": {
+      "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": {
+        "amount": 50.0,
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

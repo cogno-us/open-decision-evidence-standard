@@ -1,0 +1,26 @@
+{
+  "fixture_id": "row-payload-wrong-type-array",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Row member `payload` is a array, not its declared type.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": {
+    "effects": {
+      "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": {
+        "amount": 50.0,
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": [],
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}
