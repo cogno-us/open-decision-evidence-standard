@@ -195,28 +195,29 @@ def test_the_ten_reason_codes_and_the_two_capabilities_are_stated():
 
 # ------------------------------------------------------------------ layering on the journal contract
 
-def test_layered_version_is_pinned_and_the_journal_contract_declares_none_of_the_profile_members():
-    """The journal contract refuses the opt-in members of a run record (undeclared_member). If it ever declares them this test fails:
-    review the README section on layering and the hand-back divergence note."""
+def test_layered_version_is_pinned_and_the_journal_contract_declares_the_profile_members_as_optional():
+    """Since the journal contract's draft revision 2 (decision 23) the members of this profile are declared OPTIONAL in the journal
+    schema and listed with their owning profile in validate.py (PROFILE_OWNED); the sidecar still owns their semantics. The version stays 0.1.0-draft."""
     assert cpj.CONTRACT_VERSION == "0.1.0-draft"
     schema = json.loads((JOURNAL_DIR / "schema.json").read_text(encoding="utf-8"))
     defs = schema["$defs"]
     for member in ("age_extensions", "age_extension_refusals", "recovery_runs"):
-        assert member not in schema["properties"], member
-    assert set(defs["journal_event"]["properties"]["phase"]["enum"]) == {"opened", "input", "completed", "interrupted"}
+        assert cpj.PROFILE_OWNED["$"][member] == ["freshness/0.1"] and member in schema["properties"] and member not in schema["required"], member
+    assert set(defs["journal_event"]["properties"]["phase"]["enum"]) == {"opened", "input", "completed", "interrupted", "overdue", "expired"}
     for member in ("evaluated_at", "deadline", "age_bound_seconds", "extension_id", "nonce"):
-        assert member not in defs["journal_event"]["properties"], member
-    assert "age_basis" not in defs["resolution_input"]["properties"]
-    assert "nonce_mismatch" not in defs["resolution_input"]["properties"]["read_state"]["enum"]
+        assert cpj.PROFILE_OWNED["journal_event"][member] == ["freshness/0.1"] and member in defs["journal_event"]["properties"], member
+        assert member not in defs["journal_event"]["required"], member
+    assert cpj.PROFILE_OWNED["resolution_input"]["age_basis"] == ["freshness/0.1"] and "age_basis" in defs["resolution_input"]["properties"]
+    assert "nonce_mismatch" in defs["resolution_input"]["properties"]["read_state"]["enum"]
     for kind in ("decision", "control_plane_attempt", "resolution_check"):
-        assert "recorded_at" not in defs[kind]["properties"] or kind == "refusal", kind
-    assert "deadline" not in defs["refusal"]["properties"] and "evaluated_at" not in defs["refusal"]["properties"]
+        assert cpj.PROFILE_OWNED[kind]["recorded_at"] == ["freshness/0.1"] and "recorded_at" in defs[kind]["properties"], kind
+    assert cpj.PROFILE_OWNED["refusal"]["deadline"] == ["freshness/0.1"] and "deadline" in defs["refusal"]["properties"]
     assert schema["additionalProperties"] is False
 
 
 def test_a_retry_after_expiry_is_a_second_lifecycle_under_the_journal_contracts_own_rule():
-    """The fixture journal is a subset of the run record, so only the rules that read these rows can be shown: the journal contract's own
-    one-lifecycle rule counts the retry after an expired attempt as a second attempt; this contract states the exclusion."""
+    """The fixture journal is a subset of the run record, so only the rules that read these rows can be shown: the journal contract's
+    one-lifecycle rule (profile-aware since draft revision 2) excuses the expired attempt, as this contract states."""
     f = fx("expired-then-retry-dispatches")
     attempts = f["journal"]["attempts"]
     starts = {a["effect_id"]: set() for a in attempts}
@@ -224,7 +225,7 @@ def test_a_retry_after_expiry_is_a_second_lifecycle_under_the_journal_contracts_
         if a["status"] == "attempted":
             starts[a["effect_id"]].add(a["attempt_id"])
     (ids,) = [v for v in starts.values() if v]
-    assert len(ids) == 2, "two lifecycles start with attempted: the journal contract's second_attempt_for_effect would fire on this record"
+    assert len(ids) == 2, "two lifecycles start with attempted: the journal contract's second_attempt_for_effect fires unless the expiry excuses the first"
     assert codes(f) == []
 
 

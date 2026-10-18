@@ -148,10 +148,25 @@ def test_delegated_lifecycle_version_is_pinned():
 def test_shared_definitions_are_identical_to_the_lifecycle_contract():
     mine, theirs = cpj.load_schema()["$defs"], eal.load_schema()["$defs"]
     for name in ("extensions", "resolution_input", "resolution_check", "control_plane_attempt"):
-        assert mine[name] == theirs[name], name
-    narrowed = copy.deepcopy(mine["journal_event"])
+        assert _without_profile_members(mine[name], name) == theirs[name], name
+    narrowed = _without_profile_members(mine["journal_event"], "journal_event")
     narrowed["properties"]["reason_vocabulary_version"] = theirs["journal_event"]["properties"]["reason_vocabulary_version"]
     assert narrowed == theirs["journal_event"], "journal_event may only narrow reason_vocabulary_version"
+
+
+def _without_profile_members(definition, name=None):
+    """A $defs object as the lifecycle contract sees it: the optional profile members and profile enum values removed (the table is
+    cpj.PROFILE_OWNED / PROFILE_VALUES, which another test pins against the schema). What is left must be identical, so the profile
+    members can only be additions."""
+    d = copy.deepcopy(definition)
+    name = name or next(n for n, v in cpj.load_schema()["$defs"].items() if v == definition)
+    for member in cpj.PROFILE_OWNED.get(name, {}):
+        del d["properties"][member]
+    for key, owned in cpj.PROFILE_VALUES.items():
+        obj, member = key.split(".")
+        if obj == name:
+            d["properties"][member]["enum"] = [v for v in d["properties"][member]["enum"] if v not in owned]
+    return d
 
 
 def test_delegated_rules_come_from_the_lifecycle_validator():
@@ -289,3 +304,152 @@ def test_schema_is_draft_2020_12_and_agrees_with_reference_validator():
     for fx in INVALID:
         errors = list(validator.iter_errors(fx["document"]))
         assert bool(errors) == (fx["expected_refusal"] in structural), fx["fixture_id"]
+
+
+# ------------------------------------------------------------------ optional profile members (draft revision 2, decision 23)
+
+PROFILE_VALID = [f for f in VALID if f["fixture_id"].startswith("profile-")]
+PROFILE_INVALID = [f for f in INVALID if f["fixture_id"].startswith("profile-")]
+PROFILES = {"operation-identity/0.1", "rule-revision/0.1", "freshness/0.1"}
+
+
+def test_profile_fixtures_are_unchanged_producer_output_with_provenance():
+    assert len(PROFILE_VALID) >= 30 and len(PROFILE_INVALID) >= 15
+    for fx in PROFILE_VALID + PROFILE_INVALID:
+        assert fx["provenance"]["control_plane_commit"] and fx["provenance"]["source"]
+    for fx in PROFILE_VALID:
+        assert fx["provenance"]["source"] == "control-plane-capture" and fx["provenance"]["scenario"]
+    assert (CONTRACT_DIR / "provenance" / "capture_profile_stack.py").is_file()
+    assert (CONTRACT_DIR / "provenance" / "build_fixtures.py").is_file()
+    assert (CONTRACT_DIR / "provenance" / "mutate_invalid_fixtures.py").is_file()
+
+
+def test_every_valid_profile_fixture_turns_a_profile_on_and_every_profile_is_covered():
+    seen = set()
+    for fx in PROFILE_VALID:
+        present = cpj.profiles_present(fx["document"])
+        # operation-identity on but the request carried no operation_id: the producer holds before writing any profile member,
+        # so the record has the default shape (a real run, kept to show that "profile on" does not imply "member present")
+        assert present or fx["fixture_id"] == "profile-op-operation-id-missing-held", fx["fixture_id"]
+        seen |= present
+    assert seen == PROFILES
+    stack = {f["fixture_id"]: cpj.profiles_present(f["document"]) for f in PROFILE_VALID if f["fixture_id"].startswith("profile-all-profiles-")}
+    assert len(stack) == 3
+    assert stack["profile-all-profiles-applied"] == stack["profile-all-profiles-expired-before-dispatch"] == PROFILES
+    assert stack["profile-all-profiles-holder-inventory-missing"] == {"freshness/0.1", "rule-revision/0.1"}  # held before an operation row
+
+
+def test_no_default_fixture_is_a_profile_record():
+    """The default path is untouched: no earlier fixture owns a profile member, phase or read state."""
+    for fx in VALID + INVALID:
+        if not fx["fixture_id"].startswith("profile-") and fx["document"].get("contract_version") == "0.1.0-draft":
+            try:
+                assert cpj.profiles_present(fx["document"]) == set(), fx["fixture_id"]
+            except (KeyError, TypeError, AttributeError):
+                pass  # structurally broken on purpose; the structural rule refuses it before any profile rule
+
+
+def test_default_path_outcomes_are_exactly_those_of_the_validator_before_the_profile_members():
+    """Every fixture that existed before draft revision 2 gets the same violations (code, path, message) it got at ODES 08afffe0
+    (the journal contract was unchanged on main until this change)."""
+    baseline = json.loads((CONTRACT_DIR / "fixtures" / "baseline-outcomes-pre-profile-members.json").read_text(encoding="utf-8"))["outcomes"]
+    older = [f for f in VALID + INVALID if not f["fixture_id"].startswith("profile-")]
+    assert len(baseline) == len(older) == 80
+    for kind, group in (("valid", VALID), ("invalid", INVALID)):
+        for fx in group:
+            if not fx["fixture_id"].startswith("profile-"):
+                got = [[v.code, v.path, v.message] for v in cpj.validate(fx["document"])]
+                assert got == baseline[f"{kind}/{fx['fixture_id']}"], fx["fixture_id"]
+
+
+def test_profile_members_are_all_optional_and_documented():
+    """The ownership table in validate.py agrees with the schema: every listed member is declared, optional, owned by a known profile
+    and says so in its description; the schema has no keyword outside the plain set a minimal interpreter reads."""
+    schema = cpj.load_schema()
+    nodes = {"$": schema, **schema["$defs"]}
+    found = 0
+    for name, members in cpj.PROFILE_OWNED.items():
+        node = nodes[name]
+        for member, owners in members.items():
+            found += 1
+            assert member in node["properties"], (name, member)
+            assert member not in node.get("required", []), (name, member)
+            assert set(owners) <= PROFILES, (name, member)
+            assert all(o in node["properties"][member]["description"] for o in owners), (name, member)
+    assert found == 26
+    for key, owned in cpj.PROFILE_VALUES.items():
+        obj, member = key.split(".")
+        spec = schema["$defs"][obj]["properties"][member]
+        for value, owners in owned.items():
+            assert value in spec["enum"] and set(owners) <= PROFILES and f"'{value}'" in schema["description"] and "freshness/0.1" in schema["description"]
+    plain = {"$schema", "$id", "$defs", "$ref", "title", "description", "type", "enum", "const", "required", "properties",
+             "additionalProperties", "items", "oneOf", "anyOf", "pattern", "minLength", "maxLength", "propertyNames"}
+
+    def keywords(node):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                yield k
+                if k in {"properties", "$defs"}:
+                    for sub in v.values():
+                        yield from keywords(sub)
+                elif k in {"items", "additionalProperties", "propertyNames"} or k in {"oneOf", "anyOf"}:
+                    for sub in (v if isinstance(v, list) else [v]):
+                        yield from keywords(sub)
+    assert set(keywords(schema)) <= plain
+    for name, node in nodes.items():
+        assert node.get("additionalProperties", False) is False or name == "extensions"
+
+
+def test_the_closed_set_stays_closed_with_profile_members_present():
+    d = copy.deepcopy(next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-op-normal")["document"])
+    d["operations"][0]["extensions"] = {"x-ticket": 1}
+    d["unknown_member"] = True
+    assert codes(d) == ["undeclared_member"]
+
+
+def test_a_member_dropped_from_a_profile_record_leaves_a_valid_default_record():
+    """Profile members are optional: stripping every profile-owned member and value from a profile-on run that only adds members
+    leaves a record the contract accepts (absent = valid)."""
+    d = copy.deepcopy(next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-nonce-bound-reads")["document"])
+    for name in cpj.profile_members("$"):
+        d.pop(name, None)
+    for section, obj in (("decisions", "decision"), ("attempts", "control_plane_attempt"), ("resolution_checks", "resolution_check"),
+                         ("refusals", "refusal"), ("check_events", "journal_event")):
+        for row in d.get(section, []):
+            for m in cpj.profile_members(obj):
+                row.pop(m, None)
+    for section, key in (("decisions", "resolution_inputs"), ("refusals", "resolution_inputs"), ("resolution_checks", "inputs")):
+        for row in d[section]:
+            for x in row[key]:
+                x.pop("age_basis", None)
+    for e in d["check_events"]:
+        if e["input"]:
+            e["input"].pop("age_basis", None)
+    assert codes(d) == []
+    assert cpj.profiles_present(d) == set()
+
+
+def test_succession_covers_the_profile_lists_and_expired_is_terminal():
+    base = copy.deepcopy(next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-all-profiles-applied")["document"])
+    assert cpj.check_succession(base, base) == []
+    rewritten = copy.deepcopy(base)
+    rewritten["operations"][0]["principal_id"] = "someone-else"
+    assert [v.code for v in cpj.check_succession(base, rewritten)] == ["not_append_only"]
+    dropped = copy.deepcopy(base)
+    dropped["rule_revisions"] = []
+    assert [v.code for v in cpj.check_succession(base, dropped)] == ["not_append_only"]
+    expired = next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-expired-before-dispatch")["document"]
+    assert cpj.unfinished_checks(expired) == [], "an expired check is closed evidence, not an unfinished one"
+    overdue = next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-overdue-reported-not-closed")["document"]
+    assert cpj.unfinished_checks(overdue) == [], "the owner completed it after the overdue report"
+
+
+def test_profile_rules_do_not_relax_the_default_path():
+    """The three relaxations key on a profile member being present; the same shapes without it are still refused."""
+    d = copy.deepcopy(next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-expired-then-retry-dispatches")["document"])
+    for r in d["refusals"]:
+        r.pop("deadline")
+    assert codes(d) == ["second_attempt_for_effect"]
+    d = copy.deepcopy(next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-lease-unavailable-holds")["document"])
+    d["decisions"][0].pop("evaluated_at")
+    assert codes(d) == ["journal_missing"]

@@ -31,6 +31,8 @@ A sidecar projection of one run, `contract: "freshness-clocks"`, `contract_versi
 
 Why a projection: the journal contract is closed (`additionalProperties` false) and, at `0.1.0-draft`, declares none of the profile's members. See Journal divergence. This contract carries the profile's rows and states the journal-side additions as cross-document rules over the run record. Making the journal contract declare them as optional members is a possible minor bump (recommended, not done here; it is the owner's call).
 
+Update (2026-10-18, journal draft revision 2, decision 23): the journal contract now declares this profile's members as optional, so a raw run record produced with the profile on is accepted by it; this contract stays the owner of their semantics. Statements below that the journal contract declares none of the members or refuses the record describe draft revision 1 and are kept as the record of why the sidecar form was chosen.
+
 Journal-side additions, described here and checked through the optional journal context: (a) `evaluated_at` and `recorded_at` on decisions, attempt rows and resolution checks (`recorded_at` only on a resolution check, which already carries `evaluated_at`), `evaluated_at` and `deadline` on effect-time refusal rows, `evaluated_at` on operation, renewal and join rows (a join and a renewal also carry their own `recorded_at`; an operation row's write time is its existing `admitted_at`); (b) `evaluated_at`, `deadline`, `age_bound_seconds`, `extension_id` and `nonce` on check events, and the phases `overdue` and `expired`; (c) `age_basis` on resolution inputs and the `read_state` value `nonce_mismatch`; (d) the records `age_extensions`, `age_extension_refusals`, `recovery_runs`.
 
 ## Member model

@@ -1,0 +1,90 @@
+{
+  "fixture_id": "profile-reaper-closes-the-dead-and-reports-the-late",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: the reaper closes an abandoned check as interrupted and records a recovery run. Ids, nonces and the process owner are synthetic.",
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5e",
+    "capture": "freshness-clocks",
+    "scenario": "reaper-closes-the-dead-and-reports-the-late"
+  },
+  "document": {
+    "contract": "control-plane-journal",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "input_time_floors": {},
+    "resolution_checks": [],
+    "closeouts": [],
+    "decisions": [],
+    "refusals": [],
+    "attempts": [],
+    "observations": [],
+    "reconciliations": [],
+    "check_events": [
+      {
+        "check_id": "orphan",
+        "phase": "opened",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {},
+        "input": null,
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "orphan",
+        "phase": "interrupted",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {},
+        "input": null,
+        "reasons": [
+          "check_interrupted"
+        ],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      }
+    ],
+    "recovery_runs": [
+      {
+        "run_id": "syn-recovery-run-1",
+        "trigger": "startup",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "interrupted": [
+          "orphan"
+        ],
+        "overdue": [],
+        "open_count": 0,
+        "oldest_open_age_seconds": null
+      },
+      {
+        "run_id": "syn-recovery-run-2",
+        "trigger": "interval",
+        "recorded_at": "2026-10-05T19:00:35+00:00",
+        "interrupted": [],
+        "overdue": [],
+        "open_count": 0,
+        "oldest_open_age_seconds": null
+      }
+    ]
+  }
+}

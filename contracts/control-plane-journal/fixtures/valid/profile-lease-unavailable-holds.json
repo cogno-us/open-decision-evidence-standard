@@ -1,0 +1,60 @@
+{
+  "fixture_id": "profile-lease-unavailable-holds",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: the per-check lease cannot be taken: a hold for check_lease_unavailable alone, with no journal and no vocabulary version. Ids, nonces and the process owner are synthetic.",
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5e",
+    "capture": "freshness-clocks",
+    "scenario": "lease-unavailable-holds"
+  },
+  "document": {
+    "contract": "control-plane-journal",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "input_time_floors": {},
+    "resolution_checks": [
+      {
+        "check_id": "syn-check-1",
+        "stage": "decision",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "time_source": "test_override",
+        "inputs": [],
+        "reasons": [
+          "check_lease_unavailable"
+        ]
+      }
+    ],
+    "closeouts": [],
+    "decisions": [
+      {
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
+        "result": "hold",
+        "reasons": [
+          "check_lease_unavailable"
+        ],
+        "decided_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "time_source": "test_override",
+        "operation_horizon": {
+          "source": "runtime_proposal",
+          "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+          "not_before": null,
+          "expires_at": null
+        },
+        "binding": null,
+        "resolution_inputs": []
+      }
+    ],
+    "refusals": [],
+    "attempts": [],
+    "observations": [],
+    "reconciliations": []
+  }
+}
