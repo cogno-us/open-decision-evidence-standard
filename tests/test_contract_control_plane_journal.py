@@ -387,7 +387,7 @@ def test_no_default_fixture_is_a_profile_record():
 
 
 HARDENING_IDS = ("unpaired-surrogate-text", "trailing-line-break-digest", "non-ascii-digit-time", "trailing-line-break-time", "time-seven-fraction-digits")
-HARDENING_PREFIX = ("profile-", "reasons-", *HARDENING_IDS)
+HARDENING_PREFIX = ("profile-", "reasons-", "dispatch-license-", "causal-order-", *HARDENING_IDS)  # round 2 (decision 39) prefixes postdate the baseline
 
 
 def test_default_path_outcomes_are_exactly_those_of_the_validator_before_the_profile_members():

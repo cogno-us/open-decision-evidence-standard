@@ -727,6 +727,125 @@ def _refusal_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
+# Refusals that consume a PASSING effect check: the check passed and the refusal is written for another reason.
+BINDING_CHANGED_REASON = "authorization_binding_changed"
+
+
+def _dispatch_license_rules(doc: dict[str, Any]) -> list[Violation]:
+    """Rule ``dispatch_license`` (decision 39-D): every attempt lifecycle is licensed by an effect-stage check, and every
+    effect-stage check that carries reasons is refused exactly once.
+
+    Default path (no journal): the effect-stage rows that passed (no reasons) and were not consumed by a refusal are at least as
+    many as the distinct attempt lifecycles (``attempt_id`` groups, a ``reconciled_existing`` acknowledged-only lifecycle included).
+    A refusal consumes a failing effect row, except one for ``authorization_binding_changed`` or one that excuses an attempt refused
+    at the dispatch gate (``check_expired_before_dispatch``), which consume a passing row (the excused attempt is then not counted:
+    its refusal is its licence).
+    Journal mode (``check_events``): the same count is also taken per decision from the completed effect-stage journal events, and a
+    completed effect event that carries reasons has a refusal for its decision.
+    """
+    out: list[Violation] = []
+    excused = _expired_attempts(doc)
+    lifecycles: dict[str, str] = {}
+    for a in doc["attempts"]:
+        if a["attempt_id"] not in excused:
+            lifecycles.setdefault(a["attempt_id"], a["decision_id"])
+    rows = [c for c in doc["resolution_checks"] if c["stage"] == "effect"]
+    failing = [c for c in rows if c["reasons"]]
+    consuming_pass = [r for r in doc["refusals"] if r["reasons"] in ([BINDING_CHANGED_REASON], [EXPIRED_REASON])]
+    other = [r for r in doc["refusals"] if r not in consuming_pass]
+    if len(other) != len(failing):
+        out.append(_v("dispatch_license", "$.refusals",
+                      f"{len(failing)} effect-stage check(s) carry reasons and {len(other)} refusal(s) account for them: "
+                      "each effect-stage check with reasons has exactly one refusal"))
+    passing = len(rows) - len(failing) - len(consuming_pass)
+    if passing < len(lifecycles):
+        out.append(_v("dispatch_license", "$.attempts",
+                      f"{len(lifecycles)} attempt lifecycle(s) need a passing effect-stage check each, and {max(passing, 0)} "
+                      "unconsumed passing check(s) exist"))
+    events = [e for e in doc.get("check_events", []) if e["phase"] == "completed" and e["stage"] == "effect"]
+    if events:
+        per_event: dict[str, list[dict[str, Any]]] = {}
+        for e in events:
+            per_event.setdefault(e["decision_id"], []).append(e)
+        refusals_of: dict[str, int] = {}
+        for r in doc["refusals"]:
+            refusals_of[r["decision_id"]] = refusals_of.get(r["decision_id"], 0) + 1
+        attempts_of: dict[str, int] = {}
+        for decision_id in lifecycles.values():
+            attempts_of[decision_id] = attempts_of.get(decision_id, 0) + 1
+        for decision_id in sorted(set(per_event) | set(attempts_of), key=str):
+            checks = per_event.get(decision_id, [])
+            reasoned = sum(1 for e in checks if e["reasons"])
+            if refusals_of.get(decision_id, 0) < reasoned:
+                out.append(_v("dispatch_license", "$.refusals",
+                              f"decision {decision_id}: {reasoned} completed effect check(s) carry reasons and fewer refusals exist"))
+            if attempts_of.get(decision_id, 0) + refusals_of.get(decision_id, 0) > len(checks):
+                out.append(_v("dispatch_license", "$.attempts",
+                              f"decision {decision_id}: its attempt lifecycles and refusals outnumber its completed effect-stage checks"))
+    if out:  # one finding per record: the counts are facets of one missing licence
+        return [_v("dispatch_license", "$", "; ".join(v.message for v in out))]
+    return out
+
+
+def _nonce_minimum_rules(doc: dict[str, Any]) -> list[Violation]:
+    """Rule ``reasons_minimum``, the part the lifecycle projection cannot see: the ``nonce_mismatch`` read state belongs to the
+    freshness/0.1 profile and is not projected onto the lifecycle contract, so the implication (a completion whose own input read
+    ended in ``nonce_mismatch`` carries ``status_nonce_mismatch``) is checked here. The rest of the implication table is the
+    lifecycle contract's (``IMPLIED_REASONS``)."""
+    out: list[Violation] = []
+    needed = lifecycle().IMPLIED_REASONS["nonce_mismatch"]
+    mismatched = {e["check_id"] for e in doc.get("check_events", [])
+                  if e["phase"] == "input" and (e["input"] or {}).get("read_state") == PROFILE_READ_STATE}
+    for i, e in enumerate(doc.get("check_events", [])):
+        if e["phase"] == "completed" and e["check_id"] in mismatched and needed not in e["reasons"]:
+            out.append(_v("reasons_minimum", f"$.check_events[{i}]",
+                          f"the completion's reasons lack what its own recorded inputs imply: {needed}"))
+    return out
+
+
+def _causal_order_rules(doc: dict[str, Any]) -> list[Violation]:
+    """Rule ``causal_order`` (decision 39-F): an attempt does not start before its decision, and a closeout does not precede the
+    attempt it closes. Each comparison stays inside one clock domain: evaluation-time aliases (``decided_at``, attempt
+    ``started_at``, a reconciliation's ``evaluation_time``) against each other, and recorded (service) stamps (``recorded_at``,
+    a closeout's ``reconciled_at``) against each other. A service stamp is never compared with an evaluation time, so the
+    freshness/0.1 decoupling of the two clocks stays valid. Equal instants are in order (a pre-dispatch reconciliation and the
+    attempt that follows it share one evaluation time)."""
+    out: list[Violation] = []
+    decisions = {d["decision_id"]: d for d in doc["decisions"]}
+    first_row: dict[str, dict[str, Any]] = {}
+    for i, a in enumerate(doc["attempts"]):
+        first_row.setdefault(a["attempt_id"], a)
+        d = decisions.get(a["decision_id"])
+        if d is None:
+            continue
+        started, decided = aware(a["started_at"]), aware(d["decided_at"])
+        if started is not None and decided is not None and started < decided:
+            out.append(_v("causal_order", f"$.attempts[{i}].started_at", "an attempt does not start before the decision it executes (evaluation time)"))
+        if "recorded_at" in a and "recorded_at" in d:
+            written, decided_written = aware(a["recorded_at"]), aware(d["recorded_at"])
+            if written is not None and decided_written is not None and written < decided_written:
+                out.append(_v("causal_order", f"$.attempts[{i}].recorded_at", "an attempt row is not recorded before its decision row (service time)"))
+    for i, c in enumerate(doc["closeouts"]):
+        start = first_row.get(c["attempt_id"])
+        if start is None:
+            continue
+        rows = [a for a in doc["attempts"] if a["attempt_id"] == c["attempt_id"] and a["status"] == c["original_status"]]
+        for r in doc["reconciliations"]:
+            observation = r["observation"] or {}
+            if _accepted(r) and r["effect_id"] == c["effect_id"] and observation.get("state") == c["observed_state"] \
+                    and observation.get("observed_at") == c["observed_at"] and r["evaluation_time"] is not None:
+                evaluated, started = aware(r["evaluation_time"]), aware(start["started_at"])
+                if evaluated is not None and started is not None and evaluated < started:
+                    out.append(_v("causal_order", f"$.closeouts[{i}]", "a closeout rests on a reconciliation evaluated before the attempt it closes (evaluation time)"))
+                    break
+        closed, written = aware(c["reconciled_at"]), [aware(a["recorded_at"]) for a in rows if "recorded_at" in a]
+        if closed is not None and written and all(w is not None for w in written) and closed < max(written):
+            out.append(_v("causal_order", f"$.closeouts[{i}].reconciled_at", "a closeout is not recorded before the attempt row it closes (service time)"))
+    if out:  # one finding per record; the paths of the rows that are out of order are in the message
+        return [_v("causal_order", out[0].path, "; ".join(f"{v.path}: {v.message}" for v in out))]
+    return out
+
+
 def _input_and_time_rules(doc: dict[str, Any]) -> list[Violation]:
     out: list[Violation] = []
     for p, x in _all_inputs(doc):
@@ -958,6 +1077,10 @@ def _validate(doc: Any) -> list[Violation]:
         out.extend(rule(doc))
     if not out:
         out.extend(_delegated_rules(doc))
+    if not out:  # counting and ordering rules read a record whose references, times and attempt lifecycles already hold together
+        out.extend(_nonce_minimum_rules(doc))
+        out.extend(_dispatch_license_rules(doc))
+        out.extend(_causal_order_rules(doc))
     return out
 
 

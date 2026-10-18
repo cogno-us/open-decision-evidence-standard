@@ -2,7 +2,7 @@
   "fixture_id": "reasons-0-2-label-with-a-0-2-code",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Held decision whose reason is holder_inventory_missing, a code only runtime-authority-reasons/0.2 registers; the decision and the check events carrying it are labelled 0.2 and the open and input events (no reasons) keep 0.1, as the Control Plane labels each row by its own reasons (runtime_authority.vocabulary_for). Synthetic, derived from held-decision-journal-mode.",
+  "reason": "Held decision whose reasons include holder_inventory_missing (the reasons its own unreadable grant input implies, status_unreadable and required_input_not_read, are carried too: rule reasons_minimum), a code only runtime-authority-reasons/0.2 registers; the decision and the check events carrying it are labelled 0.2 and the open and input events (no reasons) keep 0.1, as the Control Plane labels each row by its own reasons (runtime_authority.vocabulary_for). Synthetic, derived from held-decision-journal-mode.",
   "document": {
     "contract": "control-plane-journal",
     "contract_version": "0.1.0-draft",
@@ -49,7 +49,9 @@
           }
         ],
         "reasons": [
-          "holder_inventory_missing"
+          "holder_inventory_missing",
+          "required_input_not_read",
+          "status_unreadable"
         ]
       }
     ],
@@ -66,7 +68,9 @@
         "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
         "result": "hold",
         "reasons": [
-          "holder_inventory_missing"
+          "holder_inventory_missing",
+          "required_input_not_read",
+          "status_unreadable"
         ],
         "decided_at": "2026-10-05T19:00:00+00:00",
         "time_source": "test_override",
@@ -253,7 +257,9 @@
         },
         "input": null,
         "reasons": [
-          "holder_inventory_missing"
+          "holder_inventory_missing",
+          "required_input_not_read",
+          "status_unreadable"
         ],
         "reason_vocabulary_version": "runtime-authority-reasons/0.2"
       }
