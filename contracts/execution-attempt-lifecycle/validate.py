@@ -479,6 +479,67 @@ CONTROL_PLANE_TRANSITIONS: dict[str, frozenset[str]] = {
 }
 
 
+# Rule ``result_state_matrix`` (decision 39-K). The execution result's status, flags and observation must agree. This mirrors the
+# runtime producer's export check (``engine/producer_contract.py`` ``_validate_result_state`` at 62a5cc15), row for row, and is
+# the exhaustive status x flags x observation matrix:
+#   - a failed, partial, unknown, executed or reconciled result requires ``attempted``;
+#   - an acknowledgement requires ``attempted``; a fresh execution (``newly_executed``) is acknowledged and executed, partial or unknown;
+#   - denied and failed carry no acknowledgement, no fresh execution and ``observed_state`` unknown;
+#   - executed is acknowledged, fresh and observed ``applied``; reconciled is not fresh and observed ``applied``;
+#     partial is observed ``partial``;
+#   - executed, reconciled, partial and observed require a retained observation object;
+#   - a VALIDATED observation (it has ``state``) carries the result's ``observed_state``; a route-B recovery report (it has
+#     ``status``) is told apart and is held to the recovery rules instead (``_recovery_rules``), never to this row;
+#   - ``observed_state`` is one of applied, partial, absent, unknown.
+# The observed status (effect-free) and its attempt-free shape stay with their own rules (``observed_result_claims_attempt``).
+OBSERVED_STATES = frozenset({"applied", "partial", "absent", "unknown"})
+ATTEMPT_REQUIRED_STATUSES = frozenset({"failed", "partial", "unknown", "executed", "reconciled"})
+
+
+def result_matrix_problems(result: dict[str, Any]) -> list[str]:
+    """What the producer's status matrix refuses about ``result``; empty when it conforms."""
+    problems: list[str] = []
+    status = result["status"]
+    present = {name: result[name] for name in ("attempted", "acknowledged", "newly_executed") if name in result}
+    if any(type(value) is not bool for value in present.values()):
+        return ["attempted, acknowledged and newly_executed are carried as booleans"]
+    if len(present) != 3:  # the flags are optional members; absent flags are not claimed, so the flag rows have nothing to read
+        present = {}
+    attempted, acknowledged, fresh = (present.get(n) for n in ("attempted", "acknowledged", "newly_executed"))
+    observed_state, obs = result["observed_state"], result["observation"]
+    if observed_state not in OBSERVED_STATES:
+        problems.append("observed_state is one of applied, partial, absent, unknown")
+    if status in ATTEMPT_REQUIRED_STATUSES and attempted is False:
+        problems.append(f"status {status!r} requires an attempted execution")
+    if acknowledged and attempted is False:
+        problems.append("an acknowledgement requires an attempted execution")
+    if fresh and not (acknowledged is True and status in {"executed", "partial", "unknown"}):
+        problems.append("a fresh execution is acknowledged and has status executed, partial or unknown")
+    if status in {"denied", "failed"} and (acknowledged or fresh or observed_state != "unknown"):
+        problems.append("a denied or failed result carries no acknowledgement, no fresh execution and observed_state unknown")
+    if status == "executed" and (acknowledged is False or fresh is False or observed_state != "applied"):
+        problems.append("an executed result is acknowledged, fresh and observed as applied")
+    if status == "reconciled" and (fresh or observed_state != "applied"):
+        problems.append("a reconciled result is observed as applied and is not a fresh execution")
+    if status == "partial" and observed_state != "partial":
+        problems.append("a partial result is observed as partial")
+    if status in {"executed", "reconciled", "partial", "observed"} and not isinstance(obs, dict):
+        problems.append(f"status {status!r} requires a retained observation")
+    if observation_kind(obs) == "validated" and obs["state"] != observed_state:
+        problems.append("a validated observation's state is the result's observed_state")
+    return problems
+
+
+def _result_matrix_rules(doc: dict[str, Any]) -> list[Violation]:
+    result = doc.get("execution_result")
+    if result is None:
+        return []
+    problems = result_matrix_problems(result)
+    if not problems:
+        return []
+    return [Violation("result_state_matrix", "$.execution_result", "; ".join(problems))]
+
+
 def _result_binding_rules(doc: dict[str, Any]) -> list[Violation]:
     """The execution result and its observation name the effect and decision of the attempt they report."""
     result = doc.get("execution_result")
@@ -669,6 +730,8 @@ def _validate(doc: Any) -> list[Violation]:
         return out
     for rule in (_executor_rules, _control_plane_rules, _result_binding_rules, _journal_rules):
         out.extend(rule(doc))
+    if not out:  # the matrix reads a result whose kind, binding and terminal event were already found consistent
+        out.extend(_result_matrix_rules(doc))
     return out
 
 
