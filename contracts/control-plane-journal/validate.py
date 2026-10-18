@@ -794,9 +794,9 @@ def _journal_mode_rules(doc: dict[str, Any]) -> list[Violation]:
 
 VOCABULARY_0_1 = "runtime-authority-reasons/0.1"
 VOCABULARY_0_2 = "runtime-authority-reasons/0.2"
-# The 36 codes the Control Plane registry labels runtime-authority-reasons/0.2 registers and 0.1 does not (0.2 is a 157-code
+# The 37 codes the Control Plane registry labels runtime-authority-reasons/0.2 registers and 0.1 does not (0.2 is a 158-code
 # superset of the original 121). Source: cogno-us/cognous-control-plane schemas/runtime_authority_reasons_0_2.json minus
-# runtime_authority_reasons_0_1.json at main 3755c71a. Producer rule (runtime_authority.vocabulary_for): a row carries 0.2 only if
+# runtime_authority_reasons_0_1.json at main 6b8fb627 (the 36 of 3755c71a plus grant_revocation_recorded, terminal-revocation/0.1). Producer rule (runtime_authority.vocabulary_for): a row carries 0.2 only if
 # one of its reasons is in this set, else 0.1.
 CODES_ADDED_IN_0_2 = frozenset({
     "age_extension_authority_unconfigured",
@@ -813,6 +813,7 @@ CODES_ADDED_IN_0_2 = frozenset({
     "dedupe_operation_effect_applied",
     "dedupe_unresolved_attempt_blocks_new_key",
     "escalation_after_key_ttl",
+    "grant_revocation_recorded",
     "holder_inventory_missing",
     "merge_authority_unfunded",
     "merge_operation_already_folded",
