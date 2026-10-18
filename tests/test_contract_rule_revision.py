@@ -198,15 +198,16 @@ def test_contract_is_not_part_of_core_or_pder():
 
 # ------------------------------------------------------------------ layering on the journal contract
 
-def test_layered_version_is_pinned_and_the_journal_contract_declares_none_of_the_profile_members():
-    """The journal contract refuses the opt-in members of a run record (undeclared_member). If it ever declares them
-    this test fails: review the README section on layering and the hand-back divergence note."""
+def test_layered_version_is_pinned_and_the_journal_contract_declares_the_profile_members_as_optional():
+    """Since the journal contract's draft revision 2 (decision 23) the members of this profile are declared OPTIONAL in the journal
+    schema and listed with their owning profile in validate.py (PROFILE_OWNED); the sidecar still owns their semantics. The version stays 0.1.0-draft."""
     assert cpj.CONTRACT_VERSION == "0.1.0-draft"
     schema = json.loads((JOURNAL_DIR / "schema.json").read_text(encoding="utf-8"))
     for member in ("rule_revisions", "rule_revision_refusals"):
-        assert member not in schema["properties"], member
-    assert "rule_identity" not in schema["$defs"]["decision"]["properties"]
-    assert "rule_identity" not in schema["$defs"]["refusal"]["properties"]
+        assert cpj.PROFILE_OWNED["$"][member] == ["rule-revision/0.1"] and member in schema["properties"] and member not in schema["required"], member
+    for obj in ("decision", "refusal"):
+        assert cpj.PROFILE_OWNED[obj]["rule_identity"] == ["rule-revision/0.1"] and "rule_identity" in schema["$defs"][obj]["properties"]
+        assert "rule_identity" not in schema["$defs"][obj]["required"]
     assert schema["additionalProperties"] is False
 
 

@@ -1,0 +1,143 @@
+{
+  "fixture_id": "profile-rule-refused-revision-attempts-kept",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). rule-revision/0.1: refused revision attempts are kept as rule_revision_refusals rows. Ids, nonces and the process owner are synthetic.",
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5e",
+    "capture": "rule-revision",
+    "scenario": "rule-refused-revision-attempts-kept"
+  },
+  "document": {
+    "contract": "control-plane-journal",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "input_time_floors": {},
+    "resolution_checks": [],
+    "closeouts": [],
+    "decisions": [],
+    "refusals": [],
+    "attempts": [],
+    "observations": [],
+    "reconciliations": [],
+    "rule_revisions": [
+      {
+        "revision_id": "rev-3",
+        "rule_kind": "policy",
+        "rule_ref": "urn:cognous:policy:refund-policy",
+        "from_digest": null,
+        "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+        "reviser": "synthetic-principal:reviser",
+        "signer": "synthetic-principal:signer",
+        "authority_ref": "synthetic-authority:1",
+        "reason": "synthetic",
+        "supersedes": null,
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      }
+    ],
+    "rule_revision_refusals": [
+      {
+        "refusal_id": "syn-refusal-1",
+        "revision": {
+          "revision_id": "rev-1",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": null,
+          "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:reviser",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "self_signed_revision_row"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-2",
+        "revision": {
+          "revision_id": "rev-2",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": null,
+          "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:stranger",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "signer_not_configured"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-3",
+        "revision": {
+          "revision_id": "rev-4",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "to_digest": "sha256:26d4332f0d29ba719f0352ac4d958b621445b8542e717fd0bb776c1d957f0562",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:signer",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "rule_revision_from_digest_mismatch"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-4",
+        "revision": {
+          "revision_id": "rev-3",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "to_digest": "sha256:26d4332f0d29ba719f0352ac4d958b621445b8542e717fd0bb776c1d957f0562",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:signer",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "rule_revision_duplicate"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-5",
+        "revision": {
+          "revision_id": "rev-5",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "to_digest": "sha256:26d4332f0d29ba719f0352ac4d958b621445b8542e717fd0bb776c1d957f0562",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:signer",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": "no-such-revision",
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "rule_revision_supersedes_unknown"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      }
+    ]
+  }
+}

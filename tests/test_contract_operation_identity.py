@@ -184,15 +184,16 @@ def test_contract_is_not_part_of_core_or_pder():
 
 # ------------------------------------------------------------------ layering on the journal and lifecycle contracts
 
-def test_layered_versions_are_pinned_and_neither_contract_declares_the_profile_members():
-    """The journal contract at 0.1.0-draft refuses the opt-in members of a run record (undeclared_member). If it ever
-    declares them this test fails: review the README section on layering and the hand-back divergence note."""
+def test_layered_versions_are_pinned_and_the_journal_contract_declares_the_profile_members_as_optional():
+    """Since the journal contract's draft revision 2 (decision 23) the members of this profile are declared OPTIONAL in the journal
+    schema and listed with their owning profile in validate.py (PROFILE_OWNED); the sidecar still owns their semantics. The version stays 0.1.0-draft."""
     assert cpj.CONTRACT_VERSION == "0.1.0-draft" and cpj.DELEGATED_LIFECYCLE_VERSION == "0.1.0-draft"
     schema = json.loads((JOURNAL_DIR / "schema.json").read_text(encoding="utf-8"))
     for member in ("operations", "operation_renewals", "attempt_joins"):
-        assert member not in schema["properties"], member
-    assert "check_id" not in schema["$defs"]["refusal"]["properties"]
-    assert "operation_id" not in schema["$defs"]["runtime_authority"]["properties"]
+        assert cpj.PROFILE_OWNED["$"][member] == ["operation-identity/0.1"] and member in schema["properties"] and member not in schema["required"], member
+    assert cpj.PROFILE_OWNED["refusal"]["check_id"] == ["operation-identity/0.1", "freshness/0.1"] and "check_id" in schema["$defs"]["refusal"]["properties"]
+    assert cpj.PROFILE_OWNED["runtime_authority"]["operation_id"] == ["operation-identity/0.1"] and "operation_id" in schema["$defs"]["runtime_authority"]["properties"]
+    assert "check_id" not in schema["$defs"]["refusal"]["required"]
     assert schema["additionalProperties"] is False
 
 

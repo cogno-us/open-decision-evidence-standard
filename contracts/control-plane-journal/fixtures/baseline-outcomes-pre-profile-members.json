@@ -1,0 +1,488 @@
+{
+ "description": "Violations (code, path, message) of the 80 journal fixtures (13 valid, 67 invalid) that existed before the optional profile members (draft revision 2), produced by the validator at ODES main 08afffe0; the journal contract was unchanged on main until revision 2 (checked at fe705e87). The tests assert the validator still returns exactly these (the default path is unchanged).",
+ "validator_base": "08afffe0",
+ "outcomes": {
+  "valid/effect-time-refusal": [],
+  "valid/extension-namespace-members-preserved": [],
+  "valid/failed-definitive-rejection": [],
+  "valid/held-decision-journal-mode": [],
+  "valid/interrupted-check-is-unfinished-evidence": [],
+  "valid/lost-ack-unknown-then-closeout": [],
+  "valid/no-journal-mode-normal": [],
+  "valid/normal-attempted-acknowledged-applied": [],
+  "valid/observation-unavailable-rejected-reconciliation": [],
+  "valid/partial-dispatch-partial-observation": [],
+  "valid/reconciled-existing-single-row": [],
+  "valid/tenant-binding-generation-0.2": [],
+  "valid/vocabulary-change-recorded": [],
+  "invalid/absence-carries-destination-state": [
+   [
+    "absence_has_destination_state",
+    "$.reconciliations[0].observation.destination_state",
+    "an 'absent' observation carries an empty destination_state"
+   ]
+  ],
+  "invalid/accepted-observation-from-the-future": [
+   [
+    "observation_time_future",
+    "$.reconciliations[0]",
+    "observed_at is later than evaluation_time plus the recorded tolerance"
+   ]
+  ],
+  "invalid/accepted-observation-names-another-effect": [
+   [
+    "observation_effect_id_mismatch",
+    "$.reconciliations[0].observation.effect_id",
+    "the accepted observation names the reconciled effect"
+   ]
+  ],
+  "invalid/accepted-observation-policy-missing": [
+   [
+    "observation_policy_missing",
+    "$.reconciliations[0]",
+    "an accepted observation records the policy it was accepted under (max age > 0, tolerance >= 0)"
+   ]
+  ],
+  "invalid/accepted-observation-stale": [
+   [
+    "observation_stale",
+    "$.reconciliations[0]",
+    "observed_at is older than the recorded maximum age"
+   ]
+  ],
+  "invalid/accepted-observation-state-unknown": [
+   [
+    "observation_state_unknown",
+    "$.reconciliations[0].observation.state",
+    "an observation in state 'unknown' is never accepted"
+   ]
+  ],
+  "invalid/accepted-observation-time-without-offset": [
+   [
+    "observation_time_invalid",
+    "$.reconciliations[0]",
+    "an accepted observation has a timezone-aware observed_at and the reconciliation a timezone-aware evaluation_time"
+   ]
+  ],
+  "invalid/accepted-observation-with-rejection-reasons": [
+   [
+    "accepted_observation_has_reasons",
+    "$.reconciliations[0].reasons",
+    "an accepted observation carries no rejection reasons"
+   ]
+  ],
+  "invalid/accepted-reconciliation-without-observation": [
+   [
+    "accepted_observation_missing",
+    "$.reconciliations[0].observation",
+    "an accepted reconciliation carries its observation"
+   ]
+  ],
+  "invalid/applied-observation-recorded-as-hold": [
+   [
+    "reconciliation_result_mismatch",
+    "$.reconciliations[1].result",
+    "an accepted 'applied' observation is recorded as result 'applied'"
+   ]
+  ],
+  "invalid/attempt-dangling-decision": [
+   [
+    "dangling_decision_reference",
+    "$.attempts[0]",
+    "attempt names a decision that is not in decisions"
+   ]
+  ],
+  "invalid/attempt-effect-differs-from-decision": [
+   [
+    "effect_id_mismatch",
+    "$.attempts[0]",
+    "attempt effect_id differs from its decision's effect_id"
+   ]
+  ],
+  "invalid/attempt-on-held-decision": [
+   [
+    "attempt_on_unauthorized_decision",
+    "$.attempts[0]",
+    "a attempt requires an authorized decision with a binding"
+   ]
+  ],
+  "invalid/attempted-row-carries-acknowledgement": [
+   [
+    "attempt_acknowledgement_inconsistent",
+    "$.attempts[0].acknowledgement",
+    "a 'attempted' row carries no acknowledgement (empty object; the reconciled_existing marker is checked by the lifecycle rules)"
+   ]
+  ],
+  "invalid/authorized-decision-with-reasons": [
+   [
+    "decision_result_inconsistent",
+    "$.decisions[0]",
+    "result 'authorized' if and only if reasons is empty and a binding is present"
+   ]
+  ],
+  "invalid/changed-input-without-read-attribution": [
+   [
+    "changed_input_unattributed",
+    "$.refusals[0].changed_inputs[0]",
+    "a changed input is attributed to an actual read in resolution_inputs"
+   ]
+  ],
+  "invalid/closeout-names-no-accepted-observation": [
+   [
+    "closeout_observation_missing",
+    "$.closeouts[0]",
+    "a closeout names an accepted observation of that effect, state and time"
+   ]
+  ],
+  "invalid/closeout-names-no-attempt-row": [
+   [
+    "closeout_lineage_missing",
+    "$.closeouts[0]",
+    "a closeout names an attempt row with the same effect and original status"
+   ]
+  ],
+  "invalid/closeout-original-status-unknown-enum-value": [
+   [
+    "unknown_enum_value",
+    "$.closeouts[0].original_status",
+    "value 'acknowledged' not in declared set"
+   ]
+  ],
+  "invalid/decision-result-unknown-enum-value": [
+   [
+    "unknown_enum_value",
+    "$.decisions[0].result",
+    "value 'escalate' not in declared set"
+   ]
+  ],
+  "invalid/decision-stage-check-already-has-decision": [
+   [
+    "journal_stage_binding",
+    "$.check_events[0]",
+    "a decision-stage check has no decision yet (null); an effect-stage check names its decision"
+   ]
+  ],
+  "invalid/decision-undeclared-member": [
+   [
+    "undeclared_member",
+    "$.decisions[0].injected_member",
+    "member is neither declared nor inside the extensions namespace"
+   ]
+  ],
+  "invalid/delegated-attempt-started-at-changed": [
+   [
+    "attempt_started_at_changed",
+    "$.attempts",
+    "attempt syn-attempt-1: started_at is fixed when the attempt starts and identical on every row"
+   ]
+  ],
+  "invalid/delegated-completed-journal-matches-no-check": [
+   [
+    "journal_unbound_completion",
+    "$.check_events[3]",
+    "completed journal check matches no resolution check"
+   ]
+  ],
+  "invalid/delegated-dropped-start-record": [
+   [
+    "missing_start_record",
+    "$.attempts",
+    "attempt syn-attempt-1 lifecycle lacks its 'attempted' start record"
+   ]
+  ],
+  "invalid/delegated-duplicate-journal-opening": [
+   [
+    "journal_protocol",
+    "$.check_events[1]",
+    "duplicate journal opening"
+   ]
+  ],
+  "invalid/delegated-journal-checks-reuse-one-resolution-check": [
+   [
+    "journal_check_reused",
+    "$.check_events",
+    "completed journal checks reuse one resolution check"
+   ]
+  ],
+  "invalid/delegated-reconciled-existing-false": [
+   [
+    "invalid_reconciled_marker",
+    "$.attempts[0].acknowledgement",
+    "reconciled_existing, when present, must be true"
+   ]
+  ],
+  "invalid/delegated-sequential-checks-reordered": [
+   [
+    "resolution_checks_out_of_order",
+    "$.resolution_checks",
+    "non-overlapping checks are listed out of journal order"
+   ]
+  ],
+  "invalid/deny-decision-result": [
+   [
+    "unknown_enum_value",
+    "$.decisions[0].result",
+    "value 'deny' not in declared set"
+   ]
+  ],
+  "invalid/destination-state-contradicts-observation": [
+   [
+    "destination_state_contradiction",
+    "$.reconciliations[1].observation.destination_state",
+    "destination_state.state equals the observation state"
+   ]
+  ],
+  "invalid/destination-state-names-another-effect": [
+   [
+    "destination_effect_id_mismatch",
+    "$.reconciliations[1].observation.destination_state",
+    "positive destination evidence names the same effect"
+   ]
+  ],
+  "invalid/duplicate-closeout": [
+   [
+    "duplicate_closeout",
+    "$.closeouts[1]",
+    "one closeout per attempt and observed state"
+   ]
+  ],
+  "invalid/duplicate-decision-id": [
+   [
+    "duplicate_decision_id",
+    "$.decisions[1]",
+    "decision ids are unique (the store resolves a decision only when exactly one row matches)"
+   ]
+  ],
+  "invalid/duplicate-refusal-id": [
+   [
+    "duplicate_refusal_id",
+    "$.refusals[1]",
+    "refusal ids are unique"
+   ]
+  ],
+  "invalid/duplicate-resolution-check-id-no-journal": [
+   [
+    "duplicate_check_id",
+    "$.resolution_checks[2]",
+    "duplicate resolution check id"
+   ]
+  ],
+  "invalid/duplicate-vocabulary-change": [
+   [
+    "duplicate_vocabulary_change",
+    "$.vocabulary_changes[1]",
+    "a vocabulary change is recorded once"
+   ]
+  ],
+  "invalid/effect-identity-substituted": [
+   [
+    "invalid_effect_identity",
+    "$.decisions[0].effect_id",
+    "effect_id is the commitment of {proposal, grant_id, grant_revision} from the binding"
+   ]
+  ],
+  "invalid/extension-key-without-x-prefix": [
+   [
+    "invalid_extension_key",
+    "$.extensions.vendor-note",
+    "extension member names must match the reserved x- form"
+   ]
+  ],
+  "invalid/failed-attempt-without-reason-code": [
+   [
+    "attempt_error_inconsistent",
+    "$.attempts[1].error",
+    "error is null on attempted/acknowledged/partial rows, a bounded reason code on 'failed', and 'destination_outcome_unknown:<ExceptionName>' on 'unknown'"
+   ]
+  ],
+  "invalid/held-decision-with-binding": [
+   [
+    "decision_result_inconsistent",
+    "$.decisions[0]",
+    "result 'authorized' if and only if reasons is empty and a binding is present"
+   ]
+  ],
+  "invalid/horizon-commits-to-another-proposal": [
+   [
+    "horizon_binding_mismatch",
+    "$.decisions[0].operation_horizon",
+    "the operation horizon commits to the same proposal as the binding"
+   ]
+  ],
+  "invalid/input-time-floor-key-not-a-commitment": [
+   [
+    "schema_violation",
+    "$.input_time_floors.not-a-commitment",
+    "member name does not match its declared form"
+   ]
+  ],
+  "invalid/input-time-floor-without-offset": [
+   [
+    "timestamp_invalid",
+    "$.input_time_floors.sha256:bb70894893d767f392df7aea0070fff70716cb6b934ea3664ba852518b781eda",
+    "timestamps are timezone-aware ISO-8601"
+   ]
+  ],
+  "invalid/journal-event-names-no-decision": [
+   [
+    "journal_lineage_mismatch",
+    "$.check_events[4]",
+    "journal decision_id and effect_id must name an existing decision and its effect"
+   ]
+  ],
+  "invalid/journal-mode-binding-without-runtime-authority": [
+   [
+    "runtime_authority_binding_missing",
+    "$.decisions[0].binding",
+    "journal mode: an authorized binding carries runtime_authority"
+   ]
+  ],
+  "invalid/journal-mode-decision-without-vocabulary-version": [
+   [
+    "vocabulary_version_missing",
+    "$.decisions[0]",
+    "journal mode: the reason vocabulary version is recorded on every decision and refusal"
+   ]
+  ],
+  "invalid/missing-input-claims-commitment": [
+   [
+    "missing_input_commitment",
+    "$.decisions[0].resolution_inputs[0]",
+    "a missing input claims no record commitment"
+   ]
+  ],
+  "invalid/naive-attempt-started-at": [
+   [
+    "timestamp_invalid",
+    "$.attempts[0].started_at",
+    "timestamps are timezone-aware ISO-8601"
+   ]
+  ],
+  "invalid/naive-decided-at": [
+   [
+    "timestamp_invalid",
+    "$.decisions[0].decided_at",
+    "timestamps are timezone-aware ISO-8601"
+   ]
+  ],
+  "invalid/observations-member-differs-from-accepted": [
+   [
+    "observations_mismatch",
+    "$.observations",
+    "observations lists exactly the accepted reconciliation observations (per effect, in order)"
+   ]
+  ],
+  "invalid/reconciliation-dangling-effect": [
+   [
+    "dangling_effect_reference",
+    "$.reconciliations[0]",
+    "effect_id matches no decision"
+   ]
+  ],
+  "invalid/reconciliation-retry-eligible-true": [
+   [
+    "reconciliation_retry_eligible",
+    "$.reconciliations[0].retry_eligible",
+    "a reconciliation never establishes retry eligibility; retry_eligible must be false"
+   ]
+  ],
+  "invalid/refusal-on-held-decision": [
+   [
+    "refusal_requires_authorized_decision",
+    "$.refusals[0]",
+    "a refusal requires an authorized decision with a binding"
+   ]
+  ],
+  "invalid/refusal-original-horizon-differs-from-decision": [
+   [
+    "refusal_horizon_mismatch",
+    "$.refusals[0].original_operation_horizon",
+    "the original horizon equals the horizon of the decision being refused"
+   ]
+  ],
+  "invalid/refusal-time-without-offset": [
+   [
+    "timestamp_invalid",
+    "$.refusals[0].recorded_at",
+    "timestamps are timezone-aware ISO-8601"
+   ]
+  ],
+  "invalid/refusal-without-reasons": [
+   [
+    "refusal_without_reasons",
+    "$.refusals[0].reasons",
+    "a refusal carries typed reasons"
+   ]
+  ],
+  "invalid/rejected-observation-not-held": [
+   [
+    "rejected_observation_not_held",
+    "$.reconciliations[0]",
+    "a rejected or unavailable observation is recorded with result 'hold' and non-empty reasons"
+   ]
+  ],
+  "invalid/required-collection-missing": [
+   [
+    "schema_violation",
+    "$.refusals",
+    "required member missing"
+   ]
+  ],
+  "invalid/safe-to-retry-result": [
+   [
+    "unknown_enum_value",
+    "$.reconciliations[0].result",
+    "value 'safe_to_retry' not in declared set"
+   ]
+  ],
+  "invalid/second-attempt-lifecycle-for-effect": [
+   [
+    "second_attempt_for_effect",
+    "$.attempts",
+    "effect sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829 has more than one attempt lifecycle that starts with 'attempted'; observed absence never establishes retry eligibility after a prior attempt"
+   ]
+  ],
+  "invalid/tenant-id-without-generation": [
+   [
+    "tenant_binding_incomplete",
+    "$.decisions[0].binding",
+    "generation and tenant_id are carried together (tenant binding) or not at all"
+   ]
+  ],
+  "invalid/uncertain-attempt-without-closeout": [
+   [
+    "closeout_missing",
+    "$.closeouts",
+    "attempt syn-attempt-1 is still 'unknown'; an accepted 'applied' observation of its effect requires a closeout"
+   ]
+  ],
+  "invalid/undeclared-member-outside-extensions": [
+   [
+    "undeclared_member",
+    "$.injected_member",
+    "member is neither declared nor inside the extensions namespace"
+   ]
+  ],
+  "invalid/unsupported-contract-version": [
+   [
+    "unsupported_contract_version",
+    "$.contract_version",
+    "this validator implements 0.1.0-draft only"
+   ]
+  ],
+  "invalid/vocabulary-split-into-one-code": [
+   [
+    "invalid_vocabulary_transition",
+    "$.vocabulary_changes[0]",
+    "version differs from previous_version; a split yields at least two codes"
+   ]
+  ],
+  "invalid/vocabulary-version-without-journal": [
+   [
+    "journal_missing",
+    "$.decisions[0].reason_vocabulary_version",
+    "a vocabulary version without a resolution journal (check_events)"
+   ]
+  ]
+ }
+}

@@ -30,6 +30,8 @@ A sidecar projection of one run, `contract: "rule-revision"`, `contract_version:
 
 Why a projection: the journal contract is closed and declares none of these members. A raw run record produced with the profile on is refused by it with `undeclared_member` for `rule_revisions` and `rule_revision_refusals` and for `rule_identity` on decision and refusal rows (checked on records produced by Control Plane `83b49b5`; with those members stripped every capture conforms, and every default-path run still conforms). This contract carries the rows and states the journal-side additions as cross-document rules over the run record. Making the journal contract declare them as optional members is a possible minor bump (recommended, not done here).
 
+Update (2026-10-18, journal draft revision 2, decision 23): the journal contract now declares this profile's members as optional, so a raw run record produced with the profile on is accepted by it; this contract stays the owner of their semantics. Statements below that the journal contract declares none of the members or refuses the record describe draft revision 1 and are kept as the record of why the sidecar form was chosen.
+
 ## Member model
 
 Same model as the journal contract.

@@ -1,0 +1,170 @@
+{
+  "fixture_id": "profile-extension-refusals-kept",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: refused age extensions are kept as age_extension_refusals rows. Ids, nonces and the process owner are synthetic.",
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_commit": "128eaa5e",
+    "capture": "freshness-clocks",
+    "scenario": "extension-refusals-kept"
+  },
+  "document": {
+    "contract": "control-plane-journal",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "input_time_floors": {},
+    "resolution_checks": [],
+    "closeouts": [],
+    "decisions": [],
+    "refusals": [],
+    "attempts": [],
+    "observations": [],
+    "reconciliations": [],
+    "rule_revisions": [
+      {
+        "revision_id": "adopt-1",
+        "rule_kind": "policy",
+        "rule_ref": "urn:cognous:policy:refund-policy",
+        "from_digest": null,
+        "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+        "reviser": "urn:cognous:principal:requester",
+        "signer": "urn:cognous:principal:policy-signer",
+        "authority_ref": "synthetic-authority:1",
+        "reason": "synthetic",
+        "supersedes": null,
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "age_extensions": [],
+    "age_extension_refusals": [
+      {
+        "refusal_id": "syn-refusal-1",
+        "extension": {
+          "extension_id": "syn-extension-1",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": null,
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_unsigned"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-2",
+        "extension": {
+          "extension_id": "syn-extension-2",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:requester",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_self_signed"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-3",
+        "extension": {
+          "extension_id": "syn-extension-3",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:nobody",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_signer_not_configured"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-4",
+        "extension": {
+          "extension_id": "syn-extension-4",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 1000,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_exceeds_limit"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-5",
+        "extension": {
+          "extension_id": "syn-extension-5",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 60,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T20:00:00+00:00",
+          "outage_ref": "outage-1",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_invalid"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-6",
+        "extension": {
+          "extension_id": "syn-extension-6",
+          "class_id": "synthetic-irreversible",
+          "from_max_age_seconds": 60,
+          "to_max_age_seconds": 200,
+          "not_before": "2026-10-05T19:00:00+00:00",
+          "expires_at": "2026-10-05T19:00:00+00:00",
+          "outage_ref": "x",
+          "requested_by": "urn:cognous:principal:requester",
+          "signer": "urn:cognous:principal:rule-signer",
+          "authority_ref": "urn:cognous:authority:outage-1",
+          "recorded_at": "2026-10-05T19:00:00+00:00",
+          "evaluated_at": "2026-10-05T19:00:00+00:00"
+        },
+        "reasons": [
+          "age_extension_invalid"
+        ],
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ]
+  }
+}

@@ -206,6 +206,154 @@ def _v(code: str, path: str, message: str) -> Violation:
     return Violation(code, path, message)
 
 
+# --------------------------------------------------------------------------- optional profile members
+#
+# The three opt-in extension profiles (operation-identity/0.1, rule-revision/0.1, freshness/0.1) add optional members,
+# two check phases and one read state to the run record. They are declared in schema.json as optional members and values
+# (the schema keeps to plain keywords so a minimal interpreter can read it) and listed here with their owning profile.
+# This contract checks only their presence, type and closedness; the sidecar contract of the owning profile validates their
+# semantics. Every relaxation below applies only when the corresponding profile member is present; with none present the
+# validator behaves exactly as before (tests pin this against a baseline of every earlier fixture). A test pins this table
+# against the schema: each member is declared, optional and says which profile owns it.
+
+FRESHNESS = "freshness/0.1"
+EXPIRED_REASON = "check_expired_before_dispatch"
+LEASE_REASON = "check_lease_unavailable"
+PROFILE_PHASES = {"overdue", "expired"}
+PROFILE_READ_STATE = "nonce_mismatch"
+PROFILE_TIME_MEMBERS = {"decisions": ("evaluated_at", "recorded_at"), "attempts": ("evaluated_at", "recorded_at"),
+                        "refusals": ("evaluated_at", "deadline"), "resolution_checks": ("recorded_at",),
+                        "check_events": ("evaluated_at", "deadline")}
+
+
+# Members owned by an opt-in profile, by object (a ``$defs`` name, or ``$`` for the document): member -> owning profiles.
+PROFILE_OWNED: dict[str, dict[str, list[str]]] = {
+    "$": {
+        "operations": ["operation-identity/0.1"],
+        "operation_renewals": ["operation-identity/0.1"],
+        "attempt_joins": ["operation-identity/0.1"],
+        "rule_revisions": ["rule-revision/0.1"],
+        "rule_revision_refusals": ["rule-revision/0.1"],
+        "age_extensions": ["freshness/0.1"],
+        "age_extension_refusals": ["freshness/0.1"],
+        "recovery_runs": ["freshness/0.1"],
+    },
+    "resolution_input": {
+        "age_basis": ["freshness/0.1"],
+    },
+    "resolution_check": {
+        "recorded_at": ["freshness/0.1"],
+    },
+    "control_plane_attempt": {
+        "evaluated_at": ["freshness/0.1"],
+        "recorded_at": ["freshness/0.1"],
+    },
+    "journal_event": {
+        "evaluated_at": ["freshness/0.1"],
+        "deadline": ["freshness/0.1"],
+        "age_bound_seconds": ["freshness/0.1"],
+        "extension_id": ["freshness/0.1"],
+        "nonce": ["freshness/0.1"],
+    },
+    "runtime_authority": {
+        "operation_id": ["operation-identity/0.1"],
+        "operation_issuer": ["operation-identity/0.1"],
+    },
+    "decision": {
+        "evaluated_at": ["freshness/0.1"],
+        "recorded_at": ["freshness/0.1"],
+        "rule_identity": ["rule-revision/0.1"],
+    },
+    "refusal": {
+        "evaluated_at": ["freshness/0.1"],
+        "deadline": ["freshness/0.1"],
+        "check_id": ["operation-identity/0.1", "freshness/0.1"],
+        "rule_identity": ["rule-revision/0.1"],
+    },
+}
+
+# Enumeration values owned by an opt-in profile: "<$defs name>.<member>" -> value -> owning profiles.
+PROFILE_VALUES: dict[str, dict[str, list[str]]] = {
+    "resolution_input.read_state": {
+        "nonce_mismatch": ["freshness/0.1"],
+    },
+    "journal_event.phase": {
+        "overdue": ["freshness/0.1"],
+        "expired": ["freshness/0.1"],
+    },
+}
+
+
+def _owners() -> dict[str, dict[str, list[str]]]:
+    """Profile-owned members by object (``$defs`` name, or ``$`` for the document)."""
+    return {name: PROFILE_OWNED.get(name, {}) for name in ["$"] + list(load_schema()["$defs"])}
+
+
+def profile_members(obj: str) -> set[str]:
+    """Members of a declared object (``$defs`` name, or ``$``) owned by an extension profile."""
+    return set(_owners()[obj])
+
+
+def _exclusive(obj: str, row: Any) -> set[str]:
+    """Profiles whose exclusive members are present on ``row`` (a member shared by two profiles proves neither)."""
+    if not isinstance(row, dict):
+        return set()
+    return {owners[0] for m, owners in _owners()[obj].items() if m in row and len(owners) == 1}
+
+
+def _row_inputs(doc: dict[str, Any]):
+    for row in doc["decisions"] + doc["refusals"]:
+        yield from row["resolution_inputs"]
+    for row in doc["resolution_checks"]:
+        yield from row["inputs"]
+    for e in doc.get("check_events", []):
+        if e["input"] is not None:
+            yield e["input"]
+
+
+def profiles_present(doc: dict[str, Any]) -> set[str]:
+    """Profiles that own a member or value present in the run record (empty for every default-path record)."""
+    found = _exclusive("$", doc)
+    for section, obj in (("decisions", "decision"), ("attempts", "control_plane_attempt"), ("refusals", "refusal"),
+                         ("resolution_checks", "resolution_check"), ("check_events", "journal_event")):
+        for row in doc.get(section, []):
+            found |= _exclusive(obj, row)
+    for d in doc["decisions"]:
+        if d["binding"] is not None:
+            found |= _exclusive("runtime_authority", d["binding"].get("runtime_authority"))
+    for e in doc.get("check_events", []):
+        if e["phase"] in PROFILE_PHASES:
+            found.add(FRESHNESS)
+    for x in _row_inputs(doc):
+        found |= _exclusive("resolution_input", x)
+        if x.get("read_state") == PROFILE_READ_STATE:
+            found.add(FRESHNESS)
+    return found
+
+
+def _expired_attempts(doc: dict[str, Any]) -> set[str]:
+    """Attempts whose failed start is excused by their effect-time refusal (freshness/0.1).
+
+    An attempt is excused only if its latest row is ``failed`` with ``check_expired_before_dispatch`` AND a refusal of
+    the same effect carries that reason and the profile's ``deadline`` member. One refusal excuses one attempt.
+    """
+    refusals: dict[str, int] = {}
+    for r in doc["refusals"]:
+        if "deadline" in r and EXPIRED_REASON in r["reasons"]:
+            refusals[r["effect_id"]] = refusals.get(r["effect_id"], 0) + 1
+    if not refusals:
+        return set()
+    latest: dict[str, dict[str, Any]] = {}
+    for a in doc["attempts"]:
+        latest[a["attempt_id"]] = a
+    excused: set[str] = set()
+    for aid, a in latest.items():
+        if a["status"] == "failed" and a.get("error") == EXPIRED_REASON and refusals.get(a["effect_id"], 0) > 0:
+            refusals[a["effect_id"]] -= 1
+            excused.add(aid)
+    return excused
+
+
 # --------------------------------------------------------------------------- rules
 
 def _all_inputs(doc: dict[str, Any]):
@@ -287,6 +435,7 @@ def _reference_rules(doc: dict[str, Any]) -> list[Violation]:
 def _attempt_rules(doc: dict[str, Any]) -> list[Violation]:
     out: list[Violation] = []
     starts: dict[str, set[str]] = {}
+    excused = _expired_attempts(doc)
     for i, row in enumerate(doc["attempts"]):
         p = f"$.attempts[{i}]"
         status, ack, error = row["status"], row["acknowledgement"], row.get("error")
@@ -302,7 +451,7 @@ def _attempt_rules(doc: dict[str, Any]) -> list[Violation]:
             out.append(_v("attempt_error_inconsistent", p + ".error",
                           "error is null on attempted/acknowledged/partial rows, a bounded reason code on 'failed', "
                           "and 'destination_outcome_unknown:<ExceptionName>' on 'unknown'"))
-        if status == "attempted":
+        if status == "attempted" and row["attempt_id"] not in excused:
             starts.setdefault(row["effect_id"], set()).add(row["attempt_id"])
     for effect, ids in starts.items():
         if len(ids) > 1:
@@ -318,6 +467,7 @@ def _accepted(rec: dict[str, Any]) -> bool:
 
 def _reconciliation_rules(doc: dict[str, Any]) -> list[Violation]:
     out: list[Violation] = []
+    freshness = FRESHNESS in profiles_present(doc)
     for i, rec in enumerate(doc["reconciliations"]):
         p = f"$.reconciliations[{i}]"
         if rec["retry_eligible"] is not False:
@@ -370,7 +520,11 @@ def _reconciliation_rules(doc: dict[str, Any]) -> list[Violation]:
                           "an accepted observation has a timezone-aware observed_at and the reconciliation a timezone-aware evaluation_time"))
             continue
         age = (evaluated - observed).total_seconds()
-        if age < -tolerance:
+        # freshness/0.1 decouples the observation clock: "future" is judged against the service clock re-read at
+        # reconciliation (reconciled_at) when that is later than the evaluation pass; staleness stays relative to the
+        # evaluation. Without a freshness member the evaluation time is the only reference.
+        reference = max(evaluated, aware(rec["reconciled_at"]) or evaluated) if freshness else evaluated
+        if (reference - observed).total_seconds() < -tolerance:
             out.append(_v("observation_time_future", p, "observed_at is later than evaluation_time plus the recorded tolerance"))
             continue
         if age > maximum:
@@ -480,6 +634,8 @@ def _input_and_time_rules(doc: dict[str, Any]) -> list[Violation]:
                for i, r in enumerate(doc["reconciliations"]) if r["evaluation_time"] is not None]
     stamps += [(f"$.vocabulary_changes[{i}].acknowledged_at", c["acknowledged_at"]) for i, c in enumerate(doc.get("vocabulary_changes", []))]
     stamps += [(f"$.input_time_floors.{k}", v) for k, v in doc["input_time_floors"].items()]
+    for section, members in PROFILE_TIME_MEMBERS.items():  # freshness/0.1 times, when present
+        stamps += [(f"$.{section}[{i}].{m}", row[m]) for i, row in enumerate(doc.get(section, [])) for m in members if m in row]
     for p, s in stamps:
         if aware(s) is None:
             out.append(_v("timestamp_invalid", p, "timestamps are timezone-aware ISO-8601"))
@@ -494,6 +650,8 @@ def _journal_mode_rules(doc: dict[str, Any]) -> list[Violation]:
     for section in ("decisions", "refusals"):
         for i, row in enumerate(doc[section]):
             has = "reason_vocabulary_version" in row
+            if has and not journal and section == "decisions" and _lease_hold(row):
+                continue  # freshness/0.1: the lease is refused before the check is journalled, so no journal exists
             if journal and not has:
                 out.append(_v("vocabulary_version_missing", f"$.{section}[{i}]", "journal mode: the reason vocabulary version is recorded on every decision and refusal"))
             elif has and not journal:
@@ -511,6 +669,33 @@ def _journal_mode_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
+def _lease_hold(decision: dict[str, Any]) -> bool:
+    """A hold for ``check_lease_unavailable`` alone, written under freshness/0.1 (it carries the profile's ``evaluated_at``)."""
+    return (decision["result"] == "hold" and decision["reasons"] == [LEASE_REASON] and decision["binding"] is None
+            and "evaluated_at" in decision)
+
+
+def _profile_rules(doc: dict[str, Any]) -> list[Violation]:
+    """What this contract checks of profile-owned values; the owning sidecar contract validates the rest."""
+    out: list[Violation] = []
+    opened: set[str] = set()
+    for i, e in enumerate(doc.get("check_events", [])):
+        p = f"$.check_events[{i}]"
+        if e["phase"] == "opened":
+            opened.add(e["check_id"])
+        elif e["phase"] in PROFILE_PHASES:
+            if "deadline" not in e:
+                out.append(_v("profile_value_without_member", p + ".phase",
+                              f"phase {e['phase']!r} belongs to {FRESHNESS} and its event carries the profile's deadline"))
+            elif e["check_id"] not in opened:
+                out.append(_v("journal_protocol", p, "journal event without an open check (missing opening or already closed)"))
+    for p, x in _all_inputs(doc):
+        if x.get("read_state") == PROFILE_READ_STATE and "age_basis" not in x:
+            out.append(_v("profile_value_without_member", p + ".read_state",
+                          f"read state {PROFILE_READ_STATE!r} belongs to {FRESHNESS} and its input carries age_basis"))
+    return out
+
+
 def _floor_and_vocabulary_rules(doc: dict[str, Any]) -> list[Violation]:
     out: list[Violation] = []
     seen: set[str] = set()
@@ -524,13 +709,28 @@ def _floor_and_vocabulary_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
+def _strip_input(x: dict[str, Any]) -> dict[str, Any]:
+    drop = profile_members("resolution_input") | ({"read_state"} if x.get("read_state") == PROFILE_READ_STATE else set())
+    return {k: v for k, v in x.items() if k not in drop}
+
+
 def _lifecycle_projection(doc: dict[str, Any]) -> dict[str, Any]:
+    """The run record as the lifecycle contract's document. Profile-owned members, the two profile phases and the
+    profile read state are not the lifecycle contract's (their sidecar validates them) and are left out; a record
+    without any of them projects exactly as before."""
     lc = lifecycle()
+    attempt_drop = profile_members("control_plane_attempt")
     proj: dict[str, Any] = {"contract": lc.CONTRACT, "contract_version": lc.CONTRACT_VERSION, "producer": "control-plane",
-                            "control_plane_attempts": doc["attempts"]}
+                            "control_plane_attempts": [{k: v for k, v in a.items() if k not in attempt_drop} for a in doc["attempts"]]}
     if doc.get("check_events") is not None:
-        proj["resolution_journal"] = doc["check_events"]
-        proj["resolution_checks"] = doc["resolution_checks"]
+        event_drop = profile_members("journal_event")
+        check_drop = profile_members("resolution_check")
+        proj["resolution_journal"] = [
+            {k: (_strip_input(v) if k == "input" and v is not None else v) for k, v in e.items() if k not in event_drop}
+            for e in doc["check_events"] if e["phase"] not in PROFILE_PHASES]
+        proj["resolution_checks"] = [
+            {k: ([_strip_input(x) for x in v] if k == "inputs" else v) for k, v in c.items() if k not in check_drop}
+            for c in doc["resolution_checks"]]
     return proj
 
 
@@ -567,7 +767,8 @@ def validate(doc: Any) -> list[Violation]:
     if out:
         return out
     for rule in (_decision_rules, _reference_rules, _attempt_rules, _reconciliation_rules, _closeout_rules,
-                 _refusal_rules, _input_and_time_rules, _journal_mode_rules, _floor_and_vocabulary_rules, _check_id_rules):
+                 _refusal_rules, _input_and_time_rules, _journal_mode_rules, _floor_and_vocabulary_rules, _check_id_rules,
+                 _profile_rules):
         out.extend(rule(doc))
     if not out:
         out.extend(_delegated_rules(doc))
@@ -586,7 +787,9 @@ def check_succession(earlier: dict[str, Any], later: dict[str, Any]) -> list[Vio
     if earlier.get("run_id") != later.get("run_id"):
         return [_v("not_append_only", "$.run_id", "successive exports describe the same run")]
     for name in ("decisions", "attempts", "observations", "reconciliations", "refusals", "resolution_checks", "closeouts",
-                 "check_events", "vocabulary_changes"):
+                 "check_events", "vocabulary_changes",
+                 "operations", "operation_renewals", "attempt_joins", "rule_revisions", "rule_revision_refusals",
+                 "age_extensions", "age_extension_refusals", "recovery_runs"):
         old, new = earlier.get(name, []), later.get(name, [])
         # A journal event may be rewritten only by appending a closing event; rows are never edited in place.
         if new[:len(old)] != old:
@@ -610,7 +813,7 @@ def unfinished_checks(doc: dict[str, Any]) -> list[str]:
         if e["phase"] == "opened":
             order.append(e["check_id"])
             state[e["check_id"]] = "open"
-        elif e["phase"] in {"completed", "interrupted"}:
+        elif e["phase"] in {"completed", "interrupted", "expired"}:  # expired: freshness/0.1, terminal
             state[e["check_id"]] = e["phase"]
     return [c for c in order if state[c] in {"open", "interrupted"}]
 

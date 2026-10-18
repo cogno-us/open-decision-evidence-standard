@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/control-plane-journal/schema.json",
   "title": "Control Plane journal (bounded run record) contract 0.1.0-draft",
-  "description": "Draft boundary contract for the Control Plane run record (BoundedRunRecord) as consumed by Replay (import_bounded_workflow, refusal_evidence) and by the Exchange reference runtime. Closed member sets; the reserved extensions object accepts x- names on declared extensible objects. Cross-record rules are in validate.py and README.md.",
+  "description": "Draft boundary contract for the Control Plane run record (BoundedRunRecord) as consumed by Replay (import_bounded_workflow, refusal_evidence) and by the Exchange reference runtime. Closed member sets; the reserved extensions object accepts x- names on declared extensible objects. Cross-record rules are in validate.py and README.md. Optional members documented as owned by an opt-in extension profile (operation-identity, rule-revision, freshness-clocks): this contract checks their presence, type and closedness only; the sidecar contract owns their semantics. The enumeration values 'overdue' and 'expired' (journal event phase) and 'nonce_mismatch' (input read state) belong to freshness/0.1.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -101,6 +101,62 @@
     },
     "extensions": {
       "$ref": "#/$defs/extensions"
+    },
+    "operations": {
+      "type": "array",
+      "description": "operation-identity/0.1 operation ledger rows; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "operation_renewals": {
+      "type": "array",
+      "description": "operation-identity/0.1 renewal rows; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "attempt_joins": {
+      "type": "array",
+      "description": "operation-identity/0.1 attempt join rows; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "rule_revisions": {
+      "type": "array",
+      "description": "rule-revision/0.1 signed revision rows; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "rule_revision_refusals": {
+      "type": "array",
+      "description": "rule-revision/0.1 refused revision attempts; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "age_extensions": {
+      "type": "array",
+      "description": "freshness/0.1 accepted age extensions; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "age_extension_refusals": {
+      "type": "array",
+      "description": "freshness/0.1 refused age extensions; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "recovery_runs": {
+      "type": "array",
+      "description": "freshness/0.1 recovery pass rows; optional, present only under that profile. Shape is open to the sidecar contract of the same name, which validates the rows.",
+      "items": {
+        "type": "object"
+      }
     }
   },
   "$defs": {
@@ -174,11 +230,19 @@
           "enum": [
             "unreadable",
             "cached_positive",
+            "nonce_mismatch",
             null
           ]
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "age_basis": {
+          "enum": [
+            "nonce_bound",
+            "source_asserted"
+          ],
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
         }
       }
     },
@@ -228,6 +292,10 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "recorded_at": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
         }
       }
     },
@@ -285,6 +353,14 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "evaluated_at": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "recorded_at": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
         }
       }
     },
@@ -315,7 +391,9 @@
             "opened",
             "input",
             "completed",
-            "interrupted"
+            "interrupted",
+            "overdue",
+            "expired"
           ]
         },
         "stage": {
@@ -376,6 +454,28 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "evaluated_at": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "deadline": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "age_bound_seconds": {
+          "type": "integer",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "extension_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
         }
       }
     },
@@ -458,6 +558,16 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional; owned by the opt-in profile operation-identity/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "operation_issuer": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional; owned by the opt-in profile operation-identity/0.1 (draft revision 2); the producer omits it when the profile is off."
         }
       }
     },
@@ -710,6 +820,18 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "evaluated_at": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "recorded_at": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "rule_identity": {
+          "type": "object",
+          "description": "Optional; owned by the opt-in profile rule-revision/0.1 (draft revision 2); the producer omits it when the profile is off."
         }
       }
     },
@@ -843,6 +965,23 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
+        },
+        "evaluated_at": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "deadline": {
+          "type": "string",
+          "description": "Optional; owned by the opt-in profile freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "check_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional; owned by the opt-in profiles operation-identity/0.1 and freshness/0.1 (draft revision 2); the producer omits it when the profile is off."
+        },
+        "rule_identity": {
+          "type": "object",
+          "description": "Optional; owned by the opt-in profile rule-revision/0.1 (draft revision 2); the producer omits it when the profile is off."
         }
       }
     },
