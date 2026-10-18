@@ -241,7 +241,11 @@ def _evaluate_package_content_integrity(package: dict[str, Any], trusted_digests
     return _result("pass", ["complete material package content is bound by digest; this does not authenticate an issuer"], evidence)
 
 
-def _evaluate_authentication(package: dict[str, Any], trusted_key_refs: list[str], trusted_digests: list[str]) -> dict[str, Any]:
+def _evaluate_authentication(package: dict[str, Any], trusted_key_refs: list[str], trusted_digests: list[str], detached: Any = None) -> dict[str, Any]:
+    if detached is not None:
+        # Optional detached signature section (recipient-owned keys). A failure here is reported as is; it never falls back to a weaker path.
+        from .signatures import evaluate_detached_authentication
+        return evaluate_detached_authentication(package, detached)
     record = package.get("record") if isinstance(package.get("record"), dict) else {}
     verification = record.get("verification", {}) if isinstance(record.get("verification"), dict) else {}
     signature_type = verification.get("signature_type")
@@ -528,7 +532,7 @@ def _evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any])
            if declared in V2_FAMILY or record_declared in V2_FAMILY else {}),
         "declared_profile_conformance": _evaluate_profile(package, policy.get("supported_profiles", [PROFILE_ID])),
         "package_content_integrity": _evaluate_package_content_integrity(package, trusted_digests),
-        "integrity_authentication_checks": _evaluate_authentication(package, policy.get("trusted_key_refs", []), trusted_digests),
+        "integrity_authentication_checks": _evaluate_authentication(package, policy.get("trusted_key_refs", []), trusted_digests, policy.get("detached_authentication")),
         "historical_authority_assertions": _evaluate_historical_authority(record, status_inputs, policy),
         "authority_status_and_freshness": _evaluate_authority_and_freshness(record, status_inputs, policy.get("now"), policy),
         "consumption_conditions": _evaluate_consumption(record, policy.get("relying_party"), policy.get("purpose"), policy, package),
