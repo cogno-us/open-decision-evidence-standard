@@ -6,27 +6,29 @@ Every time comparison found in the ODES validators and package evaluator, the Co
 
 Sources:
 - ODES: this repository, main `c3f97ca3` plus this change.
-- Control Plane: `cogno-us/cognous-control-plane` main `6b8fb627`.
-- Runtime: `cogno-us/cognous-execution-runtime` main `eeb4583a`.
+- Control Plane: `cogno-us/cognous-control-plane`. Rows were first read at `6b8fb627`; the rows that were MISMATCH there (parsers and the escalation deadline) were re-read at `3cd17ead` (revision 2026-10-18, below). All other Control Plane rows keep their earlier reading and line numbers and were not re-read.
+- Runtime: `cogno-us/cognous-execution-runtime`. Rows were first read at `eeb4583a`; the atomic destination parser row was re-read at `11de097c`. All other runtime rows keep their earlier reading and line numbers and were not re-read.
 
-Summary: 81 comparisons, 69 MATCH, 12 MISMATCH. ODES changed behaviour in two places only (instant syntax: at most six fraction digits, offset minutes 00 to 59), both listed under "Changed in ODES" in the semantics document; every other row below is unchanged. Mismatches outside ODES are listed for the owners of those repositories and were not edited.
+Summary: 81 comparisons, 78 MATCH, 3 MISMATCH (after the 2026-10-18 re-read; it was 69 MATCH and 12 MISMATCH). ODES changed behaviour in two places only (instant syntax: at most six fraction digits, offset minutes 00 to 59), both listed under "Changed in ODES" in the semantics document. The remaining mismatches are two ODES gaps and one Control Plane reporting-period comparison (a reporting period is not a validity window).
 
-## Mismatches
+Revision 2026-10-18 (docs only): the Control Plane and the runtime adopted the strict instant rules after this table was first written. At `3cd17ead` every Control Plane comparison parser calls `parse_instant` in `time_instant.py`, which refuses a naive time (`time_instant_naive`) and every other non-instant (`time_instant_invalid`), takes at most six fraction digits (a seventh is refused, never truncated), refuses a leap second and offset minutes above 59. At `11de097c` the atomic destination parser matches a strict ASCII regular expression before `datetime.fromisoformat`. The escalation deadline in `dedupe.py` is now inclusive (`now > deadline`). Rows 3 and 5 to 12 below are therefore MATCH; the earlier findings are kept in the notes so the history stays readable. The only `fromisoformat` use left in the Control Plane comparison code is `reason_vocabulary.py` (reporting period, row 4).
+
+## Mismatches (as of the 2026-10-18 re-read)
 
 | # | Component | Location | Finding |
 |---|---|---|---|
 | 1 | ODES | `contracts/control-plane-journal/validate.py:741` | operation_horizon not_before / expires_at: read only for time shape; an empty horizon (expires_at <= not_before) is not refused (rule 2 gap). Not changed: it would add a rule the producer does not apply |
 | 2 | ODES | `contracts/index-evidence-registry/schema.json:98` | timestamp pattern (last_computed_at): offset optional, any fraction length: deviates from rule 1 (offset mandatory, at most six fraction digits); the member is never compared. Not changed |
-| 3 | Control Plane | `src/agent_control_plane/dedupe.py:167` | escalation_due at escalation deadline: at exactly the escalation deadline the state is already escalation_due; rule 3 keeps the instant open (due only after) |
+| 3 | Control Plane | `src/agent_control_plane/dedupe.py:169` | escalation_due at escalation deadline: RESOLVED at `3cd17ead`: `now > deadline`; at exactly the escalation deadline the state is still open (rule 3). Was `>=` at `6b8fb627` |
 | 4 | Control Plane | `src/agent_control_plane/reason_vocabulary.py:135` | reporting period of a trend report: period is (start, end]; a reporting period, not a validity window. Left out of rules 2 and 3 on purpose (the owner may declare reporting periods out of scope) |
-| 5 | Control Plane | `src/agent_control_plane/bounded.py:62` | time parser used for grants, proposals, deadlines: naive time is read as UTC (rule 1 refuses it); more than six fraction digits are truncated by fromisoformat; offset minutes 60 are accepted |
-| 6 | Control Plane | `src/agent_control_plane/freshness.py:134` | time parser used for extensions and deadlines: same as bounded.py _parse |
-| 7 | Control Plane | `src/agent_control_plane/policy_gate.py:293` | time parser used for authority record expiry: same as bounded.py _parse |
-| 8 | Control Plane | `src/agent_control_plane/dedupe.py:101` | time parser used for the dedupe profile: same as bounded.py _parse |
-| 9 | Control Plane | `src/agent_control_plane/reversibility.py:80` | time parser used for reversible_until: same as bounded.py _parse; the declaration check at the class refuses a naive reversible_until, the comparison parser does not |
-| 10 | Control Plane | `src/agent_control_plane/rule_revision.py:77` | time parser used for rule rows: naive kept naive and not converted to UTC: comparing it with an aware time raises TypeError |
-| 11 | Control Plane | `src/agent_control_plane/decision_input_profile.py:79` | time parser used for decision inputs: refuses naive and malformed (matches rule 1 there); fractions over six digits truncated |
-| 12 | Runtime | `engine/local_authority_effect.py:42` | time parser of the atomic destination: naive refused (matches rule 1); more than six fraction digits truncated; offset minutes 60 accepted |
+| 5 | Control Plane | `src/agent_control_plane/bounded.py:63` | time parser used for grants, proposals, deadlines: RESOLVED at `3cd17ead`: `_parse` calls `parse_instant`; naive refused, a seventh fraction digit and offset minutes 60 refused. Was naive-as-UTC and truncating at `6b8fb627` |
+| 6 | Control Plane | `src/agent_control_plane/freshness.py:136` | time parser used for extensions and deadlines: RESOLVED at `3cd17ead`: `parse_time` calls `parse_instant` |
+| 7 | Control Plane | `src/agent_control_plane/policy_gate.py:295` | time parser used for authority record expiry: RESOLVED at `3cd17ead`: `_parse_time` calls `parse_instant` (a datetime input goes through `aware_utc`, which refuses a naive one) |
+| 8 | Control Plane | `src/agent_control_plane/dedupe.py:103` | time parser used for the dedupe profile: RESOLVED at `3cd17ead`: `_t` calls `parse_instant` |
+| 9 | Control Plane | `src/agent_control_plane/reversibility.py:82` | time parser used for reversible_until: RESOLVED at `3cd17ead`: `_utc` calls `parse_instant`; the declaration check and the comparison parser now both refuse a naive time |
+| 10 | Control Plane | `src/agent_control_plane/rule_revision.py:79` | time parser used for rule rows: RESOLVED at `3cd17ead`: `_t` calls `parse_instant`, so a naive time is refused and no longer reaches a comparison with an aware one (no TypeError) |
+| 11 | Control Plane | `src/agent_control_plane/decision_input_profile.py:91` | time parser used for decision inputs: RESOLVED at `3cd17ead`: `_parse_time` calls `parse_instant` and maps naive to the existing timezone refusal; a seventh fraction digit is refused, not truncated |
+| 12 | Runtime | `engine/local_authority_effect.py:55` | time parser of the atomic destination: RESOLVED at `11de097c`: a strict ASCII regular expression (one to six fraction digits, offset hour 00 to 23, minute 00 to 59, offset mandatory) must match before `datetime.fromisoformat` |
 
 ## ODES validators and evaluator
 
@@ -83,7 +85,7 @@ Summary: 81 comparisons, 69 MATCH, 12 MISMATCH. ODES changed behaviour in two pl
 | `src/agent_control_plane/reversibility.py:175` | reversible_until passed | window | MATCH |  |
 | `src/agent_control_plane/dedupe.py:172` | dedupe key expired (key_expired) | window | MATCH | dedupe_ttl window is [first, first + ttl) |
 | `src/agent_control_plane/dedupe.py:183` | escalation fired inside the key window | window | MATCH |  |
-| `src/agent_control_plane/dedupe.py:167` | escalation_due at escalation deadline | deadline | MISMATCH | at exactly the escalation deadline the state is already escalation_due; rule 3 keeps the instant open (due only after) |
+| `src/agent_control_plane/dedupe.py:169` | escalation_due at escalation deadline | deadline | MATCH | inclusive since `3cd17ead` (`now > deadline`); was `>=` at `6b8fb627` |
 | `src/agent_control_plane/dedupe.py:168` | provider horizon passed | instant | MATCH | a horizon is an earliest-time threshold (window start, inclusive), not a deadline |
 | `src/agent_control_plane/bounded.py:1367` | expired before dispatch (dispatch gate) | deadline | MATCH |  |
 | `src/agent_control_plane/bounded.py:919` | check overdue (recovery pass) | deadline | MATCH |  |
@@ -99,13 +101,13 @@ Summary: 81 comparisons, 69 MATCH, 12 MISMATCH. ODES changed behaviour in two pl
 | `src/agent_control_plane/bounded.py:1964` | cached input in the future (tolerance) | deadline | MATCH |  |
 | `src/agent_control_plane/bounded.py:618` | input time floor accepts up to now + tolerance | deadline | MATCH |  |
 | `src/agent_control_plane/reason_vocabulary.py:135` | reporting period of a trend report | window | MISMATCH | period is (start, end]; a reporting period, not a validity window. Left out of rules 2 and 3 on purpose (the owner may declare reporting periods out of scope) |
-| `src/agent_control_plane/bounded.py:62` | time parser used for grants, proposals, deadlines | instant | MISMATCH | naive time is read as UTC (rule 1 refuses it); more than six fraction digits are truncated by fromisoformat; offset minutes 60 are accepted |
-| `src/agent_control_plane/freshness.py:134` | time parser used for extensions and deadlines | instant | MISMATCH | same as bounded.py _parse |
-| `src/agent_control_plane/policy_gate.py:293` | time parser used for authority record expiry | instant | MISMATCH | same as bounded.py _parse |
-| `src/agent_control_plane/dedupe.py:101` | time parser used for the dedupe profile | instant | MISMATCH | same as bounded.py _parse |
-| `src/agent_control_plane/reversibility.py:80` | time parser used for reversible_until | instant | MISMATCH | same as bounded.py _parse; the declaration check at the class refuses a naive reversible_until, the comparison parser does not |
-| `src/agent_control_plane/rule_revision.py:77` | time parser used for rule rows | instant | MISMATCH | naive kept naive and not converted to UTC: comparing it with an aware time raises TypeError |
-| `src/agent_control_plane/decision_input_profile.py:79` | time parser used for decision inputs | instant | MISMATCH | refuses naive and malformed (matches rule 1 there); fractions over six digits truncated |
+| `src/agent_control_plane/bounded.py:63` | time parser used for grants, proposals, deadlines | instant | MATCH | strict `parse_instant` (`time_instant.py`) since `3cd17ead`: naive, a seventh fraction digit, a leap second and offset minutes above 59 are refused; earlier: naive read as UTC, fractions truncated, minutes 60 accepted |
+| `src/agent_control_plane/freshness.py:136` | time parser used for extensions and deadlines | instant | MATCH | strict `parse_instant` (`time_instant.py`) since `3cd17ead`: naive, a seventh fraction digit, a leap second and offset minutes above 59 are refused; earlier: same as bounded.py |
+| `src/agent_control_plane/policy_gate.py:295` | time parser used for authority record expiry | instant | MATCH | strict `parse_instant` (`time_instant.py`) since `3cd17ead`: naive, a seventh fraction digit, a leap second and offset minutes above 59 are refused; earlier: same as bounded.py |
+| `src/agent_control_plane/dedupe.py:103` | time parser used for the dedupe profile | instant | MATCH | strict `parse_instant` (`time_instant.py`) since `3cd17ead`: naive, a seventh fraction digit, a leap second and offset minutes above 59 are refused; earlier: same as bounded.py |
+| `src/agent_control_plane/reversibility.py:82` | time parser used for reversible_until | instant | MATCH | strict `parse_instant` (`time_instant.py`) since `3cd17ead`: naive, a seventh fraction digit, a leap second and offset minutes above 59 are refused; earlier: same as bounded.py |
+| `src/agent_control_plane/rule_revision.py:79` | time parser used for rule rows | instant | MATCH | strict `parse_instant` (`time_instant.py`) since `3cd17ead`: naive, a seventh fraction digit, a leap second and offset minutes above 59 are refused; earlier: naive kept naive (TypeError against an aware time) |
+| `src/agent_control_plane/decision_input_profile.py:91` | time parser used for decision inputs | instant | MATCH | strict `parse_instant` (`time_instant.py`) since `3cd17ead`: naive, a seventh fraction digit, a leap second and offset minutes above 59 are refused; earlier: naive and malformed refused, fractions truncated |
 | `src/agent_control_plane/bounded.py:2147` | nonce (status-nonce/0.1) | instant | MATCH | no time comparison: an echoed nonce is compared for equality; the age of a nonce-bound read still uses the age rows above |
 | `src/agent_control_plane/witness.py:140` | witness chain | instant | MATCH | no time comparison: digest, contiguity, linkage and non-decreasing counts only |
 | `src/agent_control_plane/bounded.py:615` | input observation time regressed | ordering | MATCH | equal allowed |
@@ -117,7 +119,7 @@ Summary: 81 comparisons, 69 MATCH, 12 MISMATCH. ODES changed behaviour in two pl
 | `engine/local_authority_effect.py:574` | atomic destination: execution claim validity | window | MATCH | [not_before, expires_at) |
 | `engine/local_authority_effect.py:590` | atomic destination: authoritative grant validity | window | MATCH |  |
 | `engine/local_authority_effect.py:640` | atomic destination: evidence age | deadline | MATCH |  |
-| `engine/local_authority_effect.py:42` | time parser of the atomic destination | instant | MISMATCH | naive refused (matches rule 1); more than six fraction digits truncated; offset minutes 60 accepted |
+| `engine/local_authority_effect.py:55` | time parser of the atomic destination | instant | MATCH | strict ASCII regular expression before `datetime.fromisoformat` since `11de097c`: seventh fraction digit, leap second, offset minutes above 59 and a missing offset refused; earlier: fractions truncated, minutes 60 accepted |
 | `engine/dedupe_destination.py:82` | operation key valid inside its TTL (float epoch clock) | window | MATCH | valid for [committed_at, committed_at + ttl) |
 | `engine/dedupe_destination.py:91` | in-progress hold inside its TTL | window | MATCH |  |
 | `engine/revocation_closeout.py:398` | closeout overdue | deadline | MATCH | overdue only strictly after the deadline |
