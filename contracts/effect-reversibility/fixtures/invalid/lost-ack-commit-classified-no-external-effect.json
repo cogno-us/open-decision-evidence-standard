@@ -1,0 +1,96 @@
+{
+  "fixture_id": "lost-ack-commit-classified-no-external-effect",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A lost commit acknowledgement is not 'no external effect'.",
+  "expected_refusal": "lost_ack_misclassified",
+  "document": {
+    "contract": "effect-reversibility",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "class_profiles": [
+      {
+        "class_id": "cls-stage",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stageable",
+        "x-reversibility": {
+          "reversibility": "reversible_until",
+          "reversible_until": "2026-10-06T19:00:00+00:00",
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-stall",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stallable",
+        "x-reversibility": {
+          "reversibility": "reversible_at_cost",
+          "reversible_until": null,
+          "reversal_cost": {
+            "description": "Cancelling after release costs a fee."
+          },
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-block",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-read",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": true,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-unobs",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": false
+        }
+      }
+    ],
+    "lost_acks": [
+      {
+        "lost_ack_id": "la-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "attempt_id": "syn-attempt-1",
+        "class_id": "cls-stage",
+        "effect_class": "stageable",
+        "lost_phase": "commit",
+        "classification": "no_external_effect",
+        "required_action": "discard_staged",
+        "retry_eligible": false,
+        "reversal_available": false
+      }
+    ]
+  }
+}

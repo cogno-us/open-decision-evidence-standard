@@ -1,0 +1,96 @@
+{
+  "fixture_id": "open-effective-status-from-unknown-snapshot",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Effective open from an unknown snapshot.",
+  "expected_refusal": "effective_status_unsupported",
+  "document": {
+    "contract": "effect-reversibility",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "class_profiles": [
+      {
+        "class_id": "cls-stage",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stageable",
+        "x-reversibility": {
+          "reversibility": "reversible_until",
+          "reversible_until": "2026-10-06T19:00:00+00:00",
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-stall",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stallable",
+        "x-reversibility": {
+          "reversibility": "reversible_at_cost",
+          "reversible_until": null,
+          "reversal_cost": {
+            "description": "Cancelling after release costs a fee."
+          },
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-block",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-read",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": true,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-unobs",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": false
+        }
+      }
+    ],
+    "snapshot_uses": [
+      {
+        "use_id": "use-1",
+        "class_id": "cls-stage",
+        "evaluated_at": "2026-10-05T19:00:30+00:00",
+        "basis": "cached_snapshot",
+        "snapshot": {
+          "status": "unknown",
+          "observed_at": "2026-10-05T19:00:10+00:00"
+        },
+        "recorded_closure": null,
+        "effective_status": "open"
+      }
+    ]
+  }
+}

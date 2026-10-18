@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/effect-reversibility/schema.json",
+  "title": "Effect reversibility extension profile 0.1.0-draft",
+  "description": "Optional extension profile layered on the control-plane-journal contract (and, for the DEFER rule, on bounded-deferral). Adds two x- members to an action class, x-effect-class and x-reversibility, and records how snapshots, dispatches and lost acknowledgements are judged against them. Closed member sets; x- extensions on declared extensible objects. Cross-record rules are in validate.py and README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "class_profiles"
+  ],
+  "properties": {
+    "contract": {
+      "const": "effect-reversibility"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "class_profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/class_profile"
+      }
+    },
+    "snapshot_uses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/snapshot_use"
+      }
+    },
+    "dispatches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dispatch"
+      }
+    },
+    "lost_acks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/lost_ack"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "reversibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reversibility",
+        "reversible_until",
+        "reversal_cost",
+        "reads_protected_data",
+        "counterparty_observable"
+      ],
+      "properties": {
+        "reversibility": {
+          "enum": [
+            "irreversible",
+            "reversible_until",
+            "reversible_at_cost"
+          ]
+        },
+        "reversible_until": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reversal_cost": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "description"
+              ],
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reads_protected_data": {
+          "type": "boolean"
+        },
+        "counterparty_observable": {
+          "type": "boolean"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "class_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class_id",
+        "irreversible",
+        "max_status_age_seconds",
+        "x-effect-class",
+        "x-reversibility"
+      ],
+      "properties": {
+        "class_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "irreversible": {
+          "type": "boolean"
+        },
+        "max_status_age_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "on_unreadable": {
+          "type": "string",
+          "minLength": 1
+        },
+        "x-effect-class": {
+          "enum": [
+            "stageable",
+            "stallable",
+            "blocking"
+          ]
+        },
+        "x-reversibility": {
+          "$ref": "#/$defs/reversibility"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "observed_at"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "open",
+            "closed",
+            "unknown"
+          ]
+        },
+        "observed_at": {
+          "type": "string"
+        }
+      }
+    },
+    "recorded_closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "closed_at",
+        "recorded_at"
+      ],
+      "properties": {
+        "closed_at": {
+          "type": "string"
+        },
+        "recorded_at": {
+          "type": "string"
+        }
+      }
+    },
+    "snapshot_use": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "use_id",
+        "class_id",
+        "evaluated_at",
+        "basis",
+        "snapshot",
+        "recorded_closure",
+        "effective_status"
+      ],
+      "properties": {
+        "use_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluated_at": {
+          "type": "string"
+        },
+        "basis": {
+          "enum": [
+            "live_read",
+            "cached_snapshot",
+            "strict_default"
+          ]
+        },
+        "snapshot": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/snapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recorded_closure": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/recorded_closure"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "effective_status": {
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "dispatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dispatch_id",
+        "effect_id",
+        "proposal_commitment",
+        "class_id",
+        "effect_class",
+        "phase",
+        "dispatched_at",
+        "open_deferral_ids"
+      ],
+      "properties": {
+        "dispatch_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposal_commitment": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "class_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_class": {
+          "enum": [
+            "stageable",
+            "stallable",
+            "blocking"
+          ]
+        },
+        "phase": {
+          "enum": [
+            "stage",
+            "start_stalled",
+            "release_stalled",
+            "commit",
+            "send"
+          ]
+        },
+        "dispatched_at": {
+          "type": "string"
+        },
+        "open_deferral_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "lost_ack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lost_ack_id",
+        "effect_id",
+        "attempt_id",
+        "class_id",
+        "effect_class",
+        "lost_phase",
+        "classification",
+        "required_action",
+        "retry_eligible",
+        "reversal_available"
+      ],
+      "properties": {
+        "lost_ack_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_class": {
+          "enum": [
+            "stageable",
+            "stallable",
+            "blocking"
+          ]
+        },
+        "lost_phase": {
+          "enum": [
+            "stage",
+            "start_stalled",
+            "release_stalled",
+            "commit",
+            "send"
+          ]
+        },
+        "classification": {
+          "enum": [
+            "no_external_effect",
+            "external_effect_possible"
+          ]
+        },
+        "required_action": {
+          "enum": [
+            "discard_staged",
+            "cancel_or_resume_stalled",
+            "reconcile_by_observation"
+          ]
+        },
+        "retry_eligible": {
+          "const": false
+        },
+        "reversal_available": {
+          "type": "boolean"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}
