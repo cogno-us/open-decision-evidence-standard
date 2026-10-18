@@ -1,0 +1,26 @@
+{
+  "fixture_id": "non-ascii-digit-time",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A time written with non-ASCII digits is not an ISO-8601 time; only [0-9] digits are accepted.",
+  "expected_refusal": "timestamp_invalid",
+  "provenance": {
+    "source": "single-defect mutation of fixture enumerates-no-holder",
+    "control_plane_revision": "128eaa5e",
+    "scenario": "holder-inventory-empty-held"
+  },
+  "context": {
+    "class_requires_revocation_assurance": true,
+    "result": "hold",
+    "reasons": [
+      "holder_inventory_missing"
+    ]
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "\u0662026-10-05T19:00:00+00:00",
+    "holders": []
+  }
+}

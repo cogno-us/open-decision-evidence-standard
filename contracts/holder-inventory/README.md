@@ -104,3 +104,9 @@ While the version is `0.x-draft` nothing is frozen and any change may break. Enu
 
 - Producer: the Control Plane's inventory documents (as dumped by `HolderInventory`) at `128eaa5` conform unchanged; the flagged class's hold behaviour matches `class_holds` on all three captured runs.
 - Consumer: the verifier's `v3.holder-inventory.document` (main `05afab8`) agrees on every fixture except those listed under Divergences.
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `non-ascii-digit-time`, `trailing-line-break-time`, `unpaired-surrogate-text`.

@@ -42,7 +42,7 @@
     "extensions": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*(?!\\n)$"
       }
     },
     "hop": {
@@ -88,7 +88,7 @@
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^sha256:[0-9a-f]{64}$"
+              "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
             },
             {
               "type": "null"
@@ -97,11 +97,11 @@
         },
         "content_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "hop_hash": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "extensions": {
           "$ref": "#/$defs/extensions"

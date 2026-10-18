@@ -45,7 +45,7 @@
     "extensions": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*(?!\\n)$"
       }
     },
     "policy": {
@@ -71,14 +71,14 @@
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            "pattern": "^[a-z][a-z0-9_]{0,63}(?!\\n)$"
           }
         },
         "refusal_reasons": {
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": "^[a-z][a-z0-9_]{0,63}$"
+            "pattern": "^[a-z][a-z0-9_]{0,63}(?!\\n)$"
           }
         },
         "extensions": {
@@ -118,7 +118,7 @@
         },
         "payload_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
@@ -195,7 +195,7 @@
           "properties": {
             "code": {
               "type": "string",
-              "pattern": "^[a-z][a-z0-9_]{0,63}$"
+              "pattern": "^[a-z][a-z0-9_]{0,63}(?!\\n)$"
             },
             "description": {
               "type": "string",
@@ -253,7 +253,7 @@
         },
         "proposal_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "action_class_id": {
           "type": "string",

@@ -83,3 +83,9 @@ While the version is `0.x-draft` nothing is frozen and any change may break. Enu
 
 - Producer: none. No component emits this document.
 - Consumer: none. The Control Plane refuses a delegated grant (`delegation_profile_unsupported`); a conforming delegated grant is therefore refused today.
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `non-ascii-digit-time`, `trailing-line-break-time`, `unpaired-surrogate-text`.

@@ -15,8 +15,10 @@ strings; a fixture states which code it expects.
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +33,124 @@ class Violation:
     code: str
     path: str
     message: str
+
+
+# --------------------------------------------------------------------------- input hardening
+
+class InputRefused(ValueError):
+    """The input file is not a strict JSON document (duplicate member, non-finite number, bad encoding)."""
+
+
+_TIME_SHAPE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})")
+
+
+def _pattern_ok(pattern: str, value: str) -> bool:
+    """A schema pattern matches the whole string: ``^`` and ``$`` are anchors, never "before a trailing newline"."""
+    body = pattern[1:] if pattern.startswith("^") else pattern
+    if body.endswith("$") and not body.endswith("\\$"):
+        body = body[:-1]
+    return re.fullmatch(body, value, re.ASCII) is not None
+
+
+def _printable(text: str) -> str:
+    return text.encode("ascii", "backslashreplace").decode("ascii")
+
+
+def _scan_input(value: Any, root: str = "$") -> list[Violation]:
+    """Refuse non-finite numbers and text that is not valid Unicode before any rule reads the document."""
+    out: list[Violation] = []
+    todo = [(value, root)]
+    while todo:
+        item, path = todo.pop()
+        if isinstance(item, float) and not math.isfinite(item):
+            out.append(Violation("schema_violation", path, "non-finite numbers (NaN, Infinity) are refused"))
+        elif isinstance(item, str):
+            try:
+                item.encode("utf-8")
+            except UnicodeEncodeError:
+                out.append(Violation("schema_violation", path, "text is not valid Unicode (unpaired surrogate)"))
+        elif isinstance(item, dict):
+            for key, member in reversed(list(item.items())):
+                if isinstance(key, str):
+                    try:
+                        key.encode("utf-8")
+                    except UnicodeEncodeError:
+                        out.append(Violation("schema_violation", f"{path}.{_printable(key)}",
+                                             "member name is not valid Unicode (unpaired surrogate)"))
+                todo.append((member, f"{path}.{_printable(str(key))}"))
+        elif isinstance(item, list):
+            for i in range(len(item) - 1, -1, -1):
+                todo.append((item[i], f"{path}[{i}]"))
+    return out
+
+
+def _guarded(fn):
+    """Wrap ``validate`` so a document can only be accepted or refused with typed violations, never raise."""
+    def validate(doc: Any, *args: Any, **kwargs: Any) -> list[Violation]:
+        found = _scan_input(doc)
+        for n, extra in enumerate(list(args) + list(kwargs.values()), 1):
+            if isinstance(extra, (dict, list)):
+                found.extend(_scan_input(extra, f"$input{n}"))
+        if found:
+            return found
+        try:
+            return fn(doc, *args, **kwargs)
+        except (UnicodeError, ArithmeticError, ValueError, RecursionError) as exc:
+            return [Violation("schema_violation", "$", f"the document could not be evaluated ({type(exc).__name__})")]
+    validate.__doc__ = fn.__doc__
+    validate.__name__ = "validate"
+    return validate
+
+
+def _refuse_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    seen: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in seen:
+            raise InputRefused(f"duplicate member name {_printable(key)!r}")
+        seen[key] = value
+    return seen
+
+
+def _refuse_constant(name: str) -> Any:
+    raise InputRefused(f"non-finite number {name} is not JSON")
+
+
+def _parse_float(text: str) -> float:
+    number = float(text)
+    if not math.isfinite(number):
+        raise InputRefused("number outside the finite range")
+    return number
+
+
+def strict_loads(text: str) -> Any:
+    """Strict JSON: no duplicate members, no NaN or Infinity (also by overflow), UTF-8 text only."""
+    try:
+        return json.loads(text, object_pairs_hook=_refuse_duplicates, parse_constant=_refuse_constant,
+                          parse_float=_parse_float)
+    except RecursionError as exc:
+        raise InputRefused("nesting too deep") from exc
+
+
+def load_strict_json(path: Path) -> Any:
+    try:
+        text = path.read_bytes().decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise InputRefused("file is not UTF-8") from exc
+    try:
+        return strict_loads(text)
+    except InputRefused:
+        raise
+    except ValueError as exc:
+        raise InputRefused(f"file is not valid JSON ({type(exc).__name__})") from exc
+
+
+def _after(start: datetime, seconds: Any) -> datetime | None:
+    """``start`` plus ``seconds``; None when the sum is outside the representable range."""
+    try:
+        return start + timedelta(seconds=seconds)
+    except (OverflowError, ValueError):
+        return None
+
 
 
 def load_schema() -> dict[str, Any]:
@@ -106,7 +226,7 @@ def _check(value: Any, schema: dict[str, Any], root: dict[str, Any], path: str, 
     if isinstance(value, str):
         if "minLength" in schema and len(value) < schema["minLength"]:
             out.append(Violation("schema_violation", path, "string shorter than minimum length"))
-        if "pattern" in schema and not re.search(schema["pattern"], value):
+        if "pattern" in schema and not _pattern_ok(schema["pattern"], value):
             out.append(Violation("schema_violation", path, f"string does not match {schema['pattern']}"))
     if isinstance(value, list) and "items" in schema:
         for i, item in enumerate(value):
@@ -403,7 +523,7 @@ def _journal_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
-def validate(doc: Any) -> list[Violation]:
+def _validate(doc: Any) -> list[Violation]:
     """Return all violations; an empty list means the document conforms to 0.1.0-draft."""
     out = validate_structure(doc)
     if out:
@@ -436,17 +556,25 @@ def preserve(doc: dict[str, Any]) -> dict[str, Any]:
     return json.loads(json.dumps(doc))
 
 
+validate = _guarded(_validate)
+
+
 def main(argv: list[str]) -> int:
-    import sys
     code = 0
     for name in argv:
-        violations = validate(json.loads(Path(name).read_text(encoding="utf-8")))
+        try:
+            data = load_strict_json(Path(name))
+        except (InputRefused, OSError) as exc:
+            print(f"{name}: input_refused $: {_printable(str(exc))}")
+            code |= 2
+            continue
+        wrapped = isinstance(data, dict) and "document" in data and "fixture_id" in data
+        violations = validate(data["document"] if wrapped else data)
         for v in violations:
-            print(f"{name}: {v.code} {v.path}: {v.message}")
+            print(f"{name}: {v.code} {v.path}: {_printable(v.message)}")
         code |= bool(violations)
     return code
 
 
 if __name__ == "__main__":
-    import sys
     raise SystemExit(main(sys.argv[1:]))

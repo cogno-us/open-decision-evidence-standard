@@ -336,6 +336,8 @@ def test_schema_is_draft_2020_12_and_agrees_with_reference_validator():
     structural = {"undeclared_member", "invalid_extension_key", "schema_violation", "unknown_enum_value",
                   "unsupported_contract_version"}
     for fx in INVALID:
+        if fx["fixture_id"] == "unpaired-surrogate-text":
+            continue  # text validity is a validator rule; the portable schema does not state it
         errors = list(validator.iter_errors(fx["document"]))
         assert bool(errors) == (fx["expected_refusal"] in structural), fx["fixture_id"]
 
@@ -383,16 +385,20 @@ def test_no_default_fixture_is_a_profile_record():
                 pass  # structurally broken on purpose; the structural rule refuses it before any profile rule
 
 
+HARDENING_IDS = ("unpaired-surrogate-text", "trailing-line-break-digest", "non-ascii-digit-time", "trailing-line-break-time")
+HARDENING_PREFIX = ("profile-", "reasons-", *HARDENING_IDS)
+
+
 def test_default_path_outcomes_are_exactly_those_of_the_validator_before_the_profile_members():
     """Every fixture that existed before draft revision 2 gets the same violations (code, path, message) it got at ODES 08afffe0
     (the journal contract was unchanged on main until this change)."""
     baseline = json.loads((CONTRACT_DIR / "fixtures" / "baseline-outcomes-pre-profile-members.json").read_text(encoding="utf-8"))["outcomes"]
     # revision 3 (decision 31) fixtures, prefix "reasons-", postdate the baseline and are covered by their own tests
-    older = [f for f in VALID + INVALID if not f["fixture_id"].startswith(("profile-", "reasons-"))]
+    older = [f for f in VALID + INVALID if not f["fixture_id"].startswith(HARDENING_PREFIX)]
     assert len(baseline) == len(older) == 80
     for kind, group in (("valid", VALID), ("invalid", INVALID)):
         for fx in group:
-            if not fx["fixture_id"].startswith(("profile-", "reasons-")):
+            if not fx["fixture_id"].startswith(HARDENING_PREFIX):
                 got = [[v.code, v.path, v.message] for v in cpj.validate(fx["document"])]
                 assert got == baseline[f"{kind}/{fx['fixture_id']}"], fx["fixture_id"]
 

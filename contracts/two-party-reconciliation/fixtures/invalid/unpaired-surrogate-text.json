@@ -1,0 +1,30 @@
+{
+  "fixture_id": "unpaired-surrogate-text",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A text member holding an unpaired surrogate code point is refused as a typed violation, never evaluated.",
+  "expected_refusal": "schema_violation",
+  "document": {
+    "contract": "two-party-reconciliation",
+    "contract_version": "0.1.0-draft",
+    "profile": "two-party-reconciliation/0.1\ud800",
+    "reconciliations": [
+      {
+        "reconciliation_id": "rec-1",
+        "event_ref": "evt-refund-1",
+        "sender": {
+          "record_id": "s-rec-1",
+          "event_ref": "evt-refund-1",
+          "party_id": "party:sender",
+          "event_digest": "sha256:4bbc011e187d19ef6b3956eaa74c3408a9e30f277a510cd58c6f080a76dabcef",
+          "recorded_at": "2026-10-17T10:00:00+00:00"
+        },
+        "receiver": null,
+        "outcome": "awaiting_peer",
+        "compared_at": null,
+        "mismatch": null,
+        "commit": null
+      }
+    ]
+  }
+}

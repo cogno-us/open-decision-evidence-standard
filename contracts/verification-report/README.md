@@ -262,3 +262,9 @@ While the version is `0.x-draft` nothing is frozen and any change may break. Enu
 
 - Producer: `cognous-verify` at main `05afab8` was run on 2026-10-18 over five witnessed runs; its V3 section, moved as described under Fixtures, validates (5 of 5). Its report as emitted (V3 in `x-tier-v3`) also validates, as a report without V3. No verifier build emits the revised shape yet (see Divergences). The earlier statement that no real verifier output had been checked is superseded for V3 only; trace reports without V3 from the verifier were not re-run here.
 - Consumer: none. The qualification repository does not read the mutation report yet (design stages S5 and S6 are not built).
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `non-ascii-digit-time`, `trailing-line-break-digest`, `trailing-line-break-time`, `unpaired-surrogate-text`.
