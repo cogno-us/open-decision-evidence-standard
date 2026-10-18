@@ -332,3 +332,18 @@ def test_installed_replay_revision_must_match_the_declared_generation(monkeypatc
     monkeypatch.setenv('ODES_ALLOW_UNVERIFIED_REPLAY', '1')
     exporter._require_installed_replay(cp)
     assert accepted_replay_revisions('0' * 40) == frozenset()
+
+
+def test_installed_replay_revision_is_read_from_the_modules_git_checkout(tmp_path, monkeypatch):
+    import subprocess, sys
+    from odes.common import installed_replay_revision
+    repo = tmp_path / 'replay'
+    (repo / 'agent_replay_bundle').mkdir(parents=True)
+    (repo / 'agent_replay_bundle' / '__init__.py').write_text('')
+    env = {'GIT_AUTHOR_NAME': 'a', 'GIT_AUTHOR_EMAIL': 'a@example.org', 'GIT_COMMITTER_NAME': 'a', 'GIT_COMMITTER_EMAIL': 'a@example.org', 'PATH': __import__('os').environ['PATH']}
+    for cmd in (['init', '-q'], ['add', '-A'], ['commit', '-q', '-m', 'x']):
+        subprocess.run(['git', '-C', str(repo), *cmd], check=True, env=env)
+    head = subprocess.run(['git', '-C', str(repo), 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip()
+    monkeypatch.syspath_prepend(str(repo))
+    sys.modules.pop('agent_replay_bundle', None)
+    assert installed_replay_revision() == head

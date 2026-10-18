@@ -112,8 +112,27 @@ def accepted_replay_revisions(control_plane_revision: str) -> frozenset[str]:
 
 
 def installed_replay_revision() -> str | None:
-    """The commit the installed ``agent_replay_bundle`` distribution was installed from (pip ``direct_url.json``), or None when unknown."""
+    """The commit the imported ``agent_replay_bundle`` comes from, or None when unknown.
+
+    Order: the module's own git checkout (editable or in-tree installs), then pip's ``direct_url.json`` VCS commit. A copy in
+    site-packages without either is unknown; unknown is never a pass.
+    """
     import importlib.metadata as metadata
+    import importlib.util
+    import subprocess
+    try:
+        spec = importlib.util.find_spec("agent_replay_bundle")
+        origin = Path(spec.origin).resolve() if spec is not None and spec.origin else None
+    except Exception:
+        origin = None
+    if origin is not None:
+        for parent in list(origin.parents)[:4]:
+            if (parent / ".git").exists():
+                try:
+                    out = subprocess.run(["git", "-C", str(parent), "rev-parse", "HEAD"], capture_output=True, text=True, check=True, timeout=20).stdout.strip()
+                except Exception:
+                    break
+                return out if re.fullmatch(r"[0-9a-f]{40}", out) else None
     try:
         names = metadata.packages_distributions().get("agent_replay_bundle") or []
         if len(set(names)) != 1:
@@ -123,7 +142,6 @@ def installed_replay_revision() -> str | None:
         return commit if isinstance(commit, str) else None
     except Exception:  # metadata trouble is "unknown", never a pass
         return None
-    return None
 
 
 def canonical_bytes(value: Any) -> bytes:
