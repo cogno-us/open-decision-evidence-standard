@@ -386,7 +386,7 @@ def test_no_default_fixture_is_a_profile_record():
                 pass  # structurally broken on purpose; the structural rule refuses it before any profile rule
 
 
-HARDENING_IDS = ("unpaired-surrogate-text", "trailing-line-break-digest", "non-ascii-digit-time", "trailing-line-break-time")
+HARDENING_IDS = ("unpaired-surrogate-text", "trailing-line-break-digest", "non-ascii-digit-time", "trailing-line-break-time", "time-seven-fraction-digits")
 HARDENING_PREFIX = ("profile-", "reasons-", *HARDENING_IDS)
 
 

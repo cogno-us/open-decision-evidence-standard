@@ -1,0 +1,25 @@
+{
+  "fixture_id": "time-seven-fraction-digits",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A time with seven fractional digits is refused: at most six are accepted, so no instant is ever silently truncated.",
+  "expected_refusal": "timestamp_invalid",
+  "provenance": {
+    "source": "single-defect mutation of fixture non-ascii-digit-time",
+    "rule": "docs/engineering/ODES-TIME-SEMANTICS.md"
+  },
+  "context": {
+    "class_requires_revocation_assurance": true,
+    "result": "hold",
+    "reasons": [
+      "holder_inventory_missing"
+    ]
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00.0000001+00:00",
+    "holders": []
+  }
+}

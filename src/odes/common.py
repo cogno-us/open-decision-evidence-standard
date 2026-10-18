@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -134,13 +134,87 @@ def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-_TIME_SHAPE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})?")
+# ---------------------------------------------------------------------------- time semantics
+# Normative text: docs/engineering/ODES-TIME-SEMANTICS.md (draft). Field table: docs/engineering/odes-time-fields.json.
+# The contract validators under contracts/ stay stdlib-only single files (they are vendored); they carry the same
+# instant pattern, and tests/test_time_semantics.py checks each of them against this module.
+
+MAX_FRACTION_DIGITS = 6  # a datetime holds microseconds; more digits are refused, never truncated
+
+INSTANT_PATTERN = (r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?"
+                   r"(Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])")
+_INSTANT = re.compile(INSTANT_PATTERN)
+# The same shape without a mandatory offset: tells a naive time from a malformed one in messages only.
+_NAIVE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?")
+
+
+def parse_instant(value: Any) -> datetime | None:
+    """An RFC 3339 instant with an explicit offset as a timezone-aware datetime, or None.
+
+    Refused (None): non-strings, naive times, lower-case ``t``/``z``, non-ASCII digits, a trailing line break, missing seconds,
+    more than six fractional digits, a leap second (``:60``), an hour of 24, impossible calendar dates, years outside 0001-9999.
+    Aware datetimes compare as instants, so an offset never changes an outcome.
+    """
+    if not isinstance(value, str) or _INSTANT.fullmatch(value) is None:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (ValueError, OverflowError):
+        return None
+    return parsed if parsed.tzinfo is not None and parsed.utcoffset() is not None else None
+
+
+def instant_problem(value: Any) -> str | None:
+    """None for a valid instant; else ``unavailable`` (absent or empty), ``naive`` (no offset) or ``malformed``."""
+    if not isinstance(value, str) or not value:
+        return "unavailable"
+    if parse_instant(value) is not None:
+        return None
+    return "naive" if _NAIVE.fullmatch(value) is not None else "malformed"
 
 
 def parse_time(value: str | None) -> datetime | None:
+    """Kept for callers that expect ValueError: None for an empty value, else the instant or ValueError (naive included)."""
     if not value:
         return None
-    if _TIME_SHAPE.fullmatch(value) is None:
-        raise ValueError("not an ISO-8601 time with ASCII digits")
-    text = value.replace("Z", "+00:00")
-    return datetime.fromisoformat(text)
+    parsed = parse_instant(value)
+    if parsed is None:
+        raise ValueError("not an RFC 3339 time with ASCII digits and a UTC offset")
+    return parsed
+
+
+def after_seconds(start: datetime, seconds: Any) -> datetime | None:
+    """``start`` plus a duration in seconds; None when the duration is not a finite number or the sum is not representable."""
+    if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds):
+        return None
+    try:
+        return start + timedelta(seconds=seconds)
+    except (OverflowError, ValueError):
+        return None
+
+
+# Validity windows are half-open: [not_before, expires_at). Deadlines are inclusive: open through the deadline itself.
+
+def window_is_empty(not_before: datetime, expires_at: datetime) -> bool:
+    return expires_at <= not_before
+
+
+def in_window(at: datetime, not_before: datetime, expires_at: datetime) -> bool:
+    return not_before <= at < expires_at
+
+
+def window_expired(at: datetime, expires_at: datetime) -> bool:
+    return at >= expires_at
+
+
+def window_not_yet_open(at: datetime, not_before: datetime) -> bool:
+    return at < not_before
+
+
+def deadline_open(at: datetime, deadline: datetime) -> bool:
+    """An action, response or evaluation at exactly the deadline still counts."""
+    return at <= deadline
+
+
+def deadline_passed(at: datetime, deadline: datetime) -> bool:
+    return at > deadline

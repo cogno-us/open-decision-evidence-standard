@@ -24,7 +24,9 @@ from .common import (
     SCHEMA_VERSION,
     SUPPORTED_V2_CONTROL_PLANE_REVISIONS,
     SUPPORTED_V2_REPLAY_REVISIONS,
-    parse_time,
+    instant_problem,
+    parse_instant,
+    window_expired,
     sha256,
 )
 from .schema_validation import schema_errors
@@ -48,15 +50,14 @@ def _package_core(package: dict[str, Any]) -> dict[str, Any]:
 
 
 def _parse_time_result(value: Any, label: str) -> tuple[datetime | None, list[str]]:
-    if not isinstance(value, str) or not value:
+    problem = instant_problem(value)
+    if problem == "unavailable":
         return None, [f"{label} is unavailable"]
-    try:
-        parsed = parse_time(value)
-        if parsed is None or parsed.tzinfo is None or parsed.utcoffset() is None:
-            return None, [f"{label} must include a timezone"]
-        return parsed, []
-    except Exception:
+    if problem == "naive":
+        return None, [f"{label} must include a timezone"]
+    if problem == "malformed":
         return None, [f"{label} is malformed"]
+    return parse_instant(value), []
 
 
 def _evaluate_schema(record: dict[str, Any]) -> dict[str, Any]:
@@ -202,7 +203,7 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
     expires_at, expiry_errors = _parse_time_result(conditions.get("expires_at"), "record consumption expiry")
     if expiry_errors:
         reasons.extend(expiry_errors)
-    if expires_at and now_dt and expires_at <= now_dt:
+    if expires_at and now_dt and window_expired(now_dt, expires_at):
         reasons.append("record consumption window has expired under recipient policy time")
 
     if not isinstance(status_inputs, dict) or not status_inputs:
