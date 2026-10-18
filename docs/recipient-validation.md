@@ -14,7 +14,7 @@ The reference validator returns separate results for:
 4. `integrity_authentication_checks` — evaluates issuer-authentication evidence separately from content integrity. A public hash is not issuer authentication.
 5. `historical_authority_assertions` — distinguishes record self-assertions from externally configured evidence about authority at decision time.
 6. `authority_status_and_freshness` — evaluates present authority, revocation, supersession, freshness and expiry against recipient policy inputs and an explicit recipient evaluation time. A record consumption window is half-open: an evaluation time equal to `consumption_conditions.expires_at` is expired.
-7. `consumption_conditions` — checks relying party and purpose.
+7. `consumption_conditions` — checks relying party and purpose. A record whose `permitted_relying_parties` is absent, empty or not a list of non-empty strings names no recipient and is refused; an empty list never means "any recipient" (decision 39-N).
 8. `recipient_reliance_decision` — recipient policy result.
 
 Each layer may return `pass`, `fail`, `unavailable`, `unsupported` or `not_evaluated`. A schema-valid record cannot automatically become verified, trusted, authorized or suitable for reliance.
