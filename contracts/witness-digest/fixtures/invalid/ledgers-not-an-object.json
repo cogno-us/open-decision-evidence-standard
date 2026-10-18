@@ -1,0 +1,21 @@
+{
+  "fixture_id": "ledgers-not-an-object",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "ledgers maps a ledger name to its entry.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": [
+    {
+      "digest": "sha256:4039d44798ee5abadba48a2721326169e8c9d20e0332abbff38371d29de75063",
+      "ledgers": [],
+      "previous_digest": null,
+      "run_id": "run-1",
+      "sequence": 0,
+      "version": "witness-digest/0.1"
+    }
+  ]
+}

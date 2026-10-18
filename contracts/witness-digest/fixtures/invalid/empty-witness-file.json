@@ -1,0 +1,12 @@
+{
+  "fixture_id": "empty-witness-file",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A witness that holds no digest verifies nothing.",
+  "expected_refusal": "witness_holds_no_digest",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": []
+}

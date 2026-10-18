@@ -1,0 +1,20 @@
+{
+  "fixture_id": "record-member-missing",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Every declared member is required.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": [
+    {
+      "digest": "sha256:4039d44798ee5abadba48a2721326169e8c9d20e0332abbff38371d29de75063",
+      "previous_digest": null,
+      "run_id": "run-1",
+      "sequence": 0,
+      "version": "witness-digest/0.1"
+    }
+  ]
+}

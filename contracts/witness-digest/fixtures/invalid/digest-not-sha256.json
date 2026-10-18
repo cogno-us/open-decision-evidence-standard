@@ -1,0 +1,30 @@
+{
+  "fixture_id": "digest-not-sha256",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The record digest is sha256: plus 64 lowercase hex.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": [
+    {
+      "digest": "abc",
+      "ledgers": {
+        "decisions": {
+          "count": 1,
+          "head": "sha256:9f66c661dc307695aba5a59bcf68cba3bc9ca11234cf56326be6211afbc3853b"
+        },
+        "resolution_checks": {
+          "count": 1,
+          "head": "sha256:67b5e59691a7aa79e3d0c28e06ba00f302b328b375b6ae28d3fdecaab0ba8064"
+        }
+      },
+      "previous_digest": null,
+      "run_id": "run-1",
+      "sequence": 0,
+      "version": "witness-digest/0.1"
+    }
+  ]
+}

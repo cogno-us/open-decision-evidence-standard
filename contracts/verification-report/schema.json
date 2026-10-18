@@ -224,7 +224,9 @@
             "manifest",
             "destination_ledger",
             "corpus",
-            "operator_set"
+            "operator_set",
+            "witness",
+            "holder_inventory"
           ]
         },
         "name": {
@@ -323,6 +325,7 @@
             "enum": [
               "V1",
               "V2",
+              "V3",
               "V4"
             ]
           }
@@ -409,6 +412,7 @@
           "enum": [
             "V1",
             "V2",
+            "V3",
             "V4"
           ]
         },
@@ -498,7 +502,8 @@
             "no_v1_scope_claim",
             "differential_agreement_is_not_equivalence",
             "no_imported_headline_numbers",
-            "seeds_are_regression_not_detection"
+            "seeds_are_regression_not_detection",
+            "witness_is_not_publication"
           ]
         },
         "statement": {

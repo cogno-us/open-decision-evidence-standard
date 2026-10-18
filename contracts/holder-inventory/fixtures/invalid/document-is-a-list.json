@@ -1,0 +1,25 @@
+{
+  "fixture_id": "document-is-a-list",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The document is one inventory object, not a list of holders.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": [
+    {
+      "holder_id": "h-routed",
+      "kind": "routed",
+      "enforcement_point": "control plane effect check",
+      "credential_ref": null
+    },
+    {
+      "holder_id": "h-self",
+      "kind": "self_credentialed",
+      "enforcement_point": "destination credential",
+      "credential_ref": null
+    }
+  ]
+}

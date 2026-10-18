@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Witness digest contract 0.1.0-draft",
+  "description": "Draft optional ODES extension profile: the witness-digest/0.1 records the Control Plane's opt-in witness emits (acp witness publish), as the JSON-lines file a witness holds, oldest record first. One record per publication: the run id, a sequence number, the previous record's digest, per list-valued ledger of the run record the count of rows covered and the hash-chain head over them, and the record's own digest. Closed member sets; x- extensions allowed. A record that matches shows only that match: not that it was published, timely, or held by anyone independent of the record keeper; it carries no signer or proof.",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/record"
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "ledger_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "count",
+        "head"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "head": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "run_id",
+        "sequence",
+        "previous_digest",
+        "ledgers",
+        "digest"
+      ],
+      "properties": {
+        "version": {
+          "const": "witness-digest/0.1"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "previous_digest": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "ledgers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/ledger_entry"
+          }
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}

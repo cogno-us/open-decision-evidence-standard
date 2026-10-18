@@ -1,0 +1,39 @@
+{
+  "fixture_id": "holder-of-kind-other",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "DERIVED from the capture: a holder of kind `other` (neither a routed nor a self-credentialed claim is made).",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_revision": "128eaa5e",
+    "scenario": "holder-inventory-enumerated",
+    "derived": "third holder of kind other"
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00+00:00",
+    "holders": [
+      {
+        "holder_id": "h-routed",
+        "kind": "routed",
+        "enforcement_point": "control plane effect check",
+        "credential_ref": null
+      },
+      {
+        "holder_id": "h-self",
+        "kind": "self_credentialed",
+        "enforcement_point": "destination credential",
+        "credential_ref": null
+      },
+      {
+        "holder_id": "h-other",
+        "kind": "other",
+        "enforcement_point": "unspecified",
+        "credential_ref": null
+      }
+    ]
+  }
+}

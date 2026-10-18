@@ -1,0 +1,39 @@
+{
+  "fixture_id": "repeated-holder-id-is-not-refused",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "DERIVED from the capture: the same holder_id listed twice. The profile defines no uniqueness rule and the Control Plane accepts it, so this contract does not refuse it (README, Not checked here).",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_revision": "128eaa5e",
+    "scenario": "holder-inventory-enumerated",
+    "derived": "first holder listed twice"
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00+00:00",
+    "holders": [
+      {
+        "holder_id": "h-routed",
+        "kind": "routed",
+        "enforcement_point": "control plane effect check",
+        "credential_ref": null
+      },
+      {
+        "holder_id": "h-self",
+        "kind": "self_credentialed",
+        "enforcement_point": "destination credential",
+        "credential_ref": null
+      },
+      {
+        "holder_id": "h-routed",
+        "kind": "routed",
+        "enforcement_point": "control plane effect check",
+        "credential_ref": null
+      }
+    ]
+  }
+}
