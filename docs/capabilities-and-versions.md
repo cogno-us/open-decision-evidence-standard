@@ -30,6 +30,7 @@ Recorded at repository commit `1ed3bb4` (main). Each row names where its value i
 | Canonicalization, legacy | `json-sort-keys-compact-utf8-no-nan` (every historical digest uses it) | `odes.canonicalization.LEGACY_CANONICALIZATION_PROFILE` |
 | Canonicalization, interoperable | `rfc8785-jcs` (a separate identifier; the legacy one is never relabelled) | `odes.canonicalization.JCS_CANONICALIZATION_PROFILE` |
 | Native evidence inventory | `0.1.0-draft` | [native evidence inventory](native-evidence-inventory.md) |
+| Detached package authentication | `odes-dsse-ed25519/0.1.0-draft` (optional extra `signatures`) | [detached authentication](detached-authentication.md), `odes.signatures.SIGNATURE_PROFILE` |
 | Contract drafts | `0.1.0-draft` for every contract | `contracts/*/README.md` |
 
 Seven coordinates identify a package in practice (narrative, base schema, package envelope, profile identifier, transformation or profile version, Python package, producer interface); the canonicalization label is an eighth that decides how a digest is computed. A narrative version alone does not identify what a recipient will evaluate.
