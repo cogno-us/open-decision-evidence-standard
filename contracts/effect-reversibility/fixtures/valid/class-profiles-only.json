@@ -1,0 +1,25 @@
+{
+  "fixture_id": "class-profiles-only",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "A class catalog with no run and no records is valid.",
+  "document": {
+    "contract": "effect-reversibility",
+    "contract_version": "0.1.0-draft",
+    "class_profiles": [
+      {
+        "class_id": "cls-block",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "fixture_id": "class-profiles-three-effect-classes",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "One class per effect class (stageable reversible_until, stallable reversible_at_cost, blocking irreversible), plus a protected-read class and an unobservable-counterparty class, both irreversible.",
+  "document": {
+    "contract": "effect-reversibility",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "class_profiles": [
+      {
+        "class_id": "cls-stage",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stageable",
+        "x-reversibility": {
+          "reversibility": "reversible_until",
+          "reversible_until": "2026-10-06T19:00:00+00:00",
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-stall",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stallable",
+        "x-reversibility": {
+          "reversibility": "reversible_at_cost",
+          "reversible_until": null,
+          "reversal_cost": {
+            "description": "Cancelling after release costs a fee."
+          },
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-block",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-read",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": true,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-unobs",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": false
+        }
+      }
+    ]
+  }
+}
