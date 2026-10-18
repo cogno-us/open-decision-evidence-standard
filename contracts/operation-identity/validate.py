@@ -557,6 +557,9 @@ def _journal_rules(doc: dict[str, Any], journal: dict[str, Any], require_profile
     return out
 
 
+_CONTEXT_ERRORS = (AttributeError, TypeError, KeyError, IndexError)
+
+
 def _validate(doc: Any, journal: dict[str, Any] | None = None, require_profile: bool = False) -> list[Violation]:
     """Return all violations; an empty list means the document conforms to 0.1.0-draft.
 
@@ -567,8 +570,11 @@ def _validate(doc: Any, journal: dict[str, Any] | None = None, require_profile: 
     if out:
         return out
     out.extend(_document_rules(doc))
-    if journal is not None:
-        out.extend(_journal_rules(doc, journal, require_profile))
+    try:
+        if journal is not None:
+            out.extend(_journal_rules(doc, journal, require_profile))
+    except _CONTEXT_ERRORS:
+        out.append(_v("context_malformed", "$", "an optional context argument (run record, host configuration or signer set) does not have the shape the cross-document rules need; it is refused, not assumed"))
     return out
 
 
