@@ -366,7 +366,8 @@ def test_every_valid_profile_fixture_turns_a_profile_on_and_every_profile_is_cov
         present = cpj.profiles_present(fx["document"])
         # operation-identity on but the request carried no operation_id: the producer holds before writing any profile member,
         # so the record has the default shape (a real run, kept to show that "profile on" does not imply "member present")
-        assert present or fx["fixture_id"] == "profile-op-operation-id-missing-held", fx["fixture_id"]
+        # terminal-revocation/0.1 adds a reason code only: its rows carry no profile member, so none is "present" (decision 33)
+        assert present or fx["fixture_id"] == "profile-op-operation-id-missing-held" or fx["fixture_id"].startswith("profile-terminal-revocation-"), fx["fixture_id"]
         seen |= present
     assert seen == PROFILES
     stack = {f["fixture_id"]: cpj.profiles_present(f["document"]) for f in PROFILE_VALID if f["fixture_id"].startswith("profile-all-profiles-")}
@@ -500,7 +501,8 @@ def test_profile_rules_do_not_relax_the_default_path():
 
 def test_registry_labels_and_the_zero_two_only_codes():
     assert cpj.VOCABULARY_0_1 == "runtime-authority-reasons/0.1" and cpj.VOCABULARY_0_2 == "runtime-authority-reasons/0.2"
-    assert len(cpj.CODES_ADDED_IN_0_2) == 36  # 157 - 121, from the Control Plane's two registry captures
+    assert len(cpj.CODES_ADDED_IN_0_2) == 37  # 158 - 121, from the Control Plane's two registry files at 6b8fb627
+    assert "grant_revocation_recorded" in cpj.CODES_ADDED_IN_0_2  # terminal-revocation/0.1
     assert {"holder_inventory_missing", "check_expired_before_dispatch", "operation_id_missing"} <= cpj.CODES_ADDED_IN_0_2
     enums = [cpj.load_schema()["$defs"][n]["properties"]["reason_vocabulary_version"]["enum"] for n in ("journal_event", "decision", "refusal")]
     assert all(e == [cpj.VOCABULARY_0_1, cpj.VOCABULARY_0_2] for e in enums), enums
@@ -539,12 +541,36 @@ def test_profile_fixtures_are_recaptured_producer_output_not_relabelled():
     """Decision 31-B: the profile fixtures were re-captured at Control Plane 3755c71a, which writes the registry labels itself; none
     carries a relabel note and the relabel script is gone from the build path."""
     assert not (CONTRACT_DIR / "provenance" / "relabel_vocabulary.py").exists()
+    # the terminal-revocation fixtures were captured later, at 6b8fb627 (the older ones are deliberately not re-captured)
     for fx in PROFILE_VALID:
+        commit = "6b8fb627" if fx["fixture_id"].startswith("profile-terminal-revocation-") else "3755c71a"
         assert "vocabulary_label" not in fx["provenance"], fx["fixture_id"]
-        assert fx["provenance"]["control_plane_commit"] == "3755c71a", fx["fixture_id"]
-        assert "Real producer run, unchanged (Control Plane 3755c71a" in fx["reason"], fx["fixture_id"]
+        assert fx["provenance"]["control_plane_commit"] == commit, fx["fixture_id"]
+        assert f"Real producer run, unchanged (Control Plane {commit}" in fx["reason"], fx["fixture_id"]
     for fx in PROFILE_INVALID:
+        commit = "6b8fb627" if fx["fixture_id"].startswith("profile-terminal-revocation-") else "3755c71a"
         assert "vocabulary_label" not in fx["provenance"], fx["fixture_id"]
-        assert fx["provenance"].get("control_plane_commit") == "3755c71a", fx["fixture_id"]
+        assert fx["provenance"].get("control_plane_commit") == commit, fx["fixture_id"]
     tamper = next(f for f in PROFILE_INVALID if f["fixture_id"] == "profile-op-grant-mismatch-held")
     assert tamper["expected_outcome"] == "reject" and "derived tamper" in tamper["reason"].lower()
+
+
+# ------------------------------------------------------------------ terminal-revocation/0.1 (Control Plane 6b8fb627)
+
+TERMINAL = [f for f in PROFILE_VALID if f["fixture_id"].startswith("profile-terminal-revocation-")]
+
+
+def test_terminal_revocation_needs_no_new_member_and_carries_the_zero_two_label():
+    """The profile adds one reason code and no record member: its rows validate under the closed member sets as declared."""
+    assert len(TERMINAL) == 3
+    for fx in TERMINAL:
+        assert codes(copy.deepcopy(fx["document"])) == [], fx["fixture_id"]
+        assert cpj.profiles_present(fx["document"]) == set(), fx["fixture_id"]
+    refusal = next(f for f in TERMINAL if f["fixture_id"].endswith("refused-after-recorded-revocation"))["document"]["refusals"][-1]
+    assert refusal["reasons"] == ["grant_revocation_recorded"] and refusal["reason_vocabulary_version"] == cpj.VOCABULARY_0_2
+    assert any(c["kind"] == "successor_grant_revision" for c in refusal["reopen_conditions"])
+
+
+def test_terminal_revocation_code_under_a_0_1_label_is_refused():
+    fx = next(f for f in PROFILE_INVALID if f["fixture_id"] == "profile-terminal-revocation-code-under-a-0-1-label")
+    assert fx["expected_refusal"] == "reason_label_mismatch" and codes(copy.deepcopy(fx["document"])) == ["reason_label_mismatch"]

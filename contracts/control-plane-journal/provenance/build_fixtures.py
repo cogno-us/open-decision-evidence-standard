@@ -1,6 +1,9 @@
 """Build the valid profile-on journal fixtures from captured run records (step 2 of 3; step 3 is mutate_invalid_fixtures.py).
 
-    python build_fixtures.py <raw-root> <contracts/control-plane-journal dir> <control-plane-commit>
+    python build_fixtures.py <raw-root> <contracts/control-plane-journal dir> <control-plane-commit> [--only <capture>]
+
+`--only <capture>` rebuilds just that capture's scenarios and leaves every other fixture untouched (used to add the terminal-revocation
+fixtures, captured at Control Plane 6b8fb627, without re-capturing the older profile fixtures; each fixture's provenance names its own commit).
 
 <raw-root> holds one directory per capture: operation-identity/, rule-revision/, freshness-clocks/ (written by the capture_fixtures.py
 of those three contracts) and stack/ (capture_profile_stack.py here), all captured from the same Control Plane commit. Each run record
@@ -69,8 +72,10 @@ def normalise(doc):
 
 RAW, CDIR, CP = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
 DEST = CDIR / "fixtures" / "valid"
-for old in DEST.glob("profile-*.json"):
-    old.unlink()
+ONLY = sys.argv[5] if len(sys.argv) > 5 and sys.argv[4] == "--only" else None
+if ONLY is None:
+    for old in DEST.glob("profile-*.json"):
+        old.unlink()
 
 # (capture dir, scenario, what it shows)
 SCENARIOS = [
@@ -110,9 +115,14 @@ SCENARIOS = [
  ("stack", "all-profiles-applied", "freshness, operation identity, rule revision and holder inventory on together: authorized, applied, then an issuer renewal."),
  ("stack", "all-profiles-expired-before-dispatch", "All four profiles on together: the dispatch gate refuses an expired check (failed attempt, refusal with deadline, join row)."),
  ("stack", "all-profiles-holder-inventory-missing", "All four profiles on, a class flagged requires_revocation_assurance and no inventory: held with holder_inventory_missing (holder-inventory/0.1 adds no record member; it surfaces as a reason)."),
+ ("terminal-revocation", "terminal-revocation-refused-after-recorded-revocation", "terminal-revocation/0.1: a grant revision observed revoked is refused at effect time (grant_revocation_recorded, label 0.2, reopen condition successor_grant_revision) after its status reads active again; the first refusal is the ordinary grant_revoked."),
+ ("terminal-revocation", "terminal-revocation-decision-holds-after-recorded-revocation", "terminal-revocation/0.1: after a recorded revocation a new decision for the same grant revision holds with grant_revocation_recorded; no binding."),
+ ("terminal-revocation", "terminal-revocation-suspension-stays-reversible", "terminal-revocation/0.1: a suspension is not terminal; the same revision is refused while suspended and applies once active again."),
 ]
 TAMPERED = "op-grant-mismatch-held"   # the capture rebinds the ledger row itself: a derived tamper, written to fixtures/invalid below
 for capture, scenario, why in SCENARIOS:
+    if ONLY and capture != ONLY:
+        continue
     cap = json.load(open(RAW / capture / f"{scenario}.json"))
     run = normalise(cap["run"])
     doc = {"contract": "control-plane-journal", "contract_version": "0.1.0-draft", "producer": "control-plane", **run}
@@ -133,4 +143,4 @@ for capture, scenario, why in SCENARIOS:
           "provenance": {"source": "control-plane-capture", "control_plane_commit": CP, "capture": capture, "scenario": scenario},
           "document": doc}
     (DEST / f"{fx['fixture_id']}.json").write_text(json.dumps(fx, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-print(len(SCENARIOS) - 1, "valid fixtures written, 1 tampered fixture written to invalid")
+print(len(SCENARIOS) - 1 if not ONLY else sum(c == ONLY for c, _, _ in SCENARIOS), "valid fixtures written, 1 tampered fixture written to invalid")

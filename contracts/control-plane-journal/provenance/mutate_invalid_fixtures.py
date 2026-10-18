@@ -17,9 +17,8 @@ spec.loader.exec_module(cpj)
 V = {p.stem[len("profile-"):]: json.loads(p.read_text()) for p in (CDIR / "fixtures" / "valid").glob("profile-*.json")}
 OUT = CDIR / "fixtures" / "invalid"
 for old in OUT.glob("profile-*.json"):
-    if old.name != "profile-op-grant-mismatch-held.json":   # written by build_fixtures.py (derived tamper, refused by the operation-identity sidecar)
+    if old.name != "profile-op-grant-mismatch-held.json" and not old.name.startswith("profile-terminal-revocation-"):   # written by build_fixtures.py (derived tamper, refused by the operation-identity sidecar) / terminal-revocation mutations below
         old.unlink()
-CP = next(iter(V.values()))["provenance"]["control_plane_commit"]
 bad = []
 
 
@@ -30,7 +29,7 @@ def make(fid, base, code, why, fn):
     if got != [code]:
         bad.append((fid, code, got))
     fx = {"fixture_id": f"profile-{fid}", "synthetic": True, "expected_outcome": "reject", "expected_refusal": code, "reason": why,
-          "provenance": {"source": f"single-defect mutation of the captured fixture profile-{base}", "control_plane_commit": CP},
+          "provenance": {"source": f"single-defect mutation of the captured fixture profile-{base}", "control_plane_commit": V[base]["provenance"]["control_plane_commit"]},
           "document": doc}
     (OUT / f"profile-{fid}.json").write_text(json.dumps(fx, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -123,6 +122,17 @@ make("lease-hold-with-another-reason", "lease-unavailable-holds", "journal_missi
 make("lease-hold-without-the-profile-clock", "lease-unavailable-holds", "journal_missing",
      "The exemption belongs to freshness/0.1 and is recognised by its `evaluated_at` member on the decision; the same hold without it is a default-path record, which has a journal or no vocabulary version.",
      lambda d: d["decisions"][0].pop("evaluated_at"))
+
+# ------------------------------------------------------------------------------ terminal-revocation/0.1 (Control Plane 6b8fb627)
+# Written outside the loop above on purpose: these fixtures are derived from a later capture and survive a re-run of the older ones.
+def relabel_0_1(d):
+    row = next(r for r in d["refusals"] if "grant_revocation_recorded" in r["reasons"])
+    row["reason_vocabulary_version"] = cpj.VOCABULARY_0_1
+
+
+make("terminal-revocation-code-under-a-0-1-label", "terminal-revocation-refused-after-recorded-revocation", "reason_label_mismatch",
+     "grant_revocation_recorded is registered only by runtime-authority-reasons/0.2 (terminal-revocation/0.1). The effect-time refusal row carrying it is relabelled 0.1, which the Control Plane never writes for that code (one defect, one row; the check events keep their 0.2 label).",
+     relabel_0_1)
 
 if bad:
     sys.exit("mutations that did not give exactly the expected code:\n" + "\n".join(map(str, bad)))

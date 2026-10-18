@@ -44,7 +44,7 @@ Same model as the journal contract.
 
 ## Reason codes
 
-Seven codes of the Control Plane reason registry (121 codes in `runtime-authority-reasons/0.1`, 157 in the superset `/0.2`; the seven are among the 36 codes only 0.2 registers) belong to the profile. They are producer reason codes, not validator codes; the validator's own codes are listed under Rules.
+Seven codes of the Control Plane reason registry (121 codes in `runtime-authority-reasons/0.1`, 158 in the superset `/0.2`; the seven are among the 37 codes only 0.2 registers) belong to the profile. They are producer reason codes, not validator codes; the validator's own codes are listed under Rules.
 
 | Code | Where it appears | Meaning |
 |---|---|---|
