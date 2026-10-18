@@ -174,10 +174,10 @@ Each category names the operator, the seed where one exists, and the expected ve
 |---|---|---|---|
 | W1 | duplicate a decision member in raw text (`result`, `effect_id`, `binding`) | none (Python parser accepts) | V1 |
 | W2 | non-JSON constant (`NaN`, `Infinity`) in a numeric member | none | V1 |
-| W3 | number-form drift: `1` vs `1.0` for `amount`, `strength`, `max_age_seconds` (changes the canonical bytes) | none | V1/V2 |
+| W3 | number-form drift: `1` vs `1.0` for `amount`, `strength`, `max_age_seconds` (an integer where a float was changes the canonical bytes; spellings of the same float do not, those are B) | none | V1/V2 |
 | W4 | Unicode: NFC vs NFD, escaped vs literal non-ASCII, lone surrogate | none | V1/V2 |
 | W5 | byte-order mark, trailing data, excessive nesting | none | V1 |
-| B (benign) | key reorder, insignificant whitespace, equal-value escape forms that the pinned profile defines equal | none | accept |
+| B (benign) | key reorder, insignificant whitespace, equal-value escape forms that the pinned profile defines equal, float spellings of one float (`50.0`, `50.00`, `5e1`, `50.0e0` have one canonical form), a resolution-check id renamed (see J2) | none | accept |
 | S1 | undeclared member outside `extensions` | `undeclared_member` fixtures | V1 |
 | S2 | enum value outside closed set (`deny`, `safe_to_retry`) | `unknown_enum_value`, `deny-decision-result`, `safe-to-retry-result` | V1 |
 | S3 | required member removed | `required-collection-missing` | V1 |
@@ -193,7 +193,7 @@ Each category names the operator, the seed where one exists, and the expected ve
 | D4 | reason code outside the registry, or vocabulary version removed | `journal-mode-decision-without-vocabulary-version` | V2 |
 | D5 | `grant_revoked` observed in the grant input, result `authorized` | none | V2 (the one recomputable code) |
 | J1 | journal opening dropped or duplicated | `delegated-duplicate-journal-opening` | V2 |
-| J2 | completed check matches no resolution check; check reused; sequential order reversed | `delegated-completed-journal-matches-no-check`, `...-checks-reuse-one-resolution-check`, `delegated-sequential-checks-reordered` | V2 |
+| J2 | completed check matches no resolution check by content (stage, inputs, reasons; renaming only a check id is not this, those ids are separate producer ids and that change is B); check reused; sequential order reversed | `delegated-completed-journal-matches-no-check`, `...-checks-reuse-one-resolution-check`, `delegated-sequential-checks-reordered` | V2 |
 | J3 | `interrupted` or opened-only check rewritten as `completed` | none | V2 |
 | T1 | naive timestamps; observation from the future; stale accepted observation; time floor regressed | `naive-decided-at`, `accepted-observation-from-the-future`, `accepted-observation-stale`, `input-time-floor-without-offset` | V2 |
 | A1 | attempt start record dropped; second attempt after observed absence; attempt on a held decision | `delegated-dropped-start-record`, `second-attempt-lifecycle-for-effect`, `attempt-on-held-decision` | V2 |
@@ -202,14 +202,22 @@ Each category names the operator, the seed where one exists, and the expected ve
 | R2 | ledger effect whose decision is `hold` | none | V4 |
 | R3 | ledger row differing from the binding in grant, target, amount, unit or operation digest | none | V4 |
 | R4 | second ledger row for one `effect_id` (excess duplicate), or a duplicate attempt acknowledgement | none | V4 |
-| R5 | acknowledged attempt with no ledger row (dropped receipt) | none | V4 |
-| R6 | ledger tail truncated | none | not detectable without sequence and chain (S4b); expected `accept`, reported as such |
+| R5 | acknowledged attempt with no ledger row (dropped receipt); also a row dropped for an `unknown` attempt whose accepted `applied` or `partial` observation the record holds | none | V4 |
+| R6 | ledger row dropped that nothing in the record corroborates (an `unknown` attempt and no accepted `applied` or `partial` observation of the effect; the tail of the ledger, since there is no sequence) | none | not detectable without sequence and chain (S4b); expected `accept`, reported as such. Revised 2026-10-18, see below: a dropped row that the record does corroborate is an R5 case, not R6 |
 | X1 | decision, proposal or ledger row transplanted from another run | none | V2/V4 |
 | L1 | outcome label or report digest altered after the freeze | none | S6 join step |
 | F (forgery bound) | mutate, then recompute every affected commitment so the document is self-consistent | none | expected `accept`; defines the certificate's limit |
 | Q (semantic) | policy weakened with consistent digests; misleading but valid reason | none | not applicable (P3); listed so the report shows "n/a", not a rate |
 
 Categories F, R6 and Q are in the catalogue on purpose. They are the cases where an accepted trace is expected, and printing them keeps the aggregate from implying a coverage the design does not have.
+
+**Revision of 2026-10-18 (programme 2, stream V3b; written after the first mutation run and the verifier follow-up were read, so it is post-hoc).** Three catalogue entries were wrong about what is damage and what is expected, and are corrected here. Each is reversible: restoring the old text restores the old expectation, and nothing else in the design depends on it.
+
+- R6. The design said "ledger tail truncated: expected `accept`". The first run dropped the ledger row of an effect whose acknowledgement was lost and refused it, and the refusal is correct: in every such trace the record also held an accepted `applied` observation of the effect, so the record itself says the row exists and the snapshot contradicts it (`observation_without_ledger_row`, with `acknowledged_attempt_without_ledger_row` for acknowledged attempts). That case is a dropped receipt, R5. The case that stays undetectable is a row nothing in the record corroborates: an `unknown` attempt and no accepted `applied` or `partial` observation, where the ledger has no sequence or chain from which the drop could be seen. R6 now means only that case, and its expected verdict is `accept`. The first corpus had no trace of that shape (the control plane observes right after dispatch), so one was captured from the control plane's own path with the follow-up observation failing (`observation_unavailable`). Measured on that single trace the verifier accepted the drop (n_eff 1; an anecdote, not a rate).
+- W3. Only an integer written where a float was changes the canonical bytes. `50.00`, `5e1` and `50.0e0` are one float with one canonical text under the pinned profile (Python `repr`), so they are value-equal forms and belong to B. A stricter reading of lexical forms would be a different profile, not a check.
+- J2. "Completed check matches no resolution check" cannot be produced by renaming one resolution-check id: the contract treats resolution-check ids and journal-check ids as separate producer ids and a completed check binds by stage, inputs and reasons. Renaming an id leaves the record consistent by content (B); an operator for this category has to change inputs or reasons.
+
+Results and the change log are in `suites/verifier-mutation/README.md` of `cogno-us/cognous-stack-qualification`.
 
 ### 4.4 Metrics and denominators
 
