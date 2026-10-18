@@ -29,6 +29,7 @@ from .common import (
     window_expired,
     sha256,
 )
+from .canonicalization import SUPPORTED_CANONICALIZATION_PROFILES, digest_for
 from .schema_validation import schema_errors
 
 
@@ -95,6 +96,9 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
     if declared == PROFILE_ID and selected_control_plane in ALL_V2_CONTROL_PLANE_REVISIONS:
         reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
     if declared in {PROFILE_ID, PROFILE_V2_ID}:
+        integrity = package.get("integrity") if isinstance(package.get("integrity"), dict) else {}
+        if "canonicalization_profile" in integrity and integrity["canonicalization_profile"] != CANONICALIZATION_PROFILE:
+            reasons.append("the declared implementation profile is defined only with the legacy canonicalization profile")
         expected_version = SECURITY_RUNTIME_GENERATIONS[selected_control_plane][0] if declared == PROFILE_V2_ID and selected_control_plane in SECURITY_RUNTIME_GENERATIONS else REFUSAL_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
         if profile.get("implementation_profile_version") != expected_version:
             return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": expected_version})
@@ -115,15 +119,19 @@ def _evaluate_package_content_integrity(package: dict[str, Any], trusted_digests
         return _result("unsupported", ["no supported package content integrity method supplied"])
     if integrity.get("algorithm") != "SHA-256":
         return _result("unsupported", [f"unsupported integrity algorithm {integrity.get('algorithm')!r}"])
-    if integrity.get("canonicalization_profile") != CANONICALIZATION_PROFILE:
-        return _result("unsupported", [f"unsupported canonicalization_profile {integrity.get('canonicalization_profile')!r}"], {"supported_canonicalization_profile": CANONICALIZATION_PROFILE})
+    canonicalization = integrity.get("canonicalization_profile")
+    if not isinstance(canonicalization, str) or canonicalization not in SUPPORTED_CANONICALIZATION_PROFILES:
+        return _result("unsupported", [f"unsupported canonicalization_profile {canonicalization!r}"], {"supported_canonicalization_profile": CANONICALIZATION_PROFILE, "supported_canonicalization_profiles": list(SUPPORTED_CANONICALIZATION_PROFILES)})
 
-    record_profile_digest = sha256(_package_core(package))
+    try:
+        record_profile_digest = digest_for(canonicalization, _package_core(package))
+        expected_package_digest = digest_for(canonicalization, _material_package_content(package))
+    except ValueError as exc:
+        return _result("fail", [f"package content cannot be canonicalized under {canonicalization!r}: {exc}"])
     if integrity.get("value") != record_profile_digest:
         reasons.append("record/profile content digest does not match exported record and profile metadata")
     evidence["record_profile_digest"] = record_profile_digest
 
-    expected_package_digest = sha256(_material_package_content(package))
     if package.get("package_digest") != expected_package_digest:
         reasons.append("package_digest does not match complete material package content")
     evidence["package_digest"] = expected_package_digest

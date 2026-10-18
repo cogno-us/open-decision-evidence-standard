@@ -1,0 +1,33 @@
+{
+ "values_json_note": "legacy canonicalizer outputs recorded at ab223358..e096402; must never change",
+ "cases": {
+  "plain": {
+   "legacy_bytes_hex": "7b2261223a5b312c322c7b2279223a747275652c227a223a6e756c6c7d5d2c2262223a312c2263223a2278227d",
+   "legacy_digest": "sha256:8e0111a63076dbd29860164eed84e9b0b2698d6fb72c9c30f4d21bf739c0fc07"
+  },
+  "float_int": {
+   "legacy_bytes_hex": "7b2276223a352e307d",
+   "legacy_digest": "sha256:ea5880e5e967ddf1dec0805ce1fe63fac7f927acbcbd2a906000b89d10867116"
+  },
+  "exp": {
+   "legacy_bytes_hex": "7b2276223a31652d30377d",
+   "legacy_digest": "sha256:91f2443f2f247a30862575eee6899b5bc41d0a8c6817c75d9335b17393d9a086"
+  },
+  "negzero": {
+   "legacy_bytes_hex": "7b2276223a2d302e307d",
+   "legacy_digest": "sha256:3804efdcecdab4b071c214185d5593cb6c3f0d386b6dd057bacd0e3740459dff"
+  },
+  "nonbmp": {
+   "legacy_bytes_hex": "7b2261223a332c22efbfbf223a322c22f09f9880223a317d",
+   "legacy_digest": "sha256:48f8c136ce1b1fb6cc384c2a496fcab8d870f137c9ef71a97d7c4475f6d0eb5d"
+  },
+  "unicode": {
+   "legacy_bytes_hex": "7b226b223a22636166c3a920e280a8207f227d",
+   "legacy_digest": "sha256:64d7007d2690b04212940703592597abe003779e4d08e483d2d2ac5306108130"
+  },
+  "big": {
+   "legacy_bytes_hex": "7b2276223a31652b32312c2277223a3132333435363738393031323334353637387d",
+   "legacy_digest": "sha256:ca701367acaa95793280995a79751c52725a15ec01389268d4b6aa3752a8ca14"
+  }
+ }
+}
