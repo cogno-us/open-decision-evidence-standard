@@ -8,6 +8,7 @@ from typing import Any
 from .common import (
     accepted_replay_revisions,
     all_accepted_replay_revisions,
+    installed_replay_checkout_dirty,
     installed_replay_revision,
     CANONICALIZATION_PROFILE,
     DOCUMENT_VERSION,
@@ -304,6 +305,19 @@ def _require_installed_replay(control_plane_revision: str) -> None:
                           "(or set ODES_ALLOW_UNVERIFIED_REPLAY=1 for a local development install)")
     if installed not in all_accepted_replay_revisions():
         raise ReplayRevisionUnsupportedError(f"installed Replay revision {installed} is not an accepted Replay revision (declared Control Plane {control_plane_revision})")
+    if installed_replay_checkout_dirty() and os.environ.get("ODES_ALLOW_UNVERIFIED_REPLAY") != "1":
+        raise ExportError("the installed Replay checkout has uncommitted changes, so the code that runs is not the accepted revision "
+                          "(commit or discard them, or set ODES_ALLOW_UNVERIFIED_REPLAY=1 for a local development install)")
+
+
+def _bundle_control_plane_revision(bundle: dict[str, Any]) -> str:
+    """The Control Plane revision the bundle declares; a bundle that does not declare one is refused, never defaulted to the
+    historical revision (which would skip the qualified-build gate for every later generation)."""
+    metadata = bundle.get("metadata")
+    revision = metadata.get("control_plane_revision") if isinstance(metadata, dict) else None
+    if not isinstance(revision, str) or not revision:
+        raise ExportError("bundle metadata.control_plane_revision is missing; the Control Plane generation cannot be selected")
+    return revision
 
 
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
@@ -317,7 +331,7 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
     except Exception as exc:
         raise ExportError(f"pinned Replay validator could not be loaded ({type(exc).__name__})") from exc
     try:
-        revision = (bundle.get("metadata") or {}).get("control_plane_revision", PINNED_REVISIONS["control_plane"])
+        revision = _bundle_control_plane_revision(bundle)
         if revision not in {PINNED_REVISIONS["control_plane"], *ALL_V2_CONTROL_PLANE_REVISIONS}:
             raise ExportError("unsupported Control Plane compatibility revision")
         if revision in ALL_V2_CONTROL_PLANE_REVISIONS:
