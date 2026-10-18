@@ -32,6 +32,16 @@ A recipient may configure a digest as trusted for inspection, but that still doe
 
 HMAC, where a future profile defines it, establishes shared-secret integrity. Synthetic signature profiles must bind the complete relevant record and profile metadata and require explicit recipient trust configuration. BitRep verification and Index inclusion can provide optional evidence signals but cannot create authority, adoption or recipient reliance by themselves.
 
+## Canonicalization profiles
+
+`integrity.canonicalization_profile` names the byte form that both digests are computed over. The validator dispatches on that declared identifier and never infers one:
+
+- `json-sort-keys-compact-utf8-no-nan` is the legacy profile. It is unchanged, and every digest already issued under it stays valid. The Cognous export profiles (`odes_cognous_stack_export_0_1`, `odes_cognous_stack_export_0_2`) are defined only with this profile; a package that declares one of them with another canonicalization identifier fails declared-profile conformance.
+- `rfc8785-jcs` is RFC 8785 (JSON Canonicalization Scheme). It is a separate profile, not a relabelling: its bytes differ from the legacy bytes for UTF-16 property order of non-BMP names, integral floats (`5.0`), small and large exponents and negative zero. Changing the label of a package does not make its digests valid, because the label sits inside the material both digests cover.
+- Any other identifier, or a non-string value, gives `unsupported` for package content integrity. Nothing falls back to a default.
+
+Permitted value domain for `rfc8785-jcs` (implemented in `odes.canonicalization`, documented there too): null, booleans, strings, lists and objects with string names; no lone surrogates; unique member names (a document with a duplicate name is refused when parsed); integers only within -(2^53 - 1) to 2^53 - 1 (larger integers are refused, not rounded); finite floats only, written with the ECMAScript number rules RFC 8785 requires; nesting up to 64 levels. Content outside the domain gives `fail` for package content integrity under that profile.
+
 ## Time and status evidence
 
 Time-dependent acceptance requires a valid recipient evaluation time. Missing or malformed `now` prevents acceptance for the affected purpose.
