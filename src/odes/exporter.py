@@ -17,7 +17,11 @@ from .common import (
     PINNED_REVISIONS,
     PROFILE_ID,
     PROFILE_V2_ID,
+    PROFILE_V2_RESTRICTIONS_ID,
     PROFILE_V2_VERSION,
+    RESTRICTION_SEMANTICS_VERSION,
+    RESTRICTION_UNKNOWN_LIMIT,
+    RESTRICTION_VERSION_SUFFIX,
     REFUSAL_PROFILE_VERSION,
     SECURITY_PROFILE_VERSION,
     SECURITY_REVISIONS,
@@ -605,14 +609,56 @@ def _selected_v2_pins(control_plane_revision: str) -> dict[str, str]:
     return dict(MERGED_REVISIONS) if control_plane_revision == MERGED_REVISIONS["control_plane"] else {**PINNED_V2_REVISIONS, "control_plane": control_plane_revision}
 
 
-def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z") -> dict[str, Any]:
+def _flag_state(risk: dict[str, Any], name: str) -> str:
+    value = risk.get(name)
+    if value is None:
+        return "unknown"
+    if not isinstance(value, bool):
+        raise ExportError(f"risk metadata {name} must be a boolean when present")
+    return "explicit_true" if value else "explicit_false"
+
+
+def _restriction_coordinates(risk: dict[str, Any], source: dict[str, Any] | None) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Risk coordinates for the explicit restriction profile and the per-value states that qualify them.
+
+    Absent or null is unknown, never false: the base boolean carries true as a conservative placeholder (the base schema cannot say
+    unknown). A malformed value, a prohibition without a restriction, or an explicit false without a retained source record is refused.
+    """
+    restricted, prohibited = _flag_state(risk, "restricted_use_flag"), _flag_state(risk, "prohibited_use_flag")
+    if prohibited == "explicit_true" and restricted == "explicit_false":
+        raise ExportError("risk metadata is contradictory: prohibited use is true while restricted use is false")
+    jurisdiction = risk.get("jurisdiction")
+    if jurisdiction is not None and (not isinstance(jurisdiction, str) or not jurisdiction.strip()):
+        raise ExportError("risk metadata jurisdiction must be a non-empty string when present")
+    if "explicit_false" in (restricted, prohibited) and not source:
+        raise ExportError("an explicit false restriction value must be attributable to a retained source record")
+    coordinates = {
+        "risk_tier": str(risk.get("risk_tier") or "unknown"),
+        "jurisdiction": jurisdiction if jurisdiction is not None else "unknown",
+        "restricted_use_flag": restricted != "explicit_false",
+        "prohibited_use_flag": prohibited != "explicit_false",
+    }
+    semantics = {"semantics_version": RESTRICTION_SEMANTICS_VERSION, "source": source,
+                 "restricted_use_flag": {"state": restricted}, "prohibited_use_flag": {"state": prohibited},
+                 "jurisdiction": {"state": "explicit" if jurisdiction is not None else "unknown"}}
+    return coordinates, semantics
+
+
+def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z", restriction_semantics: str = "legacy") -> dict[str, Any]:
+    if restriction_semantics not in {"legacy", "explicit"}:
+        raise ExportError("restriction_semantics must be 'legacy' or 'explicit'")
     manifest = deepcopy(_obj(manifest, "manifest"))
     bundle = deepcopy(_obj(reconstruction_bundle, "reconstruction_bundle"))
     replay_status, replay_findings, validated_replay = _run_replay_validation(bundle)
     control_plane_revision = validated_replay["metadata"]["control_plane_revision"]
     repaired = control_plane_revision in ALL_V2_CONTROL_PLANE_REVISIONS
-    profile_id = PROFILE_V2_ID if repaired else PROFILE_ID
+    explicit = restriction_semantics == "explicit"
+    if explicit and not repaired:
+        raise ExportError("explicit restriction semantics are defined for producer-2.0.0 generations only")
+    profile_id = (PROFILE_V2_RESTRICTIONS_ID if explicit else PROFILE_V2_ID) if repaired else PROFILE_ID
     profile_version = SECURITY_RUNTIME_GENERATIONS[control_plane_revision][0] if control_plane_revision in SECURITY_RUNTIME_GENERATIONS else REFUSAL_PROFILE_VERSION if control_plane_revision == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if control_plane_revision == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if repaired else PROFILE_VERSION
+    if explicit:
+        profile_version += RESTRICTION_VERSION_SUFFIX
     pins = _selected_v2_pins(control_plane_revision) if repaired else PINNED_REVISIONS
     _validate_manifest_binding(manifest, _extract_replay_inputs(bundle)[1])
     decision, decision_result = _check_decision_execution_consistency(bundle)
@@ -632,12 +678,17 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
     risk = proposal.get("risk_metadata") or {}
     if not isinstance(risk, dict):
         raise ExportError("risk metadata must be an object")
-    risk_coordinates = {
-        "risk_tier": str(risk.get("risk_tier") or "unknown"),
-        "jurisdiction": str(risk.get("jurisdiction") or "unknown"),
-        "restricted_use_flag": risk.get("restricted_use_flag") is not False,
-        "prohibited_use_flag": risk.get("prohibited_use_flag") is not False,
-    }
+    if explicit:
+        proposal_ref = next((r for r in _source_refs(bundle) if r["record_type"] == "runtime_proposal"), None)
+        source = {"record_type": "runtime_proposal", "record_id": proposal_ref["record_id"], "record_hash": proposal_ref["hash"]} if proposal_ref else None
+        risk_coordinates, restriction_states = _restriction_coordinates(risk, source)
+    else:
+        risk_coordinates = {
+            "risk_tier": str(risk.get("risk_tier") or "unknown"),
+            "jurisdiction": str(risk.get("jurisdiction") or "unknown"),
+            "restricted_use_flag": risk.get("restricted_use_flag") is not False,
+            "prohibited_use_flag": risk.get("prohibited_use_flag") is not False,
+        }
     decided_at = decision.get("decided_at")
     if not decided_at:
         raise ExportError("decision_timestamp is required by pder-v0.1 but no retained decision time is evidenced; exporter will not substitute bundle generation or export time")
@@ -699,6 +750,10 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
             "limits": ["Export creates no external effect and renews no authorization.", "Schema validity does not establish deployment approval, operational effectiveness, compliance, current authority, delivery success, independent review, or institutional adoption.", "Content digests bind exported content but do not authenticate the issuer or verify authority.", "BitRep and The Index are related optional evidence interfaces and are not mandatory for generic ODES adoption."],
         },
     }
+    if explicit:
+        package["provenance"]["restriction_semantics"] = restriction_states
+        if any(restriction_states[k]["state"] == "unknown" for k in ("restricted_use_flag", "prohibited_use_flag", "jurisdiction")):
+            package["provenance"]["limits"].append(RESTRICTION_UNKNOWN_LIMIT)
     if repaired:
         package["provenance"]["retained_sources"] = {"manifest": manifest, "reconstruction_bundle": bundle}
         package["provenance"]["source_artifacts"]["reconstruction_bundle_id"] = bundle["bundle_id"]

@@ -31,6 +31,14 @@ PINNED_REVISIONS = {
 
 PROFILE_V2_ID = "odes_cognous_stack_export_0_2"
 PROFILE_V2_VERSION = "odes-cognous-stack-export-0.2.0"
+# Explicit restriction semantics: a separate profile id for the behaviour that records whether each restriction value is explicit or
+# unknown. Legacy exports (PROFILE_V2_ID) are unchanged. The version is the generation's profile version plus the suffix.
+PROFILE_V2_RESTRICTIONS_ID = "odes_cognous_stack_export_0_2_restrictions"
+RESTRICTION_VERSION_SUFFIX = "+restriction-semantics-1"
+RESTRICTION_SEMANTICS_VERSION = "restriction-semantics-1"
+RESTRICTION_UNKNOWN_LIMIT = ("Restriction semantics: where a restriction or jurisdiction value is recorded with state unknown, the record carries true "
+                             "(or the text unknown) as a conservative placeholder. The placeholder does not establish a restriction, a prohibition "
+                             "or a jurisdiction, and a recipient may not treat the record as unrestricted.")
 SUPPORTED_V2_CONTROL_PLANE_REVISIONS = (
     "2ea9528eeb87e14ff10f05de06473122b9df540f",
     "248d899634d9db3518e831bc7ab568a48733f825",

@@ -119,6 +119,10 @@ Over-budget input is refused with `status = fail` and the closed reason code `bu
 
 Residual limitation: these are in-process budgets and a worker deadline, not memory or CPU isolation. The worker deadline bounds time only for the Replay check; a recipient that processes packages from untrusted senders should still run validation under operating-system limits (for example memory and CPU-time limits, or a container timeout) and reject oversized files before invoking the validator. This is not a hardened parser.
 
+## Restriction semantics profile
+
+The profile `odes_cognous_stack_export_0_2_restrictions` records whether each restriction value is explicit or unknown, keeps `true` as a conservative placeholder for unknown (an absent value never becomes unrestricted) and adds recipient checks to `consumption_conditions`. Existing profile ids and exports are unchanged. See [the profile](../profiles/cognous-stack-export-0.2-restrictions.md).
+
 ## Profile 0.2 semantic consistency
 
 Recipients must explicitly support `odes_cognous_stack_export_0_2` to inspect new
