@@ -39,6 +39,8 @@ MUTATION_NON_CLAIMS = ("no_imported_headline_numbers", "seeds_are_regression_not
 # non-claim.
 V3_INPUT_ROLES = ("witness", "holder_inventory")
 V3_NON_CLAIMS = ("witness_is_not_publication",)
+# Optional non-claim (decision 29): permitted in any report, required in none (a report that ran no profile-on sidecar check has nothing to disclaim).
+OPTIONAL_NON_CLAIMS = ("profile_sidecar_semantics_only",)
 # Family H (damage to the outside-held witness and holder-inventory artifacts, draft revision 2026-10-18, decision 28). Rows of these
 # categories are measured only on a witnessed population: a corpus that carries any of them carries only H rows and the two controls
 # that make sense there (B, F), and a report with such a corpus also carries a witnessed clean corpus. Denominators of a witnessed

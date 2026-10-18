@@ -266,10 +266,24 @@ def test_subject_digest_binds_the_inputs_and_the_pinned_profile():
 def test_every_non_claim_is_in_the_schema_set_and_the_readme():
     schema = vr.load_schema()
     ids = schema["$defs"]["non_claim"]["properties"]["id"]["enum"]
-    assert set(ids) == set(vr.CORE_NON_CLAIMS) | set(vr.MUTATION_NON_CLAIMS) | set(vr.V3_NON_CLAIMS) and len(ids) == 11
+    assert set(ids) == set(vr.CORE_NON_CLAIMS) | set(vr.MUTATION_NON_CLAIMS) | set(vr.V3_NON_CLAIMS) | set(vr.OPTIONAL_NON_CLAIMS) and len(ids) == 12
     readme = (CONTRACT_DIR / "README.md").read_text(encoding="utf-8")
     for i in ids:
         assert f"`{i}`" in readme
+
+
+def test_the_profile_sidecar_non_claim_is_optional_and_closed():
+    d = fx("trace-profile-sidecar-non-claim")
+    ids = [n["id"] for n in d["does_not_prove"]]
+    assert "profile_sidecar_semantics_only" in ids and codes(d) == []
+    # permitted everywhere, required nowhere: removing it, or never having it, leaves a valid report
+    d["does_not_prove"] = [n for n in d["does_not_prove"] if n["id"] != "profile_sidecar_semantics_only"]
+    assert codes(d) == []
+    assert "profile_sidecar_semantics_only" not in {n["id"] for n in fx("trace-all-confirmed")["does_not_prove"]}
+    for fid, code in (("profile-sidecar-non-claim-duplicated", "duplicate_non_claim"),
+                      ("profile-sidecar-non-claim-empty-statement", "schema_violation"),
+                      ("profile-sidecar-non-claim-id-misspelt", "unknown_enum_value")):
+        assert codes(bad(fid)) == [code]
 
 
 def test_the_mutation_non_claims_are_required_only_with_a_mutation_report():

@@ -72,6 +72,7 @@ NON_CLAIM_TEXT = {
     "differential_agreement_is_not_equivalence": "Agreement between verifier and controller on a corpus is not equivalence outside that corpus.",
     "no_imported_headline_numbers": "No figure from any paper is a target, baseline or expectation; the only numbers are counts from the corpora named here.",
     "seeds_are_regression_not_detection": "Seed corpora are regression checks; detection figures come only from the generated held-out corpus.",
+    "profile_sidecar_semantics_only": "Profile-on sidecar checks cover only the members the rules read; host-configuration rules such as the signer set, the extension limit and the resolver capability are not checked.",
     "witness_is_not_publication": "A witness file that matches the records shows only that match: not that it was published, that it was published in time, or that any party independent of the record keeper held it.",
 }
 
@@ -224,6 +225,9 @@ def valid():
     ext["extensions"] = {"x-run-label": "nightly"}
     ext["checks"][0]["extensions"] = {"x-note": "preserved"}
     out["extension-namespace-members-preserved"] = ("x- members on the document and on a check are accepted, ignored for contract logic and preserved.", ext)
+    sidecar = report("rep-9", subject(*base_inputs), [check("v1.wire.strict-parse", "V1", c=3), check("v2.identity.effect-id", "V2", c=2)])
+    sidecar["does_not_prove"].append({"id": "profile_sidecar_semantics_only", "statement": NON_CLAIM_TEXT["profile_sidecar_semantics_only"]})
+    out["trace-profile-sidecar-non-claim"] = ("The optional non-claim profile_sidecar_semantics_only (decision 29): a report over profile-on records says its sidecar checks cover only the members the rules read, and that host-configuration rules (signer set, extension limit, resolver capability) are not checked. Optional: a report without it is valid.", sidecar)
     out["mutation-report-witnessed"] = ("Family H: a witnessed generated corpus (H1 to H8 with the B and F controls) and its own witnessed clean corpus, next to unwitnessed corpora; H7 and H8 expect abstain; the report carries witness_is_not_publication.",
         witnessed_mutation_report())
     out["mutation-report-witnessed-seed-regression"] = ("Family H on seed fixtures: regression only, over a witnessed seed-valid clean corpus.",
@@ -299,6 +303,10 @@ def invalid(v):
     add("summary-counts-disagree", "summary_mismatch", t, lambda x: x["summary"].update({"confirmed": 3}), "The summary counts the checks as written.")
     add("report-states-nothing", "empty_report", a, lambda x: x.update({"checks": [], "summary": summary([])}), "No check and no mutation report is an empty report.")
     add("duplicate-non-claim", "duplicate_non_claim", a, lambda x: x["does_not_prove"].append(copy.deepcopy(x["does_not_prove"][0])), "Each non-claim appears once.")
+    ps = v["trace-profile-sidecar-non-claim"][1]
+    add("profile-sidecar-non-claim-duplicated", "duplicate_non_claim", ps, lambda x: x["does_not_prove"].append(copy.deepcopy(x["does_not_prove"][-1])), "The optional non-claim, like every other, appears once.")
+    add("profile-sidecar-non-claim-empty-statement", "schema_violation", ps, lambda x: x["does_not_prove"][-1].update({"statement": ""}), "A non-claim carries its statement; the optional one is not a bare id.")
+    add("profile-sidecar-non-claim-id-misspelt", "unknown_enum_value", ps, lambda x: x["does_not_prove"][-1].update({"id": "profile_sidecar_semantics_checked"}), "The id set is closed: only profile_sidecar_semantics_only is admitted, a near spelling is not.")
     add("not-an-attestation-non-claim-missing", "non_claim_missing", a, lambda x: x.update({"does_not_prove": [n for n in x["does_not_prove"] if n["id"] != "not_an_attestation"]}), "The not-an-attestation non-claim is mandatory.")
     add("semantic-quality-non-claim-missing", "non_claim_missing", a, lambda x: x.update({"does_not_prove": [n for n in x["does_not_prove"] if n["id"] != "semantic_quality_not_certified"]}), "The semantic-quality non-claim is mandatory.")
     add("does-not-prove-empty", "schema_violation", a, lambda x: x.update({"does_not_prove": []}), "The does_not_prove block cannot be empty.")

@@ -17,7 +17,8 @@ spec.loader.exec_module(cpj)
 V = {p.stem[len("profile-"):]: json.loads(p.read_text()) for p in (CDIR / "fixtures" / "valid").glob("profile-*.json")}
 OUT = CDIR / "fixtures" / "invalid"
 for old in OUT.glob("profile-*.json"):
-    old.unlink()
+    if old.name != "profile-op-grant-mismatch-held.json":   # written by build_fixtures.py (derived tamper, refused by the operation-identity sidecar)
+        old.unlink()
 CP = next(iter(V.values()))["provenance"]["control_plane_commit"]
 bad = []
 

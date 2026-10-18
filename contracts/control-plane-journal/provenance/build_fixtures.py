@@ -111,13 +111,26 @@ SCENARIOS = [
  ("stack", "all-profiles-expired-before-dispatch", "All four profiles on together: the dispatch gate refuses an expired check (failed attempt, refusal with deadline, join row)."),
  ("stack", "all-profiles-holder-inventory-missing", "All four profiles on, a class flagged requires_revocation_assurance and no inventory: held with holder_inventory_missing (holder-inventory/0.1 adds no record member; it surfaces as a reason)."),
 ]
+TAMPERED = "op-grant-mismatch-held"   # the capture rebinds the ledger row itself: a derived tamper, written to fixtures/invalid below
 for capture, scenario, why in SCENARIOS:
     cap = json.load(open(RAW / capture / f"{scenario}.json"))
     run = normalise(cap["run"])
     doc = {"contract": "control-plane-journal", "contract_version": "0.1.0-draft", "producer": "control-plane", **run}
+    if scenario == TAMPERED:
+        fx = {"fixture_id": f"profile-{scenario}", "synthetic": True, "expected_outcome": "reject",
+              "expected_refusal": "decision_operation_binding_mismatch", "refused_by": "operation-identity",
+              "reason": ("Derived tamper of a real producer run, not a producer record as written (Control Plane " + CP + ", opt-in profiles, synthetic proposals, throwaway store). "
+                         "The capture script rebinds the throwaway store's operation ledger row to another grant after the authorized decision, so the producer then holds the next decision with operation_grant_mismatch; "
+                         "the ledger row no longer matches the authorized decision's grant. The control-plane-journal validator does not read the operations rows (opaque here) and accepts the record; "
+                         "the operation-identity validator refuses it with decision_operation_binding_mismatch (sidecar fixture decision-operation-binding-mismatch), as the verifier does. "
+                         "No unaltered capture of this scenario exists: the alteration is part of the capture. Ids, nonces and the process owner are synthetic."),
+              "provenance": {"source": "control-plane-capture with the ledger row altered", "control_plane_commit": CP, "capture": capture, "scenario": scenario},
+              "document": doc}
+        (CDIR / "fixtures" / "invalid" / f"{fx['fixture_id']}.json").write_text(json.dumps(fx, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        continue
     fx = {"fixture_id": f"profile-{scenario}", "synthetic": True, "expected_outcome": "accept",
           "reason": f"Real producer run, unchanged (Control Plane {CP}, opt-in profiles, synthetic proposals, throwaway store). {why} Ids, nonces and the process owner are synthetic.",
           "provenance": {"source": "control-plane-capture", "control_plane_commit": CP, "capture": capture, "scenario": scenario},
           "document": doc}
     (DEST / f"{fx['fixture_id']}.json").write_text(json.dumps(fx, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-print(len(SCENARIOS), "fixtures written")
+print(len(SCENARIOS) - 1, "valid fixtures written, 1 tampered fixture written to invalid")
