@@ -239,13 +239,27 @@ def resolve_rule(rows: list[dict[str, Any]], rule_ref: str, observed_digest: str
             "verified_through": LEVELS[level], "findings": findings}
 
 
+def _operands_present(inputs: list[dict[str, Any]]) -> bool:
+    """At least one resolution input, each explicitly missing or carrying a non-empty record commitment and non-empty observed values."""
+    return bool(inputs) and all(x.get("missing") or (x.get("record_commitment") and x.get("observed")) for x in inputs)
+
+
 def derive_recomputability(row: dict[str, Any]) -> str:
-    """``recomputable`` only if the row retains its operands: at least one resolution input, each explicitly missing or
-    carrying a non-empty record commitment and non-empty observed values (the producer's ``derive_recomputability``)."""
+    """The producer's ``derive_recomputability`` (Control Plane ``fd0d5e0``): ``underivable`` when the operands are not retained
+    (a real decision row keeps ``observed`` empty), ``typed_only`` when operands are present, none is missing and every recorded
+    expectation is met (they do not reproduce a refusal), else ``recomputable``."""
     inputs = row.get("resolution_inputs", [])
-    if inputs and all(x.get("missing") or (x.get("record_commitment") and x.get("observed")) for x in inputs):
-        return "recomputable"
-    return "typed_only"
+    if not _operands_present(inputs):
+        return "underivable"
+    expecting = [x for x in inputs if x.get("expected")]
+    if expecting and not any(x.get("missing") for x in inputs) and all(
+            all(x.get("observed", {}).get(k) == val for k, val in x["expected"].items()) for x in expecting):
+        return "typed_only"
+    return "recomputable"
+
+
+FLAG_RULES = {("recomputable", "typed_only", "declared_overclaim"), ("recomputable", "underivable", "derivation_unavailable"),
+              ("typed_only", "recomputable", "declared_underclaim")}
 
 
 def arity_flags(declared: dict[str, int], measured: dict[str, Any]) -> list[dict[str, Any]]:
@@ -492,8 +506,8 @@ def _recomputability_rules(doc: dict[str, Any], journal: dict[str, Any] | None) 
         rows = (journal or {}).get(rep["rows_from"], [])
         for k, f in enumerate(rep["flags"]):
             q = f"{p}.flags[{k}]"
-            if f["declared"] == f["derived"] or (f["flag"] == "declared_overclaim") != (f["declared"] == "recomputable"):
-                out.append(_v("recomputability_flag_inconsistent", q, "a flag is raised only where declared and derived differ; declared_overclaim is declared recomputable"))
+            if (f["declared"], f["derived"], f["flag"]) not in FLAG_RULES:
+                out.append(_v("recomputability_flag_inconsistent", q, "a flag is raised only where declared and derived differ and names that pair: declared_overclaim is recomputable declared, typed_only derived (operands present); derivation_unavailable is recomputable declared, underivable derived; declared_underclaim is typed_only declared, recomputable derived"))
                 continue
             if rep["declared_kinds"].get(f["code"]) != f["declared"]:
                 out.append(_v("declared_kind_mismatch", q, "declared is the registry's reason_kind for the code, listed in declared_kinds"))

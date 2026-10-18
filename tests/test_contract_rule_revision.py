@@ -56,7 +56,7 @@ def codes(f, **kw):
 # ------------------------------------------------------------------ fixtures
 
 def test_fixture_sets_are_present_and_well_formed():
-    assert len(VALID) >= 15 and len(INVALID) >= 75
+    assert len(VALID) >= 15 and len(INVALID) >= 76
     for f in VALID + INVALID:
         assert f["synthetic"] is True and f["reason"].strip() and f["provenance"]["source"]
         assert f["expected_outcome"] in {"accept", "reject"}
@@ -74,7 +74,9 @@ def test_fixture_sets_are_present_and_well_formed():
 def test_valid_captures_name_the_control_plane_commit_they_came_from():
     captured = [f for f in VALID if f["provenance"]["source"].startswith("control-plane-capture")]
     assert len(captured) >= 14
-    assert {f["provenance"]["control_plane_commit"] for f in captured} == {"83b49b5"}
+    by = {f["fixture_id"]: f["provenance"]["control_plane_commit"] for f in captured}
+    assert by.pop("recomputability-derivation-unavailable") == "fd0d5e0"  # re-captured after the N2b producer fix
+    assert set(by.values()) == {"83b49b5"}
 
 
 @pytest.mark.parametrize("f", VALID, ids=lambda f: f["fixture_id"])
@@ -101,7 +103,7 @@ def test_every_rule_code_is_pinned_by_a_fixture_and_the_readme():
 def test_profile_terms_are_documented():
     readme = (CONTRACT_DIR / "README.md").read_text(encoding="utf-8")
     for term in ("tainted_for_trend", "verified_through", "measured_exceeds_declared", "arity_undeclared", "declared_overclaim",
-                 "declared_underclaim", "policy_status_unknown", "rule_identity", "rule_revision_refusal", "digest_matches_signed_revision",
+                 "declared_underclaim", "derivation_unavailable", "policy_status_unknown", "rule_identity", "rule_revision_refusal", "digest_matches_signed_revision",
                  "signer_independent_and_configured", "revision_row_present", "no_signed_revision", "unsigned_revision_row",
                  "self_signed_revision_row", "signer_not_configured", "digest_mismatch_with_adopted", "observed_digest_absent",
                  "pre_split_count", "row_predates_adoption"):
@@ -343,25 +345,48 @@ def test_arity_declared_and_measured_are_both_kept_and_flags_are_derived():
     assert [x["flag"] for x in rr.arity_flags({}, rep["measured"])] == ["arity_undeclared"] * 2
 
 
-def test_real_recomputability_output_flags_a_row_whose_manifest_input_has_an_empty_observed_value():
-    """Finding recorded in the README: derive_recomputability needs a non-empty `observed` on every input and a real row's
-    manifest input has `{}`, so every real row derives typed_only and a real grant_revoked row is flagged declared_overclaim."""
-    f = fx("recomputability-declared-overclaim")
+def test_real_recomputability_output_is_derivation_unavailable_when_operands_are_not_retained():
+    """A real row keeps `observed == {}` on its manifest input, so operands are absent: the real grant_revoked hold derives
+    underivable and is flagged derivation_unavailable, never declared_overclaim (Control Plane fd0d5e0, N2b)."""
+    f = fx("recomputability-derivation-unavailable")
     (flag,) = f["document"]["recomputability_reports"][0]["flags"]
-    assert (flag["code"], flag["declared"], flag["derived"], flag["flag"]) == ("grant_revoked", "recomputable", "typed_only", "declared_overclaim")
+    assert (flag["code"], flag["declared"], flag["derived"], flag["flag"]) == ("grant_revoked", "recomputable", "underivable", "derivation_unavailable")
     row = f["journal"]["decisions"][flag["row"]]
     manifest = next(i for i in row["resolution_inputs"] if i["input_type"] == "manifest")
-    assert manifest["observed"] == {} and rr.derive_recomputability(row) == "typed_only"
-    assert all(rr.derive_recomputability(d) == "typed_only" for d in f["journal"]["decisions"])
+    assert manifest["observed"] == {} and rr.derive_recomputability(row) == "underivable"
+    assert all(rr.derive_recomputability(d) == "underivable" for d in f["journal"]["decisions"])
+    assert not any(x["flag"] == "declared_overclaim" for x in f["document"]["recomputability_reports"][0]["flags"])
+
+
+def test_declared_overclaim_is_reserved_for_rows_with_operands_present():
+    """Operands present and the derivation shows the declared kind cannot hold: declared_overclaim is accepted against the run record;
+    the same flag on an operand-absent row is refused (the false overclaim)."""
+    f = fx("recomputability-derivation-unavailable")
+    d, j = copy.deepcopy(f["document"]), copy.deepcopy(f["journal"])
+    (flag,) = d["recomputability_reports"][0]["flags"]
+    row = j["decisions"][flag["row"]]
+    for x in row["resolution_inputs"]:  # synthetic: operands present, every recorded expectation met
+        x["observed"] = {"status": "active"}; x["expected"] = {"status": "active"}; x["record_commitment"] = "sha256:" + "1" * 64
+    assert rr.derive_recomputability(row) == "typed_only"
+    flag.update(derived="typed_only", flag="declared_overclaim")
+    assert [v.code for v in rr.validate(d, j, f["signers"])] == []
+    row["resolution_inputs"][0]["observed"] = {}  # operand removed: the same flag is now false
+    assert [v.code for v in rr.validate(d, j, f["signers"])] == ["derived_recomputability_mismatch"]
+    assert [v.code for v in rr.validate(d, None, f["signers"])] == []  # no run record: only the pair is checked
+    flag.update(derived="underivable")
+    assert [v.code for v in rr.validate(d, None, f["signers"])] == ["recomputability_flag_inconsistent"]
 
 
 def test_derive_recomputability_reference_cases():
     full = {"resolution_inputs": [{"input_type": "grant", "observed": {"status": "revoked"}, "record_commitment": "sha256:" + "1" * 64}]}
     assert rr.derive_recomputability(full) == "recomputable"
-    assert rr.derive_recomputability({"resolution_inputs": []}) == "typed_only"
-    assert rr.derive_recomputability({}) == "typed_only"
+    assert rr.derive_recomputability({"resolution_inputs": []}) == "underivable"
+    assert rr.derive_recomputability({}) == "underivable"
     assert rr.derive_recomputability({"resolution_inputs": [{"missing": True}]}) == "recomputable"
-    assert rr.derive_recomputability({"resolution_inputs": [{"observed": {"a": 1}}]}) == "typed_only"
+    assert rr.derive_recomputability({"resolution_inputs": [{"observed": {"a": 1}}]}) == "underivable"
+    met = {"resolution_inputs": [{"observed": {"a": 1}, "expected": {"a": 1}, "record_commitment": "sha256:" + "1" * 64}]}
+    assert rr.derive_recomputability(met) == "typed_only"
+    assert rr.derive_recomputability({"resolution_inputs": [{"observed": {}, "expected": {"a": 1}, "record_commitment": "sha256:" + "1" * 64}]}) == "underivable"
 
 
 def test_adoption_times_take_the_earliest_source_per_label():

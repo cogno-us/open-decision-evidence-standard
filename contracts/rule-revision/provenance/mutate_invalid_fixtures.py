@@ -36,7 +36,7 @@ def make(fid, base, code, why, fn=None, journal=False, signers=None):
 A, U, RF, E_, S_ = ("adopted-policy-decision-and-refusal-rows", "unsigned-row-resolves-unknown-and-holds", "refused-revision-attempts-kept-as-rows",
                     "policy-edited-in-place-held-then-readopted", "unsigned-then-resigned-by-supersession")
 T1, T2, AR, AW, RC = ("trend-flags-from-registry-adoption-row", "trend-pre-split-tainted-from-vocabulary-change", "arity-measured-exceeds-declared-and-undeclared",
-                      "arity-within-declaration", "recomputability-declared-overclaim")
+                      "arity-within-declaration", "recomputability-derivation-unavailable")
 POLICY = "urn:cognous:policy:refund-policy"
 def extra_row(d, **kw):
     base = {**copy.deepcopy(d["rule_revisions"][0]), "revision_id": "rev-9", "from_digest": D1, "to_digest": D2, "recorded_at": FUTURE}
@@ -143,6 +143,7 @@ def recomputable_row(d, j):
     for x in j["decisions"][1]["resolution_inputs"]:
         if not x.get("observed"): x["observed"] = {"manifest_id": "synthetic"}
 make("derived-kind-differs-from-the-retained-inputs", RC, "derived_recomputability_mismatch", "derived is recomputed from the row's retained inputs: every input here carries its operands, so the row is recomputable, not typed_only.", recomputable_row, journal=True)
+make("false-overclaim-where-operands-are-absent", RC, "recomputability_flag_inconsistent", "declared_overclaim is reserved for rows whose operands are present and show the declared kind cannot hold; operands absent is derivation_unavailable (declared recomputable, derived underivable).", lambda d, j: d["recomputability_reports"][0]["flags"][0].update(flag="declared_overclaim"))
 make("duplicate-recomputability-report-id", RC, "duplicate_report_id", "Report ids are unique within a list.", lambda d, j: d["recomputability_reports"].append(copy.deepcopy(d["recomputability_reports"][0])))
 
 # ---- run record context
