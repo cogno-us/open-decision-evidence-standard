@@ -549,6 +549,9 @@ def _journal_effect_rules(p: str, d: dict[str, Any], journal: dict[str, Any], de
     return out
 
 
+_CONTEXT_ERRORS = (AttributeError, TypeError, KeyError, IndexError, ValueError, RecursionError)
+
+
 def _validate(doc: Any, journal: dict[str, Any] | None = None) -> list[Violation]:
     """Return all violations; an empty list means the document conforms to 0.1.0-draft.
 
@@ -559,9 +562,12 @@ def _validate(doc: Any, journal: dict[str, Any] | None = None) -> list[Violation
         return out
     for rule in (_times, _identity_rules, _policy_rules, _deadline_rules, _outcome_rules, _effect_rules):
         out.extend(rule(doc))
-    out.extend(_notice_rules(doc, journal))
-    if journal is not None:
-        out.extend(check_against_journal(doc, journal))
+    try:
+        out.extend(_notice_rules(doc, journal))
+        if journal is not None:
+            out.extend(check_against_journal(doc, journal))
+    except _CONTEXT_ERRORS:
+        out.append(_v("context_malformed", "$", "the optional run record is not a conforming control-plane-journal document; its shape is checked, not assumed"))
     return out
 
 

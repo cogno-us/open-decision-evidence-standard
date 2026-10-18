@@ -69,7 +69,7 @@ Transport envelope:
 Acknowledgement:
 
 - The detail is fixed per kind. A receipt says `not_implied_by_acknowledgement` for authorization, execution, destination observation and independent verification; an unresolved receipt says `not_established`; a rejection says authorization `not_evaluated_by_transport` and external effect `not_established`. Any other value is `schema_violation`: an acknowledgement never claims an effect, an authorization or a governance decision.
-- The echoed `message_id`, `delivery_attempt_id`, `content_commitment` and `recipient_endpoint_ref` are null only on `TERMINAL_REJECTION` (`acknowledgement_binding_incomplete`) and equal the envelope's when it is present (`acknowledgement_envelope_mismatch`).
+- The echoed `message_id`, `delivery_attempt_id`, `content_commitment` and `recipient_endpoint_ref` are null only on `TERMINAL_REJECTION` (`acknowledgement_binding_incomplete`) and equal the envelope's when it is present (`acknowledgement_envelope_mismatch`). The same binding applies to an acknowledgement nested in a `delivery_result` (decision 37): a nested acknowledgement is compared with the document's envelope when one is present.
 - A `DURABLE_RECEIPT` is never issued for a result in `recovery_required` or `historical_artifacts_unavailable` (`receipt_for_unretained_result`); that case is `DURABLE_RECEIPT_UNRESOLVED`.
 
 Delivery result:

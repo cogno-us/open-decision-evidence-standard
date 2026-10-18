@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import os
 from collections import Counter, defaultdict
 from copy import deepcopy
 from typing import Any
 
 from .common import (
+    accepted_replay_revisions,
+    all_accepted_replay_revisions,
+    installed_replay_revision,
     CANONICALIZATION_PROFILE,
     DOCUMENT_VERSION,
     PACKAGE_TYPE,
@@ -264,6 +268,22 @@ def _require_supported_bundle_version(bundle: dict[str, Any]) -> None:
         raise ExportError(f"unsupported Reconstruction Bundle version {version!r}; supported: {', '.join(SUPPORTED_RECONSTRUCTION_BUNDLE_VERSIONS)}")
 
 
+def _require_installed_replay(control_plane_revision: str) -> None:
+    """The Replay code that runs must be a revision some accepted generation names; fail closed when unknown or unaccepted.
+
+    Not an exact match to the package's own declaration: older packages are deliberately re-validated with a newer accepted Replay
+    (decision 37). The declared revision stays provenance; what is bound here is that the executing code is a qualified build.
+    """
+    installed = installed_replay_revision()
+    if installed is None:
+        if os.environ.get("ODES_ALLOW_UNVERIFIED_REPLAY") == "1":
+            return
+        raise ExportError("the installed Replay revision cannot be determined; install cogno-us/cognous-agent-replay-bundle from a pinned commit "
+                          "(or set ODES_ALLOW_UNVERIFIED_REPLAY=1 for a local development install)")
+    if installed not in all_accepted_replay_revisions():
+        raise ExportError(f"installed Replay revision {installed} is not an accepted Replay revision (declared Control Plane {control_plane_revision})")
+
+
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
     _require_supported_bundle_version(bundle)
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
@@ -277,6 +297,7 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
         if revision not in {PINNED_REVISIONS["control_plane"], *ALL_V2_CONTROL_PLANE_REVISIONS}:
             raise ExportError("unsupported Control Plane compatibility revision")
         if revision in ALL_V2_CONTROL_PLANE_REVISIONS:
+            _require_installed_replay(revision)
             reconstructed = import_bounded_workflow(
                 cp,
                 proposal=proposal,

@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import math
 import re
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -339,6 +340,14 @@ def _executor_rules(doc: dict[str, Any]) -> list[Violation]:
         if any(e["status"] == "attempted" for e in seq[1:]):
             out.append(Violation("repeated_start_event", "$.attempt_events",
                                  f"attempt {aid} repeats its 'attempted' event"))
+        if seq[0]["status"] == "attempted":
+            for prev, nxt in zip(seq, seq[1:]):
+                if nxt["status"] == "attempted":
+                    continue
+                if nxt["status"] not in EXECUTOR_TRANSITIONS.get(prev["status"], frozenset()):
+                    out.append(Violation("attempt_transition", "$.attempt_events",
+                                         f"attempt {aid}: event {nxt['status']!r} may not follow {prev['status']!r}"))
+                    break
     result = doc.get("execution_result")
     if result is None:
         return out
@@ -433,9 +442,71 @@ def _control_plane_rules(doc: dict[str, Any]) -> list[Violation]:
         if len({r["started_at"] for r in seq}) > 1:
             out.append(Violation("attempt_started_at_changed", "$.control_plane_attempts",
                                  f"attempt {aid}: started_at is fixed when the attempt starts and identical on every row"))
+        if len({(r["effect_id"], r["decision_id"]) for r in seq}) > 1:
+            out.append(Violation("attempt_identity_changed", "$.control_plane_attempts",
+                                 f"attempt {aid}: effect_id and decision_id are fixed by the first row and identical on every row"))
+        if not reconciled_only:
+            for prev, nxt in zip(seq, seq[1:]):
+                if prev == nxt:
+                    continue
+                if nxt["status"] not in CONTROL_PLANE_TRANSITIONS.get(prev["status"], frozenset()):
+                    out.append(Violation("attempt_transition", "$.control_plane_attempts",
+                                         f"attempt {aid}: row status {nxt['status']!r} may not follow {prev['status']!r}"))
+                    break
         if any(seq[i] == seq[j] for i in range(len(seq)) for j in range(i)):
             out.append(Violation("repeated_record", "$.control_plane_attempts",
                                  f"attempt {aid} lifecycle repeats a record"))
+    return out
+
+
+# Allowed successors of each status (decision 37). Statuses with no successor are terminal and closed: a
+# closed attempt is never reopened and never receives a later, contradicting record.
+EXECUTOR_TRANSITIONS: dict[str, frozenset[str]] = {
+    "attempted": frozenset({"executed", "partial", "failed", "unknown", "denied", "reconciled"}),
+    "unknown": frozenset({"executed", "partial", "failed", "reconciled"}),
+    "executed": frozenset({"reconciled"}),
+    "partial": frozenset({"reconciled"}),
+    "failed": frozenset(),
+    "denied": frozenset(),
+    "reconciled": frozenset(),
+}
+CONTROL_PLANE_TRANSITIONS: dict[str, frozenset[str]] = {
+    "attempted": frozenset({"acknowledged", "unknown", "failed", "partial"}),
+    "unknown": frozenset({"acknowledged", "failed", "partial"}),
+    "acknowledged": frozenset(),
+    "partial": frozenset(),
+    "failed": frozenset(),
+}
+
+
+def _result_binding_rules(doc: dict[str, Any]) -> list[Violation]:
+    """The execution result and its observation name the effect and decision of the attempt they report."""
+    result = doc.get("execution_result")
+    if result is None:
+        return []
+    out: list[Violation] = []
+    attempt_id = result.get("attempt_id")
+    identities: dict[str, tuple[str, str]] = {}
+    for row in doc.get("attempts") or []:
+        identities.setdefault(row["attempt_id"], (row["effect_id"], row["decision_id"]))
+    for row in doc.get("control_plane_attempts") or []:
+        identities.setdefault(row["attempt_id"], (row["effect_id"], row["decision_id"]))
+    expected = identities.get(attempt_id) if attempt_id is not None else None
+    obs = result.get("observation")
+    if expected is not None:
+        effect_id, decision_id = expected
+        if "effect_id" in result and result["effect_id"] != effect_id:
+            out.append(Violation("result_binding_mismatch", "$.execution_result.effect_id",
+                                 "the result names a different effect than the attempt it reports"))
+        if "decision_id" in result and result["decision_id"] != decision_id:
+            out.append(Violation("result_binding_mismatch", "$.execution_result.decision_id",
+                                 "the result names a different decision than the attempt it reports"))
+        if isinstance(obs, dict) and "effect_id" in obs and obs["effect_id"] != effect_id:
+            out.append(Violation("result_binding_mismatch", "$.execution_result.observation.effect_id",
+                                 "the observation names a different effect than the attempt it reports"))
+    elif isinstance(obs, dict) and "effect_id" in obs and "effect_id" in result and obs["effect_id"] != result["effect_id"]:
+        out.append(Violation("result_binding_mismatch", "$.execution_result.observation.effect_id",
+                             "the observation names a different effect than the result"))
     return out
 
 
@@ -528,7 +599,7 @@ def _validate(doc: Any) -> list[Violation]:
     out = validate_structure(doc)
     if out:
         return out
-    for rule in (_executor_rules, _control_plane_rules, _journal_rules):
+    for rule in (_executor_rules, _control_plane_rules, _result_binding_rules, _journal_rules):
         out.extend(rule(doc))
     return out
 

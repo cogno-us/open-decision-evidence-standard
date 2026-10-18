@@ -49,6 +49,8 @@ Document rules (one export):
 Observation cross-check (optional second argument to `validate`, a run record or a list of accepted reconciliations, decision 25-A):
 
 - `operation_digest_mismatch`: if a row and an accepted observation's `destination_state` for the same effect both carry `operation_digest`, they must be equal. If only one carries it, nothing is compared. An observation that is not accepted, or whose `destination_state` is empty (an `absent` observation), is not read. The verifier may enforce this inside `v4.ledger.observations-agree`; it is reported once per row.
+- `observation_effect_id_invalid`: an accepted observation's `effect_id` must be a string. Any other type is refused rather than coerced.
+- `observation_effect_id_mismatch`: when an accepted observation's nested `destination_state` carries an `effect_id`, it must equal the observation's own `effect_id`. The outer `effect_id` is authoritative; a nested value that differs is refused instead of silently overriding it.
 
 ## Not checked here
 

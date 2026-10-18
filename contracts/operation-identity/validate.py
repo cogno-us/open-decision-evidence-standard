@@ -439,12 +439,15 @@ def _document_rules(doc: dict[str, Any]) -> list[Violation]:
 
 # --------------------------------------------------------------------------- journal context (optional)
 
-def _journal_rules(doc: dict[str, Any], journal: dict[str, Any]) -> list[Violation]:
+def _journal_rules(doc: dict[str, Any], journal: dict[str, Any], require_profile: bool = False) -> list[Violation]:
     if journal.get("run_id") != doc["run_id"]:
         return [_v("journal_run_mismatch", "$.run_id", "the profile document and the run record describe the same run")]
     out: list[Violation] = []
     ops = {o["operation_id"]: o for o in doc["operations"]}
-    profile_on = bool(doc["operations"])
+    # Decision 6: the ledger counts as "on" when it is non-empty. A consumer that knows the host selected the profile (the Control Plane
+    # `RuntimeAuthorityProfile.operation_identity` setting) passes ``require_profile=True`` (decision 37): an empty ledger then no longer
+    # exempts the run, so an authorized decision without an operation id, or an attempt without a join, is refused.
+    profile_on = require_profile or bool(doc["operations"])
     decisions = {d["decision_id"]: d for d in journal.get("decisions", [])}
     events = journal.get("check_events", [])
     resolution = {(c["check_id"], c["stage"]) for c in journal.get("resolution_checks", [])}
@@ -554,17 +557,18 @@ def _journal_rules(doc: dict[str, Any], journal: dict[str, Any]) -> list[Violati
     return out
 
 
-def _validate(doc: Any, journal: dict[str, Any] | None = None) -> list[Violation]:
+def _validate(doc: Any, journal: dict[str, Any] | None = None, require_profile: bool = False) -> list[Violation]:
     """Return all violations; an empty list means the document conforms to 0.1.0-draft.
 
-    ``journal`` is an optional run record (a dict with at least ``run_id``) for the cross-document rules.
+    ``journal`` is an optional run record (a dict with at least ``run_id``) for the cross-document rules. ``require_profile`` states that
+    the host selected the profile, so an empty ledger does not switch the ledger-dependent rules off (decision 37).
     """
     out = validate_structure(doc)
     if out:
         return out
     out.extend(_document_rules(doc))
     if journal is not None:
-        out.extend(_journal_rules(doc, journal))
+        out.extend(_journal_rules(doc, journal, require_profile))
     return out
 
 

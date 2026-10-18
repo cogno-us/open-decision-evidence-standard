@@ -287,3 +287,65 @@ def test_p2_generation_is_added_beside_p4_and_exactly_paired():
     assert P2_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert P4_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert _selected_v2_pins(P2_REVISIONS['control_plane']) == P2_REVISIONS
+
+
+@pytest.mark.parametrize('pinned', [7, 'x', ['a'], None, {'control_plane': ['x']}, {'control_plane': 5}])
+def test_malformed_pinned_revisions_is_a_structured_failure(pinned):
+    package = {'package_type': 'odes-recipient-package', 'provenance': {'pinned_revisions': pinned}}
+    from odes.recipient_validator import PACKAGE_TYPE
+    package['package_type'] = PACKAGE_TYPE
+    result = evaluate_recipient_package(package, {})
+    assert result['recipient_reliance_decision']['status'] == 'fail'
+
+
+@pytest.mark.parametrize('field,value', [
+    ('decision_timestamp', '2026-10-05T19:00:00+00:00\n'),
+    ('decision_timestamp', '2026-10-05T19:00:00.1234567Z'),
+    ('decision_timestamp', '2026-10-05T19:00:00z'),
+    ('decision_timestamp', '2026-10-05 19:00:00Z'),
+    ('decision_timestamp', '2026-10-05T19:00:00+0000'),
+    ('decision_timestamp', '2026-10-05T19:00:60Z'),
+])
+def test_record_instants_outside_the_normative_grammar_are_refused(field, value):
+    from odes.schema_validation import schema_errors
+    record = json.loads((Path(__file__).resolve().parents[1] / 'examples/claims-review.example.json').read_text())
+    record = record.get('record', record)
+    assert schema_errors(record) == []
+    record[field] = value
+    assert schema_errors(record) != []
+
+
+def test_installed_replay_revision_must_match_the_declared_generation(monkeypatch):
+    from odes import exporter
+    from odes.common import P2_REVISIONS, accepted_replay_revisions
+    cp = P2_REVISIONS['control_plane']
+    assert accepted_replay_revisions(cp) == {P2_REVISIONS['replay']}
+    monkeypatch.setenv('ODES_ALLOW_UNVERIFIED_REPLAY', '0')
+    monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: 'f' * 40)
+    with pytest.raises(ExportError, match='not an accepted'):
+        exporter._require_installed_replay(cp)
+    monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: P2_REVISIONS['replay'])
+    exporter._require_installed_replay(cp)
+    # An older generation's package may be re-validated with a newer accepted Replay.
+    exporter._require_installed_replay(next(iter(__import__('odes.common', fromlist=['x']).SUPPORTED_V2_CONTROL_PLANE_REVISIONS)))
+    monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: None)
+    with pytest.raises(ExportError, match='cannot be determined'):
+        exporter._require_installed_replay(cp)
+    monkeypatch.setenv('ODES_ALLOW_UNVERIFIED_REPLAY', '1')
+    exporter._require_installed_replay(cp)
+    assert accepted_replay_revisions('0' * 40) == frozenset()
+
+
+def test_installed_replay_revision_is_read_from_the_modules_git_checkout(tmp_path, monkeypatch):
+    import subprocess, sys
+    from odes.common import installed_replay_revision
+    repo = tmp_path / 'replay'
+    (repo / 'agent_replay_bundle').mkdir(parents=True)
+    (repo / 'agent_replay_bundle' / '__init__.py').write_text('')
+    env = {'GIT_AUTHOR_NAME': 'a', 'GIT_AUTHOR_EMAIL': 'a@example.org', 'GIT_COMMITTER_NAME': 'a', 'GIT_COMMITTER_EMAIL': 'a@example.org', 'PATH': __import__('os').environ['PATH']}
+    for cmd in (['init', '-q'], ['add', '-A'], ['commit', '-q', '-m', 'x']):
+        subprocess.run(['git', '-C', str(repo), *cmd], check=True, env=env)
+    head = subprocess.run(['git', '-C', str(repo), 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip()
+    monkeypatch.syspath_prepend(str(repo))
+    sys.modules.pop('agent_replay_bundle', None)
+    assert installed_replay_revision() == head

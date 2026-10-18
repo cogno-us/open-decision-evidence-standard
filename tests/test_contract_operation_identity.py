@@ -328,3 +328,21 @@ def test_every_profile_row_kind_is_exercised_by_a_valid_fixture():
         "operation_not_admitted", "renewal_not_written_by_grant_issuer", "renewal_revision_not_new"}
     assert any(j["merged_into"] for f in VALID for j in f["document"]["attempt_joins"])
     assert any(len(f["document"]["attempt_joins"]) == 2 for f in VALID)
+
+
+def test_require_profile_refuses_an_empty_ledger_beside_authorized_decisions():
+    """Decision 37: a consumer that knows the host selected the profile is not exempted by an empty ledger."""
+    f = fx("effect-time-refusal-carries-check-id")
+    f["document"].update(operations=[], operation_renewals=[], attempt_joins=[])
+    f["journal"]["refusals"][0].pop("check_id")
+    for d in f["journal"]["decisions"]:
+        d["binding"]["runtime_authority"].pop("operation_id", None)
+    assert oi.validate(f["document"], f["journal"]) == []
+    found = [v.code for v in oi.validate(f["document"], f["journal"], require_profile=True)]
+    assert "decision_operation_id_missing" in found
+    g = fx("normal-attempted-acknowledged")
+    g["document"].update(operations=[], operation_renewals=[], attempt_joins=[])
+    for d in g["journal"]["decisions"]:
+        d["binding"]["runtime_authority"].pop("operation_id", None)
+    found = [v.code for v in oi.validate(g["document"], g["journal"], require_profile=True)]
+    assert "attempt_without_join" in found

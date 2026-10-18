@@ -454,3 +454,18 @@ def test_every_profile_shape_is_exercised_by_a_valid_fixture():
             seen |= set(e["reasons"])
     assert {"check_expired_before_dispatch", "check_overdue", "check_lease_unavailable", "status_nonce_mismatch",
             "age_extension_signer_not_configured"} <= seen
+
+
+def test_historical_counts_ignore_events_recorded_after_as_of():
+    from datetime import datetime, timezone
+    t0 = "2026-10-05T19:00:00+00:00"
+    events = [
+        {"check_id": "c1", "phase": "opened", "recorded_at": t0, "deadline": "2026-10-05T19:01:00+00:00"},
+        {"check_id": "c1", "phase": "completed", "recorded_at": "2026-10-05T19:05:00+00:00"},
+        {"check_id": "c2", "phase": "opened", "recorded_at": "2026-10-05T19:10:00+00:00"},
+    ]
+    early = datetime(2026, 10, 5, 19, 0, 30, tzinfo=timezone.utc)
+    counts = fc.freshness_counts(events, early)
+    assert counts["open_count"] == 1 and counts["overdue_count"] == 0 and counts["oldest_open_age_seconds"] == 30.0
+    late = datetime(2026, 10, 5, 19, 5, 0, tzinfo=timezone.utc)  # recorded_at equal to as_of is visible
+    assert fc.freshness_counts(events, late)["open_count"] == 0

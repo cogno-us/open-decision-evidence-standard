@@ -262,32 +262,49 @@ def _document_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
-def destination_states(context: Any) -> list[dict[str, Any]]:
-    """Accepted observed destination states from a run record (``reconciliations``) or an already extracted list."""
+def _accepted_observations(context: Any) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """(observation, destination_state) pairs from a run record (``reconciliations``) or an already extracted list."""
     if isinstance(context, dict):
         context = context.get("reconciliations", [])
-    states: list[dict[str, Any]] = []
-    for item in context or []:
+    pairs: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    if not isinstance(context, (list, tuple)):
+        return pairs
+    for item in context:
         if not isinstance(item, dict):
             continue
         obs = item.get("observation") if "observation" in item else item
         if "observation_accepted" in item and item["observation_accepted"] is not True:
             continue
         if isinstance(obs, dict) and isinstance(obs.get("destination_state"), dict):
-            states.append({"effect_id": obs.get("effect_id"), **obs["destination_state"]})
-    return states
+            pairs.append((obs, obs["destination_state"]))
+    return pairs
+
+
+def destination_states(context: Any) -> list[dict[str, Any]]:
+    """Accepted observed destination states. The observation's own ``effect_id`` names the state; a different
+    ``effect_id`` nested in ``destination_state`` never overrides it (decision 37)."""
+    return [{**state, "effect_id": obs.get("effect_id")} for obs, state in _accepted_observations(context)]
 
 
 def _observation_rules(doc: dict[str, Any], context: Any) -> list[Violation]:
     """Decision 25-A: if a row and an accepted observation's destination_state both carry operation_digest they agree."""
     out: list[Violation] = []
-    for state in destination_states(context):
-        row = doc["effects"].get(state.get("effect_id"))
-        if row is None or "operation_digest" not in row or "operation_digest" not in state:
+    for obs, nested in _accepted_observations(context):
+        effect_id = obs.get("effect_id")
+        if not isinstance(effect_id, str):
+            out.append(_v("observation_effect_id_invalid", "$.observations",
+                          "an accepted observation names its effect with a string effect_id"))
             continue
-        if row["operation_digest"] != state["operation_digest"] and not any(
-                v.path == f"$.effects[{state['effect_id']!r}].operation_digest" for v in out):
-            out.append(_v("operation_digest_mismatch", f"$.effects[{state['effect_id']!r}].operation_digest",
+        if "effect_id" in nested and nested["effect_id"] != effect_id:
+            out.append(_v("observation_effect_id_mismatch", "$.observations",
+                          "destination_state names a different effect than the observation that carries it"))
+            continue
+        row = doc["effects"].get(effect_id)
+        if row is None or "operation_digest" not in row or "operation_digest" not in nested:
+            continue
+        if row["operation_digest"] != nested["operation_digest"] and not any(
+                v.path == f"$.effects[{effect_id!r}].operation_digest" for v in out):
+            out.append(_v("operation_digest_mismatch", f"$.effects[{effect_id!r}].operation_digest",
                           "the row and the accepted observation's destination_state carry different operation_digest values"))
     return out
 

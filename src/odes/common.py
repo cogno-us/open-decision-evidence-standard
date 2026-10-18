@@ -98,6 +98,59 @@ SECURITY_RUNTIME_CP_REVISIONS = frozenset(SECURITY_RUNTIME_GENERATIONS)
 ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"], SECURITY_REVISIONS["control_plane"], F5B_REVISIONS["control_plane"], P4_REVISIONS["control_plane"], P2_REVISIONS["control_plane"])
 
 
+def accepted_replay_revisions(control_plane_revision: str) -> frozenset[str]:
+    """The Replay revisions the accepted validators for a Control Plane generation name (empty when the generation is unknown)."""
+    if control_plane_revision in SECURITY_RUNTIME_GENERATIONS:
+        return frozenset({SECURITY_RUNTIME_GENERATIONS[control_plane_revision][1]["replay"]})
+    if control_plane_revision == REFUSAL_REVISIONS["control_plane"]:
+        return frozenset({REFUSAL_REVISIONS["replay"]})
+    if control_plane_revision == MERGED_REVISIONS["control_plane"]:
+        return frozenset({MERGED_REVISIONS["replay"]})
+    if control_plane_revision in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
+        return frozenset(SUPPORTED_V2_REPLAY_REVISIONS)
+    return frozenset()
+
+
+def all_accepted_replay_revisions() -> frozenset[str]:
+    """Every Replay revision any accepted generation names. Older packages are re-validated with a newer accepted Replay
+    (``recipient_validator._normalized_replay_material``), so the installed code must be one of these, not necessarily the package's own."""
+    return frozenset(SUPPORTED_V2_REPLAY_REVISIONS) | frozenset(
+        accepted for cp in ALL_V2_CONTROL_PLANE_REVISIONS for accepted in accepted_replay_revisions(cp))
+
+
+def installed_replay_revision() -> str | None:
+    """The commit the imported ``agent_replay_bundle`` comes from, or None when unknown.
+
+    Order: the module's own git checkout (editable or in-tree installs), then pip's ``direct_url.json`` VCS commit. A copy in
+    site-packages without either is unknown; unknown is never a pass.
+    """
+    import importlib.metadata as metadata
+    import importlib.util
+    import subprocess
+    try:
+        spec = importlib.util.find_spec("agent_replay_bundle")
+        origin = Path(spec.origin).resolve() if spec is not None and spec.origin else None
+    except Exception:
+        origin = None
+    if origin is not None:
+        for parent in list(origin.parents)[:4]:
+            if (parent / ".git").exists():
+                try:
+                    out = subprocess.run(["git", "-C", str(parent), "rev-parse", "HEAD"], capture_output=True, text=True, check=True, timeout=20).stdout.strip()
+                except Exception:
+                    break
+                return out if re.fullmatch(r"[0-9a-f]{40}", out) else None
+    try:
+        names = metadata.packages_distributions().get("agent_replay_bundle") or []
+        if len(set(names)) != 1:
+            return None
+        raw = metadata.distribution(names[0]).read_text("direct_url.json")
+        commit = ((json.loads(raw).get("vcs_info") or {}).get("commit_id")) if raw else None
+        return commit if isinstance(commit, str) else None
+    except Exception:  # metadata trouble is "unknown", never a pass
+        return None
+
+
 def canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
 
