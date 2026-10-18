@@ -1,0 +1,2265 @@
+{
+  "fixture_id": "clock-row-names-no-row",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "clock_row_unknown_row",
+  "reason": "A clock row names a row of the run record that carries the profile's members.",
+  "provenance": {
+    "source": "mutation of captured fixture clocks-follow-the-service-clock",
+    "control_plane_commit": "3f6a7668"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [
+      {
+        "check_id": "syn-check-1",
+        "phase": "opened",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "completed",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "opened",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "completed",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "reasons": []
+      }
+    ],
+    "clock_rows": [
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:07+00:00"
+      },
+      {
+        "row_type": "attempt",
+        "row_id": "syn-attempt-1",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:17+00:00"
+      },
+      {
+        "row_type": "attempt",
+        "row_id": "syn-attempt-1",
+        "seq": 1,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:17+00:00"
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:07+00:00"
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:17+00:00"
+      },
+      {
+        "row_type": "decision",
+        "row_id": "ghost",
+        "seq": 0,
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "input_reads": [
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "authority_context",
+        "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "role_mapping",
+        "input_id": "urn:cognous:institution:synthetic-customer-service",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "identity",
+        "input_id": "urn:cognous:identity:refund-agent-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "mandate",
+        "input_id": "urn:cognous:issuance:1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "grant",
+        "input_id": "urn:cognous:grant:routine-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "conflict",
+        "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "policy",
+        "input_id": "urn:cognous:policy:refund-policy",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "approval",
+        "input_id": "urn:cognous:approval:t1-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:refund-entitlement",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "check_id": null,
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:optional-context",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "authority_context",
+        "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "role_mapping",
+        "input_id": "urn:cognous:institution:synthetic-customer-service",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "identity",
+        "input_id": "urn:cognous:identity:refund-agent-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "mandate",
+        "input_id": "urn:cognous:issuance:1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "grant",
+        "input_id": "urn:cognous:grant:routine-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "conflict",
+        "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "policy",
+        "input_id": "urn:cognous:policy:refund-policy",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "approval",
+        "input_id": "urn:cognous:approval:t1-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:refund-entitlement",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "check_id": "syn-check-1",
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:optional-context",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "authority_context",
+        "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "role_mapping",
+        "input_id": "urn:cognous:institution:synthetic-customer-service",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "identity",
+        "input_id": "urn:cognous:identity:refund-agent-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "mandate",
+        "input_id": "urn:cognous:issuance:1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "grant",
+        "input_id": "urn:cognous:grant:routine-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "conflict",
+        "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "policy",
+        "input_id": "urn:cognous:policy:refund-policy",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "approval",
+        "input_id": "urn:cognous:approval:t1-1",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:refund-entitlement",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-2",
+        "check_id": "syn-check-2",
+        "input_type": "evidence",
+        "input_id": "urn:cognous:evidence:optional-context",
+        "age_basis": "source_asserted",
+        "read_state": null,
+        "expected_nonce": null,
+        "observed_nonce": null
+      }
+    ],
+    "age_extensions": [],
+    "age_extension_refusals": [],
+    "recovery_runs": [],
+    "freshness_reports": []
+  },
+  "journal": {
+    "run_id": "run-1",
+    "decisions": [
+      {
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "result": "authorized",
+        "reasons": [],
+        "decided_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "time_source": "test_override",
+        "operation_horizon": {
+          "source": "runtime_proposal",
+          "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+          "not_before": null,
+          "expires_at": null
+        },
+        "binding": {
+          "runtime_authority": {
+            "profile": "runtime-authority/0.1",
+            "approval_commitment": "sha256:fe36ea34cd07579b9928a1fb76c0cf694067753765afe88cb68cedae51198814",
+            "required_inputs_digest": "sha256:1c4ef694ed72bdf927f6ad39982e981634c16ad2f303b8a718b078de2aaaffaf",
+            "catalogue_digest": "sha256:28fdcb37948b69bbaa8703352426b2fea8e63c8decc86a178e81de7bd8a6da94",
+            "expected_effective_grant_digest": null,
+            "effective_grant_derivation_version": null
+          },
+          "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+          "manifest_id": "refund-integration-pilot-v1",
+          "manifest_version": "1.1",
+          "manifest_digest": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+          "actor": "urn:cognous:identity:refund-agent-1",
+          "principal": "urn:cognous:principal:refund-service",
+          "action_id": "urn:cognous:action:refund-issue-routine-v1",
+          "adapter_id": "urn:cognous:adapter:synthetic-refund-v1",
+          "target": "urn:cognous:synthetic-account:customer-001",
+          "payload_commitment": "sha256:6b782ebbcc034edeca4069b31aa4d8cbc9d3eeaf3b2034ab989bb430de962c0e",
+          "requested_permissions": [
+            "refund.issue.routine"
+          ],
+          "amount": 50.0,
+          "unit": "USD",
+          "effects": 1,
+          "authority_context_id": "urn:cognous:authority-context:pilot-1",
+          "authority_context_version": "0.1.0",
+          "authority_context_status": "proposed_pending_governor_review",
+          "requirement_id": "urn:cognous:authority-requirement:refund-routine-v1",
+          "requirement_commitment": "sha256:6590406e701b51e637c87953860d1ceb72d8da0af87311048f152e0ee2b8ccb6",
+          "grant_id": "urn:cognous:grant:routine-1",
+          "grant_revision": "1",
+          "policy_versions": [
+            {
+              "ref": "urn:cognous:policy:refund-policy",
+              "version": "1.0"
+            }
+          ],
+          "role_mapping_version": "roles-v1",
+          "role_mapping_digest": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d",
+          "effective_max_effects": 1
+        },
+        "resolution_inputs": [
+          {
+            "input_type": "manifest",
+            "input_id": "refund-integration-pilot-v1",
+            "expected": {},
+            "observed": {},
+            "record_commitment": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+            "missing": false,
+            "previous_observed_at": null
+          },
+          {
+            "input_type": "authority_context",
+            "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+            "expected": {},
+            "observed": {
+              "schema_version": "0.1.0",
+              "interface_status": "proposed_pending_governor_review"
+            },
+            "record_commitment": "sha256:383feea11df965ee6c063f6602d25fa16148e2a93504eaa3bdc61b4a6e1036e9",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "role_mapping",
+            "input_id": "urn:cognous:institution:synthetic-customer-service",
+            "expected": {},
+            "observed": {
+              "version": "roles-v1",
+              "digest": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d"
+            },
+            "record_commitment": "sha256:fc884333b0da586ae781c0c4289729465659c719c0e4602758ddbf7a2bdcb89e",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "identity",
+            "input_id": "urn:cognous:identity:refund-agent-1",
+            "expected": {},
+            "observed": {
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:5eee426c0827b2b01acc16f0acf3bd13fcfc315ad851c406822dc3242a0b18d3",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "mandate",
+            "input_id": "urn:cognous:issuance:1",
+            "expected": {},
+            "observed": {
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:d023eb722343620d7b2d4e622e0283008d72c903ef81c15d9b3dbaada7648091",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "grant",
+            "input_id": "urn:cognous:grant:routine-1",
+            "expected": {
+              "revision": "1",
+              "status": "active"
+            },
+            "observed": {
+              "revision": "1",
+              "status": "active",
+              "version": "status-v1",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:eded76117318d91618259e7ed8eced201b868bb5f714d49fbf751535a6b8a859",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "conflict",
+            "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+            "expected": {},
+            "observed": {
+              "state": "clear",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:b469c2e823a75ebd9ba5b0f315c1a092e9ef8d257e684f03a9c00765a065e2ec",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "policy",
+            "input_id": "urn:cognous:policy:refund-policy",
+            "expected": {
+              "version": "1.0",
+              "status": "active"
+            },
+            "observed": {
+              "status": "active",
+              "version": "1.0",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:ff1302d24b132d1ccb1345ca47ecd25be2200335621ca133e01f54c384007e30",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "approval",
+            "input_id": "urn:cognous:approval:t1-1",
+            "expected": {
+              "grant_revision": "1",
+              "status": "active",
+              "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+              "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+              "grant_id": "urn:cognous:grant:routine-1"
+            },
+            "observed": {
+              "status": "active",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "grant_revision": "1",
+              "runtime_authority_commitment": "sha256:fe36ea34cd07579b9928a1fb76c0cf694067753765afe88cb68cedae51198814",
+              "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+              "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+              "grant_id": "urn:cognous:grant:routine-1"
+            },
+            "record_commitment": "sha256:5a751179d3eb123dde4208c9fed8e49fbf45d80b87aac4ea4b8a3d0100edee94",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "evidence",
+            "input_id": "urn:cognous:evidence:refund-entitlement",
+            "expected": {
+              "state": "current"
+            },
+            "observed": {
+              "state": "current",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:41ac78e62c85e85b6ba4dd94a60a430c4cdb94cbcf1a51a42a3850b61def1d4f",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "evidence",
+            "input_id": "urn:cognous:evidence:optional-context",
+            "expected": {},
+            "observed": {
+              "state": "unknown",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:9918ca9a4e1da9eee69322d6c0b107f215773957e569ee85e5ca1abb94c267cd",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          }
+        ]
+      }
+    ],
+    "attempts": [
+      {
+        "attempt_id": "syn-attempt-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "decision_id": "syn-decision-1",
+        "started_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "time_source": "test_override",
+        "status": "attempted",
+        "acknowledgement": {},
+        "error": null
+      },
+      {
+        "attempt_id": "syn-attempt-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "decision_id": "syn-decision-1",
+        "started_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "time_source": "test_override",
+        "status": "acknowledged",
+        "acknowledgement": {
+          "duplicate": false,
+          "effect": {
+            "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+            "grant_id": "urn:cognous:grant:routine-1",
+            "target": "urn:cognous:synthetic-account:customer-001",
+            "amount": 50.0,
+            "unit": "USD",
+            "payload": {
+              "customer_id": "customer-001",
+              "refund_reason": "duplicate"
+            },
+            "state": "applied"
+          }
+        },
+        "error": null
+      }
+    ],
+    "refusals": [],
+    "resolution_checks": [
+      {
+        "check_id": "syn-check-1",
+        "stage": "decision",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "time_source": "test_override",
+        "inputs": [
+          {
+            "input_type": "manifest",
+            "input_id": "refund-integration-pilot-v1",
+            "expected": {},
+            "observed": {},
+            "record_commitment": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+            "missing": false,
+            "previous_observed_at": null
+          },
+          {
+            "input_type": "authority_context",
+            "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+            "expected": {},
+            "observed": {
+              "schema_version": "0.1.0",
+              "interface_status": "proposed_pending_governor_review"
+            },
+            "record_commitment": "sha256:383feea11df965ee6c063f6602d25fa16148e2a93504eaa3bdc61b4a6e1036e9",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "role_mapping",
+            "input_id": "urn:cognous:institution:synthetic-customer-service",
+            "expected": {},
+            "observed": {
+              "version": "roles-v1",
+              "digest": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d"
+            },
+            "record_commitment": "sha256:fc884333b0da586ae781c0c4289729465659c719c0e4602758ddbf7a2bdcb89e",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "identity",
+            "input_id": "urn:cognous:identity:refund-agent-1",
+            "expected": {},
+            "observed": {
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:5eee426c0827b2b01acc16f0acf3bd13fcfc315ad851c406822dc3242a0b18d3",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "mandate",
+            "input_id": "urn:cognous:issuance:1",
+            "expected": {},
+            "observed": {
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:d023eb722343620d7b2d4e622e0283008d72c903ef81c15d9b3dbaada7648091",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "grant",
+            "input_id": "urn:cognous:grant:routine-1",
+            "expected": {
+              "revision": "1",
+              "status": "active"
+            },
+            "observed": {
+              "revision": "1",
+              "status": "active",
+              "version": "status-v1",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:eded76117318d91618259e7ed8eced201b868bb5f714d49fbf751535a6b8a859",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "conflict",
+            "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+            "expected": {},
+            "observed": {
+              "state": "clear",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:b469c2e823a75ebd9ba5b0f315c1a092e9ef8d257e684f03a9c00765a065e2ec",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "policy",
+            "input_id": "urn:cognous:policy:refund-policy",
+            "expected": {
+              "version": "1.0",
+              "status": "active"
+            },
+            "observed": {
+              "status": "active",
+              "version": "1.0",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:ff1302d24b132d1ccb1345ca47ecd25be2200335621ca133e01f54c384007e30",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "approval",
+            "input_id": "urn:cognous:approval:t1-1",
+            "expected": {
+              "grant_revision": "1",
+              "status": "active",
+              "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+              "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+              "grant_id": "urn:cognous:grant:routine-1"
+            },
+            "observed": {
+              "status": "active",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "grant_revision": "1",
+              "runtime_authority_commitment": "sha256:fe36ea34cd07579b9928a1fb76c0cf694067753765afe88cb68cedae51198814",
+              "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+              "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+              "grant_id": "urn:cognous:grant:routine-1"
+            },
+            "record_commitment": "sha256:5a751179d3eb123dde4208c9fed8e49fbf45d80b87aac4ea4b8a3d0100edee94",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "evidence",
+            "input_id": "urn:cognous:evidence:refund-entitlement",
+            "expected": {
+              "state": "current"
+            },
+            "observed": {
+              "state": "current",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:41ac78e62c85e85b6ba4dd94a60a430c4cdb94cbcf1a51a42a3850b61def1d4f",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "evidence",
+            "input_id": "urn:cognous:evidence:optional-context",
+            "expected": {},
+            "observed": {
+              "state": "unknown",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:9918ca9a4e1da9eee69322d6c0b107f215773957e569ee85e5ca1abb94c267cd",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          }
+        ],
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-2",
+        "stage": "effect",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "time_source": "test_override",
+        "inputs": [
+          {
+            "input_type": "manifest",
+            "input_id": "refund-integration-pilot-v1",
+            "expected": {},
+            "observed": {},
+            "record_commitment": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+            "missing": false,
+            "previous_observed_at": null
+          },
+          {
+            "input_type": "authority_context",
+            "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+            "expected": {},
+            "observed": {
+              "schema_version": "0.1.0",
+              "interface_status": "proposed_pending_governor_review"
+            },
+            "record_commitment": "sha256:383feea11df965ee6c063f6602d25fa16148e2a93504eaa3bdc61b4a6e1036e9",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "role_mapping",
+            "input_id": "urn:cognous:institution:synthetic-customer-service",
+            "expected": {},
+            "observed": {
+              "version": "roles-v1",
+              "digest": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d"
+            },
+            "record_commitment": "sha256:fc884333b0da586ae781c0c4289729465659c719c0e4602758ddbf7a2bdcb89e",
+            "missing": false,
+            "previous_observed_at": null,
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "identity",
+            "input_id": "urn:cognous:identity:refund-agent-1",
+            "expected": {},
+            "observed": {
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:5eee426c0827b2b01acc16f0acf3bd13fcfc315ad851c406822dc3242a0b18d3",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "mandate",
+            "input_id": "urn:cognous:issuance:1",
+            "expected": {},
+            "observed": {
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:d023eb722343620d7b2d4e622e0283008d72c903ef81c15d9b3dbaada7648091",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "grant",
+            "input_id": "urn:cognous:grant:routine-1",
+            "expected": {
+              "revision": "1",
+              "status": "active"
+            },
+            "observed": {
+              "revision": "1",
+              "status": "active",
+              "version": "status-v1",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:eded76117318d91618259e7ed8eced201b868bb5f714d49fbf751535a6b8a859",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "conflict",
+            "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+            "expected": {},
+            "observed": {
+              "state": "clear",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:b469c2e823a75ebd9ba5b0f315c1a092e9ef8d257e684f03a9c00765a065e2ec",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "policy",
+            "input_id": "urn:cognous:policy:refund-policy",
+            "expected": {
+              "version": "1.0",
+              "status": "active"
+            },
+            "observed": {
+              "status": "active",
+              "version": "1.0",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:ff1302d24b132d1ccb1345ca47ecd25be2200335621ca133e01f54c384007e30",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "approval",
+            "input_id": "urn:cognous:approval:t1-1",
+            "expected": {
+              "grant_revision": "1",
+              "status": "active",
+              "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+              "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+              "grant_id": "urn:cognous:grant:routine-1"
+            },
+            "observed": {
+              "status": "active",
+              "observed_at": "2026-10-05T19:00:00+00:00",
+              "grant_revision": "1",
+              "runtime_authority_commitment": "sha256:fe36ea34cd07579b9928a1fb76c0cf694067753765afe88cb68cedae51198814",
+              "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+              "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+              "grant_id": "urn:cognous:grant:routine-1"
+            },
+            "record_commitment": "sha256:5a751179d3eb123dde4208c9fed8e49fbf45d80b87aac4ea4b8a3d0100edee94",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "evidence",
+            "input_id": "urn:cognous:evidence:refund-entitlement",
+            "expected": {
+              "state": "current"
+            },
+            "observed": {
+              "state": "current",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:41ac78e62c85e85b6ba4dd94a60a430c4cdb94cbcf1a51a42a3850b61def1d4f",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          },
+          {
+            "input_type": "evidence",
+            "input_id": "urn:cognous:evidence:optional-context",
+            "expected": {},
+            "observed": {
+              "state": "unknown",
+              "observed_at": "2026-10-05T19:00:00+00:00"
+            },
+            "record_commitment": "sha256:9918ca9a4e1da9eee69322d6c0b107f215773957e569ee85e5ca1abb94c267cd",
+            "missing": false,
+            "previous_observed_at": "2026-10-05T19:00:00+00:00",
+            "age_basis": "source_asserted"
+          }
+        ],
+        "reasons": []
+      }
+    ],
+    "check_events": [
+      {
+        "check_id": "syn-check-1",
+        "phase": "opened",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": null,
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "manifest",
+          "input_id": "refund-integration-pilot-v1",
+          "expected": {},
+          "observed": {},
+          "record_commitment": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+          "missing": false,
+          "previous_observed_at": null
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "authority_context",
+          "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+          "expected": {},
+          "observed": {
+            "schema_version": "0.1.0",
+            "interface_status": "proposed_pending_governor_review"
+          },
+          "record_commitment": "sha256:383feea11df965ee6c063f6602d25fa16148e2a93504eaa3bdc61b4a6e1036e9",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "role_mapping",
+          "input_id": "urn:cognous:institution:synthetic-customer-service",
+          "expected": {},
+          "observed": {
+            "version": "roles-v1",
+            "digest": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d"
+          },
+          "record_commitment": "sha256:fc884333b0da586ae781c0c4289729465659c719c0e4602758ddbf7a2bdcb89e",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "identity",
+          "input_id": "urn:cognous:identity:refund-agent-1",
+          "expected": {},
+          "observed": {
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:5eee426c0827b2b01acc16f0acf3bd13fcfc315ad851c406822dc3242a0b18d3",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "mandate",
+          "input_id": "urn:cognous:issuance:1",
+          "expected": {},
+          "observed": {
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:d023eb722343620d7b2d4e622e0283008d72c903ef81c15d9b3dbaada7648091",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "grant",
+          "input_id": "urn:cognous:grant:routine-1",
+          "expected": {
+            "revision": "1",
+            "status": "active"
+          },
+          "observed": {
+            "revision": "1",
+            "status": "active",
+            "version": "status-v1",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:eded76117318d91618259e7ed8eced201b868bb5f714d49fbf751535a6b8a859",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "conflict",
+          "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+          "expected": {},
+          "observed": {
+            "state": "clear",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:b469c2e823a75ebd9ba5b0f315c1a092e9ef8d257e684f03a9c00765a065e2ec",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "policy",
+          "input_id": "urn:cognous:policy:refund-policy",
+          "expected": {
+            "version": "1.0",
+            "status": "active"
+          },
+          "observed": {
+            "status": "active",
+            "version": "1.0",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:ff1302d24b132d1ccb1345ca47ecd25be2200335621ca133e01f54c384007e30",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "approval",
+          "input_id": "urn:cognous:approval:t1-1",
+          "expected": {
+            "grant_revision": "1",
+            "status": "active",
+            "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+            "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+            "grant_id": "urn:cognous:grant:routine-1"
+          },
+          "observed": {
+            "status": "active",
+            "observed_at": "2026-10-05T19:00:00+00:00",
+            "grant_revision": "1",
+            "runtime_authority_commitment": "sha256:fe36ea34cd07579b9928a1fb76c0cf694067753765afe88cb68cedae51198814",
+            "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+            "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+            "grant_id": "urn:cognous:grant:routine-1"
+          },
+          "record_commitment": "sha256:5a751179d3eb123dde4208c9fed8e49fbf45d80b87aac4ea4b8a3d0100edee94",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "evidence",
+          "input_id": "urn:cognous:evidence:refund-entitlement",
+          "expected": {
+            "state": "current"
+          },
+          "observed": {
+            "state": "current",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:41ac78e62c85e85b6ba4dd94a60a430c4cdb94cbcf1a51a42a3850b61def1d4f",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "evidence",
+          "input_id": "urn:cognous:evidence:optional-context",
+          "expected": {},
+          "observed": {
+            "state": "unknown",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:9918ca9a4e1da9eee69322d6c0b107f215773957e569ee85e5ca1abb94c267cd",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-1",
+        "phase": "completed",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:07+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-01",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-1"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": null,
+        "effect_id": null,
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": null,
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "opened",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": null,
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "manifest",
+          "input_id": "refund-integration-pilot-v1",
+          "expected": {},
+          "observed": {},
+          "record_commitment": "sha256:4d1ad6c96bc242c63998231b4df3ad7c86dc2e5e59cdae63afe7bff86e60f6ac",
+          "missing": false,
+          "previous_observed_at": null
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "authority_context",
+          "input_id": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+          "expected": {},
+          "observed": {
+            "schema_version": "0.1.0",
+            "interface_status": "proposed_pending_governor_review"
+          },
+          "record_commitment": "sha256:383feea11df965ee6c063f6602d25fa16148e2a93504eaa3bdc61b4a6e1036e9",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:10+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "role_mapping",
+          "input_id": "urn:cognous:institution:synthetic-customer-service",
+          "expected": {},
+          "observed": {
+            "version": "roles-v1",
+            "digest": "sha256:f8a8db156df7087ddf34be1ed77fc86fa20ba7668deb87a9b3a5bd0a6ace496d"
+          },
+          "record_commitment": "sha256:fc884333b0da586ae781c0c4289729465659c719c0e4602758ddbf7a2bdcb89e",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "identity",
+          "input_id": "urn:cognous:identity:refund-agent-1",
+          "expected": {},
+          "observed": {
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:5eee426c0827b2b01acc16f0acf3bd13fcfc315ad851c406822dc3242a0b18d3",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "mandate",
+          "input_id": "urn:cognous:issuance:1",
+          "expected": {},
+          "observed": {
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:d023eb722343620d7b2d4e622e0283008d72c903ef81c15d9b3dbaada7648091",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "grant",
+          "input_id": "urn:cognous:grant:routine-1",
+          "expected": {
+            "revision": "1",
+            "status": "active"
+          },
+          "observed": {
+            "revision": "1",
+            "status": "active",
+            "version": "status-v1",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:eded76117318d91618259e7ed8eced201b868bb5f714d49fbf751535a6b8a859",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "conflict",
+          "input_id": "urn:cognous:authority-requirement:refund-routine-v1",
+          "expected": {},
+          "observed": {
+            "state": "clear",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:b469c2e823a75ebd9ba5b0f315c1a092e9ef8d257e684f03a9c00765a065e2ec",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "policy",
+          "input_id": "urn:cognous:policy:refund-policy",
+          "expected": {
+            "version": "1.0",
+            "status": "active"
+          },
+          "observed": {
+            "status": "active",
+            "version": "1.0",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:ff1302d24b132d1ccb1345ca47ecd25be2200335621ca133e01f54c384007e30",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "approval",
+          "input_id": "urn:cognous:approval:t1-1",
+          "expected": {
+            "grant_revision": "1",
+            "status": "active",
+            "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+            "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+            "grant_id": "urn:cognous:grant:routine-1"
+          },
+          "observed": {
+            "status": "active",
+            "observed_at": "2026-10-05T19:00:00+00:00",
+            "grant_revision": "1",
+            "runtime_authority_commitment": "sha256:fe36ea34cd07579b9928a1fb76c0cf694067753765afe88cb68cedae51198814",
+            "proposal": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+            "policies": "sha256:1cb091c265589e9d079a3c814befac072b3ad7f11f6bfbd0968825f3b816dee2",
+            "grant_id": "urn:cognous:grant:routine-1"
+          },
+          "record_commitment": "sha256:5a751179d3eb123dde4208c9fed8e49fbf45d80b87aac4ea4b8a3d0100edee94",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "evidence",
+          "input_id": "urn:cognous:evidence:refund-entitlement",
+          "expected": {
+            "state": "current"
+          },
+          "observed": {
+            "state": "current",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:41ac78e62c85e85b6ba4dd94a60a430c4cdb94cbcf1a51a42a3850b61def1d4f",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": {
+          "input_type": "evidence",
+          "input_id": "urn:cognous:evidence:optional-context",
+          "expected": {},
+          "observed": {
+            "state": "unknown",
+            "observed_at": "2026-10-05T19:00:00+00:00"
+          },
+          "record_commitment": "sha256:9918ca9a4e1da9eee69322d6c0b107f215773957e569ee85e5ca1abb94c267cd",
+          "missing": false,
+          "previous_observed_at": null,
+          "age_basis": "source_asserted"
+        },
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      },
+      {
+        "check_id": "syn-check-2",
+        "phase": "completed",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:17+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:10+00:00",
+        "age_bound_seconds": 60,
+        "nonce": "syn-nonce-02",
+        "owner": {
+          "pid": "1001",
+          "token": "syn-owner-token-2"
+        },
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "action_class": {
+          "class_id": "synthetic-irreversible",
+          "irreversible": true,
+          "max_status_age_seconds": 60,
+          "on_unreadable": "refuse"
+        },
+        "input": null,
+        "reasons": [],
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+      }
+    ]
+  }
+}

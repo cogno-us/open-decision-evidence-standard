@@ -1,0 +1,67 @@
+{
+  "fixture_id": "unknown-recovery-trigger",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "unknown_enum_value",
+  "reason": "A recovery pass is triggered at startup, on the interval or manually.",
+  "provenance": {
+    "source": "mutation of captured fixture reaper-closes-the-dead-and-reports-the-late",
+    "control_plane_commit": "3f6a7668"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [
+      {
+        "check_id": "orphan",
+        "phase": "opened",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "reasons": []
+      },
+      {
+        "check_id": "orphan",
+        "phase": "interrupted",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "age_bound_seconds": 60,
+        "reasons": [
+          "check_interrupted"
+        ]
+      }
+    ],
+    "clock_rows": [],
+    "input_reads": [],
+    "age_extensions": [],
+    "age_extension_refusals": [],
+    "recovery_runs": [
+      {
+        "run_id": "syn-recovery-run-1",
+        "trigger": "cron",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "interrupted": [
+          "orphan"
+        ],
+        "overdue": [],
+        "open_count": 0,
+        "oldest_open_age_seconds": null
+      },
+      {
+        "run_id": "syn-recovery-run-2",
+        "trigger": "interval",
+        "recorded_at": "2026-10-05T19:00:35+00:00",
+        "interrupted": [],
+        "overdue": [],
+        "open_count": 0,
+        "oldest_open_age_seconds": null
+      }
+    ],
+    "freshness_reports": []
+  }
+}

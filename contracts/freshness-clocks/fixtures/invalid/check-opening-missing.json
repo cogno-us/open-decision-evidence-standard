@@ -1,0 +1,201 @@
+{
+  "fixture_id": "check-opening-missing",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "check_opening_missing",
+  "reason": "The first event of a check is its opening (the producer refuses an event of an unopened check).",
+  "provenance": {
+    "source": "mutation of captured fixture default-path-carries-no-clock-members",
+    "control_plane_commit": "3f6a7668"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "input",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-3",
+        "phase": "completed",
+        "stage": "decision",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "opened",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "input",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      },
+      {
+        "check_id": "syn-check-4",
+        "phase": "completed",
+        "stage": "effect",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "reasons": []
+      }
+    ],
+    "clock_rows": [],
+    "input_reads": [],
+    "age_extensions": [],
+    "age_extension_refusals": [],
+    "recovery_runs": [],
+    "freshness_reports": []
+  }
+}

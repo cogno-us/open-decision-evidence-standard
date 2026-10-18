@@ -1,0 +1,92 @@
+{
+  "fixture_id": "lease-hold-with-an-attempt",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "lease_unavailable_dispatched",
+  "reason": "A decision held for check_lease_unavailable has no attempt.",
+  "provenance": {
+    "source": "mutation of captured fixture lease-unavailable-holds",
+    "control_plane_commit": "3f6a7668"
+  },
+  "document": {
+    "contract": "freshness-clocks",
+    "contract_version": "0.1.0-draft",
+    "profile": "freshness/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "check_events": [],
+    "clock_rows": [
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "row_type": "resolution_check",
+        "row_id": "syn-check-1",
+        "seq": 0,
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "input_reads": [],
+    "age_extensions": [],
+    "age_extension_refusals": [],
+    "recovery_runs": [],
+    "freshness_reports": []
+  },
+  "journal": {
+    "run_id": "run-1",
+    "decisions": [
+      {
+        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
+        "result": "hold",
+        "reasons": [
+          "check_lease_unavailable"
+        ],
+        "decided_at": "2026-10-05T19:00:00+00:00",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "time_source": "test_override",
+        "operation_horizon": {
+          "source": "runtime_proposal",
+          "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+          "not_before": null,
+          "expires_at": null
+        },
+        "binding": null,
+        "resolution_inputs": []
+      }
+    ],
+    "attempts": [
+      {
+        "attempt_id": "ghost-attempt",
+        "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
+        "decision_id": "syn-decision-1",
+        "started_at": "2026-10-05T19:00:00+00:00",
+        "time_source": "test_override",
+        "status": "attempted",
+        "acknowledgement": {},
+        "error": null
+      }
+    ],
+    "refusals": [],
+    "resolution_checks": [
+      {
+        "check_id": "syn-check-1",
+        "stage": "decision",
+        "evaluated_at": "2026-10-05T19:00:00+00:00",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "time_source": "test_override",
+        "inputs": [],
+        "reasons": [
+          "check_lease_unavailable"
+        ]
+      }
+    ]
+  }
+}
