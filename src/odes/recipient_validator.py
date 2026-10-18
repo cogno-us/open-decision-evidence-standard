@@ -14,6 +14,10 @@ from .common import (
     PACKAGE_VERSION,
     PROFILE_ID,
     PROFILE_V2_ID,
+    PROFILE_V2_RESTRICTIONS_ID,
+    RESTRICTION_SEMANTICS_VERSION,
+    RESTRICTION_UNKNOWN_LIMIT,
+    RESTRICTION_VERSION_SUFFIX,
     PROFILE_V2_VERSION,
     REFUSAL_PROFILE_VERSION,
     SECURITY_PROFILE_VERSION,
@@ -43,6 +47,8 @@ PACKAGE_TOP_LEVEL_MEMBERS = frozenset({"package_type", "package_version", "creat
 
 
 SEMANTIC_DEADLINE_SECONDS = 5
+V2_FAMILY = frozenset({PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID})
+_RESTRICTION_STATES = frozenset({"explicit_true", "explicit_false", "unknown"})
 
 
 class DeadlineExceeded(Exception):
@@ -157,11 +163,14 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
         selected_control_plane = None
     if declared == PROFILE_ID and selected_control_plane in ALL_V2_CONTROL_PLANE_REVISIONS:
         reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
-    if declared in {PROFILE_ID, PROFILE_V2_ID}:
+    if declared in {PROFILE_ID, PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID}:
+        v2 = declared in V2_FAMILY
         integrity = package.get("integrity") if isinstance(package.get("integrity"), dict) else {}
         if "canonicalization_profile" in integrity and integrity["canonicalization_profile"] != CANONICALIZATION_PROFILE:
             reasons.append("the declared implementation profile is defined only with the legacy canonicalization profile")
-        expected_version = SECURITY_RUNTIME_GENERATIONS[selected_control_plane][0] if declared == PROFILE_V2_ID and selected_control_plane in SECURITY_RUNTIME_GENERATIONS else REFUSAL_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if declared == PROFILE_V2_ID and selected_control_plane == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if declared == PROFILE_V2_ID else PROFILE_VERSION
+        expected_version = SECURITY_RUNTIME_GENERATIONS[selected_control_plane][0] if v2 and selected_control_plane in SECURITY_RUNTIME_GENERATIONS else REFUSAL_PROFILE_VERSION if v2 and selected_control_plane == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if v2 and selected_control_plane == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if v2 else PROFILE_VERSION
+        if declared == PROFILE_V2_RESTRICTIONS_ID:
+            expected_version += RESTRICTION_VERSION_SUFFIX
         if profile.get("implementation_profile_version") != expected_version:
             return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": expected_version})
         if profile.get("schema_name") != SCHEMA_NAME or profile.get("schema_version") != SCHEMA_VERSION:
@@ -346,7 +355,46 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
     return _result("fail" if reasons else "pass", reasons, {**evidence, "configured_status_inputs": status_inputs, "record_reported_freshness": status.get("freshness")})
 
 
-def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, purpose: str | None, policy: dict[str, Any] | None = None) -> dict[str, Any]:
+def _restriction_semantics_reasons(package: dict[str, Any]) -> list[str]:
+    """Checks for the explicit restriction profile. Unknown is never unrestricted; an explicit false must be attributable."""
+    record = package.get("record") if isinstance(package.get("record"), dict) else {}
+    provenance = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
+    risk = record.get("risk_coordinates") if isinstance(record.get("risk_coordinates"), dict) else {}
+    semantics = provenance.get("restriction_semantics")
+    if not isinstance(semantics, dict) or semantics.get("semantics_version") != RESTRICTION_SEMANTICS_VERSION:
+        return ["provenance.restriction_semantics is missing or unsupported; the restriction state is not established"]
+    reasons: list[str] = []
+    unknown = False
+    explicit_false = False
+    for name in ("restricted_use_flag", "prohibited_use_flag"):
+        entry = semantics.get(name)
+        state = entry.get("state") if isinstance(entry, dict) else None
+        if state not in _RESTRICTION_STATES:
+            reasons.append(f"restriction_semantics.{name} has no supported state")
+            continue
+        expected = state != "explicit_false"
+        if risk.get(name) is not expected:
+            reasons.append(f"record {name} does not match restriction_semantics state {state}")
+        unknown = unknown or state == "unknown"
+        explicit_false = explicit_false or state == "explicit_false"
+    jurisdiction = semantics.get("jurisdiction")
+    jurisdiction_state = jurisdiction.get("state") if isinstance(jurisdiction, dict) else None
+    if jurisdiction_state not in {"explicit", "unknown"}:
+        reasons.append("restriction_semantics.jurisdiction has no supported state")
+    elif jurisdiction_state == "unknown" or risk.get("jurisdiction") == "unknown":
+        unknown = True
+        reasons.append("record jurisdiction is unknown and never matches a recipient jurisdiction")
+    source = semantics.get("source")
+    if explicit_false and not (isinstance(source, dict) and source.get("record_id") and source.get("record_hash")):
+        reasons.append("an explicit false restriction value is not attributable to a retained source record")
+    if unknown:
+        reasons.append("restriction is unknown: the source does not establish the restriction state, so reliance is blocked (this is not an established prohibition)")
+        if RESTRICTION_UNKNOWN_LIMIT not in (provenance.get("limits") if isinstance(provenance.get("limits"), list) else []):
+            reasons.append("the mandatory limitation for unknown restriction values is missing")
+    return reasons
+
+
+def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, purpose: str | None, policy: dict[str, Any] | None = None, package: dict[str, Any] | None = None) -> dict[str, Any]:
     conditions = record.get("consumption_conditions", {})
     reasons: list[str] = []
     if not isinstance(conditions, dict):
@@ -373,6 +421,8 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
             reasons.append("restricted use has no implemented recipient authorization profile")
         if not policy.get("jurisdiction") or policy.get("jurisdiction") != risk.get("jurisdiction"):
             reasons.append("recipient jurisdiction is unavailable or differs from the record")
+    if package is not None and (package.get("profile") or {}).get("implementation_profile") == PROFILE_V2_RESTRICTIONS_ID:
+        reasons.extend(_restriction_semantics_reasons(package))
     return _result("fail" if reasons else "pass", reasons, {"permitted_relying_parties": parties, "permitted_purposes": purposes})
 
 
@@ -413,7 +463,7 @@ def _normalized_replay_material(package: dict[str, Any], expected: dict[str, Any
 
 def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
     profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
-    if profile.get("implementation_profile") != PROFILE_V2_ID:
+    if profile.get("implementation_profile") not in V2_FAMILY:
         return _result("not_applicable", ["historical profile validation unchanged"])
     try:
         return _run_with_deadline(lambda: _replay_semantic_check(package), SEMANTIC_DEADLINE_SECONDS)
@@ -431,8 +481,9 @@ def _replay_semantic_check(package: dict[str, Any]) -> dict[str, Any]:
         parties, purposes = conditions["permitted_relying_parties"], conditions["permitted_purposes"]
         if len(parties) != 1 or len(purposes) != 1:
             raise ValueError("implementation profile requires exact single-recipient/purpose export")
+        mode = "explicit" if package["profile"]["implementation_profile"] == PROFILE_V2_RESTRICTIONS_ID else "legacy"
         expected = export_cognous_stack_package(sources["manifest"], sources["reconstruction_bundle"],
-            relying_party=parties[0], purpose=purposes[0], expires_at=conditions["expires_at"])
+            relying_party=parties[0], purpose=purposes[0], expires_at=conditions["expires_at"], restriction_semantics=mode)
         actual_material, expected_material = _normalized_replay_material(package, expected)
         if actual_material != expected_material:
             raise ValueError("package semantics differ from accepted Replay-derived transformation")
@@ -474,13 +525,13 @@ def _evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any])
     layers = {
         "schema_validity": _evaluate_schema(record),
         **({"replay_semantic_consistency": _evaluate_replay_semantics(package)}
-           if declared == PROFILE_V2_ID or record_declared == PROFILE_V2_ID else {}),
+           if declared in V2_FAMILY or record_declared in V2_FAMILY else {}),
         "declared_profile_conformance": _evaluate_profile(package, policy.get("supported_profiles", [PROFILE_ID])),
         "package_content_integrity": _evaluate_package_content_integrity(package, trusted_digests),
         "integrity_authentication_checks": _evaluate_authentication(package, policy.get("trusted_key_refs", []), trusted_digests),
         "historical_authority_assertions": _evaluate_historical_authority(record, status_inputs, policy),
         "authority_status_and_freshness": _evaluate_authority_and_freshness(record, status_inputs, policy.get("now"), policy),
-        "consumption_conditions": _evaluate_consumption(record, policy.get("relying_party"), policy.get("purpose"), policy),
+        "consumption_conditions": _evaluate_consumption(record, policy.get("relying_party"), policy.get("purpose"), policy, package),
     }
     provenance_members = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
     if "native_evidence_inventory" in provenance_members or "native_evidence" in policy:
