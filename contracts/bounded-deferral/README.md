@@ -112,3 +112,7 @@ The reference validator never raises: any parsed JSON value gets a list of typed
 Invalid fixtures added: `non-ascii-digit-time`, `seconds-bound-out-of-range-deferral`, `trailing-line-break-digest`, `trailing-line-break-time`, `unpaired-surrogate-text`.
 
 - `context_malformed`: an optional context argument (the run record, or for effect-reversibility also the deferral document) whose shape does not let the cross-document rules run is refused with this typed violation instead of raising. The context is not re-validated against its own schema here.
+
+## Typed constants (decision 39-B, 2026-10-18)
+
+A schema `const` matches only the same JSON type with an equal value, as `enum` already did: the integer `1` is not `true`, `0` is not `false`, `1.0` is not `1`. The constants that were compared by value alone are now typed: `effect_withheld` and `effect_did_not_occur` (the constant `true`). Invalid fixtures `effect-withheld-written-as-integer` and `effect-did-not-occur-written-as-integer`. Same `0.1.0-draft` label; every valid fixture is unchanged.

@@ -65,7 +65,7 @@ class InputRefused(ValueError):
     """The input file is not a strict JSON document (duplicate member, non-finite number, bad encoding)."""
 
 
-_TIME_SHAPE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?(Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])")
+_TIME_SHAPE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?(Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])")
 
 
 def _pattern_ok(pattern: str, value: str) -> bool:
@@ -215,7 +215,7 @@ def _resolve(schema: dict[str, Any], root: dict[str, Any]) -> dict[str, Any]:
 
 def _check(value: Any, schema: dict[str, Any], root: dict[str, Any], path: str, out: list[Violation]) -> None:
     schema = _resolve(schema, root)
-    if "const" in schema and value != schema["const"]:
+    if "const" in schema and not (type(value) is type(schema["const"]) and value == schema["const"]):
         out.append(Violation("schema_violation", path, f"expected constant {schema['const']!r}"))
         return
     if "enum" in schema and not any(value == option and type(value) is type(option) for option in schema["enum"]):

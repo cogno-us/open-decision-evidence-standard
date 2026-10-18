@@ -1,0 +1,64 @@
+{
+  "fixture_id": "effect-did-not-occur-written-as-integer",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Member effect_did_not_occur is the constant true; the integer 1 is not the boolean true. Typed equality refuses it. Derived from expired-deferral-refused-with-notice by changing one member.",
+  "expected_refusal": "schema_violation",
+  "document": {
+    "contract": "bounded-deferral",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "evaluated_at": "2026-10-05T19:02:00+00:00",
+    "deferrals": [
+      {
+        "deferral_id": "syn-deferral-1",
+        "decision_id": "syn-decision-1",
+        "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "action_class_id": "synthetic-irreversible",
+        "policy": {
+          "policy_verdict": "defer",
+          "policy_ref": "syn-policy-1",
+          "deferred_reasons": [
+            "required_input_not_read",
+            "status_unreadable"
+          ],
+          "refusal_reasons": []
+        },
+        "opened_at": "2026-10-05T19:00:00+00:00",
+        "max_age_seconds": 60,
+        "deadline": "2026-10-05T19:01:00+00:00",
+        "outcome": "refused",
+        "responses": [],
+        "resolved_at": "2026-10-05T19:01:00+00:00",
+        "refusal_reason": "deadline_expired",
+        "released_decision_id": null,
+        "effect": {
+          "observable": false,
+          "first_observable_at": null
+        },
+        "refusal_notice": {
+          "effect_withheld": true,
+          "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
+          "constraint_failed": {
+            "code": "deadline_expired",
+            "description": "No resolver answered before the deadline, so the action stays withheld."
+          },
+          "admissible_alternatives": [
+            {
+              "alternative_id": "resubmit-with-current-status",
+              "description": "Submit the request again once the status can be read."
+            },
+            {
+              "alternative_id": "request-human-review",
+              "description": "Ask for a human review of the request."
+            }
+          ],
+          "effect_did_not_occur": 1,
+          "statement": "The requested action did not occur and nothing was changed."
+        }
+      }
+    ]
+  }
+}
