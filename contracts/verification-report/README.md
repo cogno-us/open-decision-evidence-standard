@@ -268,3 +268,7 @@ While the version is `0.x-draft` nothing is frozen and any change may break. Enu
 The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
 
 Invalid fixtures added: `non-ascii-digit-time`, `trailing-line-break-digest`, `trailing-line-break-time`, `unpaired-surrogate-text`.
+
+## Typed constants (decision 39-B, 2026-10-18)
+
+A schema `const` matches only the same JSON type with an equal value, as `enum` already did: the integer `1` is not `true`, `0` is not `false`, `1.0` is not `1`. The constants that were compared by value alone are now typed: `context_only` and `report_only` (the constant `true`). Invalid fixtures `context-only-written-as-integer` and `report-only-written-as-integer`. Same `0.1.0-draft` label; every valid fixture is unchanged.

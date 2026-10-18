@@ -205,7 +205,7 @@ def utc_now_iso() -> str:
 
 MAX_FRACTION_DIGITS = 6  # a datetime holds microseconds; more digits are refused, never truncated
 
-INSTANT_PATTERN = (r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?"
+INSTANT_PATTERN = (r"[0-9]{4}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?"
                    r"(Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])")
 _INSTANT = re.compile(INSTANT_PATTERN)
 # The same shape without a mandatory offset: tells a naive time from a malformed one in messages only.
