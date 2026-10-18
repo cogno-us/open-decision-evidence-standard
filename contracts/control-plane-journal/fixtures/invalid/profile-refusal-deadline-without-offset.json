@@ -6,8 +6,7 @@
   "reason": "The refusal's `deadline` is timezone-aware.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-expired-before-dispatch",
-    "control_plane_commit": "128eaa5e",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

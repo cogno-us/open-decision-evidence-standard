@@ -527,3 +527,18 @@ def test_label_cases_on_a_held_decision():
     # a code outside both registries is not judged under either label
     f = doc("held-decision-journal-mode")
     assert codes(f) == []
+
+
+def test_profile_fixtures_are_recaptured_producer_output_not_relabelled():
+    """Decision 31-B: the profile fixtures were re-captured at Control Plane 3755c71a, which writes the registry labels itself; none
+    carries a relabel note and the relabel script is gone from the build path."""
+    assert not (CONTRACT_DIR / "provenance" / "relabel_vocabulary.py").exists()
+    for fx in PROFILE_VALID:
+        assert "vocabulary_label" not in fx["provenance"], fx["fixture_id"]
+        assert fx["provenance"]["control_plane_commit"] == "3755c71a", fx["fixture_id"]
+        assert "Real producer run, unchanged (Control Plane 3755c71a" in fx["reason"], fx["fixture_id"]
+    for fx in PROFILE_INVALID:
+        assert "vocabulary_label" not in fx["provenance"], fx["fixture_id"]
+        assert fx["provenance"].get("control_plane_commit") == "3755c71a", fx["fixture_id"]
+    tamper = next(f for f in PROFILE_INVALID if f["fixture_id"] == "profile-op-grant-mismatch-held")
+    assert tamper["expected_outcome"] == "reject" and "derived tamper" in tamper["reason"].lower()

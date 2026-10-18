@@ -2,13 +2,12 @@
   "fixture_id": "profile-overdue-reported-not-closed",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: a live check past its deadline gets a non-terminal overdue event, then completes. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: a live check past its deadline gets a non-terminal overdue event, then completes. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "freshness-clocks",
-    "scenario": "overdue-reported-not-closed",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "scenario": "overdue-reported-not-closed"
   },
   "document": {
     "contract": "control-plane-journal",

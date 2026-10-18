@@ -2,13 +2,12 @@
   "fixture_id": "profile-all-profiles-holder-inventory-missing",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). All four profiles on, a class flagged requires_revocation_assurance and no inventory: held with holder_inventory_missing (holder-inventory/0.1 adds no record member; it surfaces as a reason). Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). All four profiles on, a class flagged requires_revocation_assurance and no inventory: held with holder_inventory_missing (holder-inventory/0.1 adds no record member; it surfaces as a reason). Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "stack",
-    "scenario": "all-profiles-holder-inventory-missing",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "scenario": "all-profiles-holder-inventory-missing"
   },
   "document": {
     "contract": "control-plane-journal",

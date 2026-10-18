@@ -6,7 +6,7 @@
   "reason": "`recorded_at` (freshness/0.1) is timezone-aware like every other time in the record.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-clocks-follow-the-service-clock",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

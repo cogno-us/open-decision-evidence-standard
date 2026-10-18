@@ -6,8 +6,7 @@
   "reason": "The exemption belongs to freshness/0.1 and is recognised by its `evaluated_at` member on the decision; the same hold without it is a default-path record, which has a journal or no vocabulary version.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-lease-unavailable-holds",
-    "control_plane_commit": "128eaa5e",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

@@ -1,6 +1,6 @@
 """Capture run records with all programme-2 opt-in profiles on at once (step 1b of 3; step 1a is the three existing capture scripts).
 
-Not a test and not vendored. Run from a checkout of cogno-us/cognous-control-plane at 128eaa5e (main after N5, #49) with its dev
+Not a test and not vendored. Run from a checkout of cogno-us/cognous-control-plane at 3755c71a (main after N4 and J3; first captured at 128eaa5e, #49) with its dev
 dependencies installed:
 
     PYTHONPATH=src:. python capture_profile_stack.py <raw-dir>
