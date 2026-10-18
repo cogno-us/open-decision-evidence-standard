@@ -61,7 +61,7 @@ Observation cross-check (optional second argument to `validate`, a run record or
 
 Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, expected_refusal, provenance, document}`, plus an optional `observations` member (the accepted reconciliations of the run record, unchanged) for the cross-check. `fixtures/valid/` must be accepted. `fixtures/invalid/` must be refused with `expected_refusal` as the only violation.
 
-Valid (13): 9 are producer outputs unchanged (Control Plane `acp run` authorized and held; `LocalRefundDestination` partial and with an `operations` member; the orchestrator's projections A and B for the applied, held and renewal-race scenarios; the atomic-route projection), 2 pair a captured ledger with captured observations, and 2 are derived from captured ledgers (a row mix without the digest, an `extensions` member), each marked in its `reason`. All data is synthetic; the two `LocalRefundDestination` captures use placeholder effect ids. Invalid (46) are single-defect mutations of the valid ones. `provenance/capture_fixtures.py` and `provenance/build_fixtures.py` regenerate everything and assert each outcome; they are not tests and are not vendored.
+Valid (13): 9 are producer outputs unchanged (Control Plane `acp run` authorized and held; `LocalRefundDestination` partial and with an `operations` member; the orchestrator's projections A and B for the applied, held and renewal-race scenarios; the atomic-route projection), 2 pair a captured ledger with captured observations, and 2 are derived from captured ledgers (a row mix without the digest, an `extensions` member), each marked in its `reason`. All data is synthetic; the two `LocalRefundDestination` captures use placeholder effect ids. Invalid (48): 46 single-defect mutations of the valid ones, plus the two added by decision 32 (`trailing-line-break-digest`, `unpaired-surrogate-text`). `provenance/capture_fixtures.py` and `provenance/build_fixtures.py` regenerate everything and assert each outcome; they are not tests and are not vendored.
 
 ## Run
 
@@ -78,12 +78,13 @@ A passing run shows that a ledger export has the closed shape the verifier reads
 
 ## Divergences
 
-Checked on 2026-10-18 by running the verifier's own `ledger.shape()` (main `5ed1ffb`) over every fixture:
+Checked on 2026-10-18 by running the verifier's own `ledger.shape()` (main `5ed1ffb`) over every fixture. The three verifier bullets below record that first check and are superseded by the update that follows them:
 
 - Verifier, `operation_digest`: the verifier's row is still closed without the member, so it refuses the valid fixtures whose rows carry it (`ledger_shape`, "undeclared member"; gap report F-1, projection B). Decision 25-A already says the verifier owner changes the shape. This is the divergence this contract records; it is the same member, the same type.
 - Verifier, `extensions`: the verifier has no `extensions` member at either level and refuses the `extension-namespace-members-preserved` fixture. Default 3 is the ODES convention; if the verifier owner prefers no extension namespace on a ledger export, drop the member here instead (reversible).
 - Verifier, digest format: the verifier will accept any string once it declares the member; this contract constrains it to the format the runtime emits (default 4). Rows with another string would be valid to the verifier and refused here.
 - Verifier, `state`: both accept any string in shape. The verifier reports an unknown state only for a row with an authorized decision (`ledger_row_state_unknown`).
+- Update 2026-10-18 (docs only, after programme 2): at verifier `f99a6543` (`src/cognous_verify/ledger.py`) the row declares `operation_digest` (`sha256:` plus 64 lowercase hex, the format this contract constrains) and `extensions` (`x-` names), at the document and row level, and `v4.ledger.observations-agree` reports `operation_digest_mismatch`. Running that revision's `ledger.shape()` over the 13 valid fixtures gave 0 findings. The first three verifier bullets (operation_digest, extensions, digest format) no longer describe a divergence; `state` stays a plain string on both sides. The verifier carries its own copy of the shape; it does not import this contract.
 - Control Plane: none. `acp run` and `LocalRefundDestination` outputs conform unchanged (verifier shape: 0 findings on all producer outputs without `operation_digest`).
 - Orchestrator: projection A conforms; projection B conforms here and is refused by the verifier only for `operation_digest`.
 - Runtime: its SQLite `effects` table carries `operation_digest`; the orchestrator's projection decodes `payload_json` to the `payload` object. No runtime code emits this JSON export; the projection is the orchestrator's.
@@ -109,7 +110,7 @@ While the version is `0.x-draft` nothing is frozen and any change may break. Enu
 ## Current conformance (2026-10-18, local runs, not a qualification)
 
 - Producers: the Control Plane's `acp run` ledgers and `LocalRefundDestination` snapshots, and the orchestrator's projections A and B, pass this validator unchanged.
-- Consumer: the verifier does not yet read this contract; it refuses rows with `operation_digest` and any `extensions` member (see Divergences). Follow-ups are listed in the stream hand-back.
+- Consumer: at verifier `f99a6543` the verifier accepts rows with `operation_digest` and `extensions` and its own `ledger.shape()` accepts all 13 valid fixtures (see the update under Divergences); it keeps its own copy of the shape. At the earlier check (`5ed1ffb`) it refused both.
 
 ## Input hardening (decision 32, 2026-10-18)
 

@@ -1,6 +1,6 @@
 # Execution-attempt lifecycle contract
 
-Version: `0.1.0-draft`. Status: spike, proposal only. Not part of `pder-v0.1`, not referenced by any `odes` code path, and not a qualification input. See `docs/engineering/ODES-INTERCOMPONENT-CONTRACTS.md` for the design this spike exercises.
+Version: `0.1.0-draft`. Status: spike, proposal only. Not part of `pder-v0.1`, not referenced by any `odes` code path, and not an ODES-core / `pder-v0.1` input; used by the qualification contract matrix and the verifier mutation harness. See `docs/engineering/ODES-INTERCOMPONENT-CONTRACTS.md` for the design this spike exercises.
 
 ## Contract statement
 
