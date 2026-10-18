@@ -510,6 +510,23 @@ def _result_binding_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
+# Reason codes the control plane appends to a check row AFTER the journal completion row is written (operation grant, renewal
+# and admission gates; merge and dedupe effect-time gates; the per-input time-floor comparison). A check row may carry its
+# journal completion's reasons plus codes of this closed set and nothing else (rule ``reasons_match``). Source: the Control
+# Plane at 6093aca7, ``bounded.py`` ``_admit_operation``, ``_operation_gate``, ``_effect_gate_n4`` and
+# ``record_resolution_check``, and ``merge.py`` ``merge_gate``. A consumer that vendors this set records its digest.
+POST_JOURNAL_GATE_CODES = frozenset({
+    "operation_grant_mismatch",
+    "operation_renewal_unrecorded",
+    "operation_not_admitted",
+    "operation_merged_effect_exists",
+    "operation_merged_effect_unresolved",
+    "dedupe_unresolved_attempt_blocks_new_key",
+    "dedupe_operation_effect_applied",
+    "input_observation_time_regressed",
+})
+
+
 def _norm(inputs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [{k: v for k, v in x.items() if k not in {"previous_observed_at", "extensions"}} for x in inputs]
 
@@ -557,7 +574,8 @@ def _journal_rules(doc: dict[str, Any]) -> list[Violation]:
             # Journal ids and check ids are separate producer ids today; bind by content.
             candidates = [i for i, row in enumerate(checks_rows)
                           if row["stage"] == ev["stage"] and _norm(row["inputs"]) == _norm(state[cid]["inputs"])
-                          and set(ev["reasons"]) <= set(row["reasons"])]
+                          and set(ev["reasons"]) <= set(row["reasons"])
+                          and set(row["reasons"]) - set(ev["reasons"]) <= POST_JOURNAL_GATE_CODES]
             if not candidates:
                 out.append(Violation("journal_unbound_completion", f"$.resolution_journal[{seq}]",
                                      "completed journal check matches no resolution check"))

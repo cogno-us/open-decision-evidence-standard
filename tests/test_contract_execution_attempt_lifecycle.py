@@ -173,3 +173,40 @@ def test_schema_is_draft_2020_12_and_agrees_with_reference_validator():
             continue  # text validity is a validator rule; the portable schema does not state it
         errors = list(validator.iter_errors(fx["document"]))
         assert bool(errors) == (fx["expected_refusal"] in structural), fx["fixture_id"]
+
+
+# ---- reasons_match: a check row may carry only the completion's reasons plus the closed post-journal gate set
+
+def _journal_doc():
+    fx = next(f for f in VALID if f["fixture_id"] == "resolution-journal-checks-extensions-preserved")
+    return json.loads(json.dumps(fx["document"]))
+
+
+def test_post_journal_gate_codes_are_a_published_closed_set():
+    codes = eal.POST_JOURNAL_GATE_CODES
+    assert isinstance(codes, frozenset)
+    assert codes == {
+        "operation_grant_mismatch", "operation_renewal_unrecorded", "operation_not_admitted",
+        "operation_merged_effect_exists", "operation_merged_effect_unresolved",
+        "dedupe_unresolved_attempt_blocks_new_key", "dedupe_operation_effect_applied",
+        "input_observation_time_regressed"}
+
+
+def test_check_row_with_a_reason_the_journal_does_not_carry_is_refused():
+    doc = _journal_doc()
+    doc["resolution_checks"][0]["reasons"] = ["grant_revoked"]
+    codes = {v.code for v in eal.validate(doc)}
+    assert codes == {"journal_unbound_completion"}
+
+
+@pytest.mark.parametrize("code", sorted(eal.POST_JOURNAL_GATE_CODES) if hasattr(eal, "POST_JOURNAL_GATE_CODES") else ["operation_not_admitted"])
+def test_check_row_with_a_post_journal_gate_code_is_accepted(code):
+    doc = _journal_doc()
+    doc["resolution_checks"][0]["reasons"] = [code]
+    assert eal.validate(doc) == []
+
+
+def test_check_row_with_a_gate_code_and_a_non_gate_code_is_refused():
+    doc = _journal_doc()
+    doc["resolution_checks"][0]["reasons"] = ["operation_not_admitted", "grant_revoked"]
+    assert {v.code for v in eal.validate(doc)} == {"journal_unbound_completion"}
