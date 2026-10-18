@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 
-from .common import dump_json, load_json
+from .common import INPUT_LIMITS, BudgetExceeded, dump_json, load_json
 from .exporter import export_cognous_stack_package
 from .recipient_validator import evaluate_recipient_package
 from .schema_validation import validate_record
@@ -36,13 +36,20 @@ def main(argv: list[str] | None = None) -> int:
         dump_json(package, args.out)
         return 0
     if args.cmd == "validate-record":
-        value = load_json(args.record)
+        try:
+            value = load_json(args.record, limits=INPUT_LIMITS)
+        except BudgetExceeded as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
         record = value.get("record", value) if isinstance(value, dict) else value
         validate_record(record)
         return 0
     if args.cmd == "recipient-validate":
         try:
-            result = evaluate_recipient_package(load_json(args.package), load_json(args.policy))
+            result = evaluate_recipient_package(load_json(args.package, limits=INPUT_LIMITS), load_json(args.policy, limits=INPUT_LIMITS))
+        except BudgetExceeded as exc:
+            reason = f"input {exc}"
+            result = {"recipient_reliance_decision": {"status": "fail", "reasons": [reason], "evidence": {"reason_code": exc.code, "dimension": exc.dimension}}}
         except (ValueError, RecursionError) as exc:
             reason = f"recipient input could not be evaluated: {type(exc).__name__}"
             result = {"recipient_reliance_decision": {"status": "fail", "reasons": [reason], "evidence": {}}}

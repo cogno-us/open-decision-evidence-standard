@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import multiprocessing
 from copy import deepcopy
 from datetime import datetime
 from typing import Any
 
 from .common import (
+    BUDGET_EXCEEDED,
+    BudgetExceeded,
+    check_budget,
     CANONICALIZATION_PROFILE,
     PACKAGE_TYPE,
     PACKAGE_VERSION,
@@ -35,6 +39,63 @@ from .schema_validation import schema_errors
 
 PACKAGE_TOP_LEVEL_MEMBERS = frozenset({"package_type", "package_version", "created_by", "created_at", "record", "profile", "integrity",
                                        "provenance", "package_digest"})
+
+
+SEMANTIC_DEADLINE_SECONDS = 5
+
+
+class DeadlineExceeded(Exception):
+    """The semantic worker did not finish within the deadline and was terminated."""
+
+
+class WorkerFailed(Exception):
+    """The semantic worker raised or exited without a result."""
+
+
+def _worker(fn, conn) -> None:
+    try:
+        conn.send(("ok", fn()))
+    except BaseException as exc:  # reported to the parent as a failure; the worker never raises into the caller
+        try:
+            conn.send(("error", f"{type(exc).__name__}: {exc}"))
+        except Exception:
+            pass
+    finally:
+        conn.close()
+
+
+def _run_with_deadline(fn, seconds: float):
+    """Run ``fn`` in a forked worker and return its (picklable) result, or raise ``DeadlineExceeded`` after terminating the worker.
+
+    The parent holds no state the worker could corrupt and the worker is killed on timeout, which an in-process call cannot guarantee.
+    Memory and CPU containment beyond the deadline is a process-level matter (see docs/recipient-validation.md).
+    """
+    context = multiprocessing.get_context("fork")
+    parent, child = context.Pipe(duplex=False)
+    process = context.Process(target=_worker, args=(fn, child), daemon=True)
+    process.start()
+    child.close()
+    try:
+        if not parent.poll(seconds):
+            raise DeadlineExceeded(f"semantic validation exceeded {seconds} seconds")
+        try:
+            kind, payload = parent.recv()
+        except EOFError as exc:
+            raise WorkerFailed("semantic worker exited without a result") from exc
+    finally:
+        if process.is_alive():
+            process.kill()
+        process.join(5)
+        parent.close()
+    if kind != "ok":
+        raise WorkerFailed(payload)
+    return payload
+
+
+def _budget_result(exc: BudgetExceeded, which: str) -> dict[str, Any]:
+    reason = f"{which} {BUDGET_EXCEEDED}: {exc}"
+    return {"schema_validity": _result("not_evaluated", [reason], {"reason_code": BUDGET_EXCEEDED, "input": which, "dimension": exc.dimension}),
+            "recipient_reliance_decision": _result("fail", [reason], {"reason_code": BUDGET_EXCEEDED, "input": which, "dimension": exc.dimension})}
 
 
 def _result(status: str, reasons: list[str] | None = None, evidence: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -353,6 +414,15 @@ def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
     profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
     if profile.get("implementation_profile") != PROFILE_V2_ID:
         return _result("not_applicable", ["historical profile validation unchanged"])
+    try:
+        return _run_with_deadline(lambda: _replay_semantic_check(package), SEMANTIC_DEADLINE_SECONDS)
+    except DeadlineExceeded as exc:
+        return _result("fail", [f"Replay semantic validation did not finish: {exc}"], {"reason_code": BUDGET_EXCEEDED, "dimension": "semantic_deadline"})
+    except (WorkerFailed, ValueError, OSError) as exc:
+        return _result("fail", [f"Replay semantic validation worker failed: {exc}"])
+
+
+def _replay_semantic_check(package: dict[str, Any]) -> dict[str, Any]:
     from .exporter import ReplayDependencyError, ReplayRevisionUnsupportedError, export_cognous_stack_package
     try:
         sources = package["provenance"]["retained_sources"]
@@ -379,6 +449,12 @@ def _evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any])
     if not isinstance(package, dict) or not isinstance(policy, dict):
         reason = "package and recipient policy must be JSON objects"
         return {"schema_validity": _result("not_evaluated", [reason]), "recipient_reliance_decision": _result("fail", [reason])}
+    # Budgets come before any copy or traversal.
+    for which, value in (("package", package), ("policy", policy)):
+        try:
+            check_budget(value)
+        except BudgetExceeded as exc:
+            return _budget_result(exc, which)
     package = deepcopy(package)
     policy = deepcopy(policy)
     if package.get("package_type") != PACKAGE_TYPE:
