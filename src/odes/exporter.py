@@ -41,6 +41,25 @@ class ExportError(ValueError):
     """Raised when retained producer records cannot support a bounded ODES export."""
 
 
+class ReplayDependencyError(ExportError):
+    """The Replay check cannot run because its dependency is absent or its installed revision cannot be determined (unavailable)."""
+
+
+class ReplayRevisionUnsupportedError(ExportError):
+    """An installed Replay lacks what the check needs, or is not an accepted revision (unsupported)."""
+
+
+def _replay_import_failure(exc: ImportError) -> ExportError:
+    """Classify an import failure of the Replay distribution. Only the absent distribution is a dependency gap; a module or name
+    the installed revision does not provide is unsupported; any other import failure is an operational error and stays a failure."""
+    name = getattr(exc, "name", None) or ""
+    if isinstance(exc, ModuleNotFoundError) and name == "agent_replay_bundle":
+        return ReplayDependencyError("pinned Replay validator is unavailable; install cogno-us/cognous-agent-replay-bundle at the pinned revision")
+    if name.startswith("agent_replay_bundle"):
+        return ReplayRevisionUnsupportedError(f"installed Replay does not provide {name!r}; install an accepted Replay revision")
+    return ExportError(f"pinned Replay validator could not be imported ({type(exc).__name__}: {exc})")
+
+
 def _obj(value: Any, path: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ExportError(f"{path} must be an object")
@@ -160,7 +179,10 @@ def _extract_replay_inputs(bundle: dict[str, Any]) -> tuple[dict[str, Any], dict
         "reconciliations": [_data(r) for r in grouped.get("reconciliation", [])],
     }
     if (bundle.get("metadata") or {}).get("control_plane_revision") in {REFUSAL_REVISIONS["control_plane"], *SECURITY_RUNTIME_CP_REVISIONS}:
-        from agent_replay_bundle.refusal_evidence import extend_retained_inputs
+        try:
+            from agent_replay_bundle.refusal_evidence import extend_retained_inputs
+        except ImportError as exc:
+            raise _replay_import_failure(exc) from exc
         cp = extend_retained_inputs(cp, bundle)
     proposal = proposals[0] if proposals else None
     has_execution = any(
@@ -278,10 +300,10 @@ def _require_installed_replay(control_plane_revision: str) -> None:
     if installed is None:
         if os.environ.get("ODES_ALLOW_UNVERIFIED_REPLAY") == "1":
             return
-        raise ExportError("the installed Replay revision cannot be determined; install cogno-us/cognous-agent-replay-bundle from a pinned commit "
+        raise ReplayDependencyError("the installed Replay revision cannot be determined; install cogno-us/cognous-agent-replay-bundle from a pinned commit "
                           "(or set ODES_ALLOW_UNVERIFIED_REPLAY=1 for a local development install)")
     if installed not in all_accepted_replay_revisions():
-        raise ExportError(f"installed Replay revision {installed} is not an accepted Replay revision (declared Control Plane {control_plane_revision})")
+        raise ReplayRevisionUnsupportedError(f"installed Replay revision {installed} is not an accepted Replay revision (declared Control Plane {control_plane_revision})")
 
 
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
@@ -290,8 +312,10 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
     try:
         from agent_replay_bundle.importers import ImportContractError as ReplayImportContractError
         from agent_replay_bundle.importers import import_bounded_workflow
-    except Exception as exc:  # pragma: no cover - exercised in environments without the pinned validator
-        raise ExportError("pinned Replay validator is unavailable; install cogno-us/cognous-agent-replay-bundle at the pinned revision") from exc
+    except ImportError as exc:
+        raise _replay_import_failure(exc) from exc
+    except Exception as exc:
+        raise ExportError(f"pinned Replay validator could not be loaded ({type(exc).__name__})") from exc
     try:
         revision = (bundle.get("metadata") or {}).get("control_plane_revision", PINNED_REVISIONS["control_plane"])
         if revision not in {PINNED_REVISIONS["control_plane"], *ALL_V2_CONTROL_PLANE_REVISIONS}:
