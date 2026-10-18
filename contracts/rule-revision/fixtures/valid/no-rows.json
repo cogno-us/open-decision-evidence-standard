@@ -1,0 +1,23 @@
+{
+  "fixture_id": "no-rows",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Hand-built: the profile document of a run that wrote no revision rows, refusals, identity rows or reports (all lists present and empty).",
+  "provenance": {
+    "source": "hand-built",
+    "control_plane_commit": "83b49b5"
+  },
+  "document": {
+    "contract": "rule-revision",
+    "contract_version": "0.1.0-draft",
+    "profile": "rule-revision/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "rule_revisions": [],
+    "rule_revision_refusals": [],
+    "identity_rows": [],
+    "trend_reports": [],
+    "arity_reports": [],
+    "recomputability_reports": []
+  }
+}

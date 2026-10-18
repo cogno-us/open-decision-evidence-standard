@@ -1,0 +1,682 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/rule-revision/schema.json",
+  "title": "Rule revision extension profile 0.1.0-draft",
+  "description": "Optional extension profile layered on the control-plane-journal contract: append-only, independently signed rule revision rows, refused revision attempts, the rule_identity carried by decision and refusal rows, and the derived trend, arity and recomputability reports of the Control Plane rule-revision/0.1 profile. Closed member sets; x- extensions on declared extensible objects (not on a verbatim producer report). Cross-record and cross-document rules are in validate.py and README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "profile",
+    "run_id",
+    "rule_revisions",
+    "rule_revision_refusals",
+    "identity_rows",
+    "trend_reports",
+    "arity_reports",
+    "recomputability_reports"
+  ],
+  "properties": {
+    "contract": {
+      "const": "rule-revision"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "profile": {
+      "const": "rule-revision/0.1"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rule_revisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule_revision"
+      }
+    },
+    "rule_revision_refusals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule_revision_refusal"
+      }
+    },
+    "identity_rows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identity_row"
+      }
+    },
+    "trend_reports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/trend_report"
+      }
+    },
+    "arity_reports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/arity_report"
+      }
+    },
+    "recomputability_reports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/recomputability_report"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "rule_revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision_id",
+        "rule_kind",
+        "rule_ref",
+        "from_digest",
+        "to_digest",
+        "reviser",
+        "signer",
+        "authority_ref",
+        "reason",
+        "supersedes",
+        "recorded_at"
+      ],
+      "properties": {
+        "revision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_kind": {
+          "enum": [
+            "reason_registry",
+            "policy",
+            "gate_implementation",
+            "merge_equivalence_rule"
+          ]
+        },
+        "rule_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "from_digest": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "to_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "reviser": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signer": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "authority_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supersedes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "recorded_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "declared_arity": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "rule_revision_refusal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "refusal_id",
+        "revision",
+        "reasons",
+        "recorded_at"
+      ],
+      "properties": {
+        "refusal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "$ref": "#/$defs/rule_revision"
+        },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "self_signed_revision_row",
+              "signer_not_configured",
+              "rule_revision_duplicate",
+              "rule_revision_supersedes_unknown",
+              "rule_revision_from_digest_mismatch"
+            ]
+          }
+        },
+        "recorded_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "rule_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest",
+        "state",
+        "verified_through",
+        "findings"
+      ],
+      "properties": {
+        "digest": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "adopted",
+            "unknown"
+          ]
+        },
+        "verified_through": {
+          "enum": [
+            "none",
+            "revision_row_present",
+            "signer_independent_and_configured",
+            "digest_matches_signed_revision"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "no_signed_revision",
+              "unsigned_revision_row",
+              "self_signed_revision_row",
+              "signer_not_configured",
+              "digest_mismatch_with_adopted",
+              "observed_digest_absent"
+            ]
+          }
+        }
+      }
+    },
+    "rule_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rules",
+        "unknown"
+      ],
+      "properties": {
+        "rules": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/rule_state"
+          }
+        },
+        "unknown": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "identity_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "row_type",
+        "row_id",
+        "recorded_at",
+        "rule_identity"
+      ],
+      "properties": {
+        "row_type": {
+          "enum": [
+            "decision",
+            "refusal"
+          ]
+        },
+        "row_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recorded_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_identity": {
+          "$ref": "#/$defs/rule_identity"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "series_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "code",
+        "count",
+        "share",
+        "previous_count",
+        "disappeared"
+      ],
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "share": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "previous_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "disappeared": {
+          "type": "boolean"
+        },
+        "tainted_for_trend": {
+          "type": "boolean"
+        },
+        "taint_reasons": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "pre_split_count",
+              "row_predates_adoption"
+            ]
+          }
+        }
+      }
+    },
+    "flagged_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "set",
+        "index",
+        "version",
+        "row_time",
+        "adoption_time"
+      ],
+      "properties": {
+        "set": {
+          "enum": [
+            "previous",
+            "current"
+          ]
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "row_time": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adoption_time": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "trend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_refusals",
+        "previous_total_refusals",
+        "current_exposure",
+        "previous_exposure",
+        "unversioned_rows",
+        "series",
+        "interpretation"
+      ],
+      "properties": {
+        "total_refusals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "previous_total_refusals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "current_exposure": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "previous_exposure": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unversioned_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/series_entry"
+          }
+        },
+        "interpretation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rows_predating_adoption": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/flagged_row"
+          }
+        },
+        "flagged_row_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "trend_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_id",
+        "report"
+      ],
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "report": {
+          "$ref": "#/$defs/trend"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "arity_flag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "flag",
+        "measured",
+        "as_of"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "flag": {
+          "enum": [
+            "measured_exceeds_declared",
+            "arity_undeclared"
+          ]
+        },
+        "measured": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "declared": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "measured_arity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "as_of",
+        "period_seconds",
+        "codes"
+      ],
+      "properties": {
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "period_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "codes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "measured",
+              "shapes"
+            ],
+            "properties": {
+              "measured": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shapes": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "arity_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_id",
+        "declared",
+        "declared_from",
+        "measured",
+        "flags"
+      ],
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "declared": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "declared_from": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "measured": {
+          "$ref": "#/$defs/measured_arity"
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/arity_flag"
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "recomputability_flag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "row",
+        "code",
+        "declared",
+        "derived",
+        "flag"
+      ],
+      "properties": {
+        "row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "declared": {
+          "enum": [
+            "recomputable",
+            "typed_only"
+          ]
+        },
+        "derived": {
+          "enum": [
+            "recomputable",
+            "typed_only"
+          ]
+        },
+        "flag": {
+          "enum": [
+            "declared_overclaim",
+            "declared_underclaim"
+          ]
+        }
+      }
+    },
+    "recomputability_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_id",
+        "rows_from",
+        "declared_kinds",
+        "flags"
+      ],
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rows_from": {
+          "enum": [
+            "decisions",
+            "refusals"
+          ]
+        },
+        "declared_kinds": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": [
+              "recomputable",
+              "typed_only"
+            ]
+          }
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/recomputability_flag"
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}
