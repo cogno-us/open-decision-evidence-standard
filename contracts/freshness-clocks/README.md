@@ -135,6 +135,7 @@ Document rules need only the document. Cross-document rules need the optional ru
 | `nonce_reason_mismatch` | `status_nonce_mismatch` is a reason of a decision, refusal or resolution check if and only if an input ended in `nonce_mismatch` |
 | `nonce_reused_across_checks` | a nonce belongs to one check |
 | `not_append_only` | successive exports describe one run and the six row lists only grow (`check_succession`) |
+| `context_malformed` | an optional context argument (run record, host configuration or signer set) whose shape does not let the cross-document rules run: refused with this typed violation instead of raising (decision 39-L) |
 | `overdue_before_deadline` | an `overdue` event is written after the check's deadline |
 | `overdue_repeated` | a check is reported overdue once |
 | `overdue_without_deadline` | a check opened without a deadline is open but never overdue |

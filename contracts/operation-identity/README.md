@@ -81,6 +81,8 @@ Journal context (J; the run record is not re-validated here, only the members re
 - Shared ids, once the ledger is non-empty: every attempt has its join (`attempt_without_join`); every resolution check carries the id of a journal check of the same stage (`resolution_check_not_in_journal`); every refusal carries `check_id` (`refusal_check_id_missing`) naming an effect-stage resolution check (`refusal_check_missing`) whose journal check names the refusal's effect and decision (`refusal_check_lineage`). A refusal row that carries `check_id` is checked whether or not the ledger is non-empty.
 - One effect per operation: two different effect ids both `acknowledged` or `partial` for one operation is `operation_committed_twice` (the destination dedupe failed). A last attempt row `failed` with error `operation_already_committed` needs another effect of the same operation that was `acknowledged`, `partial` or `unknown` (`rejection_without_committed_peer`).
 
+Optional context (decision 39-L): a run record whose shape does not let the cross-document rules run is refused with the typed violation `context_malformed` instead of raising.
+
 Succession (two exports of one run, `check_succession`, code `not_append_only`): every ledger list of the earlier export is a prefix of the same list in the later one.
 
 ## Destination capability
