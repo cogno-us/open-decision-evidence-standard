@@ -30,6 +30,7 @@ from .common import (
     sha256,
 )
 from .canonicalization import SUPPORTED_CANONICALIZATION_PROFILES, digest_for
+from .evidence_inventory import evaluate_native_evidence_inventory
 from .schema_validation import schema_errors
 
 
@@ -405,6 +406,9 @@ def _evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any])
         "authority_status_and_freshness": _evaluate_authority_and_freshness(record, status_inputs, policy.get("now"), policy),
         "consumption_conditions": _evaluate_consumption(record, policy.get("relying_party"), policy.get("purpose"), policy),
     }
+    provenance_members = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
+    if "native_evidence_inventory" in provenance_members or "native_evidence" in policy:
+        layers["native_evidence_inventory"] = evaluate_native_evidence_inventory(provenance_members.get("native_evidence_inventory"), policy)
     if not profile_consistent:
         layers["declared_profile_conformance"] = _result("fail", ["explicit matching package and record profile declarations required"])
     failed = [name for name, layer in layers.items() if layer["status"] not in {"pass"}]
