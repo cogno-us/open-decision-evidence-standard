@@ -104,3 +104,9 @@ A passing run shows the document's structure and these rules. It does not show t
 14. No `deny`, no `safe_to_retry`, no core or `pder-v0.1` change, no edit of any existing contract; the profile is not wired into any code path.
 
 Source of the design: the owner's programme brief of 2026-10-17 (items C1 and C3 of the 101726_B consolidation as summarised to the worker). The addendum text itself was not available to the worker, so its exact wording is not quoted here.
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `non-ascii-digit-time`, `seconds-bound-out-of-range-deferral`, `trailing-line-break-digest`, `trailing-line-break-time`, `unpaired-surrogate-text`.

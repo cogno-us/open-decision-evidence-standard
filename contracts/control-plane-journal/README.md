@@ -159,3 +159,9 @@ The 13 questions are answered in `docs/engineering/ODES-INTERCOMPONENT-CONTRACTS
 - Authority Context, grant, approval and validation-record inputs are carried only as the minimized `resolution_input` rows; their own contracts are separate boundaries.
 - The destination `apply` acknowledgement is stored unvalidated by the producer and is opaque here.
 - Behaviour outside the record (locking, file system support, write-ahead failure refusing dispatch) is not a record rule.
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `non-ascii-digit-time`, `trailing-line-break-digest`, `trailing-line-break-time`, `unpaired-surrogate-text`.

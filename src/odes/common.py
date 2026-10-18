@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -95,9 +97,30 @@ def sha256(value: Any) -> str:
     return "sha256:" + hashlib.sha256(canonical_bytes(value)).hexdigest()
 
 
+def _refuse_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    seen: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in seen:
+            raise ValueError("duplicate member name in JSON object")
+        seen[key] = value
+    return seen
+
+
+def _refuse_constant(name: str) -> Any:
+    raise ValueError(f"non-finite number {name} is not JSON")
+
+
+def _parse_float(text: str) -> float:
+    number = float(text)
+    if not math.isfinite(number):
+        raise ValueError("number outside the finite range")
+    return number
+
+
 def load_json(path: str | Path) -> Any:
+    """Strict JSON: UTF-8 only, no duplicate members, no NaN or Infinity (including by overflow)."""
     with Path(path).open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+        return json.load(handle, object_pairs_hook=_refuse_duplicates, parse_constant=_refuse_constant, parse_float=_parse_float)
 
 
 def dump_json(value: Any, path: str | Path) -> None:
@@ -111,8 +134,13 @@ def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+_TIME_SHAPE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})?")
+
+
 def parse_time(value: str | None) -> datetime | None:
     if not value:
         return None
+    if _TIME_SHAPE.fullmatch(value) is None:
+        raise ValueError("not an ISO-8601 time with ASCII digits")
     text = value.replace("Z", "+00:00")
     return datetime.fromisoformat(text)

@@ -10,7 +10,7 @@
     "extensions": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*(?!\\n)$"
       }
     },
     "ledger_entry": {
@@ -27,7 +27,7 @@
         },
         "head": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
@@ -64,7 +64,7 @@
             },
             {
               "type": "string",
-              "pattern": "^sha256:[0-9a-f]{64}$"
+              "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
             }
           ]
         },
@@ -76,7 +76,7 @@
         },
         "digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "extensions": {
           "$ref": "#/$defs/extensions"

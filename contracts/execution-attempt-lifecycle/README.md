@@ -116,3 +116,9 @@ While the version is `0.x-draft` nothing is frozen and any change may break. The
 - `execution_result.observation` is opaque here. It belongs to the bounded-workflow observation contract.
 - No rule constrains an `observed` result's terminal event beyond what the producers do today.
 - Behaviour such as the Control Plane `close_uncertain_attempts` closeouts is outside this spike.
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `trailing-line-break-digest`, `unpaired-surrogate-text`.

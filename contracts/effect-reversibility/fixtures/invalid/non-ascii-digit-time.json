@@ -1,0 +1,94 @@
+{
+  "fixture_id": "non-ascii-digit-time",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A time written with non-ASCII digits is not an ISO-8601 time; only [0-9] digits are accepted.",
+  "expected_refusal": "timestamp_invalid",
+  "document": {
+    "contract": "effect-reversibility",
+    "contract_version": "0.1.0-draft",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "class_profiles": [
+      {
+        "class_id": "cls-stage",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stageable",
+        "x-reversibility": {
+          "reversibility": "reversible_until",
+          "reversible_until": "\u0662026-10-06T19:00:00+00:00",
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-stall",
+        "irreversible": false,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "stallable",
+        "x-reversibility": {
+          "reversibility": "reversible_at_cost",
+          "reversible_until": null,
+          "reversal_cost": {
+            "description": "Cancelling after release costs a fee."
+          },
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-block",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-read",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": true,
+          "counterparty_observable": true
+        }
+      },
+      {
+        "class_id": "cls-unobs",
+        "irreversible": true,
+        "max_status_age_seconds": 60,
+        "x-effect-class": "blocking",
+        "x-reversibility": {
+          "reversibility": "irreversible",
+          "reversible_until": null,
+          "reversal_cost": null,
+          "reads_protected_data": false,
+          "counterparty_observable": false
+        }
+      }
+    ],
+    "dispatches": [
+      {
+        "dispatch_id": "d-1",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "proposal_commitment": "sha256:133c4baa21d85e41ae7f75af45a96810aa1a175ee3e693913585568630aea96b",
+        "class_id": "cls-block",
+        "effect_class": "blocking",
+        "phase": "send",
+        "dispatched_at": "2026-10-05T19:00:10+00:00",
+        "open_deferral_ids": []
+      }
+    ]
+  }
+}

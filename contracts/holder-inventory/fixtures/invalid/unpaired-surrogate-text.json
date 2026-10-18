@@ -1,0 +1,26 @@
+{
+  "fixture_id": "unpaired-surrogate-text",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A text member holding an unpaired surrogate code point is refused as a typed violation, never evaluated.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of fixture enumerates-no-holder",
+    "control_plane_revision": "128eaa5e",
+    "scenario": "holder-inventory-empty-held"
+  },
+  "context": {
+    "class_requires_revocation_assurance": true,
+    "result": "hold",
+    "reasons": [
+      "holder_inventory_missing"
+    ]
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1\ud800",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00+00:00",
+    "holders": []
+  }
+}

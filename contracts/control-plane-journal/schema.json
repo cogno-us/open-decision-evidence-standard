@@ -80,7 +80,7 @@
     "input_time_floors": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^sha256:[0-9a-f]{64}$"
+        "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
       },
       "additionalProperties": {
         "type": "string"
@@ -163,7 +163,7 @@
     "extensions": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*(?!\\n)$"
       }
     },
     "resolution_input": {
@@ -215,7 +215,7 @@
             "string",
             "null"
           ],
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "missing": {
           "type": "boolean"
@@ -414,7 +414,7 @@
         },
         "proposal_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "decision_id": {
           "type": [
@@ -497,7 +497,7 @@
         },
         "proposal_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "not_before": {
           "type": [
@@ -535,15 +535,15 @@
         },
         "approval_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "required_inputs_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "catalogue_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "expected_effective_grant_digest": {
           "type": [
@@ -608,7 +608,7 @@
         },
         "proposal_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "manifest_id": {
           "type": "string",
@@ -620,7 +620,7 @@
         },
         "manifest_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "actor": {
           "type": "string",
@@ -644,7 +644,7 @@
         },
         "payload_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "requested_permissions": {
           "type": "array",
@@ -680,7 +680,7 @@
         },
         "requirement_commitment": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "grant_id": {
           "type": "string",
@@ -716,7 +716,7 @@
         },
         "role_mapping_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "effective_max_effects": {
           "type": "integer"
@@ -757,7 +757,7 @@
         },
         "effect_id": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "result": {
           "enum": [
@@ -898,7 +898,7 @@
         },
         "effect_id": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "recorded_at": {
           "type": "string"

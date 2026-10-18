@@ -84,12 +84,12 @@
     "extensions": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*(?!\\n)$"
       }
     },
     "sha256": {
       "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
+      "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
     },
     "fraction": {
       "type": "object",
@@ -235,7 +235,7 @@
         },
         "digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "size_bytes": {
           "type": "integer",
@@ -270,7 +270,7 @@
         },
         "inputs_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "pinned": {
           "type": "object",
@@ -294,7 +294,7 @@
             },
             "reason_registry_digest": {
               "type": "string",
-              "pattern": "^sha256:[0-9a-f]{64}$"
+              "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
             },
             "extensions": {
               "$ref": "#/$defs/extensions"
@@ -377,7 +377,7 @@
       "properties": {
         "code": {
           "type": "string",
-          "pattern": "^[a-z][a-z0-9_]*$"
+          "pattern": "^[a-z][a-z0-9_]*(?!\\n)$"
         },
         "locator": {
           "type": "string",
@@ -406,7 +406,7 @@
       "properties": {
         "check_id": {
           "type": "string",
-          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          "pattern": "^[a-z0-9][a-z0-9._-]*(?!\\n)$"
         },
         "tier": {
           "enum": [
@@ -782,7 +782,7 @@
         },
         "corpus_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "categories": {
           "type": "array",
@@ -913,7 +913,7 @@
         },
         "corpus_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "rows": {
           "type": "array",
@@ -960,7 +960,7 @@
         },
         "operator_set_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "seed": {
           "type": "integer"

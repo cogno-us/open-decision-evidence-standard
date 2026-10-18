@@ -110,3 +110,9 @@ A passing run shows structure and these rules. It does not show that a producer 
 16. No `deny`, no `safe_to_retry`, no core change, no edit of any existing contract; the profile is not wired into any code path.
 
 Source of the design: the owner's programme brief of 2026-10-17 (the KAIROS-paper effect classes and the L4 item of 101726_B as summarised to the worker). The addendum and paper text were not available to the worker, so their exact wording is not quoted.
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `non-ascii-digit-time`, `seconds-bound-out-of-range-class`, `trailing-line-break-digest`, `trailing-line-break-time`, `unpaired-surrogate-text`.

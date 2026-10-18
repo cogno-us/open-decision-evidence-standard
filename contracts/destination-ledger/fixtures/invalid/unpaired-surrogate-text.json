@@ -1,0 +1,31 @@
+{
+  "fixture_id": "unpaired-surrogate-text",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A text member holding an unpaired surrogate code point is refused as a typed violation, never evaluated.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of fixture control-plane-acp-run-applied",
+    "control_plane_commit": "128eaa5",
+    "scenario": "acp-run-authorized"
+  },
+  "document": {
+    "effects": {
+      "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829": {
+        "amount": 50.0,
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "grant_id": "urn:cognous:grant:routine-1\ud800",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

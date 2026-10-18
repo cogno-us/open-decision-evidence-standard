@@ -104,16 +104,16 @@
     "extensions": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*(?!\\n)$"
       }
     },
     "timestamp": {
       "type": "string",
-      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})(?!\\n)$"
     },
     "digest": {
       "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
+      "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
     },
     "text": {
       "type": "string",
@@ -121,7 +121,7 @@
     },
     "message_id": {
       "type": "string",
-      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+      "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,127}(?!\\n)$"
     },
     "authority_ref": {
       "type": "object",
@@ -493,21 +493,21 @@
             "string",
             "null"
           ],
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "odes_package_digest": {
           "type": [
             "string",
             "null"
           ],
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "odes_validation_digest": {
           "type": [
             "string",
             "null"
           ],
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "successor_packet_id": {
           "type": [
@@ -520,7 +520,7 @@
             "string",
             "null"
           ],
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "extensions": {
           "$ref": "#/$defs/extensions"
@@ -963,7 +963,7 @@
             "string",
             "null"
           ],
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "effect_reexecution": {
           "type": "boolean"
@@ -1098,7 +1098,7 @@
         },
         "state_version": {
           "type": "string",
-          "pattern": "^state-[0-9]+$"
+          "pattern": "^state-[0-9]+(?!\\n)$"
         },
         "relevant_decisions": {
           "type": "array",
@@ -1456,7 +1456,7 @@
             "string",
             "null"
           ],
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
         },
         "outbox_state": {
           "enum": [

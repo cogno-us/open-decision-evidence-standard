@@ -80,22 +80,22 @@
     "extensions": {
       "type": "object",
       "propertyNames": {
-        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*(?!\\n)$"
       }
     },
     "digest": {
       "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
+      "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
     },
     "token": {
       "type": "string",
       "minLength": 1,
       "maxLength": 256,
-      "pattern": "^[!-~]+$"
+      "pattern": "^[!-~]+(?!\\n)$"
     },
     "timestamp": {
       "type": "string",
-      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})?$"
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})?(?!\\n)$"
     },
     "relation_type": {
       "enum": [
@@ -135,49 +135,49 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "algorithm": {
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "attestation_id": {
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "issuer": {
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "key_id": {
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "subject": {
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "statement_type": {
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "audience": {
           "type": "string",
           "minLength": 1,
           "maxLength": 256,
-          "pattern": "^[!-~]+$"
+          "pattern": "^[!-~]+(?!\\n)$"
         },
         "content_digest": {
           "$ref": "#/$defs/digest"
@@ -525,11 +525,11 @@
         },
         "contract_address": {
           "type": "string",
-          "pattern": "^0x[0-9a-f]{40}$"
+          "pattern": "^0x[0-9a-f]{40}(?!\\n)$"
         },
         "claim_id": {
           "type": "string",
-          "pattern": "^0x[0-9a-f]{64}$"
+          "pattern": "^0x[0-9a-f]{64}(?!\\n)$"
         },
         "relation": {
           "enum": [

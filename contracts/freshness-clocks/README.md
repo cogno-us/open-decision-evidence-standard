@@ -246,3 +246,9 @@ Run by `provenance/journal_divergence.py` over the 19 raw captures (the run reco
 
 - Producer, Control Plane `3f6a7668`: all captured real runs pass every rule alone, with their run record and with host configuration. Gaps: the raw run record is refused by the journal contract (see Journal divergence); the sidecar is produced by projection, not by the Control Plane. The deadline gate narrows the check-to-commit window and does not close it.
 - Consumer: none. No consumer reads the sidecar. The Evidence Pack would need: check events with `overdue` and `expired`, the members `deadline` and `recorded_at`, `recovery_runs`, refusal rows with `check_expired_before_dispatch` and `deadline`, and a `freshness` block next to the refusal counts (derivable from `freshness_counts` here).
+
+## Input hardening (decision 32, 2026-10-18)
+
+The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
+
+Invalid fixtures added: `non-ascii-digit-time`, `trailing-line-break-time`, `unpaired-surrogate-text`.
