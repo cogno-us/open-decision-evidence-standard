@@ -6,7 +6,7 @@
   "reason": "`age_basis` is nonce_bound or source_asserted.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-nonce-bound-reads",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

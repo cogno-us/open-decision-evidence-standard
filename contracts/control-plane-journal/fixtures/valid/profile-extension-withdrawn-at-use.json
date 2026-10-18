@@ -2,13 +2,12 @@
   "fixture_id": "profile-extension-withdrawn-at-use",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: a signer withdrawn from the configured set after an extension was used; the next decision holds. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: a signer withdrawn from the configured set after an extension was used; the next decision holds. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "freshness-clocks",
-    "scenario": "extension-withdrawn-at-use",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "scenario": "extension-withdrawn-at-use"
   },
   "document": {
     "contract": "control-plane-journal",

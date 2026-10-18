@@ -2,13 +2,12 @@
   "fixture_id": "profile-lease-unavailable-holds",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: the per-check lease cannot be taken: a hold for check_lease_unavailable alone, with no journal and no vocabulary version. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: the per-check lease cannot be taken: a hold for check_lease_unavailable alone, with no journal and no vocabulary version. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "freshness-clocks",
-    "scenario": "lease-unavailable-holds",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "scenario": "lease-unavailable-holds"
   },
   "document": {
     "contract": "control-plane-journal",

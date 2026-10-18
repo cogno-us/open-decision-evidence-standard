@@ -2,10 +2,10 @@
   "fixture_id": "profile-op-duplicate-submission-reconciled-existing",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). operation-identity/0.1: a duplicate submission of one operation reconciles to the existing effect. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). operation-identity/0.1: a duplicate submission of one operation reconciles to the existing effect. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "operation-identity",
     "scenario": "op-duplicate-submission-reconciled-existing"
   },

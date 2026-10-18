@@ -6,7 +6,7 @@
   "reason": "`operation_id` on the runtime-authority block is a non-empty string.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-op-normal",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

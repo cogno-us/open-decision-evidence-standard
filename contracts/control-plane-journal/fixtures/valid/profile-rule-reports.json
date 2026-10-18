@@ -2,10 +2,10 @@
   "fixture_id": "profile-rule-reports",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). rule-revision/0.1: revision rows next to decisions that the trend, arity and recomputability reports are computed over. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). rule-revision/0.1: revision rows next to decisions that the trend, arity and recomputability reports are computed over. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "rule-revision",
     "scenario": "rule-reports"
   },
@@ -517,7 +517,7 @@
         "rule_identity": {
           "rules": {
             "runtime-authority-reasons/0.1": {
-              "digest": "sha256:6d1f806b1c38040146f7a92b83934631293b9fb79a2b626e2c339608ab0c498b",
+              "digest": "sha256:a4b825b83d7b227d354819d143c5448c4bd5c80e2405c21742c67cdc79c88bad",
               "state": "unknown",
               "verified_through": "none",
               "findings": [
@@ -711,7 +711,7 @@
         "rule_identity": {
           "rules": {
             "runtime-authority-reasons/0.1": {
-              "digest": "sha256:6d1f806b1c38040146f7a92b83934631293b9fb79a2b626e2c339608ab0c498b",
+              "digest": "sha256:a4b825b83d7b227d354819d143c5448c4bd5c80e2405c21742c67cdc79c88bad",
               "state": "unknown",
               "verified_through": "none",
               "findings": [
@@ -913,7 +913,7 @@
         "rule_identity": {
           "rules": {
             "runtime-authority-reasons/0.1": {
-              "digest": "sha256:6d1f806b1c38040146f7a92b83934631293b9fb79a2b626e2c339608ab0c498b",
+              "digest": "sha256:a4b825b83d7b227d354819d143c5448c4bd5c80e2405c21742c67cdc79c88bad",
               "state": "adopted",
               "verified_through": "digest_matches_signed_revision",
               "findings": []
@@ -2394,7 +2394,7 @@
         "rule_kind": "reason_registry",
         "rule_ref": "runtime-authority-reasons/0.1",
         "from_digest": null,
-        "to_digest": "sha256:6d1f806b1c38040146f7a92b83934631293b9fb79a2b626e2c339608ab0c498b",
+        "to_digest": "sha256:a4b825b83d7b227d354819d143c5448c4bd5c80e2405c21742c67cdc79c88bad",
         "reviser": "synthetic-principal:reviser",
         "signer": "synthetic-principal:signer",
         "authority_ref": "synthetic-authority:1",

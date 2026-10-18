@@ -2,10 +2,10 @@
   "fixture_id": "profile-rule-refused-revision-attempts-kept",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). rule-revision/0.1: refused revision attempts are kept as rule_revision_refusals rows. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). rule-revision/0.1: refused revision attempts are kept as rule_revision_refusals rows. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "rule-revision",
     "scenario": "rule-refused-revision-attempts-kept"
   },

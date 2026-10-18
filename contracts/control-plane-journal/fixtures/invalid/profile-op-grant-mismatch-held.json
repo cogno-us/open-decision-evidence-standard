@@ -4,13 +4,12 @@
   "expected_outcome": "reject",
   "expected_refusal": "decision_operation_binding_mismatch",
   "refused_by": "operation-identity",
-  "reason": "Derived tamper of a real producer run, not a producer record as written (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). The capture script rebinds the throwaway store's operation ledger row to another grant after the authorized decision, so the producer then holds the next decision with operation_grant_mismatch; the ledger row no longer matches the authorized decision's grant. The control-plane-journal validator does not read the operations rows (opaque here) and accepts the record; the operation-identity validator refuses it with decision_operation_binding_mismatch (sidecar fixture decision-operation-binding-mismatch), as the verifier does. No unaltered capture of this scenario exists: the alteration is part of the capture. Ids, nonces and the process owner are synthetic.",
+  "reason": "Derived tamper of a real producer run, not a producer record as written (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). The capture script rebinds the throwaway store's operation ledger row to another grant after the authorized decision, so the producer then holds the next decision with operation_grant_mismatch; the ledger row no longer matches the authorized decision's grant. The control-plane-journal validator does not read the operations rows (opaque here) and accepts the record; the operation-identity validator refuses it with decision_operation_binding_mismatch (sidecar fixture decision-operation-binding-mismatch), as the verifier does. No unaltered capture of this scenario exists: the alteration is part of the capture. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture with the ledger row altered",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "operation-identity",
-    "scenario": "op-grant-mismatch-held",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "scenario": "op-grant-mismatch-held"
   },
   "document": {
     "contract": "control-plane-journal",

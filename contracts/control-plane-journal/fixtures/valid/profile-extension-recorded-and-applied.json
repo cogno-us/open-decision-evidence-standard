@@ -2,10 +2,10 @@
   "fixture_id": "profile-extension-recorded-and-applied",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1 with rule-revision/0.1: a signed age extension recorded and applied; the check opens with age_bound_seconds and extension_id. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1 with rule-revision/0.1: a signed age extension recorded and applied; the check opens with age_bound_seconds and extension_id. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "freshness-clocks",
     "scenario": "extension-recorded-and-applied"
   },

@@ -6,7 +6,7 @@
   "reason": "`age_bound_seconds` on a journal event is an integer.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-extension-recorded-and-applied",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

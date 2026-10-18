@@ -1,6 +1,6 @@
 """Differential: the Control Plane's own run-record model against this contract's verdict on every profile fixture.
 
-Not a test and not vendored. Run from a checkout of cogno-us/cognous-control-plane at 128eaa5e with its dev dependencies installed:
+Not a test and not vendored. Run from a checkout of cogno-us/cognous-control-plane at 3755c71a with its dev dependencies installed:
 
     PYTHONPATH=src python differential_control_plane.py <contracts/control-plane-journal dir>
 

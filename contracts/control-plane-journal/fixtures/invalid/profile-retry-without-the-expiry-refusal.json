@@ -6,8 +6,7 @@
   "reason": "The retry is allowed only because the first attempt failed with check_expired_before_dispatch AND a refusal of the same effect carries that reason and the profile's deadline. Remove the deadline and the failed attempt is no longer excused: two lifecycles start for one effect.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-expired-then-retry-dispatches",
-    "control_plane_commit": "128eaa5e",
-    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

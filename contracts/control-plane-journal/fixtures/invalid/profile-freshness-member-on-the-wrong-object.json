@@ -6,7 +6,7 @@
   "reason": "`deadline` is declared on refusals and journal events only; a decision carrying it is refused (the optional members are declared per object, not as a free-for-all).",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-clocks-follow-the-service-clock",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "3755c71a"
   },
   "document": {
     "contract": "control-plane-journal",

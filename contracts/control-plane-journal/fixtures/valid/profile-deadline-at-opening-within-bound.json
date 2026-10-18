@@ -2,10 +2,10 @@
   "fixture_id": "profile-deadline-at-opening-within-bound",
   "synthetic": true,
   "expected_outcome": "accept",
-  "reason": "Real producer run, unchanged (Control Plane 128eaa5e, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: the check opens with a deadline; a 59 s stall before dispatch is inside the bound. Ids, nonces and the process owner are synthetic.",
+  "reason": "Real producer run, unchanged (Control Plane 3755c71a, opt-in profiles, synthetic proposals, throwaway store). freshness/0.1: the check opens with a deadline; a 59 s stall before dispatch is inside the bound. Ids, nonces and the process owner are synthetic.",
   "provenance": {
     "source": "control-plane-capture",
-    "control_plane_commit": "128eaa5e",
+    "control_plane_commit": "3755c71a",
     "capture": "freshness-clocks",
     "scenario": "deadline-at-opening-within-bound"
   },
