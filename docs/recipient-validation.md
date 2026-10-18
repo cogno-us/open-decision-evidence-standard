@@ -14,7 +14,7 @@ The reference validator returns separate results for:
 4. `integrity_authentication_checks` — evaluates issuer-authentication evidence separately from content integrity. A public hash is not issuer authentication.
 5. `historical_authority_assertions` — distinguishes record self-assertions from externally configured evidence about authority at decision time.
 6. `authority_status_and_freshness` — evaluates present authority, revocation, supersession, freshness and expiry against recipient policy inputs and an explicit recipient evaluation time. A record consumption window is half-open: an evaluation time equal to `consumption_conditions.expires_at` is expired.
-7. `consumption_conditions` — checks relying party and purpose.
+7. `consumption_conditions` — checks relying party and purpose. A record whose `permitted_relying_parties` is absent, empty or not a list of non-empty strings names no recipient and is refused; an empty list never means "any recipient" (decision 39-I).
 8. `recipient_reliance_decision` — recipient policy result.
 
 Each layer may return `pass`, `fail`, `unavailable`, `unsupported` or `not_evaluated`. A schema-valid record cannot automatically become verified, trusted, authorized or suitable for reliance.
@@ -25,6 +25,8 @@ Hashes establish content binding, not issuer identity. The reference package car
 
 - `integrity.value` binds the exported ODES record and profile metadata.
 - `package_digest` binds the material exported package content: record, profile, integrity metadata and provenance, including execution facts, source references, limitations and redaction lineage.
+
+Top-level members outside the digest (decision 39-I). The digest does not cover `package_type`, `package_version`, `created_by` and `created_at`. The validator refuses a package that carries any top-level member other than those four, the four digest-covered members and `package_digest` (nothing binds an extra member), refuses a `package_type` or `package_version` that is not the declared one, and requires `created_by` to be a non-empty string and `created_at` an RFC 3339 instant with an offset. `created_by` and `created_at` are not tamper-evident in packages exported so far (the retained packages bind four members); a recipient that relies on them needs a digest that covers them, which is a format decision, not made here.
 
 A recipient may configure a digest as trusted for inspection, but that still does not authenticate the issuer, prove signing time, establish institutional authority, verify successful delivery or create reliance. Recomputing hashes after changing package content can restore content self-consistency but still cannot create issuer authentication.
 

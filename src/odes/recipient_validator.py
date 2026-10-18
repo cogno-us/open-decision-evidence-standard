@@ -32,6 +32,10 @@ from .common import (
 from .schema_validation import schema_errors
 
 
+PACKAGE_TOP_LEVEL_MEMBERS = frozenset({"package_type", "package_version", "created_by", "created_at", "record", "profile", "integrity",
+                                       "provenance", "package_digest"})
+
+
 def _result(status: str, reasons: list[str] | None = None, evidence: dict[str, Any] | None = None) -> dict[str, Any]:
     return {"status": status, "reasons": reasons or [], "evidence": evidence or {}}
 
@@ -125,6 +129,21 @@ def _evaluate_package_content_integrity(package: dict[str, Any], trusted_digests
     evidence["package_digest"] = expected_package_digest
     evidence["configured_trusted_digests"] = trusted_digests
 
+    # Top-level members (decision 39-I). The digest above covers record, profile, integrity and provenance. The rest must be
+    # exactly the declared envelope: an extra member is refused (nothing binds it), and the four envelope members must be present
+    # and well formed. created_by and created_at are not covered by this digest in packages already exported (they are retained
+    # evidence); a recipient that needs them bound needs a digest that covers them.
+    for key in package:
+        if key not in PACKAGE_TOP_LEVEL_MEMBERS:
+            reasons.append(f"package top-level member {key!r} is not covered by the package digest and is not part of the package format")
+    if package.get("package_type") != PACKAGE_TYPE:
+        reasons.append("package_type is not the declared package type")
+    if package.get("package_version") != PACKAGE_VERSION:
+        reasons.append("package_version is not the declared package version")
+    if not isinstance(package.get("created_by"), str) or not package.get("created_by"):
+        reasons.append("created_by must be a non-empty string")
+    if parse_instant(package.get("created_at")) is None:
+        reasons.append("created_at must be an RFC 3339 instant with an offset")
     required_provenance = ["source_artifacts", "source_record_refs", "decision_facts", "execution_facts", "redaction", "unsupported_semantics", "limits"]
     for key in required_provenance:
         if key not in provenance:
@@ -261,9 +280,12 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
         return _result("fail", ["record consumption_conditions must be an object"])
     parties = conditions.get("permitted_relying_parties") if isinstance(conditions.get("permitted_relying_parties"), list) else []
     purposes = conditions.get("permitted_purposes") if isinstance(conditions.get("permitted_purposes"), list) else []
-    if relying_party and parties and relying_party not in parties:
+    if not parties or not all(isinstance(x, str) and x for x in parties):
+        # An absent, empty or malformed list names no recipient; it never means "any recipient" (decision 39-I).
+        reasons.append("record names no permitted relying party; an absent or empty list admits no recipient")
+    elif relying_party and relying_party not in parties:
         reasons.append("recipient relying party is not permitted")
-    if not relying_party and parties:
+    elif not relying_party:
         reasons.append("recipient relying party is decision-critical but unavailable")
     if purpose and purpose not in purposes:
         reasons.append("recipient purpose is not permitted")

@@ -673,6 +673,9 @@ def _journal_rules(doc: dict[str, Any], journal: dict[str, Any]) -> list[Violati
     return out
 
 
+_CONTEXT_ERRORS = (AttributeError, TypeError, KeyError, IndexError)
+
+
 def _validate(doc: Any, journal: dict[str, Any] | None = None, signers: list[str] | None = None) -> list[Violation]:
     """Return all violations; an empty list means the document conforms to 0.1.0-draft.
 
@@ -682,13 +685,16 @@ def _validate(doc: Any, journal: dict[str, Any] | None = None, signers: list[str
     out = validate_structure(doc)
     if out:
         return out
-    out.extend(_revision_rules(doc, signers))
-    out.extend(_identity_rules(doc, signers))
-    out.extend(_trend_rules(doc, journal))
-    out.extend(_arity_rules(doc))
-    out.extend(_recomputability_rules(doc, journal))
-    if journal is not None:
-        out.extend(_journal_rules(doc, journal))
+    try:
+        out.extend(_revision_rules(doc, signers))
+        out.extend(_identity_rules(doc, signers))
+        out.extend(_trend_rules(doc, journal))
+        out.extend(_arity_rules(doc))
+        out.extend(_recomputability_rules(doc, journal))
+        if journal is not None:
+            out.extend(_journal_rules(doc, journal))
+    except _CONTEXT_ERRORS:
+        out.append(_v("context_malformed", "$", "an optional context argument (run record, host configuration or signer set) does not have the shape the cross-document rules need; it is refused, not assumed"))
     return out
 
 

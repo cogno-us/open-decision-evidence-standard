@@ -75,6 +75,7 @@ Document rules need only the document. Cross-document rules need the optional ru
 | `from_digest_mismatch` | rom_digest is the digest currently adopted for the rule (or the superseded row's from_digest) |
 | `identity_row_mismatch` | the identity row is the row's rule_identity, member for member |
 | `identity_row_time_mismatch` | recorded_at is the row's decided_at (decision) or recorded_at (refusal) |
+| `context_malformed` | an optional context argument (run record, host configuration or signer set) whose shape does not let the cross-document rules run: refused with this typed violation instead of raising (decision 39-H) |
 | `identity_row_unknown_row` | an identity row names a decision or refusal of the run record |
 | `invalid_extension_key` | an `extensions` name not matching `^x-[a-z0-9][a-z0-9._-]*$` |
 | `journal_run_mismatch` | the profile document and the run record describe the same run |

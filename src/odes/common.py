@@ -153,6 +153,29 @@ def installed_replay_revision() -> str | None:
         return None
 
 
+def installed_replay_checkout_dirty() -> bool | None:
+    """True when the imported ``agent_replay_bundle`` comes from a git checkout with uncommitted changes, False when that checkout is
+    clean, None when it is not a checkout (or git cannot say). A dirty checkout runs code no commit names, so it is not a qualified build."""
+    import importlib.util
+    import subprocess
+    try:
+        spec = importlib.util.find_spec("agent_replay_bundle")
+        origin = Path(spec.origin).resolve() if spec is not None and spec.origin else None
+    except Exception:
+        return None
+    if origin is None:
+        return None
+    for parent in list(origin.parents)[:4]:
+        if (parent / ".git").exists():
+            try:
+                out = subprocess.run(["git", "-C", str(parent), "status", "--porcelain", "--untracked-files=no"], capture_output=True, text=True,
+                                     check=True, timeout=20).stdout
+            except Exception:
+                return None
+            return bool(out.strip())
+    return None
+
+
 def canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
 
