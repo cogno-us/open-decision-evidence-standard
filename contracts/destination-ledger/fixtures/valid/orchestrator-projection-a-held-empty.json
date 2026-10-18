@@ -1,0 +1,19 @@
+{
+  "fixture_id": "orchestrator-projection-a-held-empty",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Projection A for the held scenario: no effect rows, empty counts.",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "orchestrator-overlay-capture",
+    "orchestrator_commit": "ad79749",
+    "control_plane_commit": "128eaa5",
+    "runtime_commit": "d90a2ca",
+    "verifier_commit": "5ed1ffb",
+    "scenario": "candidate-journal/off/held, projection A"
+  },
+  "document": {
+    "effects": {},
+    "grant_effect_counts": {}
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "fixture_id": "rows-with-and-without-digest-in-one-ledger",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Derived from the captured renewal-race projection B by deleting operation_digest from the first row only: a ledger may mix rows with and without the optional member.",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "derived",
+    "from": "orchestrator-projection-b-two-effects-one-operation"
+  },
+  "document": {
+    "effects": {
+      "sha256:1b8e003fc0621caf29035107139966f9a7f1d94b415213b08386b110afe66382": {
+        "amount": 50.0,
+        "effect_id": "sha256:1b8e003fc0621caf29035107139966f9a7f1d94b415213b08386b110afe66382",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      },
+      "sha256:ada675de0618e79649ade2f085ec7884975a7cc4d345e11c1ce2dc44f26bcc1b": {
+        "amount": 50.0,
+        "effect_id": "sha256:ada675de0618e79649ade2f085ec7884975a7cc4d345e11c1ce2dc44f26bcc1b",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "operation_digest": "sha256:fb33d47c86c2f64875ca6689f185849ca8b070e6f82ca2ec6c333c1905c115da",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 2
+    }
+  }
+}

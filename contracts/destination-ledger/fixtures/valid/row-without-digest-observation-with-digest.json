@@ -1,0 +1,94 @@
+{
+  "fixture_id": "row-without-digest-observation-with-digest",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Projection A with the same observations: only the observation carries operation_digest, so nothing is compared (the verifier reports could-not-check for that pairing; this contract has no rule about it).",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "orchestrator-overlay-capture",
+    "orchestrator_commit": "ad79749",
+    "control_plane_commit": "128eaa5",
+    "runtime_commit": "d90a2ca",
+    "verifier_commit": "5ed1ffb",
+    "scenario": "candidate-journal/off/applied, projection A + reconciliations"
+  },
+  "observations": [
+    {
+      "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+      "reconciled_at": "2026-10-05T19:00:00+00:00",
+      "result": "applied",
+      "observation": {
+        "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+        "observed_at": "2026-10-05T19:00:00+00:00",
+        "state": "applied",
+        "destination_state": {
+          "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+          "state": "applied",
+          "grant_id": "urn:cognous:grant:routine-1",
+          "target": "urn:cognous:synthetic-account:customer-001",
+          "amount": 50.0,
+          "unit": "USD",
+          "payload": {
+            "customer_id": "customer-001",
+            "refund_reason": "duplicate"
+          },
+          "operation_digest": "sha256:23e63e113d1793a22f42e4347620115d97d84aec119a5871a5f5c935252ffda9"
+        }
+      },
+      "observation_accepted": true,
+      "retry_eligible": false,
+      "reasons": [],
+      "evaluation_time": "2026-10-05T19:00:00+00:00",
+      "observation_max_age_seconds": 300,
+      "observation_clock_tolerance_seconds": 5
+    },
+    {
+      "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+      "reconciled_at": "2026-10-05T19:00:00+00:00",
+      "result": "applied",
+      "observation": {
+        "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+        "observed_at": "2026-10-05T19:00:00+00:00",
+        "state": "applied",
+        "destination_state": {
+          "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+          "state": "applied",
+          "grant_id": "urn:cognous:grant:routine-1",
+          "target": "urn:cognous:synthetic-account:customer-001",
+          "amount": 50.0,
+          "unit": "USD",
+          "payload": {
+            "customer_id": "customer-001",
+            "refund_reason": "duplicate"
+          },
+          "operation_digest": "sha256:23e63e113d1793a22f42e4347620115d97d84aec119a5871a5f5c935252ffda9"
+        }
+      },
+      "observation_accepted": true,
+      "retry_eligible": false,
+      "reasons": [],
+      "evaluation_time": "2026-10-05T19:00:00+00:00",
+      "observation_max_age_seconds": 300,
+      "observation_clock_tolerance_seconds": 5
+    }
+  ],
+  "document": {
+    "effects": {
+      "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a": {
+        "amount": 50.0,
+        "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

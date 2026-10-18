@@ -1,0 +1,11 @@
+{
+  "fixture_id": "document-not-an-object",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The export is a JSON array, not an object.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": []
+}

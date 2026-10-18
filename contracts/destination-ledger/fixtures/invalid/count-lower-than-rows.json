@@ -1,0 +1,43 @@
+{
+  "fixture_id": "count-lower-than-rows",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The per-grant count says 1, the rows say 2.",
+  "expected_refusal": "ledger_count_mismatch",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": {
+    "effects": {
+      "sha256:1b8e003fc0621caf29035107139966f9a7f1d94b415213b08386b110afe66382": {
+        "amount": 50.0,
+        "effect_id": "sha256:1b8e003fc0621caf29035107139966f9a7f1d94b415213b08386b110afe66382",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "operation_digest": "sha256:7d095e9b8ba31a4951f888903c0000ecfcaad1bc797d52f2c4404a12fdc31741",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      },
+      "sha256:ada675de0618e79649ade2f085ec7884975a7cc4d345e11c1ce2dc44f26bcc1b": {
+        "amount": 50.0,
+        "effect_id": "sha256:ada675de0618e79649ade2f085ec7884975a7cc4d345e11c1ce2dc44f26bcc1b",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "operation_digest": "sha256:fb33d47c86c2f64875ca6689f185849ca8b070e6f82ca2ec6c333c1905c115da",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

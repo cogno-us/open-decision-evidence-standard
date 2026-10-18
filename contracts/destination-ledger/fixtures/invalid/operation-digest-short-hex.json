@@ -1,0 +1,30 @@
+{
+  "fixture_id": "operation-digest-short-hex",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Row `operation_digest` is hex of the wrong length: it must be `sha256:` plus 64 lowercase hex (documented default).",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": {
+    "effects": {
+      "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a": {
+        "amount": 50.0,
+        "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "operation_digest": "sha256:23e63e113d1793a22f42e4347620115d97d84aec",
+        "payload": {
+          "customer_id": "customer-001",
+          "refund_reason": "duplicate"
+        },
+        "state": "applied",
+        "target": "urn:cognous:synthetic-account:customer-001",
+        "unit": "USD"
+      }
+    },
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

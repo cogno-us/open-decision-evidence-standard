@@ -1,0 +1,16 @@
+{
+  "fixture_id": "effects-not-an-object",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "`effects` is an array.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "mutation"
+  },
+  "document": {
+    "effects": [],
+    "grant_effect_counts": {
+      "urn:cognous:grant:routine-1": 1
+    }
+  }
+}

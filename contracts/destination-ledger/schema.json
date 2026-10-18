@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/destination-ledger/schema.json",
+  "title": "Destination ledger contract 0.1.0-draft",
+  "description": "Draft optional ODES extension profile: the closed shape of the local destination ledger export the independent verifier reads (the Control Plane LocalRefundDestination snapshot and the orchestrator's projection of the runtime effect rows). The export carries no in-band contract marker because the verifier's top-level member set is closed. A row records a destination's recorded effect, not that the effect happened and not that the ledger is complete. Closed member sets; the extensions member holds x- names.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "effects",
+    "grant_effect_counts"
+  ],
+  "properties": {
+    "effects": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/row"
+      }
+    },
+    "grant_effect_counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "operation_digest": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effect_id",
+        "grant_id",
+        "target",
+        "amount",
+        "unit",
+        "payload",
+        "state"
+      ],
+      "properties": {
+        "effect_id": {
+          "type": "string"
+        },
+        "grant_id": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "state": {
+          "type": "string"
+        },
+        "operation_digest": {
+          "$ref": "#/$defs/operation_digest"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}
