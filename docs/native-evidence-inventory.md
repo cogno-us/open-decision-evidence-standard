@@ -2,7 +2,7 @@
 
 A package-level inventory of opaque artifacts that other systems produced in their own formats. ODES carries and checks the bytes. It does not interpret, normalize or re-serialize them, so a native signature over those bytes stays checkable by its own verifier.
 
-The inventory is separately versioned (`inventory_version`), is optional, and changes no existing profile. Packages exported under the existing profiles carry none. Where a package carries one, it sits at `provenance.native_evidence_inventory`, so the package digest binds it: changing an entry, its relation or its bytes changes the package digest.
+The inventory is separately versioned (`inventory_version`), is optional, and changes no existing profile. Packages exported under the existing Cognous profiles carry none, and a Cognous profile 0.2 package cannot carry one (its Replay re-export comparison would see an extra provenance member). The [generic recipient profile](../profiles/generic-recipient-0.1.md) carries it. Where a package carries one, it sits at `provenance.native_evidence_inventory`, so the package digest binds it: changing an entry, its relation or its bytes changes the package digest.
 
 ## Format
 
