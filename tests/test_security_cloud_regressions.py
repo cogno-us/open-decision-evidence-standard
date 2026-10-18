@@ -274,16 +274,22 @@ def test_p4_generation_is_added_beside_f5b_and_exactly_paired():
 
 
 def test_p2_generation_is_added_beside_p4_and_exactly_paired():
-    assert P2_REVISIONS == {'manifest': '2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e',
-        'replay': '46e8bd7c263f5075cac3a7a9defcb265384f40e9',
-        'control_plane': '3cd17ead6b24301290ad1e50ae4b22bbd93c12fb',
-        'moltbot_safe': '11de097c450d3ad4d89f9add41b00e38e7cc2c7c'}
+    assert P2_REVISIONS == {'manifest': 'f9ae8527326c07e3177b5f003e626b23758be3d0',
+        'replay': 'c8e665bd1936e4da90f6a324b486a320934c4bff',
+        'control_plane': '6093aca7b945698e89c0d8ac7c75306375e1a298',
+        'moltbot_safe': '62a5cc156ecb439b4103b757fd265f276bb30374'}
     assert all(len(v) == 40 for v in P2_REVISIONS.values())
     assert P2_PROFILE_VERSION not in {SECURITY_PROFILE_VERSION, F5B_PROFILE_VERSION, P4_PROFILE_VERSION}
-    # P2 keeps the shared Manifest but shares no Control Plane, runtime or Replay revision with any earlier generation.
+    # P2 shares no revision (Manifest included, since the scan-fix stream moved it) with any earlier generation.
     for other in (SECURITY_REVISIONS, F5B_REVISIONS, P4_REVISIONS):
-        for key in ('replay', 'control_plane', 'moltbot_safe'):
+        for key in ('manifest', 'replay', 'control_plane', 'moltbot_safe'):
             assert P2_REVISIONS[key] != other[key]
+    # The earlier P2 tuple is replaced, not kept (decision 38): its control plane is no longer a known generation.
+    assert '3cd17ead6b24301290ad1e50ae4b22bbd93c12fb' not in ALL_V2_CONTROL_PLANE_REVISIONS
+    assert '3cd17ead6b24301290ad1e50ae4b22bbd93c12fb' not in SECURITY_RUNTIME_GENERATIONS
+    from odes.exporter import ExportError as _ExportError
+    with pytest.raises(_ExportError, match='unsupported Control Plane compatibility revision'):
+        _selected_v2_pins('3cd17ead6b24301290ad1e50ae4b22bbd93c12fb')
     assert P2_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert P4_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert _selected_v2_pins(P2_REVISIONS['control_plane']) == P2_REVISIONS

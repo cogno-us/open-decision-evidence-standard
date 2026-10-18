@@ -80,14 +80,16 @@ P4_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
     "replay": "9aab3f6c34d2721ef1be3f6468b71dc3bad99a2a",
     "control_plane": "26a7e6594eb535827ccc248cbca36a7d119d613b",
     "moltbot_safe": "3024ef6e6ecf7da22e5f4fdf90d873f93b2a55c9"}
-# P2 generation (Programme 2 producers): Control Plane 3cd17ead / runtime 11de097c / Replay 46e8bd7c / Manifest 2c36bcd0.
+# P2 generation (Programme 2 producers): Control Plane 6093aca7 / runtime 62a5cc15 / Replay c8e665bd / Manifest f9ae8527.
 # Added beside P4 (retained P4 evidence stays accepted); an exact tuple keyed by its Control Plane revision, never mixed.
-# Alpha scaffolding: removed with the other hard pins at end-of-alpha (P5).
+# The final pin round replaced the earlier P2 tuple (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0): it is not kept, so a
+# bundle of that tuple is no longer accepted as P2 (decision 38). The profile version string is unchanged: the generation
+# is still one non-selected candidate. Alpha scaffolding: removed with the other hard pins at end-of-alpha (P5).
 P2_PROFILE_VERSION = "odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate"
-P2_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
-    "replay": "46e8bd7c263f5075cac3a7a9defcb265384f40e9",
-    "control_plane": "3cd17ead6b24301290ad1e50ae4b22bbd93c12fb",
-    "moltbot_safe": "11de097c450d3ad4d89f9add41b00e38e7cc2c7c"}
+P2_REVISIONS = {"manifest": "f9ae8527326c07e3177b5f003e626b23758be3d0",
+    "replay": "c8e665bd1936e4da90f6a324b486a320934c4bff",
+    "control_plane": "6093aca7b945698e89c0d8ac7c75306375e1a298",
+    "moltbot_safe": "62a5cc156ecb439b4103b757fd265f276bb30374"}
 SECURITY_RUNTIME_GENERATIONS = {
     SECURITY_REVISIONS["control_plane"]: (SECURITY_PROFILE_VERSION, SECURITY_REVISIONS),
     F5B_REVISIONS["control_plane"]: (F5B_PROFILE_VERSION, F5B_REVISIONS),
