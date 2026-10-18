@@ -229,11 +229,14 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
     expires_at, expiry_errors = _parse_time_result(conditions.get("expires_at"), "record consumption expiry")
     if expiry_errors:
         reasons.extend(expiry_errors)
-    if expires_at and now_dt and window_expired(now_dt, expires_at):
+    expired = bool(expires_at and now_dt and window_expired(now_dt, expires_at))
+    if expired:
         reasons.append("record consumption window has expired under recipient policy time")
 
     if not isinstance(status_inputs, dict) or not status_inputs:
-        return _result("unavailable", reasons + ["external status evidence is required for present authority/freshness acceptance"], {**evidence, "record_reported_freshness": status.get("freshness")})
+        reasons.append("external status evidence is required for present authority/freshness acceptance")
+        # A window that has definitively passed is a failure whether or not status evidence was supplied; only the absence of other evidence is unavailable.
+        return _result("fail" if expired else "unavailable", reasons, {**evidence, "record_reported_freshness": status.get("freshness")})
 
     max_age = policy.get("status_max_age_seconds")
     valid_max_age = type(max_age) is int and max_age >= 0
@@ -342,8 +345,8 @@ def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
     profile = package.get("profile") if isinstance(package.get("profile"), dict) else {}
     if profile.get("implementation_profile") != PROFILE_V2_ID:
         return _result("not_applicable", ["historical profile validation unchanged"])
+    from .exporter import ReplayDependencyError, ReplayRevisionUnsupportedError, export_cognous_stack_package
     try:
-        from .exporter import export_cognous_stack_package
         sources = package["provenance"]["retained_sources"]
         conditions = package["record"]["consumption_conditions"]
         parties, purposes = conditions["permitted_relying_parties"], conditions["permitted_purposes"]
@@ -354,6 +357,11 @@ def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
         actual_material, expected_material = _normalized_replay_material(package, expected)
         if actual_material != expected_material:
             raise ValueError("package semantics differ from accepted Replay-derived transformation")
+    except ReplayDependencyError as exc:
+        # The check could not run (Replay absent, or its revision cannot be determined). Not a contradiction in the package; still not a pass.
+        return _result("unavailable", [f"Replay semantic validation unavailable: {exc}"])
+    except ReplayRevisionUnsupportedError as exc:
+        return _result("unsupported", [f"Replay semantic validation unsupported: {exc}"])
     except Exception as exc:
         return _result("fail", [f"Replay semantic validation failed: {exc}"])
     return _result("pass", ["retained content matches accepted Replay validation; no source authentication or authority renewal"])
@@ -398,7 +406,8 @@ def _evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any])
     elif policy.get("allow_unauthenticated_informational_inspection") is True and auth_unavailable_only:
         reliance = _result("informational_only", ["content integrity passed, but issuer authentication is unavailable; policy permits informational inspection only, not reliance or authorization"])
     else:
-        reliance = _result("fail", ["recipient policy does not permit reliance because layer did not pass: " + ", ".join(failed)])
+        reliance = _result("fail", ["recipient policy does not permit reliance because layer did not pass: " + ", ".join(failed)],
+                           {"blocking_layers": {name: layers[name]["status"] for name in failed}})
     layers["recipient_reliance_decision"] = reliance
     layers["boundary_notes"] = [
         "Schema validity is structural only.",

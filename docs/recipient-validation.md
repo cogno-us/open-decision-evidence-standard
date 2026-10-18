@@ -17,7 +17,25 @@ The reference validator returns separate results for:
 7. `consumption_conditions` — checks relying party and purpose. A record whose `permitted_relying_parties` is absent, empty or not a list of non-empty strings names no recipient and is refused; an empty list never means "any recipient" (decision 39-N).
 8. `recipient_reliance_decision` — recipient policy result.
 
-Each layer may return `pass`, `fail`, `unavailable`, `unsupported` or `not_evaluated`. A schema-valid record cannot automatically become verified, trusted, authorized or suitable for reliance.
+A schema-valid record cannot automatically become verified, trusted, authorized or suitable for reliance.
+
+## Result values and precedence
+
+Every layer result has a `status`, a list of `reasons` and an `evidence` object. The status set is closed:
+
+| Status | Meaning | Examples |
+| --- | --- | --- |
+| `pass` | The layer's check ran and the evidence supports it. | Digest matches; consumption conditions satisfied. |
+| `fail` | Known-invalid content, a definitive refusal, a contradiction or an operational error that makes the check unusable. | Digest mismatch; consumption window expired (with or without status inputs); retained sources contradict the exported summary; Replay raised an unexpected error. |
+| `unavailable` | Required evidence or a required optional dependency is absent, so the check could not run. | No status inputs and the window has not expired; no issuer authentication evidence; the Replay distribution is not installed or its installed revision cannot be determined. |
+| `unsupported` | The format, method or installed revision is not implemented by this reference validator. | Unknown declared profile; declared signature type; an installed Replay that is not an accepted revision or lacks a module the check needs. |
+| `not_evaluated` | The layer was skipped because the input could not be examined. | `schema_validity` when the package or policy is not an object. |
+| `not_applicable` | The layer does not apply to the declared profile. | `replay_semantic_consistency` when the record declares profile 0.2 but the package profile does not (this also fails profile conformance). It is never a pass. |
+| `informational_only` | `recipient_reliance_decision` only. | Recipient policy allows inspection of unauthenticated material and the only non-passing layer is `integrity_authentication_checks`. It is not reliance, authorization or verification. |
+
+Precedence. A layer returns the first row that applies: known invalid content or a definitive expiry is `fail`; then an unimplemented format or revision is `unsupported`; then absent required evidence or dependency is `unavailable`. A skipped layer is `not_evaluated`; a layer excluded by the selected profile is `not_applicable`. `recipient_reliance_decision` is `pass` only when every evaluated layer is `pass`. It is `informational_only` only under the explicit policy flag and only when the single non-passing layer is `integrity_authentication_checks`. Otherwise it is `fail`, and its `evidence.blocking_layers` names each non-passing layer with its status, so a caller can tell a settled refusal (`fail`) from missing evidence (`unavailable`) or an unimplemented check (`unsupported`). Every status other than `pass` blocks reliance; the classes differ only in what a caller may reasonably do next. Inspection and reliance are separate: `informational_only` never satisfies a caller that asked for reliance.
+
+The Replay check separates three situations. The retained sources contradict the package, or Replay raises an unexpected error: `fail`. The Replay distribution is not installed, or its installed revision cannot be determined: `unavailable`. An installed Replay is not an accepted revision, or lacks a module the check needs: `unsupported`. Any other import error stays `fail` with the error type in the reason.
 
 ## Integrity boundary
 
