@@ -261,9 +261,12 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
         return _result("fail", ["record consumption_conditions must be an object"])
     parties = conditions.get("permitted_relying_parties") if isinstance(conditions.get("permitted_relying_parties"), list) else []
     purposes = conditions.get("permitted_purposes") if isinstance(conditions.get("permitted_purposes"), list) else []
-    if relying_party and parties and relying_party not in parties:
+    if not parties or not all(isinstance(x, str) and x for x in parties):
+        # An absent, empty or malformed list names no recipient; it never means "any recipient" (decision 39-N).
+        reasons.append("record names no permitted relying party; an absent or empty list admits no recipient")
+    elif relying_party and relying_party not in parties:
         reasons.append("recipient relying party is not permitted")
-    if not relying_party and parties:
+    elif not relying_party:
         reasons.append("recipient relying party is decision-critical but unavailable")
     if purpose and purpose not in purposes:
         reasons.append("recipient purpose is not permitted")
