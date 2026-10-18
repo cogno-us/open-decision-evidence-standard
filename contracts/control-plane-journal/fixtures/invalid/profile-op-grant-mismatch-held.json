@@ -9,7 +9,8 @@
     "source": "control-plane-capture with the ledger row altered",
     "control_plane_commit": "128eaa5e",
     "capture": "operation-identity",
-    "scenario": "op-grant-mismatch-held"
+    "scenario": "op-grant-mismatch-held",
+    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
   },
   "document": {
     "contract": "control-plane-journal",
@@ -559,7 +560,7 @@
         ]
       },
       {
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2",
         "decision_id": "syn-decision-2",
         "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
         "result": "hold",

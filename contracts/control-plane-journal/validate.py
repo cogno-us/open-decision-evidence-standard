@@ -669,6 +669,70 @@ def _journal_mode_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
+# ------------------------------------------------------------------ reason registry labels (draft revision 3, decision 31)
+
+VOCABULARY_0_1 = "runtime-authority-reasons/0.1"
+VOCABULARY_0_2 = "runtime-authority-reasons/0.2"
+# The 36 codes the Control Plane registry labels runtime-authority-reasons/0.2 registers and 0.1 does not (0.2 is a 157-code
+# superset of the original 121). Source: cogno-us/cognous-control-plane schemas/runtime_authority_reasons_0_2.json minus
+# runtime_authority_reasons_0_1.json at main 3755c71a. Producer rule (runtime_authority.vocabulary_for): a row carries 0.2 only if
+# one of its reasons is in this set, else 0.1.
+CODES_ADDED_IN_0_2 = frozenset({
+    "age_extension_authority_unconfigured",
+    "age_extension_exceeds_limit",
+    "age_extension_invalid",
+    "age_extension_irreversible_class",
+    "age_extension_self_signed",
+    "age_extension_signer_not_configured",
+    "age_extension_unsigned",
+    "attempt_unresolved_past_horizon",
+    "check_expired_before_dispatch",
+    "check_lease_unavailable",
+    "check_overdue",
+    "dedupe_operation_effect_applied",
+    "dedupe_unresolved_attempt_blocks_new_key",
+    "escalation_after_key_ttl",
+    "holder_inventory_missing",
+    "merge_authority_unfunded",
+    "merge_operation_already_folded",
+    "merge_operation_discriminator_mismatch",
+    "merge_operation_ids_invalid",
+    "merge_operation_not_admitted",
+    "merge_rule_unknown",
+    "merge_survivor_already_folded",
+    "operation_grant_mismatch",
+    "operation_id_invalid",
+    "operation_id_missing",
+    "operation_merged_effect_exists",
+    "operation_merged_effect_unresolved",
+    "operation_not_admitted",
+    "operation_renewal_unrecorded",
+    "purpose_cache_after_reversal_window",
+    "purpose_cache_irreversible_class",
+    "purpose_cache_stale",
+    "purpose_closure_recorded",
+    "renewal_not_written_by_grant_issuer",
+    "renewal_revision_not_new",
+    "status_nonce_mismatch",
+})
+
+
+def _reason_label_rules(doc: dict[str, Any]) -> list[Violation]:
+    """A row labelled runtime-authority-reasons/0.1 holds no code that only 0.2 registers. The converse is not checked: 0.2 is a
+    superset, so a 0.2 label on a row of 0.1 codes states a true thing the producer happens not to write. Codes outside both
+    registries are not judged (the contract has never closed the reason string set)."""
+    out: list[Violation] = []
+    for section in ("decisions", "refusals", "check_events"):
+        for i, row in enumerate(doc.get(section, [])):
+            if row.get("reason_vocabulary_version") != VOCABULARY_0_1:
+                continue
+            late = sorted(set(row.get("reasons", [])) & CODES_ADDED_IN_0_2)
+            if late:
+                out.append(_v("reason_label_mismatch", f"$.{section}[{i}].reason_vocabulary_version",
+                              f"label {VOCABULARY_0_1} but the reasons include {', '.join(late)}, which only {VOCABULARY_0_2} registers"))
+    return out
+
+
 def _lease_hold(decision: dict[str, Any]) -> bool:
     """A hold for ``check_lease_unavailable`` alone, written under freshness/0.1 (it carries the profile's ``evaluated_at``)."""
     return (decision["result"] == "hold" and decision["reasons"] == [LEASE_REASON] and decision["binding"] is None
@@ -767,7 +831,7 @@ def validate(doc: Any) -> list[Violation]:
     if out:
         return out
     for rule in (_decision_rules, _reference_rules, _attempt_rules, _reconciliation_rules, _closeout_rules,
-                 _refusal_rules, _input_and_time_rules, _journal_mode_rules, _floor_and_vocabulary_rules, _check_id_rules,
+                 _refusal_rules, _input_and_time_rules, _journal_mode_rules, _reason_label_rules, _floor_and_vocabulary_rules, _check_id_rules,
                  _profile_rules):
         out.extend(rule(doc))
     if not out:

@@ -6,7 +6,8 @@
   "reason": "The lease hold may omit the journal only when check_lease_unavailable is its sole reason (the lease is refused before a check is journalled). A second reason means a check ran, so the journal must exist.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-lease-unavailable-holds",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "128eaa5e",
+    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
   },
   "document": {
     "contract": "control-plane-journal",
@@ -30,7 +31,7 @@
     "closeouts": [],
     "decisions": [
       {
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2",
         "decision_id": "syn-decision-1",
         "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
         "result": "hold",

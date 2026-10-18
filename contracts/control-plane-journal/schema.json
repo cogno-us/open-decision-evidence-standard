@@ -449,7 +449,8 @@
         },
         "reason_vocabulary_version": {
           "enum": [
-            "runtime-authority-reasons/0.1"
+            "runtime-authority-reasons/0.1",
+            "runtime-authority-reasons/0.2"
           ]
         },
         "extensions": {
@@ -809,7 +810,8 @@
         },
         "reason_vocabulary_version": {
           "enum": [
-            "runtime-authority-reasons/0.1"
+            "runtime-authority-reasons/0.1",
+            "runtime-authority-reasons/0.2"
           ]
         },
         "reopen_conditions": {
@@ -954,7 +956,8 @@
         },
         "reason_vocabulary_version": {
           "enum": [
-            "runtime-authority-reasons/0.1"
+            "runtime-authority-reasons/0.1",
+            "runtime-authority-reasons/0.2"
           ]
         },
         "reopen_conditions": {

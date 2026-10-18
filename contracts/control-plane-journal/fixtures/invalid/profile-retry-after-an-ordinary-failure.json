@@ -6,7 +6,8 @@
   "reason": "Only the expiry excuses a failed start. The first attempt failed for another bounded reason (and the refusal row is the profile's expiry refusal), so the second start is a second lifecycle.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-expired-then-retry-dispatches",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "128eaa5e",
+    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
   },
   "document": {
     "contract": "control-plane-journal",
@@ -766,7 +767,7 @@
     ],
     "refusals": [
       {
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2",
         "check_id": "syn-check-2",
         "refusal_id": "syn-refusal-1",
         "decision_id": "syn-decision-1",
@@ -2113,7 +2114,7 @@
         "reasons": [
           "check_expired_before_dispatch"
         ],
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2"
       },
       {
         "check_id": "syn-check-3",
