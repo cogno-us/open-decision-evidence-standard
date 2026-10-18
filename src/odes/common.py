@@ -211,10 +211,103 @@ def _parse_float(text: str) -> float:
     return number
 
 
-def load_json(path: str | Path) -> Any:
-    """Strict JSON: UTF-8 only, no duplicate members, no NaN or Infinity (including by overflow)."""
-    with Path(path).open("r", encoding="utf-8") as handle:
-        return json.load(handle, object_pairs_hook=_refuse_duplicates, parse_constant=_refuse_constant, parse_float=_parse_float)
+# Input budgets for validator-side inputs (packages, policies, records). Starting values, reversible before the first freeze.
+# Basis: the qualification repository's measured admission budget (results/u1-security-20261015/budget-measurement.json: 1 MiB, depth 20,
+# 16,384 nodes, 4,096 items, 256 fields, 65,536-character strings), kept for every dimension because every valid fixture and producer-v2
+# example is within it (largest valid input: 138,883 bytes, 3,298 nodes, 14 levels of nesting). The plan's 8 MiB / depth 64 / 100,000 nodes
+# are the fallback for a dimension a valid input exceeds. The aggregate string budget equals the byte budget; there is no decompression.
+INPUT_LIMITS = {"max_bytes": 1_048_576, "max_depth": 20, "max_nodes": 16_384, "max_items": 4_096, "max_fields": 256, "max_string": 65_536}
+MAX_REPORTED_ERRORS = 100
+BUDGET_EXCEEDED = "budget_exceeded"
+
+
+class BudgetExceeded(ValueError):
+    """An input is over a budget. Closed reason code ``budget_exceeded``; distinct from malformed input."""
+
+    code = BUDGET_EXCEEDED
+
+    def __init__(self, dimension: str, limit: int):
+        super().__init__(f"{BUDGET_EXCEEDED}: input exceeds {dimension} {limit}")
+        self.dimension = dimension
+        self.limit = limit
+
+
+def check_budget(value: Any, limits: dict[str, int] | None = None) -> None:
+    """Refuse a parsed value over a budget. Iterative (no recursion), stops at the first breach, so a cyclic or huge value is bounded."""
+    limits = limits or INPUT_LIMITS
+    nodes = 0
+    total_chars = 0
+    stack: list[tuple[Any, int]] = [(value, 0)]
+    while stack:
+        item, depth = stack.pop()
+        nodes += 1
+        if nodes > limits["max_nodes"]:
+            raise BudgetExceeded("max_nodes", limits["max_nodes"])
+        if isinstance(item, str):
+            total_chars += len(item)
+            if len(item) > limits["max_string"]:
+                raise BudgetExceeded("max_string", limits["max_string"])
+        elif isinstance(item, (dict, list, tuple)):
+            if depth + 1 > limits["max_depth"]:
+                raise BudgetExceeded("max_depth", limits["max_depth"])
+            if isinstance(item, dict):
+                if len(item) > limits["max_fields"]:
+                    raise BudgetExceeded("max_fields", limits["max_fields"])
+                for key, child in item.items():
+                    if isinstance(key, str):
+                        total_chars += len(key)
+                        if len(key) > limits["max_string"]:
+                            raise BudgetExceeded("max_string", limits["max_string"])
+                    stack.append((child, depth + 1))
+            else:
+                if len(item) > limits["max_items"]:
+                    raise BudgetExceeded("max_items", limits["max_items"])
+                stack.extend((child, depth + 1) for child in item)
+        if total_chars > limits["max_bytes"]:
+            raise BudgetExceeded("max_bytes", limits["max_bytes"])
+
+
+def _nesting_exceeds(text: str, max_depth: int) -> bool:
+    """Bracket nesting over the raw text, ignoring string contents; a cheap pre-parse bound that needs no recursion."""
+    depth = 0
+    in_string = False
+    escaped = False
+    for ch in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+        elif ch == '"':
+            in_string = True
+        elif ch in "[{":
+            depth += 1
+            if depth > max_depth:
+                return True
+        elif ch in "]}":
+            depth -= 1
+    return False
+
+
+def load_json(path: str | Path, *, limits: dict[str, int] | None = None) -> Any:
+    """Strict JSON: UTF-8 only, no duplicate members, no NaN or Infinity (including by overflow).
+
+    With ``limits``, the byte budget is checked before reading more than the budget, the nesting budget before parsing, and the
+    remaining budgets after parsing; an over-budget input raises ``BudgetExceeded``. Without ``limits`` behaviour is unchanged.
+    """
+    with Path(path).open("rb") as handle:
+        raw = handle.read(limits["max_bytes"] + 1) if limits else handle.read()
+    if limits and len(raw) > limits["max_bytes"]:
+        raise BudgetExceeded("max_bytes", limits["max_bytes"])
+    text = raw.decode("utf-8")
+    if limits and _nesting_exceeds(text, limits["max_depth"]):
+        raise BudgetExceeded("max_depth", limits["max_depth"])
+    value = json.loads(text, object_pairs_hook=_refuse_duplicates, parse_constant=_refuse_constant, parse_float=_parse_float)
+    if limits:
+        check_budget(value, limits)
+    return value
 
 
 def dump_json(value: Any, path: str | Path) -> None:

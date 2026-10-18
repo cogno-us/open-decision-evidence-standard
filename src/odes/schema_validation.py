@@ -5,7 +5,9 @@ from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
 
-from .common import load_json, parse_instant
+from itertools import islice
+
+from .common import BudgetExceeded, MAX_REPORTED_ERRORS, check_budget, load_json, parse_instant
 
 
 def repository_root() -> Path:
@@ -39,11 +41,20 @@ def _instant_errors(record: Any) -> list[str]:
 
 
 def schema_errors(record: dict[str, Any]) -> list[str]:
+    try:
+        check_budget(record)
+    except BudgetExceeded as exc:
+        return [str(exc)]
     validator = Draft202012Validator(load_schema(), format_checker=FormatChecker())
-    errors = [error.message for error in sorted(validator.iter_errors(record), key=lambda item: item.path)]
+    # Collect at most MAX_REPORTED_ERRORS while iterating; a larger set is reported with a truncation marker, never fully materialized.
+    found = list(islice(validator.iter_errors(record), MAX_REPORTED_ERRORS + 1))
+    truncated = len(found) > MAX_REPORTED_ERRORS
+    errors = [error.message for error in sorted(found[:MAX_REPORTED_ERRORS], key=lambda item: item.path)]
     for message in _instant_errors(record):
         if not any(message.split(": ")[1].split(" is not")[0] in e for e in errors):
             errors.append(message)
+    if truncated:
+        errors.append(f"schema error list truncated after {MAX_REPORTED_ERRORS} errors")
     return errors
 
 

@@ -100,7 +100,24 @@ Example policy additions:
 
 Packages and recipient policies must be JSON objects, and nested `profile`, `record.verification`, `record.consumption_conditions` and `policy.status_inputs` must be objects. Other shapes return a structured `fail` decision. The `recipient-validate` command also turns malformed JSON and inputs nested too deeply for the Python interpreter into a JSON `fail` result with a nonzero exit, instead of an uncaught exception.
 
-Residual limitation: the reference validator and exporter set no byte-size, nesting-depth, container-count or error-count budgets. They parse the whole document, make deep copies, collect every schema error, canonicalize whole objects and, for profile 0.2, re-export the retained sources. An oversized or very broad package can therefore use a lot of memory and CPU before a decision is returned. Recipients who process packages from untrusted senders should run validation under operating-system or process limits (for example memory, CPU-time and file-size limits, or a timeout), and should reject oversized files before invoking the validator. This is not a hardened parser.
+Input budgets. The validator and the `recipient-validate` and `validate-record` commands enforce these starting limits before parsing, copying or schema traversal:
+
+| Budget | Value | Meaning |
+| --- | --- | --- |
+| `max_bytes` | 1,048,576 | File size, and the aggregate length of all strings and member names in a parsed value. |
+| `max_depth` | 20 | Nesting of arrays and objects. |
+| `max_nodes` | 16,384 | Every value in the document, scalars included. |
+| `max_items` | 4,096 | Elements in one array. |
+| `max_fields` | 256 | Members in one object. |
+| `max_string` | 65,536 | Characters in one string or member name. |
+| reported errors | 100 | Schema errors listed; a longer list ends with a `schema error list truncated after 100 errors` marker. |
+| semantic deadline | 5 s | The profile 0.2 Replay check runs in a separate worker that is terminated at the deadline. |
+
+Basis. The values are the qualification repository's measured admission budget (`results/u1-security-20261015/budget-measurement.json`; its own note says the measurement is not a capacity recommendation) and its 5-second worker deadline is the plan's starting value. The qualification tool `tools/security_coverage.py` has a separate 2 MiB budget for parsing source files for coverage review; it is a different subsystem and does not apply here. Every valid fixture and producer-v2 example in this repository is within these limits (largest: 138,883 bytes, 3,298 nodes, 14 levels). The earlier plan values (8 MiB, depth 64, 100,000 nodes) remain the fallback for any dimension that a valid input later exceeds. All numbers are starting values, not measured safe limits, and can change before the first freeze; they are constants in `odes.common` (`INPUT_LIMITS`, `MAX_REPORTED_ERRORS`) and `odes.recipient_validator` (`SEMANTIC_DEADLINE_SECONDS`).
+
+Over-budget input is refused with `status = fail` and the closed reason code `budget_exceeded` in `evidence.reason_code` (with `evidence.dimension` and, for the recipient decision, `evidence.input` naming the package or policy), distinct from malformed input, which has no reason code. A semantic worker that does not finish by the deadline gives `replay_semantic_consistency` `fail` with `reason_code = budget_exceeded` and `dimension = semantic_deadline`. Refusal reads no producer store, makes no retry and has no effect. References and encoded artifacts are ordinary strings: they count toward the string and aggregate budgets by length, and nothing is decompressed or fetched. `load_json` without limits and the exporter inputs (producer-side) are unchanged.
+
+Residual limitation: these are in-process budgets and a worker deadline, not memory or CPU isolation. The worker deadline bounds time only for the Replay check; a recipient that processes packages from untrusted senders should still run validation under operating-system limits (for example memory and CPU-time limits, or a container timeout) and reject oversized files before invoking the validator. This is not a hardened parser.
 
 ## Profile 0.2 semantic consistency
 
