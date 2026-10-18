@@ -1,9 +1,9 @@
 {
-  "fixture_id": "tier-v3-claimed",
+  "fixture_id": "tier-v3-claimed-without-input",
   "synthetic": true,
   "expected_outcome": "reject",
-  "reason": "Witness re-derivation (V3) is deferred; the tier is not in the closed set.",
-  "expected_refusal": "unknown_enum_value",
+  "reason": "Tier V3 re-derives from a witness file or a holder inventory; a report that says it ran V3 names one of them as an input (draft revision 2026-10-18: this fixture was `tier-v3-claimed`, refused as an unknown tier before V3 was admitted).",
+  "expected_refusal": "v3_input_missing",
   "document": {
     "contract": "verification-report",
     "contract_version": "0.1.0-draft",
@@ -144,6 +144,10 @@
       {
         "id": "differential_agreement_is_not_equivalence",
         "statement": "Agreement between verifier and controller on a corpus is not equivalence outside that corpus."
+      },
+      {
+        "id": "witness_is_not_publication",
+        "statement": "A witness file that matches the records shows only that match: not that it was published, that it was published in time, or that any party independent of the record keeper held it."
       }
     ],
     "mutation_report": null

@@ -1,0 +1,31 @@
+{
+  "fixture_id": "enforcement-point-empty",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A holder names where its authority is enforced.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00+00:00",
+    "holders": [
+      {
+        "holder_id": "h-routed",
+        "kind": "routed",
+        "enforcement_point": "",
+        "credential_ref": null
+      },
+      {
+        "holder_id": "h-self",
+        "kind": "self_credentialed",
+        "enforcement_point": "destination credential",
+        "credential_ref": null
+      }
+    ]
+  }
+}

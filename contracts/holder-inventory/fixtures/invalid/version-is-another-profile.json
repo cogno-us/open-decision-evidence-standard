@@ -1,0 +1,31 @@
+{
+  "fixture_id": "version-is-another-profile",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Only holder-inventory/0.1 is implemented.",
+  "expected_refusal": "unsupported_contract_version",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": {
+    "version": "holder-inventory/0.2",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00+00:00",
+    "holders": [
+      {
+        "holder_id": "h-routed",
+        "kind": "routed",
+        "enforcement_point": "control plane effect check",
+        "credential_ref": null
+      },
+      {
+        "holder_id": "h-self",
+        "kind": "self_credentialed",
+        "enforcement_point": "destination credential",
+        "credential_ref": null
+      }
+    ]
+  }
+}

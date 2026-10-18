@@ -1,0 +1,67 @@
+{
+  "fixture_id": "run-id-changes-mid-chain",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "One witness chain covers one run.",
+  "expected_refusal": "witness_chain_invalid",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": [
+    {
+      "digest": "sha256:bbf8dae4e34bc1823da9df2a8ddb46456d8b6305b21d6493b0b97deb16600371",
+      "ledgers": {
+        "check_events": {
+          "count": 13,
+          "head": "sha256:bafd43d3ad45dc6ab62f6c2945b39481d532bf614d9e998d4f43456c86d4615c"
+        },
+        "decisions": {
+          "count": 1,
+          "head": "sha256:e5a55dab990355d283abaa05941d0ff8d51a3316a1a8ebc3e96392e7a36af485"
+        },
+        "resolution_checks": {
+          "count": 1,
+          "head": "sha256:e3d03259489d854e91b299f2f58780e082417a543d74677110b0f70e6310d4d1"
+        }
+      },
+      "previous_digest": null,
+      "run_id": "run-1",
+      "sequence": 0,
+      "version": "witness-digest/0.1"
+    },
+    {
+      "digest": "sha256:06cdb0c9568d632df22ff7f1c3c854c6568d6e921e867578f3e24daa259fd9da",
+      "ledgers": {
+        "attempts": {
+          "count": 2,
+          "head": "sha256:f902605153af298e160d63b95584a3ae31d97848679099f973324bac24e0d994"
+        },
+        "check_events": {
+          "count": 26,
+          "head": "sha256:28da95082ab67d32a50b1310a1ec50d5578f92936212831cfb1ce9160f356768"
+        },
+        "decisions": {
+          "count": 1,
+          "head": "sha256:e5a55dab990355d283abaa05941d0ff8d51a3316a1a8ebc3e96392e7a36af485"
+        },
+        "observations": {
+          "count": 2,
+          "head": "sha256:270a21b48fa8d3bfac6b5684acb379ebec823a5a376ab2963ba95d6f7d65c20b"
+        },
+        "reconciliations": {
+          "count": 2,
+          "head": "sha256:29413a8d749f5f60eb7c6698c82d5b8d749d6527c4ac0a6bb1368a3e611d0ba1"
+        },
+        "resolution_checks": {
+          "count": 2,
+          "head": "sha256:37cc8422973f0964e1d3cc05017cafdecef7f51bedbe12f5730caa8ae41992d1"
+        }
+      },
+      "previous_digest": "sha256:bbf8dae4e34bc1823da9df2a8ddb46456d8b6305b21d6493b0b97deb16600371",
+      "run_id": "run-2",
+      "sequence": 1,
+      "version": "witness-digest/0.1"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "fixture_id": "enumerates-no-holder",
+  "synthetic": true,
+  "expected_outcome": "accept",
+  "reason": "Valid in shape and claims nothing: the inventory of a captured run in which the same flagged class was held with `holder_inventory_missing`. The profile counts an inventory only if it enumerates at least one holder.",
+  "expected_refusal": null,
+  "provenance": {
+    "source": "control-plane-capture",
+    "control_plane_revision": "128eaa5e",
+    "scenario": "holder-inventory-empty-held"
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00+00:00",
+    "holders": []
+  },
+  "context": {
+    "class_requires_revocation_assurance": true,
+    "result": "hold",
+    "reasons": [
+      "holder_inventory_missing"
+    ]
+  }
+}

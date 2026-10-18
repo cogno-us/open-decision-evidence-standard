@@ -72,6 +72,7 @@ NON_CLAIM_TEXT = {
     "differential_agreement_is_not_equivalence": "Agreement between verifier and controller on a corpus is not equivalence outside that corpus.",
     "no_imported_headline_numbers": "No figure from any paper is a target, baseline or expectation; the only numbers are counts from the corpora named here.",
     "seeds_are_regression_not_detection": "Seed corpora are regression checks; detection figures come only from the generated held-out corpus.",
+    "witness_is_not_publication": "A witness file that matches the records shows only that match: not that it was published, that it was published in time, or that any party independent of the record keeper held it.",
 }
 
 
@@ -226,7 +227,12 @@ def invalid(v):
     add("report-kind-attestation", "schema_violation", a, lambda x: x.update({"report_kind": "attestation"}), "report_kind is verification_report and nothing else.")
     add("composite-score-member", "undeclared_member", a, lambda x: x["summary"].update({"score": 0.97}), "There is no composite score member.")
     add("semantic-quality-certified", "unknown_enum_value", a, lambda x: x["scope"].update({"semantic_quality": "certified"}), "Semantic quality is not_assessed; certified is not a value.")
-    add("tier-v3-claimed", "unknown_enum_value", a, lambda x: x["scope"]["tiers_run"].append("V3"), "Witness re-derivation (V3) is deferred; the tier is not in the closed set.")
+    def claim_v3(x):
+        x["scope"]["tiers_run"].append("V3")
+        x["does_not_prove"].append({"id": "witness_is_not_publication", "statement": NON_CLAIM_TEXT["witness_is_not_publication"]})
+    add("tier-v3-claimed-without-input", "v3_input_missing", a, claim_v3, "Tier V3 re-derives from a witness file or a holder inventory; a report that says it ran V3 names one of them as an input (draft revision 2026-10-18: this fixture was `tier-v3-claimed`, refused as an unknown tier before V3 was admitted).")
+    add("tier-v5-claimed", "unknown_enum_value", a, lambda x: x["scope"]["tiers_run"].append("V5"), "The tier set is closed (V1, V2, V3, V4); another tier is a major bump.")
+    add("v3-check-tier-not-run", "check_tier_not_run", a, lambda x: (x["checks"].append(check("v3.witness.records", "V3", c=1)), x.update({"summary": summary(x["checks"])})), "A V3 check in a report whose scope does not list V3 (and with no witness input) is refused like any check of a tier not run.")
     add("rate-without-denominator", "schema_violation", m, lambda x: gen_row(x["mutation_report"] and x, "W1").update({"false_acceptance": 0.0}), "A rate is a k/n object; a bare number is refused.")
     add("pinned-controller-revision-missing", "schema_violation", a, lambda x: x["subject"]["pinned"].pop("controller_revision"), "A report names the controller revision it is relative to.")
     add("extension-key-without-x-prefix", "invalid_extension_key", a, lambda x: x.update({"extensions": {"note": 1}}), "Extension names start with x-.")
@@ -307,7 +313,8 @@ def write(kind, fid, payload):
 def main() -> int:
     for kind in ("valid", "invalid"):
         for old in (CONTRACT_DIR / "fixtures" / kind).glob("*.json"):
-            old.unlink()
+            if not old.name.startswith("v3-"):   # the v3-* fixtures are written by build_v3_fixtures.py
+                old.unlink()
     v = valid()
     for fid, (reason, doc) in v.items():
         assert vr.validate(doc) == [], (fid, vr.validate(doc))

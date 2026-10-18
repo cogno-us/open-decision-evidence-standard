@@ -1,0 +1,17 @@
+{
+  "fixture_id": "holders-member-missing",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "holders is required, even when empty.",
+  "expected_refusal": "schema_violation",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": {
+    "version": "holder-inventory/0.1",
+    "inventory_id": "inv-1",
+    "recorded_by": "urn:cognous:principal:inventory-owner",
+    "recorded_at": "2026-10-05T19:00:00+00:00"
+  }
+}

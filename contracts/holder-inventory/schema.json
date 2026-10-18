@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Holder inventory contract 0.1.0-draft",
+  "description": "Draft optional ODES extension profile: the holder-inventory/0.1 document the Control Plane's opt-in profile carries (RuntimeAuthorityProfile.holder_inventory): who recorded it, when, and the holders of authority it enumerates, each with its kind and the point where its authority is enforced. An inventory is a claim by whoever wrote it: the stack cannot check it for completeness, and a holder nobody listed stays invisible. Closed member sets; x- extensions allowed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "inventory_id",
+    "recorded_by",
+    "recorded_at",
+    "holders"
+  ],
+  "properties": {
+    "version": {
+      "const": "holder-inventory/0.1"
+    },
+    "inventory_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "recorded_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "recorded_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "holders": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "#/$defs/holder"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "holder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "holder_id",
+        "kind",
+        "enforcement_point",
+        "credential_ref"
+      ],
+      "properties": {
+        "holder_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "kind": {
+          "enum": [
+            "routed",
+            "self_credentialed",
+            "other"
+          ]
+        },
+        "enforcement_point": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "credential_ref": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "maxLength": 256
+            }
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}

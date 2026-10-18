@@ -266,7 +266,7 @@ def test_subject_digest_binds_the_inputs_and_the_pinned_profile():
 def test_every_non_claim_is_in_the_schema_set_and_the_readme():
     schema = vr.load_schema()
     ids = schema["$defs"]["non_claim"]["properties"]["id"]["enum"]
-    assert set(ids) == set(vr.CORE_NON_CLAIMS) | set(vr.MUTATION_NON_CLAIMS) and len(ids) == 10
+    assert set(ids) == set(vr.CORE_NON_CLAIMS) | set(vr.MUTATION_NON_CLAIMS) | set(vr.V3_NON_CLAIMS) and len(ids) == 11
     readme = (CONTRACT_DIR / "README.md").read_text(encoding="utf-8")
     for i in ids:
         assert f"`{i}`" in readme
@@ -287,3 +287,79 @@ def test_category_set_is_the_design_catalogue():
 
 def test_mutation_report_gates_nothing():
     assert vr.load_schema()["$defs"]["mutation_report"]["properties"]["report_only"] == {"const": True}
+
+
+# ------------------------------------------------------------------ tier V3 (draft revision 2026-10-18, decision 27)
+
+V3_FIXTURES = ("v3-witness-complete", "v3-witness-first-publication-only", "v3-witness-and-holder-inventory",
+               "v3-held-for-missing-inventory", "v3-witness-refutes-damaged-record")
+
+
+def test_tier_v3_and_the_two_input_roles_are_in_the_closed_sets():
+    schema = vr.load_schema()
+    assert schema["$defs"]["scope"]["properties"]["tiers_run"]["items"]["enum"] == ["V1", "V2", "V3", "V4"]
+    assert schema["$defs"]["check"]["properties"]["tier"]["enum"] == ["V1", "V2", "V3", "V4"]
+    roles = schema["$defs"]["input"]["properties"]["role"]["enum"]
+    assert set(vr.V3_INPUT_ROLES) <= set(roles) and len(roles) == 8
+    d = doc("trace-all-confirmed")
+    d["scope"]["tiers_run"].append("V5")
+    assert codes(d) == ["unknown_enum_value"]
+
+
+def test_v3_fixtures_are_captured_reports_with_v3_inside_checks():
+    for fid in V3_FIXTURES:
+        d = fx(fid)
+        assert "V3" in d["scope"]["tiers_run"]
+        assert any(c["tier"] == "V3" for c in d["checks"])
+        assert "x-tier-v3" not in d.get("extensions", {}), fid      # the section moved into checks
+        assert {i["role"] for i in d["subject"]["inputs"]} & set(vr.V3_INPUT_ROLES)
+        assert d["summary"]["checks"] == len(d["checks"])             # V3 checks are counted like any other
+        assert "witness_is_not_publication" in {n["id"] for n in d["does_not_prove"]}
+        assert not any("score" in k for k in d["summary"])
+        assert vr.validate(d) == []
+
+
+def test_v3_verdicts_are_derived_like_any_other_check():
+    refuted = fx("v3-witness-refutes-damaged-record")
+    head = next(c for c in refuted["checks"] if c["check_id"] == "v3.witness.ledger-heads")
+    assert head["verdict"] == "refuted" and head["findings"][0]["code"] == "witness_ledger_shrunk"
+    assert vr.overall_verdict(refuted) == "reject"
+    first = fx("v3-witness-first-publication-only")
+    cov = next(c for c in first["checks"] if c["check_id"] == "v3.witness.coverage")
+    assert cov["verdict"] == "could_not_check" and cov["could_not_check_reason"] == "input_absent"
+    complete = fx("v3-witness-complete")
+    assert {c["verdict"] for c in complete["checks"] if c["tier"] == "V3"} == {"confirmed"}
+
+
+def test_v3_requires_an_outside_input_and_an_input_requires_v3():
+    d = fx("v3-witness-complete")
+    d["subject"]["inputs"] = [i for i in d["subject"]["inputs"] if i["role"] != "witness"]
+    d["subject"]["inputs_digest"] = vr.commitment(d["subject"]["inputs"])
+    assert codes(d) == ["v3_input_missing"]
+    # a holder inventory alone also licenses V3 (its checks are about the inventory, not the witness)
+    d = fx("v3-witness-and-holder-inventory")
+    d["subject"]["inputs"] = [i for i in d["subject"]["inputs"] if i["role"] != "witness"]
+    d["subject"]["inputs_digest"] = vr.commitment(d["subject"]["inputs"])
+    assert codes(d) == []
+    d = fx("v3-witness-complete")
+    d["scope"]["tiers_run"].remove("V3")
+    assert "v3_input_without_tier" in codes(d) and "check_tier_not_run" in codes(d)
+
+
+def test_the_v3_non_claim_is_required_only_when_v3_ran():
+    d = fx("trace-all-confirmed")
+    assert "witness_is_not_publication" not in {n["id"] for n in d["does_not_prove"]}
+    d = fx("v3-witness-complete")
+    d["does_not_prove"] = [n for n in d["does_not_prove"] if n["id"] != "witness_is_not_publication"]
+    assert codes(d) == ["non_claim_missing"]
+
+
+def test_every_default_path_fixture_that_predates_the_revision_is_unchanged():
+    """The hand-written valid fixtures and every invalid fixture except the V3 ones kept their documents (the one that changed is
+    named: `tier-v3-claimed` became `tier-v3-claimed-without-input`)."""
+    ids = {f["fixture_id"] for f in INVALID}
+    assert "tier-v3-claimed" not in ids and "tier-v3-claimed-without-input" in ids
+    for fid in ("trace-all-confirmed", "trace-could-not-check", "trace-refuted-with-findings", "trace-three-verdicts",
+                "mutation-report-full", "mutation-report-with-per-scenario-tables", "trace-with-mutation-report",
+                "extension-namespace-members-preserved"):
+        assert "V3" not in fx(fid)["scope"]["tiers_run"]

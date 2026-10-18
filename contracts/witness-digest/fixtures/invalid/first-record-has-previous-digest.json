@@ -1,0 +1,30 @@
+{
+  "fixture_id": "first-record-has-previous-digest",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The first record links to nothing (null).",
+  "expected_refusal": "witness_chain_invalid",
+  "provenance": {
+    "source": "single-defect mutation of a Control Plane capture",
+    "control_plane_revision": "128eaa5e"
+  },
+  "document": [
+    {
+      "digest": "sha256:7f79d6009685906b93fd9822739c2a26201d11a3f150b85b1d779235bbe6ff34",
+      "ledgers": {
+        "decisions": {
+          "count": 1,
+          "head": "sha256:9f66c661dc307695aba5a59bcf68cba3bc9ca11234cf56326be6211afbc3853b"
+        },
+        "resolution_checks": {
+          "count": 1,
+          "head": "sha256:67b5e59691a7aa79e3d0c28e06ba00f302b328b375b6ae28d3fdecaab0ba8064"
+        }
+      },
+      "previous_digest": "sha256:7b1b763ee8f62eb88e4742a760f912d0b19bcd58b2b948999784bacc15a7f4d7",
+      "run_id": "run-1",
+      "sequence": 0,
+      "version": "witness-digest/0.1"
+    }
+  ]
+}

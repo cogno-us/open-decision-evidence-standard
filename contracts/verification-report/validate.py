@@ -35,6 +35,10 @@ CORE_NON_CLAIMS = (
     "no_v1_scope_claim", "differential_agreement_is_not_equivalence",
 )
 MUTATION_NON_CLAIMS = ("no_imported_headline_numbers", "seeds_are_regression_not_detection")
+# Tier V3 (witness re-derivation, draft revision 2026-10-18, decision 27): the tier runs only over an outside input and carries one more
+# non-claim.
+V3_INPUT_ROLES = ("witness", "holder_inventory")
+V3_NON_CLAIMS = ("witness_is_not_publication",)
 
 
 @dataclass(frozen=True)
@@ -235,6 +239,14 @@ def _document_rules(doc: dict[str, Any]) -> list[Violation]:
     if subject["inputs_digest"] != commitment(inputs):
         out.append(_v("subject_digest_mismatch", "$.subject.inputs_digest",
                       "inputs_digest is the commitment over the inputs list exactly as written"))
+    roles = {i["role"] for i in inputs}
+    v3_ran = "V3" in scope["tiers_run"]
+    if v3_ran and not roles & set(V3_INPUT_ROLES):
+        out.append(_v("v3_input_missing", "$.scope.tiers_run",
+                      "tier V3 re-derives from a witness file or a holder inventory: one of them is an input of the subject"))
+    if roles & set(V3_INPUT_ROLES) and not v3_ran:
+        out.append(_v("v3_input_without_tier", "$.scope.tiers_run",
+                      "a witness or holder inventory input is read by tier V3, which the report says it ran"))
     if not subject["pinned"]["contract_versions"]:
         out.append(_v("pinned_contract_versions_empty", "$.subject.pinned.contract_versions",
                       "a report names the contract draft versions it was checked against"))
@@ -273,7 +285,8 @@ def _document_rules(doc: dict[str, Any]) -> list[Violation]:
     ids = [n["id"] for n in doc["does_not_prove"]]
     if len(set(ids)) != len(ids):
         out.append(_v("duplicate_non_claim", "$.does_not_prove", "each non-claim appears once"))
-    required = list(CORE_NON_CLAIMS) + (list(MUTATION_NON_CLAIMS) if doc["mutation_report"] is not None else [])
+    required = list(CORE_NON_CLAIMS) + (list(MUTATION_NON_CLAIMS) if doc["mutation_report"] is not None else []) \
+        + (list(V3_NON_CLAIMS) if v3_ran else [])
     for need in required:
         if need not in ids:
             out.append(_v("non_claim_missing", "$.does_not_prove", f"the non-claim {need!r} is mandatory"))
