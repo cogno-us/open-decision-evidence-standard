@@ -1,0 +1,153 @@
+{
+  "fixture_id": "attestation-member",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "A report carries no attestation member: it is a verification report.",
+  "expected_refusal": "undeclared_member",
+  "document": {
+    "contract": "verification-report",
+    "contract_version": "0.1.0-draft",
+    "profile": "verification-report/0.1",
+    "report_kind": "verification_report",
+    "report_id": "rep-1",
+    "generated_at": "2026-10-18T12:00:00+00:00",
+    "verifier": {
+      "name": "cognous-open-control-stack-verifier",
+      "version": "0.0.0-handwritten-fixture",
+      "command": "cognous-verify",
+      "source_revision": "0000000",
+      "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan-python-semantics-v0.1"
+    },
+    "subject": {
+      "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan-python-semantics-v0.1",
+      "inputs": [
+        {
+          "role": "proposal_export",
+          "name": "proposal.json",
+          "digest": "sha256:dedc54c67b705c896fe056e89bab5503d334a836eccece33efa2c268d43191e3",
+          "size_bytes": 1013
+        },
+        {
+          "role": "run_record",
+          "name": "run-record.json",
+          "digest": "sha256:c267f13a3b1b01a72956b2d857657e4553ceb9c24f9098cf09f0119218bb07ea",
+          "size_bytes": 1015
+        }
+      ],
+      "inputs_digest": "sha256:4a4130edb525957ed471a4902082df5e5e75d5cd2a554f5a892903828d093336",
+      "pinned": {
+        "controller_revision": "87f02336",
+        "reason_registry_digest": "sha256:6f67c3c1836f72d63252e93923292bb6400e314942f3a97c40b62b36c25b9084",
+        "contract_versions": {
+          "control-plane-journal": "0.1.0-draft",
+          "execution-attempt-lifecycle": "0.1.0-draft"
+        }
+      }
+    },
+    "scope": {
+      "semantic_quality": "not_assessed",
+      "tiers_run": [
+        "V1",
+        "V2"
+      ]
+    },
+    "checks": [
+      {
+        "check_id": "v1.wire.strict-parse",
+        "tier": "V1",
+        "verdict": "confirmed",
+        "tally": {
+          "confirmed": 3,
+          "could_not_check": 0,
+          "refuted": 0,
+          "n": 3
+        },
+        "could_not_check_reason": null,
+        "findings": []
+      },
+      {
+        "check_id": "v1.wire.closed-members",
+        "tier": "V1",
+        "verdict": "confirmed",
+        "tally": {
+          "confirmed": 3,
+          "could_not_check": 0,
+          "refuted": 0,
+          "n": 3
+        },
+        "could_not_check_reason": null,
+        "findings": []
+      },
+      {
+        "check_id": "v2.identity.effect-id",
+        "tier": "V2",
+        "verdict": "confirmed",
+        "tally": {
+          "confirmed": 2,
+          "could_not_check": 0,
+          "refuted": 0,
+          "n": 2
+        },
+        "could_not_check_reason": null,
+        "findings": []
+      },
+      {
+        "check_id": "v2.decision.result-matches-reasons",
+        "tier": "V2",
+        "verdict": "confirmed",
+        "tally": {
+          "confirmed": 2,
+          "could_not_check": 0,
+          "refuted": 0,
+          "n": 2
+        },
+        "could_not_check_reason": null,
+        "findings": []
+      }
+    ],
+    "summary": {
+      "checks": 4,
+      "confirmed": 4,
+      "could_not_check": 0,
+      "refuted": 0
+    },
+    "does_not_prove": [
+      {
+        "id": "relative_to_pinned_controller",
+        "statement": "The result is relative to the controller revision, contract draft versions and reason registry named in subject.pinned; it does not carry to any other revision."
+      },
+      {
+        "id": "semantic_quality_not_certified",
+        "statement": "No claim that a decision was correct, that a policy was adequate or that a grant was lawfully issued."
+      },
+      {
+        "id": "receipt_source_bounded",
+        "statement": "Destination ledger rows are executor-written, unsequenced and unsigned: no claim that the ledger is complete or unforged, or that an effect occurred in the world."
+      },
+      {
+        "id": "self_consistent_forgery_not_detected",
+        "statement": "A record rewritten with every affected commitment recomputed is accepted; no external anchor exists."
+      },
+      {
+        "id": "not_an_attestation",
+        "statement": "This is a verification report. It is not an attestation, not an Index or BitRep signature and not an authorization; it grants and denies nothing and is never an input to a grant or decision."
+      },
+      {
+        "id": "parse_strictness_is_refusal_not_repair",
+        "statement": "An input refused at the wire level is reported as refused; the verifier does not normalize it and re-run."
+      },
+      {
+        "id": "no_v1_scope_claim",
+        "statement": "Nothing here changes the V1 scope, the failure register or any qualified row."
+      },
+      {
+        "id": "differential_agreement_is_not_equivalence",
+        "statement": "Agreement between verifier and controller on a corpus is not equivalence outside that corpus."
+      }
+    ],
+    "mutation_report": null,
+    "attestation": {
+      "issuer": "verifier"
+    }
+  }
+}
