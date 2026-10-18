@@ -7,7 +7,8 @@
     "source": "control-plane-capture",
     "control_plane_commit": "128eaa5e",
     "capture": "freshness-clocks",
-    "scenario": "extension-withdrawn-at-use"
+    "scenario": "extension-withdrawn-at-use",
+    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
   },
   "document": {
     "contract": "control-plane-journal",
@@ -604,7 +605,7 @@
         ]
       },
       {
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2",
         "rule_identity": {
           "rules": {
             "urn:cognous:policy:refund-policy": {
@@ -1822,7 +1823,7 @@
           "age_extension_signer_not_configured",
           "grant_status_stale_or_future"
         ],
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2"
       }
     ]
   }

@@ -387,11 +387,12 @@ def test_default_path_outcomes_are_exactly_those_of_the_validator_before_the_pro
     """Every fixture that existed before draft revision 2 gets the same violations (code, path, message) it got at ODES 08afffe0
     (the journal contract was unchanged on main until this change)."""
     baseline = json.loads((CONTRACT_DIR / "fixtures" / "baseline-outcomes-pre-profile-members.json").read_text(encoding="utf-8"))["outcomes"]
-    older = [f for f in VALID + INVALID if not f["fixture_id"].startswith("profile-")]
+    # revision 3 (decision 31) fixtures, prefix "reasons-", postdate the baseline and are covered by their own tests
+    older = [f for f in VALID + INVALID if not f["fixture_id"].startswith(("profile-", "reasons-"))]
     assert len(baseline) == len(older) == 80
     for kind, group in (("valid", VALID), ("invalid", INVALID)):
         for fx in group:
-            if not fx["fixture_id"].startswith("profile-"):
+            if not fx["fixture_id"].startswith(("profile-", "reasons-")):
                 got = [[v.code, v.path, v.message] for v in cpj.validate(fx["document"])]
                 assert got == baseline[f"{kind}/{fx['fixture_id']}"], fx["fixture_id"]
 
@@ -487,3 +488,42 @@ def test_profile_rules_do_not_relax_the_default_path():
     d = copy.deepcopy(next(f for f in PROFILE_VALID if f["fixture_id"] == "profile-lease-unavailable-holds")["document"])
     d["decisions"][0].pop("evaluated_at")
     assert codes(d) == ["journal_missing"]
+
+
+# ------------------------------------------------------------------ registry label 0.2 (draft revision 3, decision 31)
+
+def test_registry_labels_and_the_zero_two_only_codes():
+    assert cpj.VOCABULARY_0_1 == "runtime-authority-reasons/0.1" and cpj.VOCABULARY_0_2 == "runtime-authority-reasons/0.2"
+    assert len(cpj.CODES_ADDED_IN_0_2) == 36  # 157 - 121, from the Control Plane's two registry captures
+    assert {"holder_inventory_missing", "check_expired_before_dispatch", "operation_id_missing"} <= cpj.CODES_ADDED_IN_0_2
+    enums = [cpj.load_schema()["$defs"][n]["properties"]["reason_vocabulary_version"]["enum"] for n in ("journal_event", "decision", "refusal")]
+    assert all(e == [cpj.VOCABULARY_0_1, cpj.VOCABULARY_0_2] for e in enums), enums
+
+
+def test_a_label_matches_the_codes_in_every_captured_row():
+    """The producer rule: 0.2 only with a 0.2-only code present is not asserted (superset), but 0.1 never holds one."""
+    swept = 0
+    for fx in VALID:
+        for section in ("decisions", "refusals", "check_events"):
+            for row in fx["document"].get(section, []):
+                if row.get("reason_vocabulary_version") == cpj.VOCABULARY_0_1:
+                    assert not set(row["reasons"]) & cpj.CODES_ADDED_IN_0_2, fx["fixture_id"]
+                    swept += 1
+    assert swept > 50
+
+
+def test_label_cases_on_a_held_decision():
+    d = doc("reasons-0-2-label-with-a-0-2-code")
+    assert codes(d) == []
+    d["decisions"][0]["reason_vocabulary_version"] = cpj.VOCABULARY_0_1
+    assert codes(d) == ["reason_label_mismatch"]
+    d["decisions"][0]["reason_vocabulary_version"] = "runtime-authority-reasons/0.3"
+    assert codes(d) == ["unknown_enum_value"]
+    # a check event and a refusal row are held to the same rule
+    e = doc("reasons-0-2-label-with-a-0-2-code")
+    ev = next(x for x in e["check_events"] if x["reasons"])
+    ev["reason_vocabulary_version"] = cpj.VOCABULARY_0_1
+    assert codes(e) == ["reason_label_mismatch"]
+    # a code outside both registries is not judged under either label
+    f = doc("held-decision-journal-mode")
+    assert codes(f) == []

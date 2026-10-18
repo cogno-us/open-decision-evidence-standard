@@ -6,7 +6,8 @@
   "reason": "A `nonce_mismatch` read belongs to freshness/0.1 and its input carries age_basis.",
   "provenance": {
     "source": "single-defect mutation of the captured fixture profile-nonce-replay-rejected",
-    "control_plane_commit": "128eaa5e"
+    "control_plane_commit": "128eaa5e",
+    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
   },
   "document": {
     "contract": "control-plane-journal",
@@ -981,7 +982,7 @@
     ],
     "refusals": [
       {
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2",
         "check_id": "syn-check-3",
         "refusal_id": "syn-refusal-1",
         "decision_id": "syn-decision-1",
@@ -2644,7 +2645,7 @@
         "reasons": [
           "status_nonce_mismatch"
         ],
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1"
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2"
       }
     ]
   }

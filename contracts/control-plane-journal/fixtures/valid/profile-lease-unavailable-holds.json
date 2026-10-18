@@ -7,7 +7,8 @@
     "source": "control-plane-capture",
     "control_plane_commit": "128eaa5e",
     "capture": "freshness-clocks",
-    "scenario": "lease-unavailable-holds"
+    "scenario": "lease-unavailable-holds",
+    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
   },
   "document": {
     "contract": "control-plane-journal",
@@ -31,7 +32,7 @@
     "closeouts": [],
     "decisions": [
       {
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2",
         "decision_id": "syn-decision-1",
         "effect_id": "sha256:daf1e9f4f362506714549621a7e41269c4caf98aebb7cd948340655f675a46d5",
         "result": "hold",

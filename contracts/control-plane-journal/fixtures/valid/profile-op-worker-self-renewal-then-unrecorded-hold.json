@@ -7,7 +7,8 @@
     "source": "control-plane-capture",
     "control_plane_commit": "128eaa5e",
     "capture": "operation-identity",
-    "scenario": "op-worker-self-renewal-then-unrecorded-hold"
+    "scenario": "op-worker-self-renewal-then-unrecorded-hold",
+    "vocabulary_label": "reason_vocabulary_version rewritten from runtime-authority-reasons/0.1 to /0.2 on rows holding a 0.2-only code (decision 31); reasons unchanged"
   },
   "document": {
     "contract": "control-plane-journal",
@@ -557,7 +558,7 @@
         ]
       },
       {
-        "reason_vocabulary_version": "runtime-authority-reasons/0.1",
+        "reason_vocabulary_version": "runtime-authority-reasons/0.2",
         "decision_id": "syn-decision-2",
         "effect_id": "sha256:a9115d383ea0418b3578586c010ef272931aecda8810ac1afe0c5bf529a0a540",
         "result": "hold",
