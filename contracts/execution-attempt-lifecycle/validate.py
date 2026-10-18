@@ -527,6 +527,49 @@ POST_JOURNAL_GATE_CODES = frozenset({
 })
 
 
+# Rule ``reasons_minimum`` (decision 39-E). A completion's reasons include the minimum set its own recorded input events imply. The
+# table is what the Control Plane writer (``bounded.py`` ``_resolve_journal``, ``_read_grant``, ``_read_input``, ``capture`` and
+# ``runtime_authority.validate_extensions`` at 6093aca7) always writes for these recorded facts; it is a floor, never a full
+# derivation (the required-input list is not recorded, so ``required_input_not_read`` is not derived):
+#   an input whose read_state is "unreadable" and that no later read of the same input rescued as "cached_positive"
+#       -> status_unreadable
+#   an input with read_state "nonce_mismatch"                         -> status_nonce_mismatch
+#   an authority_context whose last read is missing, no read_state    -> authority_context_missing
+#   a purpose whose last read is missing, no read_state               -> purpose_unreadable
+#   any input whose last read is missing and not rescued              -> at least one reason
+IMPLIED_REASONS = {
+    "unreadable": "status_unreadable",
+    "nonce_mismatch": "status_nonce_mismatch",
+    "authority_context_missing": "authority_context_missing",
+    "purpose_missing": "purpose_unreadable",
+}
+
+
+def implied_reasons(inputs: list[dict[str, Any]]) -> tuple[set[str], bool]:
+    """The reasons a completed check must carry given its recorded input events, and whether it must carry at least one."""
+    last: dict[tuple[Any, Any], dict[str, Any]] = {}
+    states: dict[tuple[Any, Any], set[Any]] = {}
+    implied: set[str] = set()
+    for x in inputs:
+        key = (x.get("input_type"), x.get("input_id"))
+        last[key] = x
+        states.setdefault(key, set()).add(x.get("read_state"))
+        if x.get("read_state") == "nonce_mismatch":
+            implied.add(IMPLIED_REASONS["nonce_mismatch"])
+    some = False
+    for key, x in last.items():
+        rescued = "cached_positive" in states[key]
+        if "unreadable" in states[key] and not rescued:
+            implied.add(IMPLIED_REASONS["unreadable"])
+        if x.get("missing") is True and not rescued:
+            some = True
+            if x.get("read_state") is None and x.get("input_type") == "authority_context":
+                implied.add(IMPLIED_REASONS["authority_context_missing"])
+            if x.get("read_state") is None and x.get("input_type") == "purpose":
+                implied.add(IMPLIED_REASONS["purpose_missing"])
+    return implied, some
+
+
 def _norm(inputs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [{k: v for k, v in x.items() if k not in {"previous_observed_at", "extensions"}} for x in inputs]
 
@@ -571,6 +614,13 @@ def _journal_rules(doc: dict[str, Any]) -> list[Violation]:
             continue
         state[cid]["closed"] = True
         if ev["phase"] == "completed":
+            implied, some = implied_reasons(state[cid]["inputs"])
+            lacking = implied - set(ev["reasons"])
+            if lacking or (some and not ev["reasons"]):
+                out.append(Violation("reasons_minimum", f"$.resolution_journal[{seq}]",
+                                     "the completion's reasons lack what its own recorded inputs imply"
+                                     + (f": {', '.join(sorted(lacking))}" if lacking else ": a missing input requires at least one reason")))
+                continue
             # Journal ids and check ids are separate producer ids today; bind by content.
             candidates = [i for i, row in enumerate(checks_rows)
                           if row["stage"] == ev["stage"] and _norm(row["inputs"]) == _norm(state[cid]["inputs"])
