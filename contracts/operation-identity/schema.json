@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cogno-us/open-decision-evidence-standard/contracts/operation-identity/schema.json",
+  "title": "Operation identity extension profile 0.1.0-draft",
+  "description": "Optional extension profile layered on the control-plane-journal contract: the operation ledger, renewal rows and per-attempt join rows written by the Control Plane under the opt-in operation-identity/0.1 profile. Closed member sets; x- extensions on every declared object. Cross-record and cross-document rules are in validate.py and README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "contract_version",
+    "profile",
+    "run_id",
+    "operations",
+    "operation_renewals",
+    "attempt_joins"
+  ],
+  "properties": {
+    "contract": {
+      "const": "operation-identity"
+    },
+    "contract_version": {
+      "const": "0.1.0-draft"
+    },
+    "profile": {
+      "const": "operation-identity/0.1"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/operation"
+      }
+    },
+    "operation_renewals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/operation_renewal"
+      }
+    },
+    "attempt_joins": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/attempt_join"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions"
+    }
+  },
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^x-[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation_id",
+        "principal_id",
+        "authority_domain",
+        "issuer",
+        "grant_id",
+        "first_grant_revision",
+        "admitted_at"
+      ],
+      "properties": {
+        "operation_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$"
+        },
+        "principal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority_domain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "first_grant_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "admitted_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "operation_renewal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "renewal_id",
+        "operation_id",
+        "grant_id",
+        "from_revision",
+        "to_revision",
+        "written_by",
+        "outcome",
+        "refusal_code",
+        "recorded_at"
+      ],
+      "properties": {
+        "renewal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$"
+        },
+        "grant_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "from_revision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "to_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "written_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "enum": [
+            "accepted",
+            "refused"
+          ]
+        },
+        "refusal_code": {
+          "enum": [
+            null,
+            "operation_not_admitted",
+            "renewal_not_written_by_grant_issuer",
+            "renewal_revision_not_new"
+          ]
+        },
+        "recorded_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    },
+    "attempt_join": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "join_id",
+        "operation_id",
+        "attempt_id",
+        "check_id",
+        "effect_id",
+        "decision_id",
+        "grant_id",
+        "grant_revision",
+        "resolver_id",
+        "resolver_version",
+        "class_max_age",
+        "expected_effective_grant_digest",
+        "merged_into",
+        "recorded_at",
+        "time_source"
+      ],
+      "properties": {
+        "join_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$"
+        },
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "check_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effect_id": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grant_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolver_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolver_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class_max_age": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_effective_grant_digest": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "merged_into": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#-]{0,127}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recorded_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "time_source": {
+          "enum": [
+            "control_plane",
+            "test_override"
+          ]
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
+    }
+  }
+}
