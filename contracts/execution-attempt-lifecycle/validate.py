@@ -459,13 +459,14 @@ def _control_plane_rules(doc: dict[str, Any]) -> list[Violation]:
     return out
 
 
-# Allowed successors of each status (decision 37). Statuses with no successor are terminal and closed: a
+# Allowed successors of each status (decision 37; decision 39-P adds executed -> unknown and partial -> unknown: the Control Plane
+# adapter appends an unknown row after an executed or partial one when the follow-up observation is not accepted). Statuses with no successor are terminal and closed: a
 # closed attempt is never reopened and never receives a later, contradicting record.
 EXECUTOR_TRANSITIONS: dict[str, frozenset[str]] = {
     "attempted": frozenset({"executed", "partial", "failed", "unknown", "denied", "reconciled"}),
     "unknown": frozenset({"executed", "partial", "failed", "reconciled"}),
-    "executed": frozenset({"reconciled"}),
-    "partial": frozenset({"reconciled"}),
+    "executed": frozenset({"unknown", "reconciled"}),
+    "partial": frozenset({"unknown", "reconciled"}),
     "failed": frozenset(),
     "denied": frozenset(),
     "reconciled": frozenset(),
