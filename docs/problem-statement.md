@@ -1,6 +1,6 @@
 # Problem Statement
 
-Draft status note: This document is part of a discussion draft for an open, vendor-neutral candidate standard. It is not a product announcement, legal advice, compliance advice, certification, assurance, or warranty.
+Draft status note: This document is part of a discussion draft for an open, vendor-neutral candidate standard. It is not a product announcement, legal advice, compliance advice, certification, assurance, or warranty. Governance is currently single-maintainer (Cognous is the initial editorial maintainer); the work is a draft.
 
 Decisions travel. Evidence usually does not.
 

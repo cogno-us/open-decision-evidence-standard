@@ -23,7 +23,7 @@ Cross-component test commands below now run in a disposable checkout assembled b
 
 ## Overview
 
-ODES is an open, vendor-neutral discussion draft and reference tooling for portable decision evidence. The v0.2 narrative and implementation profile retain the pder-v0.1 record schema. It carries coordinates for recipient evaluation, rather than deciding whether a recipient should rely on the underlying decision.
+ODES is an open, vendor-neutral discussion draft and reference tooling for portable decision evidence. The v0.2 narrative and implementation profile retain the pder-v0.1 record schema. It carries coordinates for recipient evaluation, rather than deciding whether a recipient should rely on the underlying decision. Governance is currently single-maintainer (Cognous is the initial editorial maintainer) and the work is a draft, not a ratified standard.
 
 **Implementation status:** public reference work. The [current component lock](https://github.com/cogno-us/cognous-open-control-stack/blob/main/component-lock.json) defines the selected integration; a component merge does not automatically change that selection or approve deployment.
 
@@ -78,6 +78,7 @@ Use these sources for details; their historical checkpoints retain the status an
 - [docs/cognous-stack-field-mapping.md](docs/cognous-stack-field-mapping.md)
 - [docs/selective-disclosure.md](docs/selective-disclosure.md)
 - [docs/related-work.md](docs/related-work.md)
+- [docs/capabilities-and-versions.md](docs/capabilities-and-versions.md) (capability layers and the version register)
 
 For a nontechnical introduction, read the [business overview](collateral/business-collateral.md) and [one-page overview](collateral/one-page-overview.md). Both describe this component's role and evidence limits, not additional runtime features.
 
