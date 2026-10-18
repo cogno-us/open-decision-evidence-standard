@@ -1,0 +1,673 @@
+{
+  "fixture_id": "localized-detection-above-detection",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "Intended-code detection cannot exceed detection.",
+  "expected_refusal": "localized_exceeds_detected",
+  "document": {
+    "contract": "verification-report",
+    "contract_version": "0.1.0-draft",
+    "profile": "verification-report/0.1",
+    "report_kind": "verification_report",
+    "report_id": "rep-5",
+    "generated_at": "2026-10-18T12:00:00+00:00",
+    "verifier": {
+      "name": "cognous-open-control-stack-verifier",
+      "version": "0.0.0-handwritten-fixture",
+      "command": "cognous-verify",
+      "source_revision": "0000000",
+      "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan-python-semantics-v0.1"
+    },
+    "subject": {
+      "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan-python-semantics-v0.1",
+      "inputs": [
+        {
+          "role": "corpus",
+          "name": "clean-generated",
+          "digest": "sha256:6bae1b6c4d8a401beeb2bd446548cdfd2bbce015a56fe2ff55b363294b175533",
+          "size_bytes": 1015
+        },
+        {
+          "role": "corpus",
+          "name": "generated-corpus",
+          "digest": "sha256:f1398706bfa36af7bce57ee26c86a045354820d43a043297a62ea00e2a96041b",
+          "size_bytes": 1016
+        },
+        {
+          "role": "corpus",
+          "name": "odes-fixtures",
+          "digest": "sha256:861e47098d10683f1f95602264fd24a5a5a7b41228212ab400c96a0362cec3db",
+          "size_bytes": 1013
+        },
+        {
+          "role": "corpus",
+          "name": "odes-valid",
+          "digest": "sha256:b4aaa3b8665a5162c26eef19ba39c9500e3fa0580b15c2ec8312ada0b336b342",
+          "size_bytes": 1010
+        },
+        {
+          "role": "operator_set",
+          "name": "operators.json",
+          "digest": "sha256:1391bd0464de487872df0b610a99d4059ded9d7718adccbda2351ecb08803682",
+          "size_bytes": 1014
+        }
+      ],
+      "inputs_digest": "sha256:5cde2491334dc31fc9a2907a2402473efbf7433745f0b7c8e50647570ac449fa",
+      "pinned": {
+        "controller_revision": "87f02336",
+        "reason_registry_digest": "sha256:6f67c3c1836f72d63252e93923292bb6400e314942f3a97c40b62b36c25b9084",
+        "contract_versions": {
+          "control-plane-journal": "0.1.0-draft",
+          "execution-attempt-lifecycle": "0.1.0-draft"
+        }
+      }
+    },
+    "scope": {
+      "semantic_quality": "not_assessed",
+      "tiers_run": [
+        "V1",
+        "V2"
+      ]
+    },
+    "checks": [],
+    "summary": {
+      "checks": 0,
+      "confirmed": 0,
+      "could_not_check": 0,
+      "refuted": 0
+    },
+    "does_not_prove": [
+      {
+        "id": "relative_to_pinned_controller",
+        "statement": "The result is relative to the controller revision, contract draft versions and reason registry named in subject.pinned; it does not carry to any other revision."
+      },
+      {
+        "id": "semantic_quality_not_certified",
+        "statement": "No claim that a decision was correct, that a policy was adequate or that a grant was lawfully issued."
+      },
+      {
+        "id": "receipt_source_bounded",
+        "statement": "Destination ledger rows are executor-written, unsequenced and unsigned: no claim that the ledger is complete or unforged, or that an effect occurred in the world."
+      },
+      {
+        "id": "self_consistent_forgery_not_detected",
+        "statement": "A record rewritten with every affected commitment recomputed is accepted; no external anchor exists."
+      },
+      {
+        "id": "not_an_attestation",
+        "statement": "This is a verification report. It is not an attestation, not an Index or BitRep signature and not an authorization; it grants and denies nothing and is never an input to a grant or decision."
+      },
+      {
+        "id": "parse_strictness_is_refusal_not_repair",
+        "statement": "An input refused at the wire level is reported as refused; the verifier does not normalize it and re-run."
+      },
+      {
+        "id": "no_v1_scope_claim",
+        "statement": "Nothing here changes the V1 scope, the failure register or any qualified row."
+      },
+      {
+        "id": "differential_agreement_is_not_equivalence",
+        "statement": "Agreement between verifier and controller on a corpus is not equivalence outside that corpus."
+      },
+      {
+        "id": "no_imported_headline_numbers",
+        "statement": "No figure from any paper is a target, baseline or expectation; the only numbers are counts from the corpora named here."
+      },
+      {
+        "id": "seeds_are_regression_not_detection",
+        "statement": "Seed corpora are regression checks; detection figures come only from the generated held-out corpus."
+      }
+    ],
+    "mutation_report": {
+      "report_only": true,
+      "operator_set_digest": "sha256:1391bd0464de487872df0b610a99d4059ded9d7718adccbda2351ecb08803682",
+      "seed": 20261018,
+      "frozen_revision": "qual-0000000",
+      "family_t": [
+        {
+          "corpus_id": "t-seed-ODES",
+          "provenance": "seed",
+          "corpus_digest": "sha256:861e47098d10683f1f95602264fd24a5a5a7b41228212ab400c96a0362cec3db",
+          "categories": [
+            {
+              "category": "S1",
+              "expected_verdict": "reject",
+              "n_gen": 6,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 6,
+              "verdicts": {
+                "reject": 6,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": {
+                "refused_with_intended_code": {
+                  "k": 6,
+                  "n": 6
+                }
+              },
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            },
+            {
+              "category": "D1",
+              "expected_verdict": "reject",
+              "n_gen": 4,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 4,
+              "verdicts": {
+                "reject": 4,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": {
+                "refused_with_intended_code": {
+                  "k": 3,
+                  "n": 4
+                }
+              },
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            },
+            {
+              "category": "J2",
+              "expected_verdict": "reject",
+              "n_gen": 5,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 5,
+              "verdicts": {
+                "reject": 5,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": {
+                "refused_with_intended_code": {
+                  "k": 5,
+                  "n": 5
+                }
+              },
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            }
+          ],
+          "scenarios": null
+        },
+        {
+          "corpus_id": "t-generated-heldout",
+          "provenance": "generated",
+          "corpus_digest": "sha256:f1398706bfa36af7bce57ee26c86a045354820d43a043297a62ea00e2a96041b",
+          "categories": [
+            {
+              "category": "W1",
+              "expected_verdict": "reject",
+              "n_gen": 20,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 20,
+              "verdicts": {
+                "reject": 20,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": {
+                "any_code": {
+                  "k": 20,
+                  "n": 20
+                },
+                "intended_code": {
+                  "k": 20,
+                  "n": 20
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 0,
+                "n": 20
+              },
+              "abstained": {
+                "k": 0,
+                "n": 20
+              },
+              "errored": {
+                "k": 0,
+                "n": 20
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": null,
+                  "n": 0
+                },
+                "deltas": []
+              }
+            },
+            {
+              "category": "D1",
+              "expected_verdict": "reject",
+              "n_gen": 20,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 20,
+              "verdicts": {
+                "reject": 19,
+                "accept": 0,
+                "abstain": 1,
+                "error": 0
+              },
+              "detection": {
+                "any_code": {
+                  "k": 19,
+                  "n": 20
+                },
+                "intended_code": {
+                  "k": 20,
+                  "n": 20
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 0,
+                "n": 20
+              },
+              "abstained": {
+                "k": 1,
+                "n": 20
+              },
+              "errored": {
+                "k": 0,
+                "n": 20
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": null,
+                  "n": 0
+                },
+                "deltas": []
+              }
+            },
+            {
+              "category": "R4",
+              "expected_verdict": "reject",
+              "n_gen": 12,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 12,
+              "verdicts": {
+                "reject": 8,
+                "accept": 4,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": {
+                "any_code": {
+                  "k": 8,
+                  "n": 12
+                },
+                "intended_code": {
+                  "k": 8,
+                  "n": 12
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 4,
+                "n": 12
+              },
+              "abstained": {
+                "k": 0,
+                "n": 12
+              },
+              "errored": {
+                "k": 0,
+                "n": 12
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": 3,
+                  "n": 4
+                },
+                "deltas": [
+                  {
+                    "measure": "unauthorized_effects",
+                    "nonzero_mutants": 3,
+                    "min": 0,
+                    "max": 1
+                  },
+                  {
+                    "measure": "held_count",
+                    "nonzero_mutants": 1,
+                    "min": -1,
+                    "max": 0
+                  }
+                ]
+              }
+            },
+            {
+              "category": "R5",
+              "expected_verdict": "reject",
+              "n_gen": 10,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 10,
+              "verdicts": {
+                "reject": 9,
+                "accept": 0,
+                "abstain": 0,
+                "error": 1
+              },
+              "detection": {
+                "any_code": {
+                  "k": 9,
+                  "n": 10
+                },
+                "intended_code": {
+                  "k": 9,
+                  "n": 10
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 0,
+                "n": 10
+              },
+              "abstained": {
+                "k": 0,
+                "n": 10
+              },
+              "errored": {
+                "k": 1,
+                "n": 10
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": null,
+                  "n": 0
+                },
+                "deltas": []
+              }
+            },
+            {
+              "category": "B",
+              "expected_verdict": "accept",
+              "n_gen": 8,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 8,
+              "verdicts": {
+                "reject": 0,
+                "accept": 8,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": {
+                "any_code": {
+                  "k": 0,
+                  "n": 8
+                },
+                "intended_code": {
+                  "k": 0,
+                  "n": 8
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 8,
+                "n": 8
+              },
+              "abstained": {
+                "k": 0,
+                "n": 8
+              },
+              "errored": {
+                "k": 0,
+                "n": 8
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": 0,
+                  "n": 8
+                },
+                "deltas": []
+              }
+            },
+            {
+              "category": "R6",
+              "expected_verdict": "accept",
+              "n_gen": 5,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 5,
+              "verdicts": {
+                "reject": 0,
+                "accept": 5,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": {
+                "any_code": {
+                  "k": 0,
+                  "n": 5
+                },
+                "intended_code": {
+                  "k": 0,
+                  "n": 5
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 5,
+                "n": 5
+              },
+              "abstained": {
+                "k": 0,
+                "n": 5
+              },
+              "errored": {
+                "k": 0,
+                "n": 5
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": 0,
+                  "n": 5
+                },
+                "deltas": []
+              }
+            },
+            {
+              "category": "F",
+              "expected_verdict": "accept",
+              "n_gen": 6,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 6,
+              "verdicts": {
+                "reject": 0,
+                "accept": 6,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": {
+                "any_code": {
+                  "k": 0,
+                  "n": 6
+                },
+                "intended_code": {
+                  "k": 0,
+                  "n": 6
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 6,
+                "n": 6
+              },
+              "abstained": {
+                "k": 0,
+                "n": 6
+              },
+              "errored": {
+                "k": 0,
+                "n": 6
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": 0,
+                  "n": 6
+                },
+                "deltas": []
+              }
+            },
+            {
+              "category": "Q",
+              "expected_verdict": "not_applicable",
+              "n_gen": 0,
+              "n_noop": 0,
+              "n_na": 0,
+              "n_eff": 0,
+              "verdicts": {
+                "reject": 0,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": null,
+              "regression": null,
+              "false_acceptance": null,
+              "abstained": null,
+              "errored": null,
+              "metric_impact": null
+            },
+            {
+              "category": "I5",
+              "expected_verdict": "reject",
+              "n_gen": 10,
+              "n_noop": 2,
+              "n_na": 1,
+              "n_eff": 7,
+              "verdicts": {
+                "reject": 7,
+                "accept": 0,
+                "abstain": 0,
+                "error": 0
+              },
+              "detection": {
+                "any_code": {
+                  "k": 7,
+                  "n": 7
+                },
+                "intended_code": {
+                  "k": 7,
+                  "n": 7
+                }
+              },
+              "regression": null,
+              "false_acceptance": {
+                "k": 0,
+                "n": 7
+              },
+              "abstained": {
+                "k": 0,
+                "n": 7
+              },
+              "errored": {
+                "k": 0,
+                "n": 7
+              },
+              "metric_impact": {
+                "conditioned_on": "false_acceptance",
+                "changed": {
+                  "k": null,
+                  "n": 0
+                },
+                "deltas": []
+              }
+            }
+          ],
+          "scenarios": null
+        }
+      ],
+      "family_s": [
+        {
+          "corpus_id": "s-context",
+          "context_only": true,
+          "rows": [
+            {
+              "source_id": "cp-adversarial-mutations",
+              "n_cases": 3,
+              "detected": 3,
+              "survived": 0,
+              "errored": 0
+            },
+            {
+              "source_id": "hub-destination-admission-mutations",
+              "n_cases": 13,
+              "detected": 13,
+              "survived": 0,
+              "errored": 0
+            }
+          ]
+        }
+      ],
+      "clean": [
+        {
+          "corpus_id": "clean-generated",
+          "provenance": "generated",
+          "corpus_digest": "sha256:6bae1b6c4d8a401beeb2bd446548cdfd2bbce015a56fe2ff55b363294b175533",
+          "rows": [
+            {
+              "category": "W1",
+              "false_rejection": {
+                "k": 0,
+                "n": 30
+              }
+            },
+            {
+              "category": "B",
+              "false_rejection": {
+                "k": 1,
+                "n": 30
+              }
+            }
+          ]
+        },
+        {
+          "corpus_id": "clean-odes-valid",
+          "provenance": "seed_valid_fixtures",
+          "corpus_digest": "sha256:b4aaa3b8665a5162c26eef19ba39c9500e3fa0580b15c2ec8312ada0b336b342",
+          "rows": [
+            {
+              "category": "W1",
+              "false_rejection": {
+                "k": 0,
+                "n": 33
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
