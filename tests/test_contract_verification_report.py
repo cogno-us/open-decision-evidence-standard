@@ -280,9 +280,10 @@ def test_the_mutation_non_claims_are_required_only_with_a_mutation_report():
 
 def test_category_set_is_the_design_catalogue():
     cats = vr.load_schema()["$defs"]["category"]["enum"]
-    assert len(cats) == len(set(cats)) == 36
+    assert len(cats) == len(set(cats)) == 44          # the 36 of the design catalogue plus family H (decision 28)
     for c in ("W1", "W5", "B", "S1", "I5", "D5", "J3", "T1", "A2", "R6", "X1", "L1", "F", "Q"):
         assert c in cats
+    assert [c for c in cats if c.startswith("H")] == list(vr.WITNESS_CATEGORIES)
 
 
 def test_mutation_report_gates_nothing():
@@ -363,3 +364,77 @@ def test_every_default_path_fixture_that_predates_the_revision_is_unchanged():
                 "mutation-report-full", "mutation-report-with-per-scenario-tables", "trace-with-mutation-report",
                 "extension-namespace-members-preserved"):
         assert "V3" not in fx(fid)["scope"]["tiers_run"]
+
+
+# ------------------------------------------------------------------ family H (draft revision 2026-10-18, decision 28)
+
+def _w(fid="mutation-report-witnessed"):
+    return doc(fid)
+
+
+def _wrow(d, cat, corpus=1):
+    return next(r for r in d["mutation_report"]["family_t"][corpus]["categories"] if r["category"] == cat)
+
+
+def test_family_h_rows_carry_the_expected_verdicts_of_the_design():
+    d = _w()
+    for c in ("H1", "H2", "H3", "H4", "H5", "H6"):
+        assert _wrow(d, c)["expected_verdict"] == "reject"
+    for c in ("H7", "H8"):          # a could_not_check outcome, never a rejection and never a confirmation
+        row = _wrow(d, c)
+        assert row["expected_verdict"] == "abstain" and row["verdicts"]["reject"] == 0 and row["detection"]["any_code"]["k"] == 0
+        assert row["abstained"] == {"k": row["n_eff"], "n": row["n_eff"]}
+    for c in ("B", "F"):
+        assert _wrow(d, c)["expected_verdict"] == "accept"
+    assert vr.validate(d) == []
+
+
+def test_a_witnessed_population_is_separate_from_the_unwitnessed_ones():
+    d = _w()
+    t_ids = [c["corpus_id"] for c in d["mutation_report"]["family_t"]]
+    assert t_ids == ["t-generated-heldout", "t-generated-witnessed"]
+    unwitnessed = {r["category"] for r in d["mutation_report"]["family_t"][0]["categories"]}
+    assert not unwitnessed & set(vr.WITNESS_CATEGORIES)
+    clean = {c["corpus_id"]: {r["category"] for r in c["rows"]} for c in d["mutation_report"]["clean"]}
+    assert not clean["clean-generated"] & set(vr.WITNESS_CATEGORIES)
+    assert clean["clean-generated-witnessed"] & set(vr.WITNESS_CATEGORIES)
+    # no row in the witnessed clean corpus is an unwitnessed category
+    assert clean["clean-generated-witnessed"] <= set(vr.WITNESSED_POPULATION_CATEGORIES)
+
+
+def test_unwitnessed_category_beside_family_h_is_refused():
+    assert codes(bad("unwitnessed-category-in-a-witnessed-corpus")) == ["witnessed_corpus_mixed"]
+    assert codes(bad("unwitnessed-category-in-a-witnessed-clean-corpus")) == ["witnessed_corpus_mixed"]
+    d = _w()
+    d["mutation_report"]["family_t"][1]["categories"].append(copy.deepcopy(_wrow(_w("mutation-report-witnessed"), "H1")))
+    assert codes(d) == ["duplicate_category"]
+
+
+def test_witnessed_clean_corpus_is_required_and_not_replaceable_by_an_unwitnessed_one():
+    assert codes(bad("witnessed-clean-corpus-missing")) == ["witnessed_clean_corpus_missing"]
+    d = _w("mutation-report-witnessed-seed-regression")
+    assert [c["provenance"] for c in d["mutation_report"]["clean"]] == ["seed_valid_fixtures"]
+    assert vr.validate(d) == []
+
+
+def test_family_h_report_needs_the_witness_non_claim():
+    assert codes(bad("witnessed-report-without-witness-non-claim")) == ["non_claim_missing"]
+    # a report without family H rows does not need it
+    assert "witness_is_not_publication" not in {n["id"] for n in doc("mutation-report-full")["does_not_prove"]}
+
+
+def test_family_h_set_and_expected_verdict_set_are_closed():
+    assert codes(bad("unknown-witness-category")) == ["unknown_enum_value"]
+    assert codes(bad("expected-verdict-witness-absent-as-reject")) == ["unknown_enum_value"]
+    assert vr.load_schema()["$defs"]["trace_row"]["properties"]["expected_verdict"]["enum"] == ["reject", "accept", "abstain", "not_applicable"]
+
+
+def test_seed_rows_of_family_h_are_regression_only():
+    assert codes(bad("witnessed-seed-corpus-reports-detection")) == ["seed_corpus_reports_detection"]
+
+
+def test_earlier_fixtures_are_unchanged_by_the_family_h_revision():
+    """Every fixture that existed before decision 28 still validates as it did; the only schema changes are additive enumeration values."""
+    for f in VALID + INVALID:
+        got = [v.code for v in vr.validate(f["document"])]
+        assert got == ([] if f["expected_outcome"] == "accept" else [f["expected_refusal"]]), f["fixture_id"]

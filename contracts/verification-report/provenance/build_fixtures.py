@@ -76,8 +76,8 @@ NON_CLAIM_TEXT = {
 }
 
 
-def non_claims(mutation=False):
-    ids = list(vr.CORE_NON_CLAIMS) + (list(vr.MUTATION_NON_CLAIMS) if mutation else [])
+def non_claims(mutation=False, witness=False):
+    ids = list(vr.CORE_NON_CLAIMS) + (list(vr.MUTATION_NON_CLAIMS) if mutation else []) + (list(vr.V3_NON_CLAIMS) if witness else [])
     return [{"id": i, "statement": NON_CLAIM_TEXT[i]} for i in ids]
 
 
@@ -164,6 +164,39 @@ def mutation_subject():
                    ("corpus", "clean-generated"), ("corpus", "odes-valid"))
 
 
+def witnessed_mutation_report(seed_only=False):
+    """Family H (draft revision 2026-10-18, decision 28): a witnessed population with its own clean corpus, apart from the unwitnessed ones."""
+    noimpact = lambda n: {"conditioned_on": "false_acceptance", "changed": {"k": 0, "n": n}, "deltas": []}
+    if seed_only:
+        t = [{"corpus_id": "t-seed-witness-digest", "provenance": "seed", "corpus_digest": d("witness-digest-fixtures"),
+              "categories": [trow("H1", 3, 3, 0, seed=True), trow("H2", 2, 2, 0, seed=True), trow("H3", 4, 4, 0, seed=True, intended=3),
+                             trow("H4", 2, 2, 0, seed=True)], "scenarios": None}]
+        clean = [{"corpus_id": "clean-witness-valid-fixtures", "provenance": "seed_valid_fixtures", "corpus_digest": d("witness-valid"),
+                  "rows": [{"category": "H1", "false_rejection": {"k": 0, "n": 5}}, {"category": "H3", "false_rejection": {"k": 0, "n": 5}}]}]
+        subj = subject(("operator_set", "operators.json"), ("corpus", "witness-digest-fixtures"), ("corpus", "witness-valid"))
+    else:
+        t = [{"corpus_id": "t-generated-heldout", "provenance": "generated", "corpus_digest": d("generated-corpus"),
+              "categories": [trow("W1", 20, 20, 0), trow("D1", 20, 19, 0, abst=1, intended=18)], "scenarios": None},
+             {"corpus_id": "t-generated-witnessed", "provenance": "generated", "corpus_digest": d("generated-witnessed-corpus"),
+              "categories": [trow("H1", 12, 12, 0), trow("H2", 10, 10, 0), trow("H3", 14, 12, 0, noop=2, intended=11),
+                             trow("H4", 16, 16, 0), trow("H5", 12, 11, 0, abst=1), trow("H6", 9, 8, 0, abst=1),
+                             trow("H7", 10, 0, 0, abst=10, expected="abstain"), trow("H8", 6, 0, 0, abst=6, expected="abstain"),
+                             trow("B", 8, 0, 8, expected="accept", impact=noimpact(8)),
+                             trow("F", 6, 0, 6, expected="accept", impact=noimpact(6))], "scenarios": None}]
+        clean = [{"corpus_id": "clean-generated", "provenance": "generated", "corpus_digest": d("clean-generated"),
+                  "rows": [{"category": "W1", "false_rejection": {"k": 0, "n": 30}}, {"category": "B", "false_rejection": {"k": 1, "n": 30}}]},
+                 {"corpus_id": "clean-generated-witnessed", "provenance": "generated", "corpus_digest": d("clean-generated-witnessed"),
+                  "rows": [{"category": "H1", "false_rejection": {"k": 0, "n": 24}}, {"category": "H4", "false_rejection": {"k": 0, "n": 24}},
+                           {"category": "H6", "false_rejection": {"k": 0, "n": 24}}, {"category": "B", "false_rejection": {"k": 0, "n": 24}}]}]
+        subj = subject(("operator_set", "operators.json"), ("corpus", "generated-corpus"), ("corpus", "generated-witnessed-corpus"),
+                       ("corpus", "clean-generated"), ("corpus", "clean-generated-witnessed"))
+    m = {"report_only": True, "operator_set_digest": d("operators.json"), "seed": 20261018, "frozen_revision": "qual-0000000",
+         "family_t": t, "family_s": [], "clean": clean}
+    rep = report("rep-w1", subj, [], mutation=m)
+    rep["does_not_prove"] = non_claims(True, True)
+    return rep
+
+
 def valid():
     out = {}
     base_inputs = (("run_record", "run-record.json"), ("proposal_export", "proposal.json"))
@@ -191,6 +224,10 @@ def valid():
     ext["extensions"] = {"x-run-label": "nightly"}
     ext["checks"][0]["extensions"] = {"x-note": "preserved"}
     out["extension-namespace-members-preserved"] = ("x- members on the document and on a check are accepted, ignored for contract logic and preserved.", ext)
+    out["mutation-report-witnessed"] = ("Family H: a witnessed generated corpus (H1 to H8 with the B and F controls) and its own witnessed clean corpus, next to unwitnessed corpora; H7 and H8 expect abstain; the report carries witness_is_not_publication.",
+        witnessed_mutation_report())
+    out["mutation-report-witnessed-seed-regression"] = ("Family H on seed fixtures: regression only, over a witnessed seed-valid clean corpus.",
+        witnessed_mutation_report(seed_only=True))
     return out
 
 
@@ -290,6 +327,28 @@ def invalid(v):
     add("delta-above-changed-count", "delta_inconsistent", m, lambda x: gen_row(x, "R4")["metric_impact"]["deltas"][0].update({"nonzero_mutants": 4}), "Deltas describe accepted mutants whose measures changed.")
     add("duplicate-category-in-corpus", "duplicate_category", m, lambda x: gen(x)["categories"].append(copy.deepcopy(gen_row(x, "W1"))), "One row per category in a corpus.")
     add("duplicate-category-in-clean-corpus", "duplicate_category", m, lambda x: x["mutation_report"]["clean"][0]["rows"].append(copy.deepcopy(x["mutation_report"]["clean"][0]["rows"][0])), "One row per category in a clean corpus.")
+    w = v["mutation-report-witnessed"][1]
+    wg = lambda x: x["mutation_report"]["family_t"][1]
+    add("unwitnessed-category-in-a-witnessed-corpus", "witnessed_corpus_mixed", w,
+        lambda x: wg(x)["categories"].append(copy.deepcopy(next(r for r in x["mutation_report"]["family_t"][0]["categories"] if r["category"] == "W1"))),
+        "A corpus with family H rows is a witnessed population: an unwitnessed category (W1) beside them would pool two denominators.")
+    add("unwitnessed-category-in-a-witnessed-clean-corpus", "witnessed_corpus_mixed", w,
+        lambda x: x["mutation_report"]["clean"][1]["rows"].append({"category": "W1", "false_rejection": {"k": 0, "n": 24}}),
+        "A witnessed clean corpus carries no unwitnessed category; an unwitnessed clean corpus carries no family H row.")
+    add("witnessed-clean-corpus-missing", "witnessed_clean_corpus_missing", w,
+        lambda x: x["mutation_report"].update({"clean": x["mutation_report"]["clean"][:1]}),
+        "Family H rows need a witnessed clean corpus of their own; the unwitnessed clean corpora do not stand in for it.")
+    add("witnessed-report-without-witness-non-claim", "non_claim_missing", w,
+        lambda x: x.update({"does_not_prove": [n for n in x["does_not_prove"] if n["id"] != "witness_is_not_publication"]}),
+        "A report that measures witness damage carries witness_is_not_publication, as a V3 trace report does.")
+    add("unknown-witness-category", "unknown_enum_value", w, lambda x: wg(x)["categories"][0].update({"category": "H9"}),
+        "The category set is closed: H1 to H8 and no other family H value.")
+    add("expected-verdict-witness-absent-as-reject", "unknown_enum_value", w,
+        lambda x: wg(x)["categories"][7].update({"expected_verdict": "could_not_check"}),
+        "An expected verdict is reject, accept, abstain or not_applicable; could_not_check is a per-check verdict, not a mutant outcome.")
+    add("witnessed-seed-corpus-reports-detection", "seed_corpus_reports_detection", v["mutation-report-witnessed-seed-regression"][1],
+        lambda x: x["mutation_report"]["family_t"][0]["categories"][0].update({"detection": {"any_code": {"k": 3, "n": 3}, "intended_code": {"k": 3, "n": 3}}}),
+        "Seeds are regression, not detection, for family H as for every category.")
     sc = v["mutation-report-with-per-scenario-tables"][1]
     add("duplicate-scenario-id", "duplicate_scenario_id", sc, lambda x: gen(x)["scenarios"].append(copy.deepcopy(gen(x)["scenarios"][0])), "One table per scenario.")
     add("duplicate-corpus-id-across-families", "duplicate_corpus_id", m, lambda x: x["mutation_report"]["family_s"][0].update({"corpus_id": "t-seed-ODES"}), "Corpus ids are unique across family S, family T and clean lists, so denominators cannot be pooled by name.")
@@ -313,7 +372,7 @@ def write(kind, fid, payload):
 def main() -> int:
     for kind in ("valid", "invalid"):
         for old in (CONTRACT_DIR / "fixtures" / kind).glob("*.json"):
-            if not old.name.startswith("v3-"):   # the v3-* fixtures are written by build_v3_fixtures.py
+            if not old.name.startswith("v3-") and old.stem != "unknown-input-role-witness-chain":   # written by build_v3_fixtures.py
                 old.unlink()
     v = valid()
     for fid, (reason, doc) in v.items():
