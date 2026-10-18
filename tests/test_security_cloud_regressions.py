@@ -322,10 +322,12 @@ def test_installed_replay_revision_must_match_the_declared_generation(monkeypatc
     assert accepted_replay_revisions(cp) == {P2_REVISIONS['replay']}
     monkeypatch.setenv('ODES_ALLOW_UNVERIFIED_REPLAY', '0')
     monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: 'f' * 40)
-    with pytest.raises(ExportError, match='not accepted'):
+    with pytest.raises(ExportError, match='not an accepted'):
         exporter._require_installed_replay(cp)
     monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: P2_REVISIONS['replay'])
     exporter._require_installed_replay(cp)
+    # An older generation's package may be re-validated with a newer accepted Replay.
+    exporter._require_installed_replay(next(iter(__import__('odes.common', fromlist=['x']).SUPPORTED_V2_CONTROL_PLANE_REVISIONS)))
     monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: None)
     with pytest.raises(ExportError, match='cannot be determined'):
         exporter._require_installed_replay(cp)

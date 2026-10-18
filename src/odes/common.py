@@ -111,6 +111,13 @@ def accepted_replay_revisions(control_plane_revision: str) -> frozenset[str]:
     return frozenset()
 
 
+def all_accepted_replay_revisions() -> frozenset[str]:
+    """Every Replay revision any accepted generation names. Older packages are re-validated with a newer accepted Replay
+    (``recipient_validator._normalized_replay_material``), so the installed code must be one of these, not necessarily the package's own."""
+    return frozenset(SUPPORTED_V2_REPLAY_REVISIONS) | frozenset(
+        accepted for cp in ALL_V2_CONTROL_PLANE_REVISIONS for accepted in accepted_replay_revisions(cp))
+
+
 def installed_replay_revision() -> str | None:
     """The commit the imported ``agent_replay_bundle`` comes from, or None when unknown.
 
