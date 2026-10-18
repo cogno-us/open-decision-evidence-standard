@@ -17,6 +17,8 @@ The reference validator returns separate results for:
 7. `consumption_conditions` — checks relying party and purpose. A record whose `permitted_relying_parties` is absent, empty or not a list of non-empty strings names no recipient and is refused; an empty list never means "any recipient" (decision 39-N).
 8. `recipient_reliance_decision` — recipient policy result.
 
+An additional layer, `native_evidence_inventory`, is present only when the package carries `provenance.native_evidence_inventory` or the recipient policy has a `native_evidence` section. Any result other than `pass` for it blocks reliance. See [native-evidence-inventory.md](native-evidence-inventory.md).
+
 A schema-valid record cannot automatically become verified, trusted, authorized or suitable for reliance.
 
 ## Result values and precedence
