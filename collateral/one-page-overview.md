@@ -2,7 +2,7 @@
 
 ## Purpose
 
-ODES is an open, vendor-neutral discussion draft and reference tooling for portable decision evidence. The v0.2 narrative and implementation profile retain the pder-v0.1 record schema. It carries coordinates for recipient evaluation, rather than deciding whether a recipient should rely on the underlying decision.
+ODES is an open, vendor-neutral discussion draft and reference tooling for portable decision evidence. The v0.2 narrative and implementation profile retain the pder-v0.1 record schema. It carries coordinates for recipient evaluation, rather than deciding whether a recipient should rely on the underlying decision. Governance is currently single-maintainer (Cognous is the initial editorial maintainer) and the work is a draft, not a ratified standard.
 
 ## Problem
 

@@ -20,4 +20,6 @@ A record may be schema-valid and still fail verifier acceptance because it is ex
 
 Schema validation checks structure. It does not establish that the underlying decision is correct, lawful, complete, or suitable for reliance.
 
-This repository does not provide production verifier code. The intent is to describe expected verifier behavior for an open record format.
+This repository provides a reference recipient validator (`odes recipient-validate`; see [recipient validation](../docs/recipient-validation.md)) for Cognous export packages. It is reference code and is not production-qualified, and no conformance certification exists. It does not verify signatures: a declared signature type is reported `unsupported` or `unavailable`, never `pass`. It evaluates only the Cognous profiles; a package under another profile is reported `unsupported`.
+
+The list above describes expected verifier behavior for the open record format. It is not a statement of what the reference validator implements for every step, and a verifier for another profile needs its own documented behavior and tests.
