@@ -1,0 +1,142 @@
+{
+  "fixture_id": "self-signed-row-without-the-reason",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "refusal_reason_mismatch",
+  "reason": "A self-signed revision is refused for being self-signed.",
+  "provenance": {
+    "source": "mutation of captured fixture refused-revision-attempts-kept-as-rows",
+    "control_plane_commit": "83b49b5"
+  },
+  "document": {
+    "contract": "rule-revision",
+    "contract_version": "0.1.0-draft",
+    "profile": "rule-revision/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "rule_revisions": [
+      {
+        "revision_id": "rev-3",
+        "rule_kind": "policy",
+        "rule_ref": "urn:cognous:policy:refund-policy",
+        "from_digest": null,
+        "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+        "reviser": "synthetic-principal:reviser",
+        "signer": "synthetic-principal:signer",
+        "authority_ref": "synthetic-authority:1",
+        "reason": "synthetic",
+        "supersedes": null,
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      }
+    ],
+    "rule_revision_refusals": [
+      {
+        "refusal_id": "syn-refusal-1",
+        "revision": {
+          "revision_id": "rev-1",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": null,
+          "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:reviser",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "self_signed_revision_row"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-2",
+        "revision": {
+          "revision_id": "rev-2",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": null,
+          "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:stranger",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "signer_not_configured"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-3",
+        "revision": {
+          "revision_id": "rev-4",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "to_digest": "sha256:26d4332f0d29ba719f0352ac4d958b621445b8542e717fd0bb776c1d957f0562",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:reviser",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "rule_revision_from_digest_mismatch"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-4",
+        "revision": {
+          "revision_id": "rev-3",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "to_digest": "sha256:26d4332f0d29ba719f0352ac4d958b621445b8542e717fd0bb776c1d957f0562",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:signer",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": null,
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "rule_revision_duplicate"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "refusal_id": "syn-refusal-5",
+        "revision": {
+          "revision_id": "rev-5",
+          "rule_kind": "policy",
+          "rule_ref": "urn:cognous:policy:refund-policy",
+          "from_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+          "to_digest": "sha256:26d4332f0d29ba719f0352ac4d958b621445b8542e717fd0bb776c1d957f0562",
+          "reviser": "synthetic-principal:reviser",
+          "signer": "synthetic-principal:signer",
+          "authority_ref": "synthetic-authority:1",
+          "reason": "synthetic",
+          "supersedes": "no-such-revision",
+          "recorded_at": "2026-10-05T18:58:20+00:00"
+        },
+        "reasons": [
+          "rule_revision_supersedes_unknown"
+        ],
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      }
+    ],
+    "identity_rows": [],
+    "trend_reports": [],
+    "arity_reports": [],
+    "recomputability_reports": []
+  },
+  "signers": [
+    "synthetic-principal:signer"
+  ]
+}

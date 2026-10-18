@@ -1,0 +1,87 @@
+{
+  "fixture_id": "self-signed-revision-accepted",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "self_signed_row_accepted",
+  "reason": "A self-signed row is refused and kept as a refusal row; it never appears among accepted rows.",
+  "provenance": {
+    "source": "mutation of captured fixture adopted-policy-decision-and-refusal-rows",
+    "control_plane_commit": "83b49b5"
+  },
+  "document": {
+    "contract": "rule-revision",
+    "contract_version": "0.1.0-draft",
+    "profile": "rule-revision/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "rule_revisions": [
+      {
+        "revision_id": "rev-1",
+        "rule_kind": "policy",
+        "rule_ref": "urn:cognous:policy:refund-policy",
+        "from_digest": null,
+        "to_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+        "reviser": "synthetic-principal:reviser",
+        "signer": "synthetic-principal:signer",
+        "authority_ref": "synthetic-authority:1",
+        "reason": "synthetic",
+        "supersedes": null,
+        "recorded_at": "2026-10-05T18:58:20+00:00"
+      },
+      {
+        "revision_id": "rev-9",
+        "rule_kind": "policy",
+        "rule_ref": "urn:cognous:policy:refund-policy",
+        "from_digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+        "to_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "reviser": "synthetic-principal:reviser",
+        "signer": "synthetic-principal:reviser",
+        "authority_ref": "synthetic-authority:1",
+        "reason": "synthetic",
+        "supersedes": null,
+        "recorded_at": "2027-01-01T00:00:00+00:00"
+      }
+    ],
+    "rule_revision_refusals": [],
+    "identity_rows": [
+      {
+        "row_type": "decision",
+        "row_id": "syn-decision-1",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "rule_identity": {
+          "rules": {
+            "urn:cognous:policy:refund-policy": {
+              "digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+              "state": "adopted",
+              "verified_through": "digest_matches_signed_revision",
+              "findings": []
+            }
+          },
+          "unknown": []
+        }
+      },
+      {
+        "row_type": "refusal",
+        "row_id": "syn-refusal-1",
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "rule_identity": {
+          "rules": {
+            "urn:cognous:policy:refund-policy": {
+              "digest": "sha256:8f64d7b309b6186ff850b800d985ede065255d72b40d9d3891728e2e411aa54d",
+              "state": "adopted",
+              "verified_through": "digest_matches_signed_revision",
+              "findings": []
+            }
+          },
+          "unknown": []
+        }
+      }
+    ],
+    "trend_reports": [],
+    "arity_reports": [],
+    "recomputability_reports": []
+  },
+  "signers": [
+    "synthetic-principal:signer"
+  ]
+}
