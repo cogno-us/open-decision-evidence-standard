@@ -39,6 +39,7 @@ from .common import (
 )
 from .canonicalization import SUPPORTED_CANONICALIZATION_PROFILES, digest_for
 from .evidence_inventory import evaluate_native_evidence_inventory
+from .generic_profile import GENERIC_PROFILE_ID, GENERIC_PROFILE_VERSION, GENERIC_PROVENANCE_MEMBERS, GENERIC_REQUIRED_PROVENANCE
 from .schema_validation import schema_errors
 
 
@@ -177,7 +178,21 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
             reasons.append("profile schema coordinates do not match pder-v0.1")
         if not isinstance(package.get("provenance"), dict):
             reasons.append("Cognous-stack profile requires package provenance outside the pder-v0.1 base record")
-    return _result("fail" if reasons else "pass", reasons, {"declared_profile": declared, "implementation_profile_version": profile.get("implementation_profile_version")})
+    evidence: dict[str, Any] = {"declared_profile": declared, "implementation_profile_version": profile.get("implementation_profile_version")}
+    if declared == GENERIC_PROFILE_ID:
+        if profile.get("implementation_profile_version") != GENERIC_PROFILE_VERSION:
+            return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": GENERIC_PROFILE_VERSION})
+        if profile.get("schema_name") != SCHEMA_NAME or profile.get("schema_version") != SCHEMA_VERSION:
+            reasons.append("profile schema coordinates do not match pder-v0.1")
+        if not isinstance(package.get("provenance"), dict):
+            reasons.append("generic profile requires package provenance outside the pder-v0.1 base record")
+        else:
+            for key in package["provenance"]:
+                if key not in GENERIC_PROVENANCE_MEMBERS:
+                    reasons.append(f"provenance member {key!r} is not defined by the generic recipient profile")
+        # The profile carries no Cognous retained sources: the Replay reconstruction check does not apply and is never reported as passed.
+        evidence["cognous_replay_reconstruction"] = "not_applicable"
+    return _result("fail" if reasons else "pass", reasons, evidence)
 
 
 def _evaluate_package_content_integrity(package: dict[str, Any], trusted_digests: list[str]) -> dict[str, Any]:
@@ -223,13 +238,14 @@ def _evaluate_package_content_integrity(package: dict[str, Any], trusted_digests
         reasons.append("created_by must be a non-empty string")
     if parse_instant(package.get("created_at")) is None:
         reasons.append("created_at must be an RFC 3339 instant with an offset")
-    required_provenance = ["source_artifacts", "source_record_refs", "decision_facts", "execution_facts", "redaction", "unsupported_semantics", "limits"]
+    generic = (package.get("profile") if isinstance(package.get("profile"), dict) else {}).get("implementation_profile") == GENERIC_PROFILE_ID
+    required_provenance = list(GENERIC_REQUIRED_PROVENANCE) if generic else ["source_artifacts", "source_record_refs", "decision_facts", "execution_facts", "redaction", "unsupported_semantics", "limits"]
     for key in required_provenance:
         if key not in provenance:
             reasons.append(f"provenance.{key} is unavailable")
-    if not isinstance(provenance.get("source_record_refs"), list):
+    if not generic and not isinstance(provenance.get("source_record_refs"), list):
         reasons.append("provenance.source_record_refs must be available as an array")
-    if not isinstance(provenance.get("execution_facts"), dict):
+    if not generic and not isinstance(provenance.get("execution_facts"), dict):
         reasons.append("provenance.execution_facts must be available as an object")
     if not isinstance(provenance.get("unsupported_semantics"), list) or not isinstance(provenance.get("limits"), list):
         reasons.append("limitations and unsupported semantics must survive export")
@@ -425,7 +441,7 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
             reasons.append("restricted use has no implemented recipient authorization profile")
         if not policy.get("jurisdiction") or policy.get("jurisdiction") != risk.get("jurisdiction"):
             reasons.append("recipient jurisdiction is unavailable or differs from the record")
-    if package is not None and (package.get("profile") or {}).get("implementation_profile") == PROFILE_V2_RESTRICTIONS_ID:
+    if package is not None and (package.get("profile") or {}).get("implementation_profile") in {PROFILE_V2_RESTRICTIONS_ID, GENERIC_PROFILE_ID}:
         reasons.extend(_restriction_semantics_reasons(package))
     return _result("fail" if reasons else "pass", reasons, {"permitted_relying_parties": parties, "permitted_purposes": purposes})
 
@@ -559,6 +575,8 @@ def _evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any])
         "BitRep signature verification and Index inclusion, if supplied separately, do not create institutional authority.",
         "The recipient validator does not access producer databases or execute workflows.",
     ]
+    if declared == GENERIC_PROFILE_ID:
+        layers["boundary_notes"].append("The generic recipient profile carries no Cognous retained sources: no Cognous Replay reconstruction check was run, and a pass is not claimed.")
     return layers
 
 

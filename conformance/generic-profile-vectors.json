@@ -1,0 +1,289 @@
+{
+  "cases": [
+    {
+      "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+      "envelope": {
+        "payloadType": "application/vnd.odes.package+json",
+        "signatures": [
+          {
+            "keyid": "issuer-key-1",
+            "sig": "3ItiRRvh0a1YFrjII7nt02ZD7HQyU9cSAoaH0jgBGain6SuP6g0Rdvmm21S2GiX7kM69IbSG5XPEddrItfOhCw=="
+          }
+        ]
+      },
+      "package": {
+        "created_at": "2026-10-01T00:00:00Z",
+        "created_by": "example-issuer",
+        "integrity": {
+          "algorithm": "SHA-256",
+          "canonicalization_profile": "json-sort-keys-compact-utf8-no-nan",
+          "kind": "content-digest",
+          "value": "sha256:7d18d0fbdccaf506379177356cb0b79f66768fecc4b525b7bc20f553502d48db",
+          "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."
+        },
+        "package_digest": "sha256:adb7e8afc85f45e1399bfeed9a04e49b5f40dab9fb6853bdef15bc470c7ecfd4",
+        "package_type": "odes_decision_evidence_export_package",
+        "package_version": "0.1.0",
+        "profile": {
+          "implementation_profile": "odes_generic_recipient_0_1",
+          "implementation_profile_version": "odes-generic-recipient-0.1.0-draft",
+          "schema_name": "pder-v0.1",
+          "schema_version": "0.1"
+        },
+        "provenance": {
+          "limits": [],
+          "native_evidence_inventory": {
+            "artifacts": [
+              {
+                "artifact_id": "receipt-1",
+                "byte_length": 29,
+                "bytes_base64": "eyAieiIgOiAxLAogImEiOlsxLjAsIDJlMF0gfQo=",
+                "digest_algorithm": "sha256",
+                "digest_value": "080a57f781a202de517749161a17eeaffb4d4bc1696286e70ae39bb9afd37e2e",
+                "media_type": "application/json",
+                "relation": "execution_evidence",
+                "required": true,
+                "source_format": "example-receipt",
+                "source_format_version": "1"
+              }
+            ],
+            "inventory_type": "odes_native_evidence_inventory",
+            "inventory_version": "0.1.0-draft"
+          },
+          "restriction_semantics": {
+            "jurisdiction": {
+              "state": "explicit"
+            },
+            "prohibited_use_flag": {
+              "state": "explicit_false"
+            },
+            "restricted_use_flag": {
+              "state": "explicit_false"
+            },
+            "semantics_version": "restriction-semantics-1",
+            "source": {
+              "record_hash": "sha256:abababababababababababababababababababababababababababababababab",
+              "record_id": "source-record-1"
+            }
+          },
+          "unsupported_semantics": []
+        },
+        "record": {
+          "authority": {
+            "authority_basis": "internal-delegation",
+            "authority_valid_at_decision": true,
+            "human_reviewer_role": "reviewer"
+          },
+          "consumption_conditions": {
+            "expires_at": "2027-01-01T00:00:00Z",
+            "permitted_purposes": [
+              "audit"
+            ],
+            "permitted_relying_parties": [
+              "recipient.example.org"
+            ]
+          },
+          "decision_id": "minimal-0001",
+          "decision_timestamp": "2026-07-01T00:00:00Z",
+          "decision_type": "decision_notice",
+          "evidence": {
+            "evidence_commitment_type": "none",
+            "selective_disclosure_available": false
+          },
+          "human_disposition": {
+            "machine_reliance_level": "none",
+            "review_substantiveness": "not_applicable",
+            "status": "accepted"
+          },
+          "issuer": {
+            "organization_id": "example-issuer",
+            "system_id": "example-system"
+          },
+          "machine_role": {
+            "ai_used": false,
+            "role": "none"
+          },
+          "policy_basis": [
+            {
+              "policy_id": "baseline-policy",
+              "policy_type": "internal_policy",
+              "policy_version": "1.0"
+            }
+          ],
+          "record_type": "portable_decision_evidence_record",
+          "risk_coordinates": {
+            "jurisdiction": "example-jurisdiction",
+            "prohibited_use_flag": false,
+            "restricted_use_flag": false,
+            "risk_tier": "unknown"
+          },
+          "schema_version": "0.1",
+          "status": {
+            "freshness": "current",
+            "revoked": false,
+            "superseded": false
+          },
+          "verification": {
+            "conformance_profile": "odes_generic_recipient_0_1",
+            "issuer_key_reference": "none",
+            "signature_type": "none"
+          }
+        }
+      },
+      "pae_sha256": "4ba0c4eeac3d25c62588919f4775e56fabb2e52a5c7d39b4626b265357e6a174",
+      "payload_sha256": "17f87d87d989f09a78bd33cd1c1e352aede4b37279a151fdec135605069c92a1",
+      "trusted_keys": [
+        {
+          "algorithm": "ed25519",
+          "issuer": "example-issuer/example-system",
+          "keyid": "issuer-key-1",
+          "public_key": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg="
+        }
+      ]
+    },
+    {
+      "canonicalization_profile": "rfc8785-jcs",
+      "envelope": {
+        "payloadType": "application/vnd.odes.package+json",
+        "signatures": [
+          {
+            "keyid": "issuer-key-1",
+            "sig": "buHQedKWlhsC73d15nMQigH5F6GkkCWaeDCVsNp63bdHtAdQ9jltTKdmxGdSQlak2rjtw8LJgCg8Q8RXgQiEBQ=="
+          }
+        ]
+      },
+      "package": {
+        "created_at": "2026-10-01T00:00:00Z",
+        "created_by": "example-issuer",
+        "integrity": {
+          "algorithm": "SHA-256",
+          "canonicalization_profile": "rfc8785-jcs",
+          "kind": "content-digest",
+          "value": "sha256:7d18d0fbdccaf506379177356cb0b79f66768fecc4b525b7bc20f553502d48db",
+          "verification_claim": "Binds the exported ODES record and profile metadata only; does not establish issuer identity or institutional authority."
+        },
+        "package_digest": "sha256:7cf615e82854987dc9c086b8afaf856aac464a96d514891f772a936a0e5035a3",
+        "package_type": "odes_decision_evidence_export_package",
+        "package_version": "0.1.0",
+        "profile": {
+          "implementation_profile": "odes_generic_recipient_0_1",
+          "implementation_profile_version": "odes-generic-recipient-0.1.0-draft",
+          "schema_name": "pder-v0.1",
+          "schema_version": "0.1"
+        },
+        "provenance": {
+          "limits": [],
+          "native_evidence_inventory": {
+            "artifacts": [
+              {
+                "artifact_id": "receipt-1",
+                "byte_length": 29,
+                "bytes_base64": "eyAieiIgOiAxLAogImEiOlsxLjAsIDJlMF0gfQo=",
+                "digest_algorithm": "sha256",
+                "digest_value": "080a57f781a202de517749161a17eeaffb4d4bc1696286e70ae39bb9afd37e2e",
+                "media_type": "application/json",
+                "relation": "execution_evidence",
+                "required": true,
+                "source_format": "example-receipt",
+                "source_format_version": "1"
+              }
+            ],
+            "inventory_type": "odes_native_evidence_inventory",
+            "inventory_version": "0.1.0-draft"
+          },
+          "restriction_semantics": {
+            "jurisdiction": {
+              "state": "explicit"
+            },
+            "prohibited_use_flag": {
+              "state": "explicit_false"
+            },
+            "restricted_use_flag": {
+              "state": "explicit_false"
+            },
+            "semantics_version": "restriction-semantics-1",
+            "source": {
+              "record_hash": "sha256:abababababababababababababababababababababababababababababababab",
+              "record_id": "source-record-1"
+            }
+          },
+          "unsupported_semantics": []
+        },
+        "record": {
+          "authority": {
+            "authority_basis": "internal-delegation",
+            "authority_valid_at_decision": true,
+            "human_reviewer_role": "reviewer"
+          },
+          "consumption_conditions": {
+            "expires_at": "2027-01-01T00:00:00Z",
+            "permitted_purposes": [
+              "audit"
+            ],
+            "permitted_relying_parties": [
+              "recipient.example.org"
+            ]
+          },
+          "decision_id": "minimal-0001",
+          "decision_timestamp": "2026-07-01T00:00:00Z",
+          "decision_type": "decision_notice",
+          "evidence": {
+            "evidence_commitment_type": "none",
+            "selective_disclosure_available": false
+          },
+          "human_disposition": {
+            "machine_reliance_level": "none",
+            "review_substantiveness": "not_applicable",
+            "status": "accepted"
+          },
+          "issuer": {
+            "organization_id": "example-issuer",
+            "system_id": "example-system"
+          },
+          "machine_role": {
+            "ai_used": false,
+            "role": "none"
+          },
+          "policy_basis": [
+            {
+              "policy_id": "baseline-policy",
+              "policy_type": "internal_policy",
+              "policy_version": "1.0"
+            }
+          ],
+          "record_type": "portable_decision_evidence_record",
+          "risk_coordinates": {
+            "jurisdiction": "example-jurisdiction",
+            "prohibited_use_flag": false,
+            "restricted_use_flag": false,
+            "risk_tier": "unknown"
+          },
+          "schema_version": "0.1",
+          "status": {
+            "freshness": "current",
+            "revoked": false,
+            "superseded": false
+          },
+          "verification": {
+            "conformance_profile": "odes_generic_recipient_0_1",
+            "issuer_key_reference": "none",
+            "signature_type": "none"
+          }
+        }
+      },
+      "pae_sha256": "6620eb8c2e80c864421528bf5ce9e4f0da34f12e50221a3e642a22624a4d2c12",
+      "payload_sha256": "ece526f481556f1d22eb65e7f314b3a275e6592cbf3a198e65a6876f7f03fa8e",
+      "trusted_keys": [
+        {
+          "algorithm": "ed25519",
+          "issuer": "example-issuer/example-system",
+          "keyid": "issuer-key-1",
+          "public_key": "A6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg="
+        }
+      ]
+    }
+  ],
+  "description": "Synthetic vectors for the generic recipient profile. The key is synthetic; only its public part is listed.",
+  "payload_type": "application/vnd.odes.package+json",
+  "profile": "odes_generic_recipient_0_1"
+}
