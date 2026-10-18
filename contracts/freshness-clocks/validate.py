@@ -351,6 +351,9 @@ def freshness_counts(check_events: list[dict[str, Any]], as_of: datetime) -> dic
     """The counts of the producer's ``freshness.freshness_counts`` over journal check events (derivable from the sidecar's rows)."""
     by_check: dict[str, list[dict[str, Any]]] = {}
     for e in check_events:
+        recorded = aware(e.get("recorded_at"))
+        if recorded is not None and recorded > as_of:
+            continue  # an event recorded after as_of is not visible to a report as of as_of (a report at the same instant sees it)
         by_check.setdefault(e["check_id"], []).append(e)
     open_ages: list[float] = []
     abandoned = expired = overdue = 0

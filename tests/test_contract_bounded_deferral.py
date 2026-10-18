@@ -115,7 +115,7 @@ def test_required_valid_cases_exist():
 CONTEXT_CODES = {"journal_run_mismatch", "deferral_dangling_decision", "deferral_decision_not_held", "deferral_effect_mismatch",
                  "deferral_proposal_mismatch", "deferral_reasons_not_held", "deferral_before_decision", "deferral_max_age_mismatch",
                  "release_decision_unauthorized", "release_decision_before_release", "effect_attempted_before_release",
-                 "effect_attempted_without_release", "refused_effect_observed"}
+                 "effect_attempted_without_release", "refused_effect_observed", "context_malformed"}
 
 
 def test_every_rule_code_is_pinned_and_documented():
@@ -257,6 +257,7 @@ CONTEXT_CASES = {
     "effect_attempted_before_release": (mixed_journal, "released-by-resolver-before-deadline", lambda d: d["deferrals"][0]["responses"][0].__setitem__("received_at", "2026-10-05T19:00:30+00:00") or d["deferrals"][0].__setitem__("resolved_at", "2026-10-05T19:00:30+00:00")),
     "effect_attempted_without_release": (mixed_journal, "open-deferral-within-deadline", lambda d: None),
     "refused_effect_observed": (mixed_journal, "refused-by-resolver", lambda d: None),
+    "context_malformed": (lambda: {**mixed_journal(), "decisions": 5, "attempts": 5}, "open-deferral-within-deadline", lambda d: None),
 }
 
 

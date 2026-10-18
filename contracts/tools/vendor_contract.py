@@ -75,15 +75,40 @@ def copy(contract: str, dest: Path, role: str, level: str, odes_commit: str | No
     return manifest
 
 
+def _safe_name(dest: Path, name: object) -> bool:
+    """A manifest name is an exact relative path with no ``..`` or absolute parts that stays under ``dest`` once resolved."""
+    if not isinstance(name, str) or not name or "\\" in name or "\x00" in name:
+        return False
+    parts = Path(name).parts
+    if Path(name).is_absolute() or any(part in ("", ".", "..") for part in parts):
+        return False
+    try:
+        (dest / name).resolve().relative_to(dest.resolve())
+    except ValueError:
+        return False
+    return not (dest / name).is_symlink()
+
+
 def check(dest: Path) -> list[str]:
-    manifest = json.loads((dest / "CONTRACT.json").read_text(encoding="utf-8"))
+    try:
+        manifest = json.loads((dest / "CONTRACT.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return [f"manifest unreadable: {type(exc).__name__}"]
     problems: list[str] = []
-    listed = manifest["files"]
+    listed = manifest.get("files") if isinstance(manifest, dict) else None
+    if not isinstance(listed, dict):
+        return ["manifest has no files mapping"]
+    for required in COPY_FILES:
+        if required not in listed:
+            problems.append(f"inventory omits required file: {required}")
     for name, digest in listed.items():
+        if not _safe_name(dest, name):
+            problems.append(f"unsafe name: {name!r}")
+            continue
         path = dest / name
         if not path.is_file():
             problems.append(f"missing: {name}")
-        elif _sha256(path) != digest:
+        elif not isinstance(digest, str) or _sha256(path) != digest:
             problems.append(f"modified: {name}")
     actual = {str(f.relative_to(dest)) for f in _files(dest) if f.is_file()}
     for extra in sorted(actual - set(listed)):

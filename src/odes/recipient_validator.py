@@ -80,7 +80,14 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
     if declared != verification.get("conformance_profile"):
         reasons.append("package profile and record verification.conformance_profile differ")
     provenance = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
-    selected_control_plane = provenance.get("pinned_revisions", {}).get("control_plane")
+    pinned = provenance.get("pinned_revisions")
+    if "pinned_revisions" in provenance and not isinstance(pinned, dict):
+        reasons.append("provenance.pinned_revisions must be an object")
+    selected_control_plane = pinned.get("control_plane") if isinstance(pinned, dict) else None
+    if not isinstance(selected_control_plane, str):
+        if selected_control_plane is not None:
+            reasons.append("provenance.pinned_revisions.control_plane must be a string")
+        selected_control_plane = None
     if declared == PROFILE_ID and selected_control_plane in ALL_V2_CONTROL_PLANE_REVISIONS:
         reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
     if declared in {PROFILE_ID, PROFILE_V2_ID}:
@@ -330,7 +337,7 @@ def _evaluate_replay_semantics(package: dict[str, Any]) -> dict[str, Any]:
     return _result("pass", ["retained content matches accepted Replay validation; no source authentication or authority renewal"])
 
 
-def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
+def _evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(package, dict) or not isinstance(policy, dict):
         reason = "package and recipient policy must be JSON objects"
         return {"schema_validity": _result("not_evaluated", [reason]), "recipient_reliance_decision": _result("fail", [reason])}
@@ -379,3 +386,12 @@ def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) 
         "The recipient validator does not access producer databases or execute workflows.",
     ]
     return layers
+
+
+def evaluate_recipient_package(package: dict[str, Any], policy: dict[str, Any]) -> dict[str, Any]:
+    """Evaluate a package against a recipient policy. Malformed nested shapes yield a structured ``fail`` result."""
+    try:
+        return _evaluate_recipient_package(package, policy)
+    except (AttributeError, TypeError, KeyError, IndexError) as exc:
+        reason = f"recipient input has a malformed nested shape ({type(exc).__name__})"
+        return {"schema_validity": _result("not_evaluated", [reason]), "recipient_reliance_decision": _result("fail", [reason])}

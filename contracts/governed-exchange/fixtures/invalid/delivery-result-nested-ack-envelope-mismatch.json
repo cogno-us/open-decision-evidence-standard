@@ -1,0 +1,126 @@
+{
+  "fixture_id": "delivery-result-nested-ack-envelope-mismatch",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "reason": "The acknowledgement nested in a delivery result echoes a different content commitment than the envelope the document carries.",
+  "expected_refusal": "acknowledgement_envelope_mismatch",
+  "document": {
+    "contract": "governed-exchange",
+    "contract_version": "0.1.0-draft",
+    "producer": "exchange-transport",
+    "delivery_result": {
+      "acknowledgement": {
+        "acknowledgement_id": "syn-ack-a-1",
+        "acknowledgement_kind": "DURABLE_RECEIPT",
+        "content_commitment": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "created_at": "2026-10-06T12:00:01Z",
+        "delivery_attempt_id": "syn-delivery-1",
+        "detail": {
+          "acknowledged_object": "durable_inbox_receipt",
+          "authorization": "not_implied_by_acknowledgement",
+          "destination_observation": "not_implied_by_acknowledgement",
+          "duplicate_suppressed": false,
+          "execution": "not_implied_by_acknowledgement",
+          "independent_verification": "not_implied_by_acknowledgement",
+          "producer_refs": {
+            "control_plane_attempt_ids": [
+              "syn-cp-attempt-1"
+            ],
+            "decision_id": "syn-decision-1",
+            "effect_id": "syn-effect-1",
+            "executor_attempt_id": "syn-attempt-1",
+            "executor_attempt_ids": [
+              "syn-attempt-1"
+            ],
+            "odes_package_digest": "sha256:64469ac97b792821398f5876dfc3c34b5f0c1c70186ff9f9fca94bd41e118455",
+            "odes_validation_digest": "sha256:25b83dbda8b2339b9c61882ce6b87508faabf06190bc7664bd77aaff1b3de5c8",
+            "reconstruction_bundle_id": "syn-reconstruction-1",
+            "reconstruction_digest": "sha256:6c094b4f91f31be00888ef7ae55e5f7dd9773d9eb24546a0b6983fc5d030d16e",
+            "successor_packet_digest": "sha256:e93085ef5ca02d4bf5bb30c39a036276a23fc854240a8c36cfcf348c8370f0f9",
+            "successor_packet_id": "succ-syn-msg-1-1"
+          },
+          "recipient_assessment_handling": "ACCEPT_FOR_ASSESSMENT",
+          "recipient_processing_status": "retained"
+        },
+        "message_id": "syn-msg-1",
+        "recipient_endpoint_ref": "local://syn-recipient"
+      },
+      "acknowledgement_received": true,
+      "attempted": true,
+      "delivery_attempt_id": "syn-delivery-1",
+      "message_id": "syn-msg-1",
+      "transport_state": "DELIVERED"
+    },
+    "transport_envelope": {
+      "acknowledgement_for_attempt_id": null,
+      "canonicalization_version": "json-sort-keys-compact-v1",
+      "content_commitment": "sha256:8516f1f9e7b20c3dbd72faa93e5083d812f84493c26e47168b5c77b367c87832",
+      "conversation_id": "conv-refund-001",
+      "correlation_id": "syn-corr-1",
+      "created_at": "2026-10-06T12:00:00Z",
+      "delivery_attempt_id": "syn-delivery-1",
+      "expires_at": "2026-10-07T00:00:00Z",
+      "governed_message": {
+        "acknowledgement_requested": true,
+        "authority_refs": [
+          {
+            "ref": "urn:cognous:alvorada:public-stack-profile:0.1.0",
+            "type": "authority_context"
+          },
+          {
+            "ref": "re-resolve-before-effect",
+            "type": "control_plane_current_authorization_required"
+          }
+        ],
+        "content": {
+          "note": "Narrative content is not authority.",
+          "summary": "Bounded synthetic refund proposal"
+        },
+        "content_digest": "sha256:d7cdf80daa89eeea4523a1007212e3ceac4fb416843a08c3e94b2c9f05919d24",
+        "conversation_id": "conv-refund-001",
+        "created_at": "2026-10-06T11:59:00Z",
+        "evidence_refs": [
+          {
+            "digest": "sha256:cf26b6e25e7b52756f5923999d54bbe11e827c00116d205ae1263126386c3113",
+            "ref": "syn-bundle-1",
+            "type": "replay_bundle"
+          }
+        ],
+        "expires_at": "2026-10-07T00:00:00Z",
+        "message_digest": "sha256:8516f1f9e7b20c3dbd72faa93e5083d812f84493c26e47168b5c77b367c87832",
+        "message_id": "syn-msg-1",
+        "message_type": "PROPOSE",
+        "operation_commitment": "sha256:e1a58656c0f3f4a329f455af3dfde8782551c259b954c20951eb37b9b411d37a",
+        "profile": "urn:cognous:profiles:odex-gax-imx-refund-exchange:0.1.0",
+        "proposal_commitment": "sha256:c56ad132b83916fc6367b37d72032353223cfd0631b6715123439ba4ae1fbb0d",
+        "protocol_version": "0.1.0",
+        "purpose": "refund_execution_assessment",
+        "recipient": "refund-recipient",
+        "requested_action": {
+          "action_id": "syn.refund",
+          "actor": "syn-actor",
+          "adapter_id": "syn-adapter",
+          "amount": 10.0,
+          "payload": {
+            "k": 1
+          },
+          "principal": "syn-principal",
+          "requested_permissions": [
+            "syn.permission"
+          ],
+          "target": "syn-target",
+          "unit": "USD"
+        },
+        "sender": "refund-sender"
+      },
+      "message_id": "syn-msg-1",
+      "recipient_endpoint_ref": "local://syn-recipient",
+      "recipient_identity_ref": "urn:syn:identity:recipient",
+      "retry_of_attempt_id": null,
+      "sender_endpoint_ref": "local://syn-sender",
+      "sender_identity_ref": "urn:syn:identity:sender",
+      "transport_profile": "urn:cognous:profiles:governed-message-transport:0.1.0",
+      "transport_version": "0.1.0"
+    }
+  }
+}

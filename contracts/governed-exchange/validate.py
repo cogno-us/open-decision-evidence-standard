@@ -20,6 +20,7 @@ import hashlib
 import json
 import math
 import re
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -443,7 +444,7 @@ _ACK_STATES = {"DURABLE_RECEIPT": {"DELIVERED"}, "TERMINAL_REJECTION": {"TERMINA
                "DURABLE_RECEIPT_UNRESOLVED": {"PENDING_RETRY", "UNRESOLVED"}}
 
 
-def _delivery_rules(d: dict[str, Any], path: str) -> list[Violation]:
+def _delivery_rules(d: dict[str, Any], path: str, doc: dict[str, Any] | None = None) -> list[Violation]:
     out: list[Violation] = []
     if not d["attempted"]:
         extra = [k for k in ("delivery_attempt_id", "acknowledgement_received", "acknowledgement", "interruption") if k in d]
@@ -474,7 +475,7 @@ def _delivery_rules(d: dict[str, Any], path: str) -> list[Violation]:
         out.append(Violation("delivery_state_ack_mismatch", f"{path}.transport_state",
                              f"acknowledgement kind {ack['acknowledgement_kind']} allows transport_state "
                              + "/".join(sorted(_ACK_STATES[ack["acknowledgement_kind"]]))))
-    out.extend(_ack_rules(ack, {}, f"{path}.acknowledgement"))
+    out.extend(_ack_rules(ack, doc if doc is not None else {}, f"{path}.acknowledgement"))
     return out
 
 
@@ -635,7 +636,7 @@ def _validate(doc: Any) -> list[Violation]:
     if "acknowledgement" in doc:
         out.extend(_ack_rules(doc["acknowledgement"], doc))
     if "delivery_result" in doc:
-        out.extend(_delivery_rules(doc["delivery_result"], "$.delivery_result"))
+        out.extend(_delivery_rules(doc["delivery_result"], "$.delivery_result", doc))
     if "retained_artifact_export" in doc:
         out.extend(_export_rules(doc["retained_artifact_export"], "$.retained_artifact_export"))
     if "recipient_result" in doc:

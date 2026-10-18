@@ -98,6 +98,34 @@ SECURITY_RUNTIME_CP_REVISIONS = frozenset(SECURITY_RUNTIME_GENERATIONS)
 ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"], SECURITY_REVISIONS["control_plane"], F5B_REVISIONS["control_plane"], P4_REVISIONS["control_plane"], P2_REVISIONS["control_plane"])
 
 
+def accepted_replay_revisions(control_plane_revision: str) -> frozenset[str]:
+    """The Replay revisions the accepted validators for a Control Plane generation name (empty when the generation is unknown)."""
+    if control_plane_revision in SECURITY_RUNTIME_GENERATIONS:
+        return frozenset({SECURITY_RUNTIME_GENERATIONS[control_plane_revision][1]["replay"]})
+    if control_plane_revision == REFUSAL_REVISIONS["control_plane"]:
+        return frozenset({REFUSAL_REVISIONS["replay"]})
+    if control_plane_revision == MERGED_REVISIONS["control_plane"]:
+        return frozenset({MERGED_REVISIONS["replay"]})
+    if control_plane_revision in SUPPORTED_V2_CONTROL_PLANE_REVISIONS:
+        return frozenset(SUPPORTED_V2_REPLAY_REVISIONS)
+    return frozenset()
+
+
+def installed_replay_revision() -> str | None:
+    """The commit the installed ``agent_replay_bundle`` distribution was installed from (pip ``direct_url.json``), or None when unknown."""
+    import importlib.metadata as metadata
+    try:
+        names = metadata.packages_distributions().get("agent_replay_bundle") or []
+        if len(set(names)) != 1:
+            return None
+        raw = metadata.distribution(names[0]).read_text("direct_url.json")
+        commit = ((json.loads(raw).get("vcs_info") or {}).get("commit_id")) if raw else None
+        return commit if isinstance(commit, str) else None
+    except Exception:  # metadata trouble is "unknown", never a pass
+        return None
+    return None
+
+
 def canonical_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
 

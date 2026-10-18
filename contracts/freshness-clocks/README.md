@@ -118,7 +118,7 @@ Document rules need only the document. Cross-document rules need the optional ru
 | `extension_refusal_reasons_not_canonical` | reasons are sorted and unique |
 | `extension_refusal_time_mismatch` | a refusal is recorded at the extension's own `recorded_at` |
 | `extension_unknown` | an `extension_id` names an `age_extensions` row |
-| `freshness_counts_mismatch` | the counts are derived from the document's check events as of `as_of` (`freshness_counts`) |
+| `freshness_counts_mismatch` | the counts are derived from the document's check events as of `as_of` (`freshness_counts`); an event recorded after `as_of` is not visible to that report, and one recorded at `as_of` is (decision 37) |
 | `input_read_check_unknown` | an input read's `check_id` names a check opened in `check_events` |
 | `input_read_mismatch` | an input read is the input's `age_basis`, `read_state` and nonces |
 | `input_read_missing` | every non-manifest input that carries an `age_basis` has an input read |

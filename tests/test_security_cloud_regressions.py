@@ -287,3 +287,48 @@ def test_p2_generation_is_added_beside_p4_and_exactly_paired():
     assert P2_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert P4_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert _selected_v2_pins(P2_REVISIONS['control_plane']) == P2_REVISIONS
+
+
+@pytest.mark.parametrize('pinned', [7, 'x', ['a'], None, {'control_plane': ['x']}, {'control_plane': 5}])
+def test_malformed_pinned_revisions_is_a_structured_failure(pinned):
+    package = {'package_type': 'odes-recipient-package', 'provenance': {'pinned_revisions': pinned}}
+    from odes.recipient_validator import PACKAGE_TYPE
+    package['package_type'] = PACKAGE_TYPE
+    result = evaluate_recipient_package(package, {})
+    assert result['recipient_reliance_decision']['status'] == 'fail'
+
+
+@pytest.mark.parametrize('field,value', [
+    ('decision_timestamp', '2026-10-05T19:00:00+00:00\n'),
+    ('decision_timestamp', '2026-10-05T19:00:00.1234567Z'),
+    ('decision_timestamp', '2026-10-05T19:00:00z'),
+    ('decision_timestamp', '2026-10-05 19:00:00Z'),
+    ('decision_timestamp', '2026-10-05T19:00:00+0000'),
+    ('decision_timestamp', '2026-10-05T19:00:60Z'),
+])
+def test_record_instants_outside_the_normative_grammar_are_refused(field, value):
+    from odes.schema_validation import schema_errors
+    record = json.loads((Path(__file__).resolve().parents[1] / 'examples/claims-review.example.json').read_text())
+    record = record.get('record', record)
+    assert schema_errors(record) == []
+    record[field] = value
+    assert schema_errors(record) != []
+
+
+def test_installed_replay_revision_must_match_the_declared_generation(monkeypatch):
+    from odes import exporter
+    from odes.common import P2_REVISIONS, accepted_replay_revisions
+    cp = P2_REVISIONS['control_plane']
+    assert accepted_replay_revisions(cp) == {P2_REVISIONS['replay']}
+    monkeypatch.setenv('ODES_ALLOW_UNVERIFIED_REPLAY', '0')
+    monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: 'f' * 40)
+    with pytest.raises(ExportError, match='not accepted'):
+        exporter._require_installed_replay(cp)
+    monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: P2_REVISIONS['replay'])
+    exporter._require_installed_replay(cp)
+    monkeypatch.setattr(exporter, 'installed_replay_revision', lambda: None)
+    with pytest.raises(ExportError, match='cannot be determined'):
+        exporter._require_installed_replay(cp)
+    monkeypatch.setenv('ODES_ALLOW_UNVERIFIED_REPLAY', '1')
+    exporter._require_installed_replay(cp)
+    assert accepted_replay_revisions('0' * 40) == frozenset()

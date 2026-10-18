@@ -110,3 +110,5 @@ Source of the design: the owner's programme brief of 2026-10-17 (items C1 and C3
 The reference validator never raises: any parsed JSON value gets a list of typed violations. Non-finite numbers (NaN, Infinity) and text that is not valid Unicode are refused as `schema_violation`; `main()` reads files with a strict loader (duplicate members, NaN, Infinity, overflowing numbers and non-UTF-8 input are refused, exit status 2, line `input_refused`); schema patterns match the whole string (`(?!\n)$` in `schema.json`) and times are ISO-8601 with ASCII digits and a UTC offset. No code, member or accepted form changed meaning; no code was added.
 
 Invalid fixtures added: `non-ascii-digit-time`, `seconds-bound-out-of-range-deferral`, `trailing-line-break-digest`, `trailing-line-break-time`, `unpaired-surrogate-text`.
+
+- `context_malformed`: an optional context argument (the run record, or for effect-reversibility also the deferral document) whose shape does not let the cross-document rules run is refused with this typed violation instead of raising. The context is not re-validated against its own schema here.

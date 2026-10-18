@@ -85,7 +85,7 @@ def test_invalid_fixture_is_refused_with_stated_reason(fx):
     assert [v.code for v in er.validate(fx["document"])] == [fx["expected_refusal"]], fx["reason"]
 
 
-CONTEXT_CODES = {"journal_run_mismatch", "class_profile_journal_mismatch", "lost_ack_attempt_mismatch", "open_deferral_mismatch"}
+CONTEXT_CODES = {"journal_run_mismatch", "class_profile_journal_mismatch", "lost_ack_attempt_mismatch", "open_deferral_mismatch", "context_malformed"}
 
 
 def test_every_rule_code_is_pinned_and_documented():
@@ -331,3 +331,28 @@ def test_schema_is_draft_2020_12_and_agrees_with_reference_validator():
             continue  # text validity is a validator rule; the portable schema does not state it
         errors = list(validator.iter_errors(fx["document"]))
         assert bool(errors) == (fx["expected_refusal"] in structural), fx["fixture_id"]
+
+
+def test_deferral_document_must_describe_the_same_run_as_the_profile_and_the_run_record():
+    still_open = deferral_fixture("open-deferral-within-deadline")
+    d = _deferral_dispatch(["syn-deferral-1"], "2026-10-05T19:00:10+00:00", still_open)
+    d["run_id"] = still_open["run_id"] + "-other"
+    assert "journal_run_mismatch" in codes(d, deferrals=still_open)
+    # No run_id on the profile document: the run record and the deferral document are still compared.
+    d.pop("run_id")
+    journal = journal_fixture("held-decision-journal-mode")
+    if journal["run_id"] != still_open["run_id"]:
+        assert "journal_run_mismatch" in codes(d, journal, still_open)
+
+
+@pytest.mark.parametrize("bad", [5, [], "x", {"attempts": 5}, {"run_id": "run-1", "attempts": [5], "check_events": [7]}, {"run_id": "run-1", "check_events": 3}])
+def test_malformed_journal_context_is_a_typed_violation_not_an_exception(bad):
+    d = doc("lost-ack-send-irreversible-reconcile")
+    assert "context_malformed" in codes(d, bad) or "journal_run_mismatch" in codes(d, bad)
+
+
+@pytest.mark.parametrize("bad", [5, {"deferrals": 5}, {"run_id": "run-1", "deferrals": [5]}, {"run_id": "run-1", "deferrals": [{}]}])
+def test_malformed_deferral_context_is_a_typed_violation_not_an_exception(bad):
+    d = doc("blocking-send-with-no-open-deferral")
+    found = codes(d, deferrals=bad)
+    assert "context_malformed" in found or "journal_run_mismatch" in found

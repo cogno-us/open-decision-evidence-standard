@@ -495,6 +495,10 @@ def check_against_context(doc: dict[str, Any], journal: dict[str, Any] | None, d
     """Rules that need the run record and/or the bounded-deferral document."""
     out: list[Violation] = []
     classes = _profiles(doc)
+    if deferrals is not None:
+        for other, what in ((doc.get("run_id"), "the profile document"), (journal.get("run_id") if journal is not None else None, "the run record")):
+            if other is not None and deferrals.get("run_id") != other:
+                return [_v("journal_run_mismatch", "$.run_id", f"{what} and the bounded-deferral document describe the same run")]
     if journal is not None:
         if doc.get("run_id") is not None and journal.get("run_id") != doc["run_id"]:
             return [_v("journal_run_mismatch", "$.run_id", "the profile document and the run record describe the same run")]
@@ -532,6 +536,9 @@ def check_against_context(doc: dict[str, Any], journal: dict[str, Any] | None, d
     return out
 
 
+_CONTEXT_ERRORS = (AttributeError, TypeError, KeyError, IndexError, ValueError, RecursionError)
+
+
 def _validate(doc: Any, journal: dict[str, Any] | None = None, deferrals: dict[str, Any] | None = None) -> list[Violation]:
     """Return all violations; an empty list means the document conforms to 0.1.0-draft."""
     out = validate_structure(doc)
@@ -540,7 +547,10 @@ def _validate(doc: Any, journal: dict[str, Any] | None = None, deferrals: dict[s
     for rule in (_time_rules, _identity_rules, _class_rules, _reference_rules, _snapshot_rules, _dispatch_rules, _lost_ack_rules):
         out.extend(rule(doc))
     if journal is not None or deferrals is not None:
-        out.extend(check_against_context(doc, journal, deferrals))
+        try:
+            out.extend(check_against_context(doc, journal, deferrals))
+        except _CONTEXT_ERRORS:
+            out.append(_v("context_malformed", "$", "the optional run record and deferral document are checked for shape, not assumed to conform"))
     return out
 
 
