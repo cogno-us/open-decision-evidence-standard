@@ -1,0 +1,54 @@
+{
+  "fixture_id": "duplicate-renewal-id",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "duplicate_renewal_id",
+  "reason": "Renewal ids are unique, refused rows included.",
+  "provenance": {
+    "source": "mutation of captured fixture renewal-refused-not-admitted-and-not-new",
+    "control_plane_commit": "83b49b5"
+  },
+  "document": {
+    "contract": "operation-identity",
+    "contract_version": "0.1.0-draft",
+    "profile": "operation-identity/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "operations": [
+      {
+        "operation_id": "op-order-100/refund-1",
+        "principal_id": "urn:cognous:principal:refund-service",
+        "authority_domain": "customer-refunds",
+        "issuer": "urn:cognous:principal:synthetic-governor",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "first_grant_revision": "1",
+        "admitted_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "operation_renewals": [
+      {
+        "renewal_id": "syn-renewal-1",
+        "operation_id": "unknown-op",
+        "grant_id": null,
+        "from_revision": null,
+        "to_revision": "2",
+        "written_by": "urn:cognous:principal:synthetic-governor",
+        "outcome": "refused",
+        "refusal_code": "operation_not_admitted",
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      },
+      {
+        "renewal_id": "syn-renewal-1",
+        "operation_id": "op-order-100/refund-1",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "from_revision": "1",
+        "to_revision": "1",
+        "written_by": "urn:cognous:principal:synthetic-governor",
+        "outcome": "refused",
+        "refusal_code": "renewal_revision_not_new",
+        "recorded_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "attempt_joins": []
+  }
+}

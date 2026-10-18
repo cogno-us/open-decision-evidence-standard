@@ -1,0 +1,49 @@
+{
+  "fixture_id": "unsupported-contract-version",
+  "synthetic": true,
+  "expected_outcome": "reject",
+  "expected_refusal": "unsupported_contract_version",
+  "reason": "A different contract version is refused typed.",
+  "provenance": {
+    "source": "mutation of captured fixture normal-attempted-acknowledged",
+    "control_plane_commit": "83b49b5"
+  },
+  "document": {
+    "contract": "operation-identity",
+    "contract_version": "9.0.0",
+    "profile": "operation-identity/0.1",
+    "producer": "control-plane",
+    "run_id": "run-1",
+    "operations": [
+      {
+        "operation_id": "op-order-100/refund-1",
+        "principal_id": "urn:cognous:principal:refund-service",
+        "authority_domain": "customer-refunds",
+        "issuer": "urn:cognous:principal:synthetic-governor",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "first_grant_revision": "1",
+        "admitted_at": "2026-10-05T19:00:00+00:00"
+      }
+    ],
+    "operation_renewals": [],
+    "attempt_joins": [
+      {
+        "join_id": "syn-join-1",
+        "operation_id": "op-order-100/refund-1",
+        "attempt_id": "syn-attempt-1",
+        "check_id": "syn-check-2",
+        "effect_id": "sha256:d19d83b15e0ec164f3da356fe7a1ecef64734724d7fd65265e91e95f2ffe2829",
+        "decision_id": "syn-decision-1",
+        "grant_id": "urn:cognous:grant:routine-1",
+        "grant_revision": "1",
+        "resolver_id": "synthetic-resolver",
+        "resolver_version": "1",
+        "class_max_age": 60,
+        "expected_effective_grant_digest": null,
+        "merged_into": null,
+        "recorded_at": "2026-10-05T19:00:00+00:00",
+        "time_source": "test_override"
+      }
+    ]
+  }
+}
