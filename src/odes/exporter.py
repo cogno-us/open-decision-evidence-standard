@@ -135,13 +135,6 @@ def _actions(manifest: dict[str, Any]) -> list[dict[str, Any]]:
     return output
 
 
-def _find_action(manifest: dict[str, Any], action_id: str | None) -> dict[str, Any] | None:
-    for action in _actions(manifest):
-        if action_id in {action.get("action_id"), action.get("name"), action.get("action_name")}:
-            return action
-    return None
-
-
 def _decision_result(data: dict[str, Any]) -> str:
     raw = str(_first(data, "result", "decision", "authorization", "status") or "unknown").lower().strip()
     if raw in {"allow", "allowed", "authorized", "grant", "granted", "approved"}:

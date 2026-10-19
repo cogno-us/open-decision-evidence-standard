@@ -63,7 +63,6 @@ def start(**options):
 
 def with_identity(r, f, c, operation_id="op-order-100/refund-1"):
     cfg = c.model_copy(update={"operation_identity": OperationIdentityProfile(resolver_id="synthetic-resolver", resolver_version="1")})
-    import tests.test_operation_identity as oi
     r.contexts[PROFILE]["runtime_authority"]["operation_id"] = operation_id
     from tests.test_runtime_authority import bind_approval
     bind_approval(r, cfg)

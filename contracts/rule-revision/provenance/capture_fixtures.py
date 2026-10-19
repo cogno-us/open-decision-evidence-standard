@@ -15,14 +15,12 @@ import tempfile
 from datetime import timedelta
 from pathlib import Path
 
-import pytest
-
 import agent_control_plane.bounded as bounded
 from agent_control_plane.bounded import commitment
 from agent_control_plane.reason_vocabulary import (VocabularyChange, arity_flags, measured_arity, recomputability_flags,
                                                    refusal_trends)
-from agent_control_plane.rule_revision import RuleRevision, RuleRevisionProfile, RuleRevisionRefused, append_rule_revision
-from tests.test_bounded_authorization import ISSUER, NOW, POLICY_REF, PROFILE
+from agent_control_plane.rule_revision import RuleRevisionProfile, RuleRevisionRefused, append_rule_revision
+from tests.test_bounded_authorization import NOW, POLICY_REF
 from tests.test_runtime_authority import held, setup_flow
 import tests.test_rule_revision as rr
 
