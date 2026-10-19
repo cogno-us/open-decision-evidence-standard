@@ -6,7 +6,6 @@ from copy import deepcopy
 from typing import Any
 
 from .common import (
-    accepted_replay_revisions,
     all_accepted_replay_revisions,
     installed_replay_checkout_dirty,
     installed_replay_revision,
@@ -23,8 +22,6 @@ from .common import (
     RESTRICTION_UNKNOWN_LIMIT,
     RESTRICTION_VERSION_SUFFIX,
     REFUSAL_PROFILE_VERSION,
-    SECURITY_PROFILE_VERSION,
-    SECURITY_REVISIONS,
     SECURITY_RUNTIME_CP_REVISIONS,
     SECURITY_RUNTIME_GENERATIONS,
     REFUSAL_REVISIONS,

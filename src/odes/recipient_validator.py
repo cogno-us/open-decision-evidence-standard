@@ -20,13 +20,11 @@ from .common import (
     RESTRICTION_VERSION_SUFFIX,
     PROFILE_V2_VERSION,
     REFUSAL_PROFILE_VERSION,
-    SECURITY_PROFILE_VERSION,
     SECURITY_RUNTIME_GENERATIONS,
     REFUSAL_REVISIONS,
     MERGED_PROFILE_VERSION,
     MERGED_REVISIONS,
     ALL_V2_CONTROL_PLANE_REVISIONS,
-    PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
     SCHEMA_VERSION,
@@ -35,7 +33,6 @@ from .common import (
     instant_problem,
     parse_instant,
     window_expired,
-    sha256,
 )
 from .canonicalization import SUPPORTED_CANONICALIZATION_PROFILES, digest_for
 from .evidence_inventory import evaluate_native_evidence_inventory
