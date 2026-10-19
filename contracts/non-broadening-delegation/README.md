@@ -43,6 +43,16 @@ Subset means "not above", not "strictly below": a child equal to its parent in e
 - Aggregate budget across siblings or over time (question 4). `max_effects` and `max_amount` are per grant, as in `_matching_permission`.
 - Signatures and the identity `chain` (`delegation_chain_missing` remains the Control Plane's own check).
 
+## Entry conditions for enabling delegation
+
+Delegation stays refused (`delegation_profile_unsupported`) until all of the following hold. They are conditions on a future opt-in implementation, not behaviour of any component today, and they do not change this document's rules.
+
+- (a) Delegator binding. The child grant is bound to its delegator over the exact child grant, and the binding is checked at acceptance, not only at issuance.
+- (b) Ancestor status walk. At decision time every ancestor's status is read and a non-active ancestor refuses the decision with its own refusal code. Status is not part of this document (see "Not checked here"), so the walk is a Control Plane responsibility.
+- (c) Unendorsed-parent fixture. A producer fixture in which the child names a real parent that never endorsed it, and is refused.
+
+The same conditions are recorded in the Control Plane documentation (`docs/bounded_authorization_effect.md`, "Delegation entry conditions").
+
 ## Questions asked as defaults (owner asked not to be asked; each is reversible while the draft stays `0.1.0-draft`)
 
 1. Parent reference by `grant_id` only, not `grant_id` plus revision. Default: id only (the control plane grant model has no parent revision). Reversible: add an optional `parent_grant_revision`.
