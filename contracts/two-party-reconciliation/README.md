@@ -62,7 +62,7 @@ Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, [expecte
 
 Valid (7): `matched-and-committed`, `mismatch-surfaced-not-committed`, `ambiguous-delivery-sender-only`, `receiver-only-awaiting-sender`, `mismatch-escalated`, `several-events-mixed`, `extension-namespace-members-preserved`.
 
-Invalid (26): one per code above, named for the defect. The headline case is `mismatch-committed-as-two-valid-records`.
+Invalid (31): one per code above, named for the defect. The headline case is `mismatch-committed-as-two-valid-records`.
 
 ## Run
 

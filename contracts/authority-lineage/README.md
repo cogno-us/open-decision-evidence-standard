@@ -37,7 +37,7 @@ Continuity (what resolving means). Walk the previous links from an effect hop. T
 - A flag names an effect hop in the document (`discontinuity_flag_dangling`) and that effect really does not resolve (`discontinuity_flag_false`).
 - A delegation that does not resolve and has no effect below it needs no flag (there is no terminal effect to explain); it is reported by `find_break`.
 
-A document is valid with unresolved effects when they are flagged. Validity here means the record is honest about its own gaps; it never means the effect was authorized. A consumer treats a flagged effect as unauthorized-until-explained.
+A document is valid with unresolved effects when they are flagged. Validity here means the record is honest about its own gaps; it never means the effect was authorized. A consumer treats a flagged effect as unauthorized-until-explained. An effective authority is derived from a single lineage, never from the union of two independent principals' scopes; this contract defines no merging of lineages.
 
 `find_break(doc, hop_id)` and `unresolved_effects(doc)` expose the walk.
 

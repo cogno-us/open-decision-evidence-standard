@@ -74,7 +74,7 @@ Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, [expecte
 
 Valid (7): `root-grant-no-delegation`, `delegation-equal-bounds`, `delegation-narrower-in-every-bound`, `two-level-chain-depth-exhausts`, `two-siblings-from-one-parent`, `child-permission-fits-second-parent-permission`, `extension-namespace-members-preserved`.
 
-Invalid (23): the six required cases are `broadened-amount`, `window-expires-later` (and `window-starts-earlier`), `widened-data-scope` (and `widened-targets`, `action-not-in-parent`), `depth-exhausted`, `missing-parent`, `cycle` (and `self-parent`); the rest pin each other code.
+Invalid (28): the six required cases are `broadened-amount`, `window-expires-later` (and `window-starts-earlier`), `widened-data-scope` (and `widened-targets`, `action-not-in-parent`), `depth-exhausted`, `missing-parent`, `cycle` (and `self-parent`); the rest pin each other code.
 
 ## Run
 
