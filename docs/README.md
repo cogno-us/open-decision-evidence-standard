@@ -62,7 +62,7 @@ Each contract README is the source of the copies other repositories vendor.
 | [engineering/ODES-P0-INVENTORY.md](engineering/ODES-P0-INVENTORY.md) | Decoupling inventory, with retained per-repository inventories in `engineering/p0-inventory/` (JSON, not edited). *Historical.* |
 | [workstreams/odes-control-plane-store-checkpoint.md](workstreams/odes-control-plane-store-checkpoint.md) | Control Plane store compatibility checkpoint. *Historical.* |
 | [workstreams/odes-producer-v2-checkpoint.md](workstreams/odes-producer-v2-checkpoint.md) | Producer v2 checkpoint. *Historical.* |
-| [security-runtime-profile-20261016.md](security-runtime-profile-20261016.md), [security-runtime-f5b-profile-20261016.md](security-runtime-f5b-profile-20261016.md), [security-runtime-p4-p2-profiles.md](security-runtime-p4-p2-profiles.md) | Candidate producer generations (not selected). *Historical.* |
+| [security-runtime-profile-20261016.md](security-runtime-profile-20261016.md), [security-runtime-f5b-profile-20261016.md](security-runtime-f5b-profile-20261016.md), [security-runtime-p4-p2-profiles.md](security-runtime-p4-p2-profiles.md) | Candidate producer generations (listed here; selection is by the hub lock). *Historical.* |
 | [security-cloud-remediation-20261016.md](security-cloud-remediation-20261016.md) | Remediation proposal and its disposition. *Historical.* |
 
 ## Repository pages outside docs/

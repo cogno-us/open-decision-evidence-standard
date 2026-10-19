@@ -166,7 +166,7 @@ The lifecycle contract's own negative controls (`tests/test_contract_lifecycle_c
 
 ### 4.2 Seeds, and why they cannot be the measurement
 
-ODES journal contract: 67 invalid fixtures over 58 distinct codes, 13 valid. Lifecycle: 31 invalid over 22 codes, 20 valid. The union is 71 distinct codes (9 shared, because the journal contract delegates). All fixtures are synthetic and hand-built, and the valid ones are marked `synthetic: true`.
+ODES journal contract: 104 invalid fixtures over 64 distinct codes, 53 valid. Lifecycle: 54 invalid over 27 codes, 21 valid. The union is 82 distinct codes (9 shared, because the journal contract delegates). All fixtures are synthetic and hand-built, and the valid ones are marked `synthetic: true`.
 
 These are **regression seeds**, not a detection measurement: each invalid fixture was written for a rule the validator already implements, so a validator that passes its own fixtures says only that it has not regressed. The report therefore keeps two corpora apart:
 
@@ -367,7 +367,7 @@ The code wins in each case.
 |---|---|
 | `PYTHONPATH=src python -m pytest -q tests` in ODES at `321bd404` | 880 passed |
 | `python tools/adversarial_mutations.py` in the Control Plane at `87f02336` | `DETECTED: delegation`, `DETECTED: independence`, `DETECTED: unknown-context` |
-| count of `expected_refusal` over `contracts/{control-plane-journal,execution-attempt-lifecycle}/fixtures/invalid` | journal 67 fixtures, 58 distinct codes; lifecycle 31 fixtures, 22 codes; union 71 distinct, 9 shared; valid 13 and 20 |
+| count of `expected_refusal` over `contracts/{control-plane-journal,execution-attempt-lifecycle}/fixtures/invalid` | journal 104 fixtures, 64 distinct codes; lifecycle 54 fixtures, 27 codes; union 82 distinct, 9 shared; valid 53 and 21 |
 | `python -I` on the registry `schemas/runtime_authority_reasons_0_1.json` | 121 codes; `typed_only` 120; `recomputable` 1 (`grant_revoked`) |
 | AST count of `CASES` in hub `tools/*_mutations.py` | 13, 8, 9, 7, 4 |
 | `python -I -c 'json.loads(...)'` duplicate member and `NaN` | last duplicate wins; `NaN` accepted (3.2) |

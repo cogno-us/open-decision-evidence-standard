@@ -34,8 +34,8 @@ ODES is an open, vendor-neutral discussion draft and reference tooling for porta
 <a id="cognous-stack-components"></a>
 
 <!-- stack-map:start -->
-<!-- Canonical block: identical text in every component README. Source: docs/stack-map.md in the hub. Refresh at the pin round. -->
-The Open Control Stack groups its repositories by responsibility. The groups are a navigation map, not an execution sequence and not a requirement to install every component. The hub [component lock](https://github.com/cogno-us/cognous-open-control-stack/blob/main/component-lock.json) is the only source of selected revisions; [release status](https://github.com/cogno-us/cognous-open-control-stack/blob/main/docs/release-status.md) states their evidence and limits. Last checked against `component-lock.json` at hub commit `dcc9bd7533ef`.
+<!-- Canonical block: identical text in every component README. Source: docs/stack-map.md in the hub. -->
+The Open Control Stack groups its repositories by responsibility. The groups are a navigation map, not an execution sequence and not a requirement to install every component. The hub [component lock](https://github.com/cogno-us/cognous-open-control-stack/blob/main/component-lock.json) is the only source of selected revisions; [release status](https://github.com/cogno-us/cognous-open-control-stack/blob/main/docs/release-status.md) states their evidence and limits. The component revisions selected for the stack are listed in the hub's `component-lock.json`; this repository does not record which hub commit it was last checked against.
 
 | Group | Members |
 | --- | --- |
@@ -84,7 +84,7 @@ What this shows:
 
 ## What ships
 
-Labels as defined above. The lock pins an older ODES revision than `main`; items marked "after the lock" were merged after it.
+Labels as defined above. The revision of this repository that the stack selects is recorded in the hub lock.
 
 ### Command line: `odes`
 
@@ -101,14 +101,14 @@ Labels as defined above. The lock pins an older ODES revision than `main`; items
 | [`schema/pder-v0.1.schema.json`](schema/pder-v0.1.schema.json), [field notes](schema/pder-v0.1-fields.md) | Closed JSON schema for one decision-evidence record. Every substantive field is an issuer assertion. | selected |
 | [minimal](profiles/minimal.md), [agentic AI](profiles/agentic-ai.md), [regulated enterprise](profiles/regulated-enterprise.md) | Informative sector and minimal profiles. | merged |
 | [Cognous stack export 0.1](profiles/cognous-stack-export-0.1.md) | Historical Cognous export profile. | merged |
-| [Cognous stack export 0.2](profiles/cognous-stack-export-0.2.md) | Producer 2.0.0 export with Replay semantic consistency; generation 0.2.1 (merged producer pair) is the lock's profile. | selected |
-| [Cognous stack export 0.2 restrictions](profiles/cognous-stack-export-0.2-restrictions.md) | Explicit restriction semantics (`odes_cognous_stack_export_0_2_restrictions`): unknown is not unrestricted. | merged (after the lock) |
-| [Generic recipient 0.1](profiles/generic-recipient-0.1.md) | `odes_generic_recipient_0_1`: needs no Cognous component and can carry the native evidence inventory; no Replay check is run or claimed. | merged (after the lock) |
-| [Native evidence inventory](docs/native-evidence-inventory.md) | Byte-preserving inventory of native evidence with limits; recipient checked; nothing fetched. | merged (after the lock) |
-| [Detached authentication](docs/detached-authentication.md) | Optional DSSE with Ed25519 (`pip install -e ".[signatures]"`); a verifying signature authenticates origin only. | merged (after the lock) |
-| `rfc8785-jcs` canonicalization | RFC 8785 as a separate profile next to the legacy one; integers within -(2^53 - 1) to 2^53 - 1; relabelling a package does not make its digests valid. See [recipient validation](docs/recipient-validation.md#canonicalization-profiles). | merged (after the lock) |
+| [Cognous stack export 0.2](profiles/cognous-stack-export-0.2.md) | Producer 2.0.0 export with Replay semantic consistency; the implementation profile selected for the stack is recorded in the hub lock. | selected |
+| [Cognous stack export 0.2 restrictions](profiles/cognous-stack-export-0.2-restrictions.md) | Explicit restriction semantics (`odes_cognous_stack_export_0_2_restrictions`): unknown is not unrestricted. | merged |
+| [Generic recipient 0.1](profiles/generic-recipient-0.1.md) | `odes_generic_recipient_0_1`: needs no Cognous component and can carry the native evidence inventory; no Replay check is run or claimed. | merged |
+| [Native evidence inventory](docs/native-evidence-inventory.md) | Byte-preserving inventory of native evidence with limits; recipient checked; nothing fetched. | merged |
+| [Detached authentication](docs/detached-authentication.md) | Optional DSSE with Ed25519 (`pip install -e ".[signatures]"`); a verifying signature authenticates origin only. | merged |
+| `rfc8785-jcs` canonicalization | RFC 8785 as a separate profile next to the legacy one; integers within -(2^53 - 1) to 2^53 - 1; relabelling a package does not make its digests valid. See [recipient validation](docs/recipient-validation.md#canonicalization-profiles). | merged |
 
-Version coordinates: the lock's "implementation profile 0.2.1" is the profile version `odes-cognous-stack-export-0.2.1` (the merged Control Plane and Replay pair); it sits beside the narrative version 0.2, the base schema `pder-v0.1`, the package envelope 0.1.0 and the Python package 0.2.0. These are different axes, not conflicting values. The [capabilities and version register](docs/capabilities-and-versions.md) lists every coordinate and where it is defined. <!-- pin-round: refresh the lock pin and the "after the lock" labels -->
+Version coordinates: the implementation profile recorded in the lock is a profile version of the form `odes-cognous-stack-export-<version>`; it sits beside the narrative version 0.2, the base schema `pder-v0.1`, the package envelope 0.1.0 and the Python package 0.2.0. These are different axes, not conflicting values. The [capabilities and version register](docs/capabilities-and-versions.md) lists every coordinate and where it is defined.
 
 ### Contract drafts (`contracts/`)
 
@@ -166,13 +166,13 @@ The [documentation index](docs/README.md) lists every page by role and marks his
 
 ## Compatibility and selection
 
-The [component lock](https://github.com/cogno-us/cognous-open-control-stack/blob/main/component-lock.json) selects the integration; a merge here does not change that selection or approve deployment. The lock pins this repository at `c5e9a0f3695a`; `main` is ahead of it. The implementation supports the persistence-compatible Control Plane and Replay generation while preserving older mappings (see the [compatibility checkpoint](docs/workstreams/odes-control-plane-store-checkpoint.md) and [merged producer compatibility](docs/merged-producer-compatibility.md): the exact merged pair has the consumer mapping `odes-cognous-stack-export-0.2.1`; atomic-claim and refund-intent evidence are not added). This accepted implementation does not turn the discussion draft into a ratified standard or establish external adoption. Test results and historical qualification records are in the [central test hub](https://github.com/cogno-us/cognous-stack-qualification/blob/main/results/readme-commentary/index.md); read them against their recorded source revisions.
+The [component lock](https://github.com/cogno-us/cognous-open-control-stack/blob/main/component-lock.json) selects the integration; a merge here does not change that selection or approve deployment. The revision of this repository selected for the stack is listed in the lock. The implementation supports the persistence-compatible Control Plane and Replay generation while preserving older mappings (see the [compatibility checkpoint](docs/workstreams/odes-control-plane-store-checkpoint.md) and [merged producer compatibility](docs/merged-producer-compatibility.md): the exact merged pair has the consumer mapping `odes-cognous-stack-export-0.2.1`; atomic-claim and refund-intent evidence are not added). This accepted implementation does not turn the discussion draft into a ratified standard or establish external adoption. Test results and historical qualification records are in the [central test hub](https://github.com/cogno-us/cognous-stack-qualification/blob/main/results/readme-commentary/index.md); read them against their recorded source revisions.
 
 ## Run the tests
 
 ```bash
 python -m pip install -e ".[dev]"
-PYTHONPATH=src python -m pytest -q   # 2 to 3 minutes; 3011 passed, 8 skipped at the time of writing
+PYTHONPATH=src python -m pytest -q   # runs the full component-local suite
 ```
 
 Cross-component test commands run in a disposable checkout assembled by the [qualification workflows](CROSS_COMPONENT_TESTS.md); plain local test discovery covers the component-local tests retained here. Historical reports and dependency pins keep their original scope. The [qualification suites](https://github.com/cogno-us/cognous-stack-qualification/tree/39f038435afdd71ba162860faa5718d90d7bde64/suites/open-decision-evidence-standard) hold the executable integration harnesses. The documentation register and contract vendoring tests (`tests/test_documentation_register.py`, `tests/test_vendor_contract_tool.py`) check that public text keeps its qualified wording and that contract copies verify.
