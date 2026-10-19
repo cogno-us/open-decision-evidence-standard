@@ -46,15 +46,6 @@ def delete_refusal_add_attempt(doc):
                        for s, ack in (("attempted", {}), ("acknowledged", {"duplicate": False}))]
 
 
-def clear_effect_reasons(doc):
-    for c in doc["resolution_checks"]:
-        if c["stage"] == "effect":
-            c["reasons"] = []
-    for e in doc["check_events"]:
-        if e["phase"] == "completed" and e["stage"] == "effect":
-            e["reasons"] = []
-
-
 def drop_reason_everywhere(doc, code):
     for section in ("decisions", "resolution_checks", "refusals"):
         for row in doc[section]:
