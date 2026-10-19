@@ -406,6 +406,11 @@ def _executor_rules(doc: dict[str, Any]) -> list[Violation]:
                                  + ("" if kind == "validated" else
                                     "; 'applied'/'partial' is only what recovery reports, and 'unknown' otherwise")))
             return out
+    if result["status"] in ATTEMPT_REQUIRED_STATUSES and result["attempt_id"] not in ids:
+        # Rule ``result_attempt_unresolved``: a status that claims an attempt names a row of ``attempts`` (null names none).
+        return out + [Violation("result_attempt_unresolved", "$.execution_result.attempt_id",
+                                f"result status {result['status']!r} names an attempt row of the record "
+                                "(a null attempt_id or an id that matches no row is refused)")]
     seq = per_attempt.get(result["attempt_id"])
     if result["attempt_id"] in ids and seq and result["status"] != "observed":
         terminal = seq[-1]["status"]

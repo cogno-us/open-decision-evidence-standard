@@ -69,7 +69,8 @@ def test_required_invalid_cases_exist():
             "effect_free_reconcile_claims_attempt", "recovery_state_mismatch",
             "recovery_observations_mismatch", "unknown_enum_value", "schema_violation",
             "observed_result_claims_attempt", "executed_without_observation", "attempt_started_at_changed",
-            "null_observation_state_mismatch", "observations_mismatch", "invalid_extension_key"} <= codes
+            "null_observation_state_mismatch", "observations_mismatch", "invalid_extension_key",
+            "result_attempt_unresolved"} <= codes
     ids = {f["fixture_id"] for f in INVALID}
     assert {"empty-object-observation", "executor-unknown-with-validated-partial-observation",
             "executor-unknown-validated-absent-state-mismatch", "null-observation-state-absent",
