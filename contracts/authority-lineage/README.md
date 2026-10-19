@@ -66,7 +66,7 @@ Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, [expecte
 
 Valid (10): `grant-only`, `grant-to-effect`, `grant-delegation-delegation-effect`, `two-effects-share-a-delegation`, `effect-without-origin-flagged`, `previous-missing-flagged`, `previous-hash-mismatch-flagged`, `break-deeper-in-the-chain-flagged-at-the-break`, `mixed-resolved-and-flagged`, `extension-namespace-members-preserved`.
 
-Invalid (22): one per code above, named for the defect (for example `orphan-effect-unflagged`, `tampered-hop-content`, `flag-on-resolved-effect`, `link-to-an-effect`).
+Invalid (24): one per code above (22), named for the defect (for example `orphan-effect-unflagged`, `tampered-hop-content`, `flag-on-resolved-effect`, `link-to-an-effect`), plus the two added by decision 32 (`trailing-line-break-digest`, `unpaired-surrogate-text`).
 
 ## Run
 

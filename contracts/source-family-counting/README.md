@@ -63,7 +63,7 @@ Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, [expecte
 
 Valid (8): `one-original-satisfies-one`, `six-sends-of-one-message-count-one`, `retries-plus-second-family-satisfies-two`, `resend-and-derived-inherit-the-family`, `two-originals-of-one-family-count-one`, `claim-with-no-confirmations`, `two-claims-over-one-record-set`, `extension-namespace-members-preserved`.
 
-Invalid (21): one per code above, named for the defect. Headline: `six-retries-counted-as-six`.
+Invalid (22): one per code above (21), named for the defect, plus the one added by decision 32 (`unpaired-surrogate-text`). Headline: `six-retries-counted-as-six`.
 
 ## Run
 
