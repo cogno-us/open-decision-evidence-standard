@@ -1,6 +1,6 @@
 # P4 and P2 producer generations: non-selected candidate profiles — 18 October 2026
 
-Status: candidate, informative. Both profile versions below are candidate identifiers for qualification pin generations, not selected or frozen identifiers. They stay `0.1.0-draft` territory like the rest of the export profiles.
+Status: candidate, informative. Both profile versions below are candidate identifiers for qualification pin generations. They are listed here for attribution; selection is by the hub lock only. They stay `0.1.0-draft` territory like the rest of the export profiles.
 
 ## P4
 
