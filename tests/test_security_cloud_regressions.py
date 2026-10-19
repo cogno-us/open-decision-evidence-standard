@@ -275,16 +275,16 @@ def test_p4_generation_is_added_beside_f5b_and_exactly_paired():
 
 def test_p2_generation_is_added_beside_p4_and_exactly_paired():
     assert P2_REVISIONS == {'manifest': 'ff5490828b2bf7f6a976da209f3f533701855687',
-        'replay': '2a7963b18d96eb2e9e4fdb1a09c7588cf5c0ef00',
+        'replay': '6a6a477495ac24e813f12bb0fe314acfe8bac9cf',
         'control_plane': '2bac7875391cad0a431fa0d75208b7ade39743e3',
-        'moltbot_safe': 'c4a05883266b815f39d97cbf2240406647985147'}
+        'moltbot_safe': '6b16962db140590b808f02b5c2cb11a217aec46f'}
     assert all(len(v) == 40 for v in P2_REVISIONS.values())
     assert P2_PROFILE_VERSION not in {SECURITY_PROFILE_VERSION, F5B_PROFILE_VERSION, P4_PROFILE_VERSION}
     # P2 shares no revision (Manifest included, since the scan-fix stream moved it) with any earlier generation.
     for other in (SECURITY_REVISIONS, F5B_REVISIONS, P4_REVISIONS):
         for key in ('manifest', 'replay', 'control_plane', 'moltbot_safe'):
             assert P2_REVISIONS[key] != other[key]
-    # The earlier P2 tuples are replaced, not kept (decisions 38 and 41): their control planes are no longer known generations.
+    # The earlier P2 tuples are replaced, not kept (decisions 38, 41 and 42): their control planes are no longer known generations.
     from odes.exporter import ExportError as _ExportError
     from odes.common import all_accepted_replay_revisions
     for replaced_control_plane in ('3cd17ead6b24301290ad1e50ae4b22bbd93c12fb', '6093aca7b945698e89c0d8ac7c75306375e1a298'):
@@ -292,7 +292,7 @@ def test_p2_generation_is_added_beside_p4_and_exactly_paired():
         assert replaced_control_plane not in SECURITY_RUNTIME_GENERATIONS
         with pytest.raises(_ExportError, match='unsupported Control Plane compatibility revision'):
             _selected_v2_pins(replaced_control_plane)
-    for replaced_replay in ('c8e665bd1936e4da90f6a324b486a320934c4bff',):
+    for replaced_replay in ('c8e665bd1936e4da90f6a324b486a320934c4bff', '2a7963b18d96eb2e9e4fdb1a09c7588cf5c0ef00'):
         assert replaced_replay not in all_accepted_replay_revisions()
     assert P2_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert P4_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
