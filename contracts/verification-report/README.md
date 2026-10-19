@@ -85,7 +85,7 @@ Mandatory. Twelve identifiers, a closed set; `statement` is the producer's wordi
 | Id | What the report does not claim |
 |---|---|
 | `relative_to_pinned_controller` | consistency with the named controller revision, drafts and registry only; not carried to another revision |
-| `semantic_quality_not_certified` | decision correctness, policy adequacy, lawful issue of a grant |
+| `semantic_quality_not_certified` | decision correctness, policy adequacy, lawful issue of a grant. A V1 or V2 pass establishes integrity and internal consistency of the record, not that the recorded decision was the correct one |
 | `receipt_source_bounded` | the destination ledger is executor-written, unsequenced and unsigned: no claim it is complete or unforged, or that an effect occurred in the world |
 | `self_consistent_forgery_not_detected` | a record rewritten with every commitment recomputed is accepted (category F) |
 | `not_an_attestation` | not an attestation, not an Index or BitRep signature, not an authorization; never an input to a grant or decision |
@@ -98,6 +98,8 @@ Mandatory. Twelve identifiers, a closed set; `statement` is the producer's wordi
 | `profile_sidecar_semantics_only` | profile-on sidecar checks cover only the members the rules read; host-configuration rules such as signer set, extension limit and resolver capability are not checked |
 
 An `x-` extension is ignored for contract logic. A consumer must not read any extension as an attestation, a signature or a score.
+
+Two further statements apply to every tier a report can carry (`V1` to `V4`). None of them checks permission: the tiers read what the record says about a decision and its authority, and none re-derives whether the action was permitted; no tier that does so is defined. And durable inclusion is not a verification level: a record whose counts, order and bindings agree does not show that any row was durably stored or retained. The closed id set has no separate id for this; a producer states it inside the `statement` of `self_consistent_forgery_not_detected` (the independent verifier does), and a dedicated id would need a change to the enumeration first.
 
 ## Member model
 
@@ -177,7 +179,7 @@ Same model as the other drafts.
 
 Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, expected_refusal, document}`. `fixtures/valid/` must be accepted. `fixtures/invalid/` must be refused with `expected_refusal` as the only violation.
 
-Valid (16) and invalid (87). Eleven valid and 75 invalid are HAND-WRITTEN and synthetic (no producer existed when the draft was written): digests are SHA-256 over placeholder labels, not over real files, and the verifier `version` is `0.0.0-handwritten-fixture`. `provenance/build_fixtures.py` regenerates them (invalid ones are single-defect mutations of the valid ones) and asserts each outcome; it leaves the `v3-*` files alone.
+Valid (16) and invalid (94). Eleven valid and 82 invalid are HAND-WRITTEN and synthetic (no producer existed when the draft was written): digests are SHA-256 over placeholder labels, not over real files, and the verifier `version` is `0.0.0-handwritten-fixture`. `provenance/build_fixtures.py` regenerates them (invalid ones are single-defect mutations of the valid ones) and asserts each outcome; it leaves the `v3-*` files alone.
 
 Five valid fixtures (`v3-*`) are captured: the unchanged JSON output of `cognous-verify` (verifier main `05afab8`, PR #10) run with `--witness` (and `--holder-inventory` where the scenario has one) over runs captured from the Control Plane at `128eaa5` (`acp witness publish`; a bounded workflow with a fixed clock for the staged and inventory runs). One of the five runs over a record from which a covered row was removed (the damage is applied to a copy). Honest limit: that verifier build predates this revision and reports V3 in `extensions["x-tier-v3"]`, so `provenance/capture_v3_reports.py` moves that section into `checks`, `subject.inputs` and `scope.tiers_run`, recomputes `inputs_digest` and `summary`, and appends the `witness_is_not_publication` non-claim (statement taken from the verifier's own limits text); nothing else is edited and `report_id` is the verifier's. No verifier has emitted the revised shape yet. Twelve invalid `v3-*` and related fixtures are single-defect mutations of those captures (`provenance/build_v3_fixtures.py`). The scripts are not tests and are not vendored.
 
@@ -192,7 +194,7 @@ PYTHONPATH=src python -m pytest -q tests/test_contract_verification_report.py
 
 ## What this does and does not show
 
-A passing run shows that a report is well formed, that its verdicts and tallies are arithmetically consistent, that its mutation tables keep their denominators apart, and that it carries the mandatory non-claims. It does not show that the verifier is correct or independent, that a corpus is representative, or that the result transfers to another controller revision. It records no behaviour the verifier lacks.
+A passing run shows that a report is well formed, that its verdicts and tallies are arithmetically consistent, that its mutation tables keep their denominators apart, and that it carries the mandatory non-claims. It does not show that the verifier is correct or independent, that a corpus is representative, that the recorded decision was the correct one or was permitted, that any row was durably stored, or that the result transfers to another controller revision. It records no behaviour the verifier lacks.
 
 ## Divergences
 
