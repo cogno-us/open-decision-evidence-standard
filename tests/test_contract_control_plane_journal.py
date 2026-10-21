@@ -501,7 +501,9 @@ def test_profile_rules_do_not_relax_the_default_path():
 
 def test_registry_labels_and_the_zero_two_only_codes():
     assert cpj.VOCABULARY_0_1 == "runtime-authority-reasons/0.1" and cpj.VOCABULARY_0_2 == "runtime-authority-reasons/0.2"
-    assert len(cpj.CODES_ADDED_IN_0_2) == 37  # 158 - 121, from the Control Plane's two registry files at 6b8fb627
+    assert len(cpj.CODES_ADDED_IN_0_2) == 42  # 163 - 121, from the Control Plane's two registry files at 5c474ba8
+    assert {"action_blocked", "missing_effect_limits", "missing_amount_limit", "effect_limit_malformed",
+            "authority_limit_malformed"} <= cpj.CODES_ADDED_IN_0_2  # Control Plane #79
     assert "grant_revocation_recorded" in cpj.CODES_ADDED_IN_0_2  # terminal-revocation/0.1
     assert {"holder_inventory_missing", "check_expired_before_dispatch", "operation_id_missing"} <= cpj.CODES_ADDED_IN_0_2
     enums = [cpj.load_schema()["$defs"][n]["properties"]["reason_vocabulary_version"]["enum"] for n in ("journal_event", "decision", "refusal")]
@@ -574,3 +576,26 @@ def test_terminal_revocation_needs_no_new_member_and_carries_the_zero_two_label(
 def test_terminal_revocation_code_under_a_0_1_label_is_refused():
     fx = next(f for f in PROFILE_INVALID if f["fixture_id"] == "profile-terminal-revocation-code-under-a-0-1-label")
     assert fx["expected_refusal"] == "reason_label_mismatch" and codes(copy.deepcopy(fx["document"])) == ["reason_label_mismatch"]
+
+
+# ------------------------------------------------------------------ the five manifest-gate codes of Control Plane #79 (decision 44)
+
+MANIFEST_GATE_CODES = ["action_blocked", "missing_effect_limits", "missing_amount_limit", "effect_limit_malformed",
+                       "authority_limit_malformed"]
+
+
+def test_valid_fixture_with_the_manifest_gate_codes_under_a_0_2_label_is_accepted():
+    d = doc("reasons-0-2-label-with-the-manifest-gate-codes")
+    assert codes(d) == []
+    assert set(MANIFEST_GATE_CODES) <= set(d["decisions"][0]["reasons"])
+    assert d["decisions"][0]["reason_vocabulary_version"] == cpj.VOCABULARY_0_2
+
+
+@pytest.mark.parametrize("code", MANIFEST_GATE_CODES)
+def test_each_manifest_gate_code_under_a_0_1_label_is_refused(code):
+    d = doc("reasons-0-2-label-with-a-0-2-code")
+    for row in (d["decisions"][0], d["resolution_checks"][0], d["check_events"][-1]):
+        row["reasons"] = sorted(set(row["reasons"]) | {code})
+    assert codes(d) == []
+    d["decisions"][0]["reason_vocabulary_version"] = cpj.VOCABULARY_0_1
+    assert codes(d) == ["reason_label_mismatch"]
