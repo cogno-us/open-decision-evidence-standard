@@ -249,8 +249,14 @@ def _evaluate_package_content_integrity(package: dict[str, Any], trusted_digests
 
     if reasons:
         return _result("fail", reasons, evidence)
-    if trusted_digests and expected_package_digest not in trusted_digests and record_profile_digest not in trusted_digests:
-        return _result("unavailable", ["content digest matches package but is not in the configured trusted digest set"], evidence)
+    # Only package_digest anchors the complete-package pass: integrity.value (the record/profile digest) does not cover provenance
+    # (limits, unsupported_semantics, restriction_semantics), so a trusted record/profile digest is not an anchor (decision 45).
+    if trusted_digests and expected_package_digest not in trusted_digests:
+        note = ("content digest matches package but is not in the configured trusted digest set"
+                if record_profile_digest not in trusted_digests else
+                "the configured trusted digest is the record/profile digest, which does not cover provenance (limits, unsupported semantics, "
+                "restriction semantics); only package_digest anchors the complete package, so this is not accepted as an anchor")
+        return _result("unavailable", [note], evidence)
     return _result("pass", ["complete material package content is bound by digest; this does not authenticate an issuer"], evidence)
 
 
