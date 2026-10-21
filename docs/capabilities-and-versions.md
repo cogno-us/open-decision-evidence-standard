@@ -49,7 +49,7 @@ All of these use `odes_cognous_stack_export_0_2`. Each version string selects on
 | `odes-cognous-stack-export-0.2.3-security-runtime-candidate` | `996baeb4` | `3601fb21` | |
 | `odes-cognous-stack-export-0.2.4-security-runtime-f5b-candidate` | `a34c3dc2` | `def0ee0f` | |
 | `odes-cognous-stack-export-0.2.5-security-runtime-p4-candidate` | `26a7e659` | `9aab3f6c` | |
-| `odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate` | `5c474ba8` | `d268b1ea` | |
+| `odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate` | `e77fe0ee` | `53c0cd60` | |
 
 ## Content digests
 

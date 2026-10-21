@@ -8,7 +8,7 @@ Status: candidate, informative. Both profile versions below are candidate identi
 
 ## P2
 
-`odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate` is the candidate profile version for the Programme 2 generation: Control Plane 5c474ba8 / runtime 79f39166 / Replay d268b1ea / Manifest 8b016916. It is added beside P4 and does not replace it. The earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 / 62a5cc15 / c8e665bd / f9ae8527, then the runtime c4a05883 and Replay 2a7963b1 of the same Control Plane and Manifest, then 2bac7875 / 6b16962d / 6a6a4774 / ff549082) were replaced in place; they are not kept (decisions 38, 41, 42 and 43).
+`odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate` is the candidate profile version for the Programme 2 generation: Control Plane e77fe0ee / runtime cab4d9ab / Replay 53c0cd60 / Manifest fa170815. It is added beside P4 and does not replace it. The earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 / 62a5cc15 / c8e665bd / f9ae8527, then the runtime c4a05883 and Replay 2a7963b1 of the same Control Plane and Manifest, then 2bac7875 / 6b16962d / 6a6a4774 / ff549082, then 5c474ba8 / 79f39166 / d268b1ea / 8b016916) were replaced in place; they are not kept (decisions 38, 41, 42, 43 and 46).
 
 ## Rules shared with the earlier generations
 

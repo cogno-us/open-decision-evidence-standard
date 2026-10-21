@@ -88,16 +88,16 @@ P4_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
     "replay": "9aab3f6c34d2721ef1be3f6468b71dc3bad99a2a",
     "control_plane": "26a7e6594eb535827ccc248cbca36a7d119d613b",
     "moltbot_safe": "3024ef6e6ecf7da22e5f4fdf90d873f93b2a55c9"}
-# P2 generation (Programme 2 producers): Control Plane 5c474ba8 / runtime 79f39166 / Replay d268b1ea / Manifest 8b016916.
+# P2 generation (Programme 2 producers): Control Plane e77fe0ee / runtime cab4d9ab / Replay 53c0cd60 / Manifest fa170815.
 # Added beside P4 (retained P4 evidence stays accepted); an exact tuple keyed by its Control Plane revision, never mixed.
-# The tuple was moved in place three times: the earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 /
-# 62a5cc15 / c8e665bd / f9ae8527; then the runtime c4a05883 and Replay 2a7963b1 of the same Control Plane and Manifest; then the scan-3 tuple 2bac7875 / 6b16962d / 6a6a4774 / ff549082) are not kept, so a bundle of any of them is no longer accepted as P2 (decisions 38, 41 and 42). The profile version string is unchanged: the generation
+# The tuple was moved in place four times: the earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 /
+# 62a5cc15 / c8e665bd / f9ae8527; then the runtime c4a05883 and Replay 2a7963b1 of the same Control Plane and Manifest; then the scan-3 tuples 2bac7875 / 6b16962d / 6a6a4774 / ff549082 and 5c474ba8 / 79f39166 / d268b1ea / 8b016916) are not kept, so a bundle of any of them is no longer accepted as P2 (decisions 38, 41, 42, 43 and 46). The profile version string is unchanged: the generation
 # is still one non-selected candidate. Alpha scaffolding: removed with the other hard pins at end-of-alpha (P5).
 P2_PROFILE_VERSION = "odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate"
-P2_REVISIONS = {"manifest": "8b0169169dfe792dee91257a7d5e9b585bb6206f",
-    "replay": "d268b1ea864cfb9400fab334f1f72987cb1409bb",
-    "control_plane": "5c474ba83a1477df93dec92d076f8e62b0a98ae1",
-    "moltbot_safe": "79f391662afd8b7f1034d201932231b49dd02ab9"}
+P2_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
+    "replay": "53c0cd60d565ea1797ed0be87a2310c5b68b24f6",
+    "control_plane": "e77fe0ee8714617899592528e660a80fbb2e864a",
+    "moltbot_safe": "cab4d9abc651c7efbafb429798d2c908f048bf5c"}
 SECURITY_RUNTIME_GENERATIONS = {
     SECURITY_REVISIONS["control_plane"]: (SECURITY_PROFILE_VERSION, SECURITY_REVISIONS),
     F5B_REVISIONS["control_plane"]: (F5B_PROFILE_VERSION, F5B_REVISIONS),
