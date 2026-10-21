@@ -225,11 +225,15 @@
       ],
       "properties": {
         "digest": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "minLength": 1
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}(?!\\n)$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "state": {
           "enum": [
