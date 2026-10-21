@@ -913,11 +913,13 @@ def _journal_mode_rules(doc: dict[str, Any]) -> list[Violation]:
 
 VOCABULARY_0_1 = "runtime-authority-reasons/0.1"
 VOCABULARY_0_2 = "runtime-authority-reasons/0.2"
-# The 37 codes the Control Plane registry labels runtime-authority-reasons/0.2 registers and 0.1 does not (0.2 is a 158-code
+# The 42 codes the Control Plane registry labels runtime-authority-reasons/0.2 registers and 0.1 does not (0.2 is a 163-code
 # superset of the original 121). Source: cogno-us/cognous-control-plane schemas/runtime_authority_reasons_0_2.json minus
-# runtime_authority_reasons_0_1.json at main 6b8fb627 (the 36 of 3755c71a plus grant_revocation_recorded, terminal-revocation/0.1). Producer rule (runtime_authority.vocabulary_for): a row carries 0.2 only if
-# one of its reasons is in this set, else 0.1.
+# runtime_authority_reasons_0_1.json at main 5c474ba8 (the 37 of 6b8fb627 plus action_blocked, missing_effect_limits,
+# missing_amount_limit, effect_limit_malformed and authority_limit_malformed, the manifest-gate codes of CP #79). Producer rule
+# (runtime_authority.vocabulary_for): a row carries 0.2 only if one of its reasons is in this set, else 0.1.
 CODES_ADDED_IN_0_2 = frozenset({
+    "action_blocked",
     "age_extension_authority_unconfigured",
     "age_extension_exceeds_limit",
     "age_extension_invalid",
@@ -926,11 +928,13 @@ CODES_ADDED_IN_0_2 = frozenset({
     "age_extension_signer_not_configured",
     "age_extension_unsigned",
     "attempt_unresolved_past_horizon",
+    "authority_limit_malformed",
     "check_expired_before_dispatch",
     "check_lease_unavailable",
     "check_overdue",
     "dedupe_operation_effect_applied",
     "dedupe_unresolved_attempt_blocks_new_key",
+    "effect_limit_malformed",
     "escalation_after_key_ttl",
     "grant_revocation_recorded",
     "holder_inventory_missing",
@@ -941,6 +945,8 @@ CODES_ADDED_IN_0_2 = frozenset({
     "merge_operation_not_admitted",
     "merge_rule_unknown",
     "merge_survivor_already_folded",
+    "missing_amount_limit",
+    "missing_effect_limits",
     "operation_grant_mismatch",
     "operation_id_invalid",
     "operation_id_missing",
