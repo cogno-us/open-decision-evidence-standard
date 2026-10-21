@@ -55,6 +55,7 @@ make("unknown-arity-flag", AR, "unknown_enum_value", "The two arity flags are cl
 make("unknown-rows-from", RC, "unknown_enum_value", "Recomputability rows come from decisions or refusals.", lambda d, j: d["recomputability_reports"][0].update(rows_from="attempts"))
 make("unknown-taint-reason", T1, "unknown_enum_value", "The two taint reasons are closed.", lambda d, j: d["trend_reports"][0]["report"]["series"][0].update(taint_reasons=["row_is_old"]))
 make("digest-not-a-commitment", A, "schema_violation", "to_digest is a sha256 commitment (a contract-only tightening of the producer's non-empty string).", lambda d, j: d["rule_revisions"][0].update(to_digest="v1"))
+make("observed-digest-not-a-commitment", A, "schema_violation", "rule_identity digest is the observed sha256 commitment or null, like the revision rows' digests (a contract-only tightening of the producer's non-empty string).", lambda d, j: d["identity_rows"][0]["rule_identity"]["rules"][POLICY].update(digest="md5:not-a-sha256-digest"))
 make("missing-reviser", A, "schema_violation", "A revision row carries every member.", lambda d, j: d["rule_revisions"][0].pop("reviser"))
 make("empty-refusal-reasons", RF, "schema_violation", "A refusal row states at least one reason.", lambda d, j: d["rule_revision_refusals"][0].update(reasons=[]))
 make("measurement-period-zero", AR, "schema_violation", "period_seconds is at least 1.", lambda d, j: d["arity_reports"][0]["measured"].update(period_seconds=0))

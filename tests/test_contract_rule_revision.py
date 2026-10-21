@@ -438,3 +438,17 @@ def test_every_profile_shape_is_exercised_by_a_valid_fixture():
     assert {x[1] for x in states} == set(rr.LEVELS)
     assert any(d["trend_reports"] for d in docs) and any(d["arity_reports"] for d in docs) and any(d["recomputability_reports"] for d in docs)
     assert {t for d in docs for r in d["trend_reports"] for s in r["report"]["series"] for t in s.get("taint_reasons", [])} == {"pre_split_count", "row_predates_adoption"}
+
+
+def test_rule_identity_digest_is_a_sha256_commitment_or_null():
+    """README: digests are ``sha256:`` plus 64 lower-case hex; a malformed observed digest is a schema_violation."""
+    f = fx("adopted-policy-decision-and-refusal-rows")
+    jsonschema = pytest.importorskip("jsonschema")
+    good = f["document"]["identity_rows"][0]["rule_identity"]["rules"][POLICY]["digest"]
+    assert good.startswith("sha256:") and len(good) == 71
+    bad_values = ["NOT-A-DIGEST", "NOT-A-DIGEST\n", good + "\n", good.upper(), "sha256:" + "a" * 63, "sha256:" + "a" * 65, "md5:" + "a" * 32, ""]
+    for bad in bad_values:
+        d = copy.deepcopy(f["document"])
+        d["identity_rows"][0]["rule_identity"]["rules"][POLICY]["digest"] = bad
+        assert [v.code for v in rr.validate(d)] == ["schema_violation"], repr(bad)
+        assert list(jsonschema.Draft202012Validator(json.loads((CONTRACT_DIR / "schema.json").read_text())).iter_errors(d)), repr(bad)

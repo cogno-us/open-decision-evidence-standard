@@ -138,7 +138,7 @@ Each fixture file is `{fixture_id, synthetic, expected_outcome, reason, provenan
 
 Valid (15): fourteen are captures of real runs and real producer function outputs of Control Plane `83b49b5` (synthetic proposals, fixed clock, throwaway stores, ids replaced by synthetic ones): `adopted-policy-decision-and-refusal-rows`, `unsigned-row-resolves-unknown-and-holds`, `refused-revision-attempts-kept-as-rows`, `policy-edited-in-place-held-then-readopted`, `unsigned-then-resigned-by-supersession`, `host-rule-unadopted-does-not-gate`, `identity-rows-across-a-registry-adoption`, `trend-flags-from-registry-adoption-row`, `trend-pre-split-tainted-from-vocabulary-change`, `trend-plain-without-adoption-annotation`, `arity-measured-exceeds-declared-and-undeclared`, `arity-within-declaration`, `recomputability-derivation-unavailable`, `extension-namespace-members-preserved` (a capture plus `x-` members). `no-rows` is hand-built. `provenance` names the source of each. Scripts are in `provenance/`: `capture_fixtures.py` (needs a Control Plane checkout) writes the raw runs, `build_fixtures.py` normalises and projects them into the valid fixtures, `mutate_invalid_fixtures.py` regenerates the invalid ones. They are not tests and are not vendored.
 
-Invalid (82): one or more per code above, single-defect mutations of the valid fixtures (each `provenance` names its base).
+Invalid (83): one or more per code above, single-defect mutations of the valid fixtures (each `provenance` names its base).
 
 ## Run
 
