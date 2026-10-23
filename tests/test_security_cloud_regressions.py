@@ -275,8 +275,8 @@ def test_p4_generation_is_added_beside_f5b_and_exactly_paired():
 
 def test_p2_generation_is_added_beside_p4_and_exactly_paired():
     assert P2_REVISIONS == {'manifest': 'fa170815ef96a54c233d0dd9da821b60debabf8b',
-        'replay': '028f63d1c001f99580583888fa4b4e46d77a267b',
-        'control_plane': '0a41faa972699f7ec3063967a14cd9bdd3e67d27',
+        'replay': 'ab421ad0fdc6a24999273adf82455968953598ae',
+        'control_plane': '7a4bcd40b3b49e61ff3c294dcca53b52f460b22c',
         'moltbot_safe': 'ec728da6dc301a664b331ac8986afd6e850a1273'}
     assert all(len(v) == 40 for v in P2_REVISIONS.values())
     assert P2_PROFILE_VERSION not in {SECURITY_PROFILE_VERSION, F5B_PROFILE_VERSION, P4_PROFILE_VERSION}
@@ -287,12 +287,12 @@ def test_p2_generation_is_added_beside_p4_and_exactly_paired():
     # The earlier P2 tuples are replaced, not kept (decisions 38, 41, 42, 43, 46 and 47): their control planes are no longer known generations.
     from odes.exporter import ExportError as _ExportError
     from odes.common import all_accepted_replay_revisions
-    for replaced_control_plane in ('3cd17ead6b24301290ad1e50ae4b22bbd93c12fb', '6093aca7b945698e89c0d8ac7c75306375e1a298', '2bac7875391cad0a431fa0d75208b7ade39743e3', '5c474ba83a1477df93dec92d076f8e62b0a98ae1', 'e77fe0ee8714617899592528e660a80fbb2e864a'):
+    for replaced_control_plane in ('3cd17ead6b24301290ad1e50ae4b22bbd93c12fb', '6093aca7b945698e89c0d8ac7c75306375e1a298', '2bac7875391cad0a431fa0d75208b7ade39743e3', '5c474ba83a1477df93dec92d076f8e62b0a98ae1', 'e77fe0ee8714617899592528e660a80fbb2e864a', '0a41faa972699f7ec3063967a14cd9bdd3e67d27'):
         assert replaced_control_plane not in ALL_V2_CONTROL_PLANE_REVISIONS
         assert replaced_control_plane not in SECURITY_RUNTIME_GENERATIONS
         with pytest.raises(_ExportError, match='unsupported Control Plane compatibility revision'):
             _selected_v2_pins(replaced_control_plane)
-    for replaced_replay in ('c8e665bd1936e4da90f6a324b486a320934c4bff', '2a7963b18d96eb2e9e4fdb1a09c7588cf5c0ef00', '6a6a477495ac24e813f12bb0fe314acfe8bac9cf', 'd268b1ea864cfb9400fab334f1f72987cb1409bb', '53c0cd60d565ea1797ed0be87a2310c5b68b24f6'):
+    for replaced_replay in ('c8e665bd1936e4da90f6a324b486a320934c4bff', '2a7963b18d96eb2e9e4fdb1a09c7588cf5c0ef00', '6a6a477495ac24e813f12bb0fe314acfe8bac9cf', 'd268b1ea864cfb9400fab334f1f72987cb1409bb', '53c0cd60d565ea1797ed0be87a2310c5b68b24f6', '028f63d1c001f99580583888fa4b4e46d77a267b'):
         assert replaced_replay not in all_accepted_replay_revisions()
     assert P2_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
     assert P4_REVISIONS['control_plane'] in ALL_V2_CONTROL_PLANE_REVISIONS
