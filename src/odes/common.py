@@ -88,15 +88,15 @@ P4_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
     "replay": "9aab3f6c34d2721ef1be3f6468b71dc3bad99a2a",
     "control_plane": "26a7e6594eb535827ccc248cbca36a7d119d613b",
     "moltbot_safe": "3024ef6e6ecf7da22e5f4fdf90d873f93b2a55c9"}
-# P2 generation (Programme 2 producers): Control Plane 0a41faa9 / runtime ec728da6 / Replay 028f63d1 / Manifest fa170815.
+# P2 generation (Programme 2 producers): Control Plane 7a4bcd40 / runtime ec728da6 / Replay ab421ad0 / Manifest fa170815.
 # Added beside P4 (retained P4 evidence stays accepted); an exact tuple keyed by its Control Plane revision, never mixed.
-# The tuple was moved in place five times: the earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 /
-# 62a5cc15 / c8e665bd / f9ae8527; then the runtime c4a05883 and Replay 2a7963b1 of the same Control Plane and Manifest; then the scan-3 tuples 2bac7875 / 6b16962d / 6a6a4774 / ff549082 and 5c474ba8 / 79f39166 / d268b1ea / 8b016916; then the scan-6 / wave-7 tuple e77fe0ee / cab4d9ab / 53c0cd60) are not kept, so a bundle of any of them is no longer accepted as P2 (decisions 38, 41, 42, 43, 46 and 47). The profile version string is unchanged: the generation
+# The tuple was moved in place six times: the earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 /
+# 62a5cc15 / c8e665bd / f9ae8527; then the runtime c4a05883 and Replay 2a7963b1 of the same Control Plane and Manifest; then the scan-3 tuples 2bac7875 / 6b16962d / 6a6a4774 / ff549082 and 5c474ba8 / 79f39166 / d268b1ea / 8b016916; then the scan-6 / wave-7 tuple e77fe0ee / cab4d9ab / 53c0cd60; then 0a41faa9 / 028f63d1, moved to 7a4bcd40 / ab421ad0 for the Replay denial failure_class re-tie) are not kept, so a bundle of any of them is no longer accepted as P2 (decisions 38, 41, 42, 43, 46 and 47; the 0a41faa9 / 028f63d1 re-tie to 7a4bcd40 / ab421ad0 carries no decision number yet). The profile version string is unchanged: the generation
 # is still one non-selected candidate. Alpha scaffolding: removed with the other hard pins at end-of-alpha (P5).
 P2_PROFILE_VERSION = "odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate"
 P2_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
-    "replay": "028f63d1c001f99580583888fa4b4e46d77a267b",
-    "control_plane": "0a41faa972699f7ec3063967a14cd9bdd3e67d27",
+    "replay": "ab421ad0fdc6a24999273adf82455968953598ae",
+    "control_plane": "7a4bcd40b3b49e61ff3c294dcca53b52f460b22c",
     "moltbot_safe": "ec728da6dc301a664b331ac8986afd6e850a1273"}
 SECURITY_RUNTIME_GENERATIONS = {
     SECURITY_REVISIONS["control_plane"]: (SECURITY_PROFILE_VERSION, SECURITY_REVISIONS),
