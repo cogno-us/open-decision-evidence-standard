@@ -275,7 +275,7 @@ def test_p4_generation_is_added_beside_f5b_and_exactly_paired():
 
 def test_p2_generation_is_added_beside_p4_and_exactly_paired():
     assert P2_REVISIONS == {'manifest': 'fa170815ef96a54c233d0dd9da821b60debabf8b',
-        'replay': 'c58e4ae13f1fe6fcc84f3c1ac14862d07b10270e',
+        'replay': '40012b8c174c6f25685bd5d9bc93ff46cc9a5842',
         'control_plane': '7a4bcd40b3b49e61ff3c294dcca53b52f460b22c',
         'moltbot_safe': 'c5e97e87dd239c821b1b4a406a55dcd03c5bc61f'}
     assert all(len(v) == 40 for v in P2_REVISIONS.values())
