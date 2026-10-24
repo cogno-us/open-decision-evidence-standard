@@ -90,7 +90,7 @@ P4_REVISIONS = {"manifest": "2c36bcd0b620dbfe7ad924bc7196a3f0c04c5c5e",
     "moltbot_safe": "3024ef6e6ecf7da22e5f4fdf90d873f93b2a55c9"}
 # P2 generation (Programme 2 producers): Control Plane 7a4bcd40 / runtime c5e97e87 (Runtime F3) / Replay 40012b8c (merge of Replay #79, tree identical to c58e4ae1; development pin, UNQUALIFIED) / Manifest fa170815.
 # Added beside P4 (retained P4 evidence stays accepted); an exact tuple keyed by its Control Plane revision, never mixed.
-# The tuple was moved in place six times: the earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 /
+# The tuple was moved in place eight times: the earlier P2 tuples (3cd17ead / 11de097c / 46e8bd7c / 2c36bcd0, then 6093aca7 /
 # 62a5cc15 / c8e665bd / f9ae8527; then the runtime c4a05883 and Replay 2a7963b1 of the same Control Plane and Manifest; then the scan-3 tuples 2bac7875 / 6b16962d / 6a6a4774 / ff549082 and 5c474ba8 / 79f39166 / d268b1ea / 8b016916; then the scan-6 / wave-7 tuple e77fe0ee / cab4d9ab / 53c0cd60; then 0a41faa9 / 028f63d1, moved to 7a4bcd40 / ab421ad0 for the Replay denial failure_class re-tie, then the runtime ec728da6 and Replay ab421ad0 of the same Control Plane and Manifest, moved to c5e97e87 / 40012b8c for the Runtime F3 re-tie) are not kept, so a bundle of any of them is no longer accepted as P2 (decisions 38, 41, 42, 43, 46, 47 and 48; the 0a41faa9 / 028f63d1 re-tie to 7a4bcd40 / ab421ad0 carries no decision number yet). The profile version string is unchanged: the generation
 # is still one non-selected candidate. Alpha scaffolding: removed with the other hard pins at end-of-alpha (P5).
 P2_PROFILE_VERSION = "odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate"
