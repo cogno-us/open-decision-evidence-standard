@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import re
+from datetime import datetime
 from collections import Counter, defaultdict
 from copy import deepcopy
 from typing import Any
@@ -28,6 +30,7 @@ from .common import (
     MERGED_PROFILE_VERSION,
     MERGED_REVISIONS,
     ALL_V2_CONTROL_PLANE_REVISIONS,
+    CUR_REVISIONS,
     PINNED_V2_REVISIONS,
     PROFILE_VERSION,
     SCHEMA_NAME,
@@ -314,6 +317,47 @@ def _bundle_control_plane_revision(bundle: dict[str, Any]) -> str:
     return revision
 
 
+# Current generation (CUR) only. Keys the genuine Replay reconstruction carries at the top level and in metadata (checked against real Replay output for
+# every captured scenario, with and without the executor export). Any other key is refused, so a label cannot ride along under an unnamed key.
+CUR_BUNDLE_TOP_LEVEL_KEYS = frozenset({"bundle_id", "bundle_version", "commitments", "derivation", "generated_at", "import_reports", "integrity",
+                                       "links", "metadata", "producer_profiles", "records", "run_id", "semantics", "status"})
+CUR_BUNDLE_METADATA_KEYS = frozenset({"effect_observation_history", "control_plane_revision", "moltbot_safe_revision", "moltbot_producer_contract",
+                                      "manifest_revision", "executor_failure_reference_verification", "alvorada_revision"})
+# Per-run values that legitimately differ between two reconstructions of the same input (a fresh UUID and the generation time): shape check only.
+_CUR_VARYING_TOP_LEVEL = ("bundle_id", "generated_at")
+
+
+def _require_exact_current_bundle_envelope(bundle: dict[str, Any], validated: dict[str, Any]) -> None:
+    """Under the current generation the retained bundle must carry exactly the keys and values the accepted validator reconstructs.
+
+    Key presence is compared as well as value (an absent key is not a key set to None), nested values are compared whole, and unknown top-level or
+    metadata keys are refused. Only bundle_id and generated_at vary per run; they are shape-checked (string uuid, ISO-8601 timestamp).
+    """
+    if set(bundle) != CUR_BUNDLE_TOP_LEVEL_KEYS:
+        extra, missing = sorted(set(bundle) - CUR_BUNDLE_TOP_LEVEL_KEYS), sorted(CUR_BUNDLE_TOP_LEVEL_KEYS - set(bundle))
+        raise ExportError(f"retained Replay bundle keys differ from the accepted validator (unexpected {extra}, missing {missing})")
+    metadata = bundle.get("metadata")
+    if not isinstance(metadata, dict) or set(metadata) != CUR_BUNDLE_METADATA_KEYS:
+        keys = set(metadata) if isinstance(metadata, dict) else set()
+        raise ExportError("retained Replay metadata keys differ from the accepted validator "
+                          f"(unexpected {sorted(keys - CUR_BUNDLE_METADATA_KEYS)}, missing {sorted(CUR_BUNDLE_METADATA_KEYS - keys)})")
+    if set(validated) != CUR_BUNDLE_TOP_LEVEL_KEYS or set(validated["metadata"]) != CUR_BUNDLE_METADATA_KEYS:
+        raise ExportError("accepted validator reconstruction has an unexpected key set")
+    if metadata != validated["metadata"]:
+        raise ExportError("retained Replay metadata differs from accepted validator")
+    for key in sorted(CUR_BUNDLE_TOP_LEVEL_KEYS - set(_CUR_VARYING_TOP_LEVEL) - {"metadata"}):
+        if bundle[key] != validated[key]:
+            raise ExportError(f"retained Replay {key} differs from accepted validator reconstruction")
+    if not (isinstance(bundle["bundle_id"], str) and re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", bundle["bundle_id"])):
+        raise ExportError("retained Replay bundle_id is not a UUID")
+    generated = bundle["generated_at"]
+    try:
+        if not isinstance(generated, str) or datetime.fromisoformat(generated).tzinfo is None:
+            raise ValueError(generated)
+    except ValueError:
+        raise ExportError("retained Replay generated_at is not a timezone-aware ISO-8601 timestamp") from None
+
+
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
     _require_supported_bundle_version(bundle)
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
@@ -341,7 +385,10 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
                 if bundle.get(field) != validated.get(field):
                     raise ExportError(f"retained Replay {field} differs from accepted validator reconstruction")
             for field in ("effect_observation_history", "moltbot_producer_contract",
-                          "moltbot_safe_revision", "manifest_revision", "alvorada_revision"):
+                          "moltbot_safe_revision", "manifest_revision", "alvorada_revision",
+                          "control_plane_profile", "effective_configuration_verification"):
+                # The last two are Replay's Registry-governed profile labels: a plain import never emits them, so a retained bundle carrying them
+                # (a plain bundle relabelled with governed metadata) differs from the reconstruction and is refused. ODES does not support that profile.
                 retained = bundle.get("metadata", {}).get(field)
                 expected = deepcopy(validated["metadata"].get(field))
                 # Older accepted Replay did not emit the supported revision set.
@@ -352,6 +399,8 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
                     expected.pop("compatible_control_plane_revisions", None)
                 if retained != expected:
                     raise ExportError(f"retained Replay {field} differs from accepted validator")
+            if revision == CUR_REVISIONS["control_plane"]:
+                _require_exact_current_bundle_envelope(bundle, validated)
         else:
             reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot)
     except ReplayImportContractError as exc:

@@ -98,14 +98,28 @@ P2_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
     "replay": "40012b8c174c6f25685bd5d9bc93ff46cc9a5842",
     "control_plane": "7a4bcd40b3b49e61ff3c294dcca53b52f460b22c",
     "moltbot_safe": "c5e97e87dd239c821b1b4a406a55dcd03c5bc61f"}
+# Current generation (CUR): Control Plane b19c47dd / runtime f7a55e2a / Manifest fa170815 (unchanged) with the Replay revision below, the Replay
+# that defines the CUR pairing (cognous-replay-bundle #80). Added BESIDE P2, which is not moved, renamed or reused: an exact tuple keyed by its
+# Control Plane revision, never mixed, never a range. The Replay revision is defined once, here; it is the Replay main merge commit of PR #81 (E1), which carries the CUR
+# pairing (cognous-replay-bundle #80). A later Replay revision may require another one-line re-tie of this one constant. PROVISIONAL DEVELOPMENT PIN, UNQUALIFIED, non-authorizing.
+# Scope: the plain bounded run only. effective_configuration, policy-binding members, reason vocabulary 0.3, selection_refusal and
+# authorization-pin evidence are not supported by this generation and stay refused (by Replay, fail closed). Alpha scaffolding: removed with the
+# other hard pins at end-of-alpha (P5).
+CUR_REPLAY_REVISION = "d395e37c443fedf1bf6b9a4651338b7b7de4a553"
+CUR_PROFILE_VERSION = "odes-cognous-stack-export-0.2.7-security-runtime-cur-candidate"
+CUR_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
+    "replay": CUR_REPLAY_REVISION,
+    "control_plane": "b19c47ddd020409d24e52e70b11359c46265edbb",
+    "moltbot_safe": "f7a55e2a8494801e49193f9f46935f0a971c248d"}
 SECURITY_RUNTIME_GENERATIONS = {
     SECURITY_REVISIONS["control_plane"]: (SECURITY_PROFILE_VERSION, SECURITY_REVISIONS),
     F5B_REVISIONS["control_plane"]: (F5B_PROFILE_VERSION, F5B_REVISIONS),
     P4_REVISIONS["control_plane"]: (P4_PROFILE_VERSION, P4_REVISIONS),
     P2_REVISIONS["control_plane"]: (P2_PROFILE_VERSION, P2_REVISIONS),
+    CUR_REVISIONS["control_plane"]: (CUR_PROFILE_VERSION, CUR_REVISIONS),
 }
 SECURITY_RUNTIME_CP_REVISIONS = frozenset(SECURITY_RUNTIME_GENERATIONS)
-ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"], SECURITY_REVISIONS["control_plane"], F5B_REVISIONS["control_plane"], P4_REVISIONS["control_plane"], P2_REVISIONS["control_plane"])
+ALL_V2_CONTROL_PLANE_REVISIONS = (*SUPPORTED_V2_CONTROL_PLANE_REVISIONS, MERGED_REVISIONS["control_plane"], REFUSAL_REVISIONS["control_plane"], SECURITY_REVISIONS["control_plane"], F5B_REVISIONS["control_plane"], P4_REVISIONS["control_plane"], P2_REVISIONS["control_plane"], CUR_REVISIONS["control_plane"])
 
 
 def accepted_replay_revisions(control_plane_revision: str) -> frozenset[str]:
