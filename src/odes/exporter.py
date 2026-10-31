@@ -341,7 +341,10 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
                 if bundle.get(field) != validated.get(field):
                     raise ExportError(f"retained Replay {field} differs from accepted validator reconstruction")
             for field in ("effect_observation_history", "moltbot_producer_contract",
-                          "moltbot_safe_revision", "manifest_revision", "alvorada_revision"):
+                          "moltbot_safe_revision", "manifest_revision", "alvorada_revision",
+                          "control_plane_profile", "effective_configuration_verification"):
+                # The last two are Replay's Registry-governed profile labels: a plain import never emits them, so a retained bundle carrying them
+                # (a plain bundle relabelled with governed metadata) differs from the reconstruction and is refused. ODES does not support that profile.
                 retained = bundle.get("metadata", {}).get(field)
                 expected = deepcopy(validated["metadata"].get(field))
                 # Older accepted Replay did not emit the supported revision set.

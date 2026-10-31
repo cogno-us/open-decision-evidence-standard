@@ -544,3 +544,48 @@ def test_the_require_flag_turns_an_unavailable_replay_into_a_failure_not_a_skip(
     strict, lax = nested(True), nested(False)
     assert strict.returncode != 0 and "ODES_REQUIRE_CUR_E2E=1 but the end-to-end Replay could not be set up" in strict.stdout and "skipped" not in strict.stdout
     assert lax.returncode == 0 and "1 skipped" in lax.stdout
+
+
+# ================================================================================================ governed labels cannot be laundered onto a plain bundle
+GOVERNED_PROFILE_ID = "control-plane-current-stack-registry-governed-effective-configuration-0.1@b19c47dd"
+VERIFICATION = "internal_consistency_only_registry_source_revision_unverified"
+
+
+@pytest.mark.parametrize("keys", [{"control_plane_profile": GOVERNED_SELECTOR}, {"effective_configuration_verification": VERIFICATION},
+                                  {"control_plane_profile": GOVERNED_SELECTOR, "effective_configuration_verification": VERIFICATION}])
+def test_a_plain_current_bundle_carrying_governed_metadata_labels_is_refused_at_export(replay, keys):
+    bundle = bundle_of(replay)  # real plain CUR bundle; the governed metadata keys are added WITHOUT touching anything else
+    bundle["metadata"].update(keys)
+    with pytest.raises(ExportError, match="retained Replay (control_plane_profile|effective_configuration_verification) differs from accepted validator"):
+        exporter.export_cognous_stack_package(MANIFEST, bundle)
+
+
+def test_a_governed_bundle_relabelled_to_the_plain_profile_id_keeping_its_metadata_is_refused(replay):
+    cp, proposal = _governed("governed_executed")
+    bundle = replay.import_bounded_workflow(cp, proposal=proposal, moltbot_export=None, control_plane_revision=CUR_CP,
+                                            control_plane_profile=GOVERNED_SELECTOR).model_dump(mode="json")
+    plain_id = bundle_of(replay)["producer_profiles"][0]["profile_id"]
+    assert bundle["metadata"]["control_plane_profile"] == GOVERNED_SELECTOR and bundle["producer_profiles"][0]["profile_id"] == GOVERNED_PROFILE_ID
+    for p in bundle["producer_profiles"]:
+        p["profile_id"] = plain_id
+    for r in bundle["import_reports"]:
+        r["adapter_profile"] = plain_id
+    with pytest.raises(ExportError, match="pinned Replay semantic validation failed: typed refusal profile: runtime authority fields unsupported"):
+        exporter.export_cognous_stack_package(MANIFEST, bundle)  # metadata keys deliberately NOT popped
+
+
+def test_governed_metadata_labels_injected_into_an_exported_package_do_not_validate(replay):
+    package = exporter.export_cognous_stack_package(MANIFEST, bundle_of(replay))
+    package["provenance"]["retained_sources"]["reconstruction_bundle"]["metadata"].update(
+        {"control_plane_profile": GOVERNED_SELECTOR, "effective_configuration_verification": VERIFICATION})
+    result = evaluate_recipient_package(seal(package), policy_for(package))
+    assert result["replay_semantic_consistency"]["status"] != "pass" and result["recipient_reliance_decision"]["status"] != "pass"
+
+
+@pytest.mark.parametrize("field,value", [("moltbot_safe_revision", None), ("moltbot_safe_revision", P2_RT), ("manifest_revision", None), ("manifest_revision", "")])
+def test_runtime_and_manifest_labels_are_cross_checked_against_the_current_values(replay, field, value):
+    bundle = bundle_of(replay)
+    assert bundle["metadata"][field] == {"moltbot_safe_revision": CUR_RT, "manifest_revision": CUR_MANIFEST}[field]
+    bundle["metadata"][field] = value
+    with pytest.raises(ExportError, match="differs from accepted validator|pinned Replay semantic validation failed"):
+        exporter.export_cognous_stack_package(MANIFEST, bundle)
