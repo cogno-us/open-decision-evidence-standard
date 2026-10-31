@@ -1,0 +1,29 @@
+{
+  "captured_on": "2026-10-31",
+  "producer": {
+    "control_plane": "b19c47ddd020409d24e52e70b11359c46265edbb",
+    "note": "CURRENT GENERATION, Registry-governed profile. PROVISIONAL DEVELOPMENT PIN, UNQUALIFIED, non-authorizing. BUILDER_TESTED upstream. The Registry revision is NOT carried in the record: it is recorded here only as the capture environment, never inferred from a record. No Runtime export is captured for these records.",
+    "pynacl": "required, out-of-tree",
+    "python": "3.13",
+    "registry_code": "a40fe755e2384a99c37016fa9ad59396f1835900 (r08-v8; the capture refuses any other Registry checkout)"
+  },
+  "scenarios": {
+    "governed_age_only": "one family only (observation_max_age); authorized, executed",
+    "governed_binding_changed": "decision minted under configuration A, workflow rebuilt under configuration B (observation_max_age 61), execute refused authorization_binding_changed; the record holds the decision-time member A and the refusal, never B",
+    "governed_decided_only": "authorized, not executed (no attempt)",
+    "governed_executed": "three r08-v8 families (anchor_deadline, observation_max_age, observation_clock_tolerance); authorized, executed, acknowledged; same recorded digest as the S0 probe record (sha256:74e7cda7...)"
+  },
+  "script": "capture_registry_governed.py (run from a pristine Control Plane checkout; see its docstring)",
+  "script_sha256": "102951523ee8f74830d59ae8ba7ea7aa278555ca2c92a4b0edecf94547aeafca",
+  "sha256": {
+    "governed_age_only/control_plane_run.json": "ffe7cd1f6ccc68e2c05cdca043b4052624eaf548ee1bf2248d19d260d5a04987",
+    "governed_age_only/proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d",
+    "governed_binding_changed/control_plane_run.json": "b72651fe39179299f0745c8534fe7ba84b1742b2e0dda8d45a6fba4ed22a8f84",
+    "governed_binding_changed/proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d",
+    "governed_decided_only/control_plane_run.json": "a121c86f2a62bd461e5f4c282853596bcee76f8f0c4b51967592a7a617da5782",
+    "governed_decided_only/proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d",
+    "governed_executed/control_plane_run.json": "6c531a4042ac0d04b093369443557d4891ce6c93b314b0809eaf0d550858937e",
+    "governed_executed/proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d"
+  },
+  "source": "real records: Control Plane run record (BoundedRecordStore run.json) and proposal written by the Control Plane's own Registry-governed workflow (GovernedPolicyWorkflow) built with the Control Plane tests' own builders (tests/final3_support.py, tests/d06_support.py), signed synthetic Ed25519 Registry r08-v8 material, synthetic clock; throwaway stores, nothing hand-edited after capture"
+}

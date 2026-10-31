@@ -52,7 +52,7 @@ POLICY_BINDING = {"approval_commitment_version": "approval-commitment/0.2", "pol
 # ================================================================================================ the pins (no Replay needed)
 def test_the_replay_pin_is_this_one_literal_and_defined_in_one_place():
     # The only literal 40-hex Replay value in this file. Re-tying to the Replay merge SHA is a one-line change in common.py plus this literal.
-    assert CUR_REPLAY_REVISION == "bb5fe6f3cb3775729bc3a1434ad45dbc985636c8"
+    assert CUR_REPLAY_REVISION == "d395e37c443fedf1bf6b9a4651338b7b7de4a553"
     assert CUR_REVISIONS["replay"] == CUR_REPLAY_REVISION
     source = (ROOT / "src" / "odes" / "common.py").read_text(encoding="utf-8")
     assert source.count(CUR_REPLAY_REVISION) == 1  # defined once; every other use derives from the constant
@@ -480,3 +480,67 @@ def test_an_unsupported_member_injected_into_an_exported_package_does_not_valida
     result = evaluate_recipient_package(seal(package), policy_for(package))
     assert result["replay_semantic_consistency"]["status"] != "pass"
     assert result["recipient_reliance_decision"]["status"] != "pass"
+
+
+# ================================================================================================ Registry-governed profile (Replay E1): explicit unsupported scope
+# Replay d395e37c (PR #81, E1) can import records written by the Control Plane's Registry-governed workflow when asked for its governed profile selector.
+# ODES was NOT asked to support that profile. These REAL records (copied byte-identically from Replay tests/fixtures/registry_governed_effective_configuration;
+# digests checked against the Replay PROVENANCE.json copy alongside) pin the OBSERVED behaviour: refused end to end, at the ODES export gate
+# ("pinned Replay semantic validation failed"), so no ODES package exists for them. No acceptance semantics are added. Observation, not a support claim.
+GOVERNED = DATA.parent / "registry_governed_unsupported"
+GOVERNED_SELECTOR = "registry-governed-effective-configuration/0.1"
+GOVERNED_SCENARIOS = ["governed_age_only", "governed_binding_changed", "governed_decided_only", "governed_executed"]
+
+
+def _governed(name):
+    return tuple(json.loads((GOVERNED / name / f).read_text(encoding="utf-8")) for f in ("control_plane_run.json", "proposal.json"))
+
+
+def test_the_governed_fixtures_are_byte_identical_to_the_replay_ones():
+    import hashlib
+    expected = json.loads((GOVERNED / "REPLAY_PROVENANCE.json").read_text(encoding="utf-8"))["sha256"]
+    assert sorted(expected) == sorted(f"{n}/{f}" for n in GOVERNED_SCENARIOS for f in ("control_plane_run.json", "proposal.json"))
+    for rel, digest in expected.items():
+        assert hashlib.sha256((GOVERNED / rel).read_bytes()).hexdigest() == digest, rel
+
+
+@pytest.mark.parametrize("name", GOVERNED_SCENARIOS)
+def test_registry_governed_records_are_refused_end_to_end_as_unsupported_scope(replay, name):
+    cp, proposal = _governed(name)
+    assert all("effective_configuration" in d["binding"]["runtime_authority"] for d in cp["decisions"])
+    # Gate 1: the plain current-generation import (what ODES uses) refuses them at Replay.
+    with pytest.raises(replay.ImportContractError, match="runtime authority fields unsupported"):
+        replay.import_bounded_workflow(copy.deepcopy(cp), proposal=copy.deepcopy(proposal), moltbot_export=None, control_plane_revision=CUR_CP)
+    # Gate 2: even a bundle Replay itself admits under its governed selector is refused by the ODES export (pinned Replay semantic validation).
+    bundle = replay.import_bounded_workflow(copy.deepcopy(cp), proposal=copy.deepcopy(proposal), moltbot_export=None, control_plane_revision=CUR_CP,
+                                            control_plane_profile=GOVERNED_SELECTOR).model_dump(mode="json")
+    with pytest.raises(ExportError, match="pinned Replay semantic validation failed: typed refusal profile: runtime authority fields unsupported"):
+        exporter.export_cognous_stack_package(MANIFEST, bundle)
+
+
+# ================================================================================================ CI cannot silently skip (no Replay needed)
+def test_the_ci_job_fetches_the_pinned_replay_and_forbids_skipping():
+    text = (ROOT / ".github" / "workflows" / "current-generation-e2e.yml").read_text(encoding="utf-8")
+    assert "name: Current generation tests against pinned Replay" in text
+    assert "from odes.common import CUR_REPLAY_REVISION" in text  # the revision comes from the one constant, never a second literal
+    assert 'test "$(git -C "$RUNNER_TEMP/replay" rev-parse HEAD)" = "$REV"' in text  # fetched HEAD must equal the pin
+    assert "ODES_REQUIRE_CUR_E2E: '1'" in text and "ODES_TEST_REPLAY_REPO: ${{ runner.temp }}/replay" in text
+    assert "python -m pytest -q tests/test_current_generation.py" in text
+    assert not re.search(r"\b[0-9a-f]{40}\b", text.split("Fetch Replay")[1].split("python -m pytest")[0])  # no hard-coded SHA in the fetch step
+
+
+def test_the_require_flag_turns_an_unavailable_replay_into_a_failure_not_a_skip():
+    """The guard itself: with ODES_REQUIRE_CUR_E2E=1 and no usable Replay the end-to-end tests FAIL (CI cannot go green by skipping); without it they skip."""
+    if os.environ.get("ODES_NESTED_GUARD_CHECK"):
+        pytest.skip("nested run")
+    target = f"{Path(__file__).as_posix()}::test_real_current_record_without_executor_export_exports_as_partial"
+
+    def nested(require):
+        env = {**os.environ, "ODES_NESTED_GUARD_CHECK": "1", "ODES_TEST_REPLAY_REPO": str(ROOT / "no-such-replay-repository"), "PYTHONDONTWRITEBYTECODE": "1"}
+        env.pop("ODES_REQUIRE_CUR_E2E", None)
+        if require:
+            env["ODES_REQUIRE_CUR_E2E"] = "1"
+        return subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", target], capture_output=True, text=True, env=env, cwd=ROOT, timeout=300)
+    strict, lax = nested(True), nested(False)
+    assert strict.returncode != 0 and "ODES_REQUIRE_CUR_E2E=1 but the end-to-end Replay could not be set up" in strict.stdout and "skipped" not in strict.stdout
+    assert lax.returncode == 0 and "1 skipped" in lax.stdout
