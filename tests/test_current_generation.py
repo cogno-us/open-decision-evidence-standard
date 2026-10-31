@@ -7,7 +7,7 @@ alongside) through the Replay that defines the pairing, then ODES export and rec
 Replay setup for the end-to-end tests: the exporter requires the installed Replay HEAD to be an accepted, clean revision
 (``exporter._require_installed_replay``). ``ODES_TEST_REPLAY_REPO`` names a git repository that contains CUR_REPLAY_REVISION (for example a
 checkout of cognous-replay-bundle); the tests create a clean scratch clone of it at exactly that commit and never touch the checkout. The
-end-to-end tests skip when it is not set (as the other Replay-dependent tests skip when Replay is not installed). This is a PROVISIONAL
+end-to-end tests skip when it is not set (as the other Replay-dependent tests skip when Replay is not installed). Setting ODES_REQUIRE_CUR_E2E=1 turns that skip into a FAILURE (used by CI so the tests cannot silently skip). This is a PROVISIONAL
 DEVELOPMENT PIN, UNQUALIFIED, non-authorizing; provenance labels are caller-asserted.
 """
 import copy
@@ -52,7 +52,7 @@ POLICY_BINDING = {"approval_commitment_version": "approval-commitment/0.2", "pol
 # ================================================================================================ the pins (no Replay needed)
 def test_the_replay_pin_is_this_one_literal_and_defined_in_one_place():
     # The only literal 40-hex Replay value in this file. Re-tying to the Replay merge SHA is a one-line change in common.py plus this literal.
-    assert CUR_REPLAY_REVISION == "d48b8f1995fecdb928315aba27acbe0c48ad997c"
+    assert CUR_REPLAY_REVISION == "bb5fe6f3cb3775729bc3a1434ad45dbc985636c8"
     assert CUR_REVISIONS["replay"] == CUR_REPLAY_REVISION
     source = (ROOT / "src" / "odes" / "common.py").read_text(encoding="utf-8")
     assert source.count(CUR_REPLAY_REVISION) == 1  # defined once; every other use derives from the constant
@@ -225,7 +225,10 @@ def replay(tmp_path_factory):
     """A clean scratch clone of the Replay repository at exactly CUR_REPLAY_REVISION, importable for this module only."""
     scratch = _scratch_replay(tmp_path_factory)
     if scratch is None:
-        pytest.skip("needs ODES_TEST_REPLAY_REPO naming a git repository that contains the pinned Replay revision")
+        msg = "needs ODES_TEST_REPLAY_REPO naming a git repository that contains the pinned Replay revision"
+        if os.environ.get("ODES_REQUIRE_CUR_E2E") == "1":
+            pytest.fail("ODES_REQUIRE_CUR_E2E=1 but the end-to-end Replay could not be set up at CUR_REPLAY_REVISION: " + msg)
+        pytest.skip(msg)
     saved_path = list(sys.path)
     saved_modules = {k: v for k, v in sys.modules.items() if k.split(".")[0] == "agent_replay_bundle"}
     for k in saved_modules:

@@ -50,7 +50,7 @@ All of these use `odes_cognous_stack_export_0_2`. Each version string selects on
 | `odes-cognous-stack-export-0.2.4-security-runtime-f5b-candidate` | `a34c3dc2` | `def0ee0f` | |
 | `odes-cognous-stack-export-0.2.5-security-runtime-p4-candidate` | `26a7e659` | `9aab3f6c` | |
 | `odes-cognous-stack-export-0.2.6-security-runtime-p2-candidate` | `7a4bcd40` | `40012b8c` (merge of Replay #79; development pin, UNQUALIFIED) | |
-| `odes-cognous-stack-export-0.2.7-security-runtime-cur-candidate` | `b19c47dd` | `d48b8f19` (head of Replay #80, not yet merged; development pin, UNQUALIFIED) | Current generation: runtime `f7a55e2a`, Manifest `fa170815`. Plain bounded run only. Added beside P2. |
+| `odes-cognous-stack-export-0.2.7-security-runtime-cur-candidate` | `b19c47dd` | `bb5fe6f3` (merged Replay main revision carrying the pairing from #80; development pin, UNQUALIFIED) | Current generation: runtime `f7a55e2a`, Manifest `fa170815`. Plain bounded run only. Added beside P2. |
 
 ## Content digests
 

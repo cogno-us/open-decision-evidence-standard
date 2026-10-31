@@ -100,12 +100,12 @@ P2_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
     "moltbot_safe": "c5e97e87dd239c821b1b4a406a55dcd03c5bc61f"}
 # Current generation (CUR): Control Plane b19c47dd / runtime f7a55e2a / Manifest fa170815 (unchanged) with the Replay revision below, the Replay
 # that defines the CUR pairing (cognous-replay-bundle #80). Added BESIDE P2, which is not moved, renamed or reused: an exact tuple keyed by its
-# Control Plane revision, never mixed, never a range. The Replay revision is defined once, here; it is the head of Replay #80 until that PR is
-# merged and is then re-tied to the merge commit by changing this one constant. PROVISIONAL DEVELOPMENT PIN, UNQUALIFIED, non-authorizing.
+# Control Plane revision, never mixed, never a range. The Replay revision is defined once, here; it is the merged Replay main revision that carries the CUR
+# pairing (cognous-replay-bundle #80 merged). A later Replay revision may require another one-line re-tie of this one constant. PROVISIONAL DEVELOPMENT PIN, UNQUALIFIED, non-authorizing.
 # Scope: the plain bounded run only. effective_configuration, policy-binding members, reason vocabulary 0.3, selection_refusal and
 # authorization-pin evidence are not supported by this generation and stay refused (by Replay, fail closed). Alpha scaffolding: removed with the
 # other hard pins at end-of-alpha (P5).
-CUR_REPLAY_REVISION = "d48b8f1995fecdb928315aba27acbe0c48ad997c"
+CUR_REPLAY_REVISION = "bb5fe6f3cb3775729bc3a1434ad45dbc985636c8"
 CUR_PROFILE_VERSION = "odes-cognous-stack-export-0.2.7-security-runtime-cur-candidate"
 CUR_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
     "replay": CUR_REPLAY_REVISION,
