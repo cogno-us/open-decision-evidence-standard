@@ -5,8 +5,8 @@ runtime run records written by their own flows at pristine b19c47dd / f7a55e2a c
 alongside) through the Replay that defines the pairing, then ODES export and recipient validation, and check content, not only acceptance.
 
 Replay setup for the end-to-end tests: the exporter requires the installed Replay HEAD to be an accepted, clean revision
-(``exporter._require_installed_replay``). ``ODES_TEST_REPLAY_REPO`` names a git repository that contains CUR_REPLAY_REVISION (for example a
-checkout of cognous-replay-bundle); the tests create a clean scratch clone of it at exactly that commit and never touch the checkout. The
+(``exporter._require_installed_replay``). ``ODES_TEST_REPLAY_REPO`` names a git repository that contains CUR_REPLAY_REVISION reachable through a branch or tag ref (a
+clone copies only heads and tags, so a commit held only under refs/remotes/* fails; for example ``git fetch <replay> <ref>:refs/heads/pin``); the tests create a clean scratch clone of it at exactly that commit and never touch the checkout. The
 end-to-end tests skip when it is not set (as the other Replay-dependent tests skip when Replay is not installed). Setting ODES_REQUIRE_CUR_E2E=1 turns that skip into a FAILURE (used by CI so the tests cannot silently skip). This is a PROVISIONAL
 DEVELOPMENT PIN, UNQUALIFIED, non-authorizing; provenance labels are caller-asserted.
 """
@@ -526,6 +526,7 @@ def test_the_ci_job_fetches_the_pinned_replay_and_forbids_skipping():
     assert 'test "$(git -C "$RUNNER_TEMP/replay" rev-parse HEAD)" = "$REV"' in text  # fetched HEAD must equal the pin
     assert "ODES_REQUIRE_CUR_E2E: '1'" in text and "ODES_TEST_REPLAY_REPO: ${{ runner.temp }}/replay" in text
     assert "python -m pytest -q tests/test_current_generation.py" in text
+    assert re.search(r"^    timeout-minutes: \d+$", text, re.M)  # a bounded job
     assert not re.search(r"\b[0-9a-f]{40}\b", text.split("Fetch Replay")[1].split("python -m pytest")[0])  # no hard-coded SHA in the fetch step
 
 
@@ -589,3 +590,139 @@ def test_runtime_and_manifest_labels_are_cross_checked_against_the_current_value
     bundle["metadata"][field] = value
     with pytest.raises(ExportError, match="differs from accepted validator|pinned Replay semantic validation failed"):
         exporter.export_cognous_stack_package(MANIFEST, bundle)
+
+
+# ================================================================================================ retained bundle envelope is an exact allowlist (CUR only)
+def _export_refused(bundle, match):
+    with pytest.raises(ExportError, match=match):
+        exporter.export_cognous_stack_package(MANIFEST, bundle)
+
+
+@pytest.mark.parametrize("executor", [True, False])
+@pytest.mark.parametrize("name", sorted(SCENARIOS))
+def test_every_genuine_replay_bundle_has_exactly_the_allowlisted_key_sets_and_still_exports(replay, name, executor):
+    bundle = bundle_of(replay, name, executor=executor)
+    assert set(bundle) == exporter.CUR_BUNDLE_TOP_LEVEL_KEYS and set(bundle["metadata"]) == exporter.CUR_BUNDLE_METADATA_KEYS
+    assert bundle["metadata"]["executor_failure_reference_verification"] == "source_asserted_not_independently_verified"
+    assert (bundle["metadata"]["moltbot_safe_revision"] is None) is (not executor)  # present-and-None is the genuine no-executor shape
+    package = exporter.export_cognous_stack_package(MANIFEST, bundle)
+    assert package["provenance"]["retained_sources"]["reconstruction_bundle"]["metadata"] == bundle["metadata"]
+
+
+def test_the_allowlists_are_the_documented_literal_sets():
+    assert exporter.CUR_BUNDLE_TOP_LEVEL_KEYS == {"bundle_id", "bundle_version", "commitments", "derivation", "generated_at", "import_reports", "integrity",
+                                                  "links", "metadata", "producer_profiles", "records", "run_id", "semantics", "status"}
+    assert exporter.CUR_BUNDLE_METADATA_KEYS == {"effect_observation_history", "control_plane_revision", "moltbot_safe_revision", "moltbot_producer_contract",
+                                                 "manifest_revision", "executor_failure_reference_verification", "alvorada_revision"}
+
+
+def test_per_run_values_bundle_id_and_generated_at_vary_between_genuine_bundles_and_both_export(replay):
+    first, second = bundle_of(replay), bundle_of(replay)
+    assert first["bundle_id"] != second["bundle_id"]  # fresh each run: shape-checked, never compared for equality
+    for bundle in (first, second):
+        exporter.export_cognous_stack_package(MANIFEST, bundle)
+
+
+@pytest.mark.parametrize("key,value", [("bundle_id", "not-a-uuid"), ("bundle_id", None), ("bundle_id", 7), ("bundle_id", "55108DD8-36F5-42CC-BDF0-FE12AF0A54CA"),
+                                       ("generated_at", "yesterday"), ("generated_at", None), ("generated_at", "2026-10-31T15:33:39"), ("generated_at", 1)])
+def test_the_per_run_values_are_shape_checked(replay, key, value):
+    bundle = bundle_of(replay)
+    bundle[key] = value
+    _export_refused(bundle, "retained Replay (bundle_id|generated_at) is not")
+
+
+# --- each bypass the reviewer listed, with nothing popped
+@pytest.mark.parametrize("extra", [{"authority_claim": "registry-governed authorized"}, {"nested": {"control_plane_profile": GOVERNED_SELECTOR}},
+                                   {"anything": 1}, {"control_plane_profile": None}, {"effective_configuration_verification": None}])
+def test_an_unknown_or_none_valued_extra_metadata_key_is_refused(replay, extra):
+    bundle = bundle_of(replay)
+    bundle["metadata"].update(extra)
+    _export_refused(bundle, "retained Replay (metadata keys differ|control_plane_profile differs|effective_configuration_verification differs)")
+
+
+def test_an_authority_label_in_a_nested_value_of_a_known_metadata_key_is_refused(replay):
+    bundle = bundle_of(replay)
+    bundle["metadata"]["moltbot_producer_contract"]["authority_claim"] = {"control_plane_profile": GOVERNED_SELECTOR}
+    _export_refused(bundle, "differs from accepted validator")
+
+
+def test_a_stronger_executor_failure_reference_verification_label_is_refused(replay):
+    bundle = bundle_of(replay)
+    bundle["metadata"]["executor_failure_reference_verification"] = "independently_verified_authoritative"
+    _export_refused(bundle, "retained Replay metadata differs from accepted validator")
+
+
+GENUINE_METADATA_KEYS = ["effect_observation_history", "control_plane_revision", "moltbot_safe_revision", "moltbot_producer_contract",
+                         "manifest_revision", "executor_failure_reference_verification", "alvorada_revision"]
+ANY_METADATA_REFUSAL = "retained Replay|differs from accepted validator|pinned Replay semantic validation failed|control_plane_revision"
+
+
+@pytest.mark.parametrize("key", GENUINE_METADATA_KEYS)
+def test_dropping_any_genuine_metadata_key_is_refused(replay, key):
+    bundle = bundle_of(replay)
+    del bundle["metadata"][key]
+    _export_refused(bundle, ANY_METADATA_REFUSAL)
+
+
+@pytest.mark.parametrize("key", GENUINE_METADATA_KEYS)
+def test_setting_any_genuine_metadata_key_to_none_is_refused_when_the_genuine_value_is_not_none(replay, key):
+    bundle = bundle_of(replay)
+    assert bundle["metadata"][key] is not None  # with the executor export every genuine value is set
+    bundle["metadata"][key] = None
+    _export_refused(bundle, ANY_METADATA_REFUSAL)
+
+
+def test_an_absent_metadata_key_is_not_the_same_as_a_key_set_to_none(replay):
+    bundle = bundle_of(replay, executor=False)  # genuine: moltbot_safe_revision present and None
+    assert "moltbot_safe_revision" in bundle["metadata"] and bundle["metadata"]["moltbot_safe_revision"] is None
+    del bundle["metadata"]["moltbot_safe_revision"]
+    _export_refused(bundle, "retained Replay metadata keys differ")
+
+
+@pytest.mark.parametrize("extra", [{"foo": 1}, {"authority_claim": "x"}, {"control_plane_profile": GOVERNED_SELECTOR}, {"effective_configuration": {}}])
+def test_an_unknown_top_level_key_is_refused(replay, extra):
+    bundle = bundle_of(replay)
+    bundle.update(extra)
+    _export_refused(bundle, "retained Replay bundle keys differ")
+
+
+@pytest.mark.parametrize("key", ["bundle_version", "derivation", "generated_at", "bundle_id", "run_id", "integrity", "status", "semantics", "links"])
+def test_a_missing_top_level_key_is_refused(replay, key):
+    bundle = bundle_of(replay)
+    del bundle[key]
+    _export_refused(bundle, "retained Replay bundle keys differ|unsupported Reconstruction Bundle version|differs from accepted validator|pinned Replay semantic validation failed")
+
+
+@pytest.mark.parametrize("key,value", [("integrity", [{"claim": "authoritative"}]), ("run_id", "run-2"), ("derivation", {"claim": "x"})])
+def test_deterministic_top_level_values_are_compared_not_retained_verbatim(replay, key, value):
+    bundle = bundle_of(replay)
+    bundle[key] = value
+    _export_refused(bundle, "retained Replay (integrity|run_id|derivation) differs|run_id conflicts")
+
+
+def test_the_envelope_allowlist_does_not_apply_to_the_historical_p2_path(replay):
+    """P2 is unchanged: the strict envelope is entered only for the current Control Plane revision."""
+    import inspect
+    source = inspect.getsource(exporter._run_replay_validation)
+    assert source.count("_require_exact_current_bundle_envelope") == 1
+    assert 'if revision == CUR_REVISIONS["control_plane"]:\n                _require_exact_current_bundle_envelope' in source
+
+
+def test_an_extra_metadata_key_injected_into_an_exported_package_does_not_validate(replay):
+    package = exporter.export_cognous_stack_package(MANIFEST, bundle_of(replay))
+    package["provenance"]["retained_sources"]["reconstruction_bundle"]["metadata"]["authority_claim"] = "registry-governed authorized"
+    result = evaluate_recipient_package(seal(package), policy_for(package))
+    assert result["replay_semantic_consistency"]["status"] != "pass"
+
+
+# ================================================================================================ fixture provenance digests
+def test_the_current_generation_fixtures_match_their_provenance_digests():
+    import hashlib
+    expected = json.loads((DATA / "PROVENANCE.json").read_text(encoding="utf-8"))["sha256"]
+    files = sorted(str(p.relative_to(DATA)) for p in DATA.rglob("*") if p.is_file() and p.name not in ("PROVENANCE.json", "manifest.json"))
+    assert sorted(expected) == files and len(files) == 3 * len(SCENARIOS)  # every scenario file is listed, none extra (the manifest is bound by the proposals' manifest_digest)
+    from odes.common import sha256 as digest
+    assert {json.loads((DATA / n / "proposal.json").read_text(encoding="utf-8"))["manifest_digest"] for n in SCENARIOS} == {digest(MANIFEST)}
+    for rel, digest in expected.items():
+        assert hashlib.sha256((DATA / rel).read_bytes()).hexdigest() == digest, rel
+    assert json.loads((DATA / "manifest.json").read_text(encoding="utf-8")) == MANIFEST
