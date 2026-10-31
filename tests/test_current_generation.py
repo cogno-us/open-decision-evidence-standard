@@ -701,7 +701,7 @@ def test_deterministic_top_level_values_are_compared_not_retained_verbatim(repla
 
 
 def test_the_envelope_allowlist_does_not_apply_to_the_historical_p2_path(replay):
-    """P2 is unchanged: the strict envelope is entered only for the current Control Plane revision."""
+    """The strict envelope allowlist is entered only for the current Control Plane revision (the two governed-label field checks in the shared loop are not CUR-gated)."""
     import inspect
     source = inspect.getsource(exporter._run_replay_validation)
     assert source.count("_require_exact_current_bundle_envelope") == 1
