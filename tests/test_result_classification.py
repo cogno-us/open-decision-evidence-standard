@@ -213,9 +213,17 @@ def _pinned_replay_available():
 
 @pytest.mark.skipif(not _pinned_replay_available(), reason="needs the accepted Replay revision installed")
 @pytest.mark.parametrize("path", EXAMPLES, ids=lambda p: p.name)
-def test_control_producer_v2_examples_pass_the_semantic_layer(path):
+def test_control_producer_v2_examples_respect_semantic_refusals(path):
     package = json.loads(path.read_text())
     result = evaluate_recipient_package(package, POLICY)
-    assert result["replay_semantic_consistency"]["status"] == "pass"
+    semantic = result["replay_semantic_consistency"]
+    # These retained historical packages are byte-authentic but are no longer
+    # semantically admissible to the pinned Replay. Never recast refusal as PASS.
+    invalid = {"lost_ack.package.json", "prior_absence.package.json"}
+    if path.name in invalid:
+        assert semantic["status"] == "fail", (path.name, semantic)
+        assert any("unknown result" in reason or "execution observation" in reason for reason in semantic["reasons"])
+    else:
+        assert semantic["status"] == "pass", (path.name, semantic)
     assert result["package_content_integrity"]["status"] == "pass"
     assert result["recipient_reliance_decision"]["status"] == "fail"
