@@ -18,7 +18,7 @@ from odes.exporter import ExportError
 from odes.recipient_validator import evaluate_recipient_package
 
 ROOT = Path(__file__).resolve().parents[1]
-LEGACY = json.loads((ROOT / "examples" / "producer-v2" / "lost_ack.package.json").read_text())
+LEGACY = json.loads((ROOT / "examples" / "producer-v2" / "restart.package.json").read_text())
 SOURCE = {"record_type": "runtime_proposal", "record_id": "r1", "record_hash": "sha256:" + "a" * 64}
 
 
