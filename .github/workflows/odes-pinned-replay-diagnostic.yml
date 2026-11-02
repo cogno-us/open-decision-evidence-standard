@@ -1,0 +1,38 @@
+name: ODES pinned historical Replay regression
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          path: odes
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: cogno-us/cognous-replay-bundle
+          ref: 40012b8c174c6f25685bd5d9bc93ff46cc9a5842
+          path: replay
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Verify exact Replay revision and install
+        run: |
+          test "$(git -C replay rev-parse HEAD)" = "40012b8c174c6f25685bd5d9bc93ff46cc9a5842"
+          python -m pip install -e './replay[dev]' -e './odes[dev]'
+          python -m pip check
+      - name: Run all ODES tests against pinned historical Replay
+        working-directory: odes
+        run: |
+          python -m pytest tests -q --tb=short --maxfail=10 2>&1 | tee ../odes-pinned-replay-regression.log
+          exit "${PIPESTATUS[0]}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: odes-pinned-replay-regression
+          path: odes-pinned-replay-diagnostic.log

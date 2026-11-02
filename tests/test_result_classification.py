@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from odes import exporter
-from odes.common import PROFILE_V2_ID
+from odes.common import CUR_REPLAY_REVISION, P2_REVISIONS, PROFILE_V2_ID, installed_replay_revision
 from odes.recipient_validator import _evaluate_authority_and_freshness, evaluate_recipient_package
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -213,9 +213,19 @@ def _pinned_replay_available():
 
 @pytest.mark.skipif(not _pinned_replay_available(), reason="needs the accepted Replay revision installed")
 @pytest.mark.parametrize("path", EXAMPLES, ids=lambda p: p.name)
-def test_control_producer_v2_examples_pass_the_semantic_layer(path):
+def test_control_producer_v2_examples_respect_semantic_refusals(path):
     package = json.loads(path.read_text())
     result = evaluate_recipient_package(package, POLICY)
-    assert result["replay_semantic_consistency"]["status"] == "pass"
+    semantic = result["replay_semantic_consistency"]
+    # P2/current Replay rejects these historical observations. Older accepted
+    # Replay generations legitimately validate the same frozen source packages.
+    # Preserve the exact-generation semantics rather than rewriting source evidence.
+    strict = installed_replay_revision() in {P2_REVISIONS["replay"], CUR_REPLAY_REVISION}
+    invalid = {"lost_ack.package.json", "prior_absence.package.json"}
+    if strict and path.name in invalid:
+        assert semantic["status"] == "fail", (path.name, semantic)
+        assert any("unknown result" in reason or "execution observation" in reason for reason in semantic["reasons"])
+    else:
+        assert semantic["status"] == "pass", (path.name, semantic)
     assert result["package_content_integrity"]["status"] == "pass"
     assert result["recipient_reliance_decision"]["status"] == "fail"

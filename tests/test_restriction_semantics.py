@@ -12,13 +12,15 @@ from pathlib import Path
 import pytest
 
 from odes import exporter
-from odes.common import (PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_VERSION, RESTRICTION_SEMANTICS_VERSION,
+from odes.common import (CUR_REPLAY_REVISION, P2_REVISIONS, PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_VERSION, RESTRICTION_SEMANTICS_VERSION,
                          RESTRICTION_UNKNOWN_LIMIT, RESTRICTION_VERSION_SUFFIX, sha256)
 from odes.exporter import ExportError
 from odes.recipient_validator import evaluate_recipient_package
 
 ROOT = Path(__file__).resolve().parents[1]
-LEGACY = json.loads((ROOT / "examples" / "producer-v2" / "lost_ack.package.json").read_text())
+LEGACY = json.loads((ROOT / "examples" / "producer-v2" / "restart.package.json").read_text())
+# The retained lost_ack and prior_absence packages are historical negative examples,
+# not eligible sources for a successful fresh Replay reconstruction.
 SOURCE = {"record_type": "runtime_proposal", "record_id": "r1", "record_hash": "sha256:" + "a" * 64}
 
 
@@ -239,3 +241,21 @@ def test_explicit_export_end_to_end():
     assert result["declared_profile_conformance"]["status"] == "pass"
     assert result["consumption_conditions"]["status"] == "fail"
     assert result["recipient_reliance_decision"]["status"] == "fail"
+
+
+@needs_replay
+@pytest.mark.parametrize("scenario,expected_message", [
+    ("lost_ack", "unknown result cannot carry a validated applied/partial observation"),
+    ("prior_absence", "execution observation must be null or a typed observation"),
+])
+def test_legacy_invalid_observation_is_refused(scenario, expected_message):
+    from odes.common import installed_replay_revision
+    if installed_replay_revision() not in {P2_REVISIONS["replay"], CUR_REPLAY_REVISION}:
+        pytest.skip("this refusal is specific to the P2/current Replay validation generation")
+    package = json.loads((ROOT / "examples" / "producer-v2" / f"{scenario}.package.json").read_text())
+    sources = package["provenance"]["retained_sources"]
+    cond = package["record"]["consumption_conditions"]
+    with pytest.raises(ExportError, match=expected_message):
+        exporter.export_cognous_stack_package(
+            sources["manifest"], sources["reconstruction_bundle"],
+            relying_party="recipient.example.org", purpose="audit", expires_at=cond["expires_at"])
