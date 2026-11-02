@@ -28,7 +28,7 @@ jobs:
       - name: Reproduce four reported failures without suppressing test results
         working-directory: odes
         run: |
-          python -m pytest tests/test_restriction_semantics.py tests/test_generic_recipient_profile.py tests/test_current_generation.py -vv --tb=short --maxfail=10 2>&1 | tee ../odes-pinned-replay-diagnostic.log
+          python -m pytest tests -q --tb=short --maxfail=10 2>&1 | tee ../odes-pinned-replay-diagnostic.log
           exit "${PIPESTATUS[0]}"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
