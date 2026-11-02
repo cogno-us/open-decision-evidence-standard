@@ -51,8 +51,8 @@ POLICY_BINDING = {"approval_commitment_version": "approval-commitment/0.2", "pol
 
 # ================================================================================================ the pins (no Replay needed)
 def test_the_replay_pin_is_this_one_literal_and_defined_in_one_place():
-    # The only literal 40-hex Replay value in this file. Re-tying to the Replay merge SHA is a one-line change in common.py plus this literal.
-    assert CUR_REPLAY_REVISION == "d395e37c443fedf1bf6b9a4651338b7b7de4a553"
+    # The only literal 40-hex Replay pin in this file (SUPERSEDED_CUR_REPLAY below is the refused predecessor). Re-tying to the Replay merge SHA is a one-line change in common.py plus this literal.
+    assert CUR_REPLAY_REVISION == "6f45e288ae37ec7e7712f9296760927d2d843bba"
     assert CUR_REVISIONS["replay"] == CUR_REPLAY_REVISION
     source = (ROOT / "src" / "odes" / "common.py").read_text(encoding="utf-8")
     assert source.count(CUR_REPLAY_REVISION) == 1  # defined once; every other use derives from the constant
@@ -202,6 +202,22 @@ def test_the_installed_replay_gate_accepts_the_current_pin_when_clean_and_refuse
     monkeypatch.setattr(exporter, "installed_replay_revision", lambda: None)
     with pytest.raises(exporter.ReplayDependencyError):
         exporter._require_installed_replay(CUR_CP)
+
+
+SUPERSEDED_CUR_REPLAY = "d395e37c443fedf1bf6b9a4651338b7b7de4a553"  # PR #81 merge commit; superseded in place by PR #82 (the pin above). Refused as current.
+
+
+def test_the_superseded_replay_d395e37c_is_refused_as_the_current_generation(monkeypatch):  # R1C: exact-HEAD gate, no superseded-heads list exists
+    assert SUPERSEDED_CUR_REPLAY != CUR_REPLAY_REVISION
+    assert SUPERSEDED_CUR_REPLAY not in all_accepted_replay_revisions()
+    assert accepted_replay_revisions(CUR_CP) == frozenset({CUR_REPLAY_REVISION})
+    monkeypatch.setenv("ODES_ALLOW_UNVERIFIED_REPLAY", "0")
+    monkeypatch.setattr(exporter, "installed_replay_revision", lambda: SUPERSEDED_CUR_REPLAY)
+    monkeypatch.setattr(exporter, "installed_replay_checkout_dirty", lambda: False)
+    with pytest.raises((ReplayRevisionUnsupportedError, exporter.ReplayDependencyError)):
+        exporter._require_installed_replay(CUR_CP)
+    with pytest.raises(ValueError, match="exact qualified Replay revision"):
+        _normalized_replay_material(_package(CUR_PROFILE_VERSION, CUR_REVISIONS, SUPERSEDED_CUR_REPLAY), _package(CUR_PROFILE_VERSION, CUR_REVISIONS))
 
 
 # ================================================================================================ end to end with the real Replay
