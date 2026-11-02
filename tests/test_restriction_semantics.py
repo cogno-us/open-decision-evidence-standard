@@ -244,12 +244,15 @@ def test_explicit_export_end_to_end():
 
 
 @needs_replay
-@pytest.mark.parametrize("scenario", ["lost_ack", "prior_absence"])
-def test_legacy_unknown_result_with_applied_observation_is_refused(scenario):
+@pytest.mark.parametrize("scenario,expected_message", [
+    ("lost_ack", "unknown result cannot carry a validated applied/partial observation"),
+    ("prior_absence", "execution observation must be null or a typed observation"),
+])
+def test_legacy_invalid_observation_is_refused(scenario, expected_message):
     package = json.loads((ROOT / "examples" / "producer-v2" / f"{scenario}.package.json").read_text())
     sources = package["provenance"]["retained_sources"]
     cond = package["record"]["consumption_conditions"]
-    with pytest.raises(ExportError, match="unknown result cannot carry a validated applied/partial observation"):
+    with pytest.raises(ExportError, match=expected_message):
         exporter.export_cognous_stack_package(
             sources["manifest"], sources["reconstruction_bundle"],
             relying_party="recipient.example.org", purpose="audit", expires_at=cond["expires_at"])
