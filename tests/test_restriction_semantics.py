@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from odes import exporter
-from odes.common import (PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_VERSION, RESTRICTION_SEMANTICS_VERSION,
+from odes.common import (CUR_REPLAY_REVISION, P2_REVISIONS, PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_VERSION, RESTRICTION_SEMANTICS_VERSION,
                          RESTRICTION_UNKNOWN_LIMIT, RESTRICTION_VERSION_SUFFIX, sha256)
 from odes.exporter import ExportError
 from odes.recipient_validator import evaluate_recipient_package
@@ -249,6 +249,9 @@ def test_explicit_export_end_to_end():
     ("prior_absence", "execution observation must be null or a typed observation"),
 ])
 def test_legacy_invalid_observation_is_refused(scenario, expected_message):
+    from odes.common import installed_replay_revision
+    if installed_replay_revision() not in {P2_REVISIONS["replay"], CUR_REPLAY_REVISION}:
+        pytest.skip("this refusal is specific to the P2/current Replay validation generation")
     package = json.loads((ROOT / "examples" / "producer-v2" / f"{scenario}.package.json").read_text())
     sources = package["provenance"]["retained_sources"]
     cond = package["record"]["consumption_conditions"]
