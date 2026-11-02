@@ -19,6 +19,8 @@ from odes.recipient_validator import evaluate_recipient_package
 
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY = json.loads((ROOT / "examples" / "producer-v2" / "restart.package.json").read_text())
+# The retained lost_ack and prior_absence packages are historical negative examples,
+# not eligible sources for a successful fresh Replay reconstruction.
 SOURCE = {"record_type": "runtime_proposal", "record_id": "r1", "record_hash": "sha256:" + "a" * 64}
 
 
@@ -239,3 +241,15 @@ def test_explicit_export_end_to_end():
     assert result["declared_profile_conformance"]["status"] == "pass"
     assert result["consumption_conditions"]["status"] == "fail"
     assert result["recipient_reliance_decision"]["status"] == "fail"
+
+
+@needs_replay
+@pytest.mark.parametrize("scenario", ["lost_ack", "prior_absence"])
+def test_legacy_unknown_result_with_applied_observation_is_refused(scenario):
+    package = json.loads((ROOT / "examples" / "producer-v2" / f"{scenario}.package.json").read_text())
+    sources = package["provenance"]["retained_sources"]
+    cond = package["record"]["consumption_conditions"]
+    with pytest.raises(ExportError, match="unknown result cannot carry a validated applied/partial observation"):
+        exporter.export_cognous_stack_package(
+            sources["manifest"], sources["reconstruction_bundle"],
+            relying_party="recipient.example.org", purpose="audit", expires_at=cond["expires_at"])
