@@ -1,7 +1,8 @@
-name: ODES historical Replay example diagnosis
+name: ODES pinned historical Replay regression
 on:
+  pull_request:
   push:
-    branches: [diagnostics/odes-pinned-replay-examples]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -25,13 +26,13 @@ jobs:
           test "$(git -C replay rev-parse HEAD)" = "40012b8c174c6f25685bd5d9bc93ff46cc9a5842"
           python -m pip install -e './replay[dev]' -e './odes[dev]'
           python -m pip check
-      - name: Reproduce four reported failures without suppressing test results
+      - name: Run all ODES tests against pinned historical Replay
         working-directory: odes
         run: |
-          python -m pytest tests -q --tb=short --maxfail=10 2>&1 | tee ../odes-pinned-replay-diagnostic.log
+          python -m pytest tests -q --tb=short --maxfail=10 2>&1 | tee ../odes-pinned-replay-regression.log
           exit "${PIPESTATUS[0]}"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: odes-pinned-replay-diagnostic
+          name: odes-pinned-replay-regression
           path: odes-pinned-replay-diagnostic.log
