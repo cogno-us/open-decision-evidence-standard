@@ -1,0 +1,18 @@
+{
+ "legacy": {
+  "effect_id": "sha256:f42a2866e8359b1adca34c53c91f5f56b375203b6957fd7408f70d211629452a",
+  "generation": "bounded-authorization-effect/0.2",
+  "grant_id": "urn:cognous:grant:routine-1",
+  "grant_revision": "1",
+  "proposal": "sha256:becaea3f10b5edf56ea181e0cd62793ebe8262238f948fb72dc5c0389c7f8c53",
+  "tenant_id": "tenant-alpha"
+ },
+ "strict": {
+  "effect_id": "sha256:4e5844d6d53ab6f8694e9c76cb6238ec4110137dd35de73cb0b22963961ecde8",
+  "generation": "bounded-authorization-effect/0.3-strict-tenant",
+  "grant_id": "urn:cognous:grant:routine-1",
+  "grant_revision": "1",
+  "proposal": "sha256:becaea3f10b5edf56ea181e0cd62793ebe8262238f948fb72dc5c0389c7f8c53",
+  "tenant_id": "tenant-alpha"
+ }
+}

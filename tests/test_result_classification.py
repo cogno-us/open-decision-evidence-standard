@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from odes import exporter
-from odes.common import CUR_REPLAY_REVISION, P2_REVISIONS, PROFILE_V2_ID, installed_replay_revision
+from odes.common import CP2_REPLAY_REVISION, CUR_REPLAY_REVISION, P2_REVISIONS, PROFILE_V2_ID, installed_replay_revision
 from odes.recipient_validator import _evaluate_authority_and_freshness, evaluate_recipient_package
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -220,7 +220,7 @@ def test_control_producer_v2_examples_respect_semantic_refusals(path):
     # P2/current Replay rejects these historical observations. Older accepted
     # Replay generations legitimately validate the same frozen source packages.
     # Preserve the exact-generation semantics rather than rewriting source evidence.
-    strict = installed_replay_revision() in {P2_REVISIONS["replay"], CUR_REPLAY_REVISION}
+    strict = installed_replay_revision() in {P2_REVISIONS["replay"], CUR_REPLAY_REVISION, CP2_REPLAY_REVISION}
     invalid = {"lost_ack.package.json", "prior_absence.package.json"}
     if strict and path.name in invalid:
         assert semantic["status"] == "fail", (path.name, semantic)

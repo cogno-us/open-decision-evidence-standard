@@ -33,6 +33,7 @@ DATA = ROOT / "tests" / "data" / "current_generation"
 CUR_CP = "b19c47ddd020409d24e52e70b11359c46265edbb"
 CUR_RT = "f7a55e2a8494801e49193f9f46935f0a971c248d"
 CUR_MANIFEST = "fa170815ef96a54c233d0dd9da821b60debabf8b"
+CP2_CP = "484fdbd297235dd24148ddb0703f2055a31eabff"  # the CP-2 (strict-tenant) generation, added beside CUR; its own file is tests/test_cp2_generation.py
 P2_CP, P2_RT = P2_REVISIONS["control_plane"], P2_REVISIONS["moltbot_safe"]
 HISTORICAL = [(SECURITY_PROFILE_VERSION, SECURITY_REVISIONS), (F5B_PROFILE_VERSION, F5B_REVISIONS),
               (P4_PROFILE_VERSION, P4_REVISIONS), (P2_PROFILE_VERSION, P2_REVISIONS)]
@@ -68,7 +69,7 @@ def test_the_current_tuple_is_exactly_these_four_forty_hex_pins():
 
 def test_the_current_generation_is_unique_and_shares_no_control_plane_runtime_or_replay_with_any_other():
     versions = [v for v, _ in SECURITY_RUNTIME_GENERATIONS.values()]
-    assert len(versions) == len(set(versions)) == 5 and versions.count(CUR_PROFILE_VERSION) == 1
+    assert len(versions) == len(set(versions)) == 6 and versions.count(CUR_PROFILE_VERSION) == 1
     for version, pins in HISTORICAL:
         assert version != CUR_PROFILE_VERSION
         for key in ("replay", "control_plane", "moltbot_safe"):
@@ -80,10 +81,10 @@ def test_the_current_generation_is_unique_and_shares_no_control_plane_runtime_or
 
 def test_the_current_pins_are_in_each_generation_set_exactly_once_and_the_sets_are_explicit():
     assert set(SECURITY_RUNTIME_GENERATIONS) == {SECURITY_REVISIONS["control_plane"], F5B_REVISIONS["control_plane"],
-                                                 P4_REVISIONS["control_plane"], P2_CP, CUR_CP}
+                                                 P4_REVISIONS["control_plane"], P2_CP, CUR_CP, CP2_CP}
     assert SECURITY_RUNTIME_CP_REVISIONS == frozenset(SECURITY_RUNTIME_GENERATIONS)
     assert ALL_V2_CONTROL_PLANE_REVISIONS.count(CUR_CP) == 1
-    assert ALL_V2_CONTROL_PLANE_REVISIONS[-2:] == (P2_CP, CUR_CP)  # appended after P2, P2 not moved
+    assert ALL_V2_CONTROL_PLANE_REVISIONS[-3:] == (P2_CP, CUR_CP, CP2_CP)  # CUR appended after P2, CP-2 appended after CUR; neither predecessor moved
     assert accepted_replay_revisions(CUR_CP) == frozenset({CUR_REPLAY_REVISION})
     assert CUR_REPLAY_REVISION in all_accepted_replay_revisions()
     for _, pins in HISTORICAL:

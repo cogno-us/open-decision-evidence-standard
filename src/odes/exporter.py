@@ -30,6 +30,7 @@ from .common import (
     MERGED_PROFILE_VERSION,
     MERGED_REVISIONS,
     ALL_V2_CONTROL_PLANE_REVISIONS,
+    CP2_REVISIONS,
     CUR_REVISIONS,
     PINNED_V2_REVISIONS,
     PROFILE_VERSION,
@@ -300,6 +301,10 @@ def _require_installed_replay(control_plane_revision: str) -> None:
             return
         raise ReplayDependencyError("the installed Replay revision cannot be determined; install cogno-us/cognous-agent-replay-bundle from a pinned commit "
                           "(or set ODES_ALLOW_UNVERIFIED_REPLAY=1 for a local development install)")
+    # CP-2 only: exact. The union below would let an installed CUR or historical Replay pass for a CP-2 declaration; the CP-2 generation is defined by one Replay.
+    if control_plane_revision == CP2_REVISIONS["control_plane"] and installed != CP2_REVISIONS["replay"]:
+        raise ReplayRevisionUnsupportedError(f"installed Replay revision {installed} is not the Replay revision of the declared Control Plane generation "
+                                             f"{control_plane_revision} (expected {CP2_REVISIONS['replay']})")
     if installed not in all_accepted_replay_revisions():
         raise ReplayRevisionUnsupportedError(f"installed Replay revision {installed} is not an accepted Replay revision (declared Control Plane {control_plane_revision})")
     if installed_replay_checkout_dirty() and os.environ.get("ODES_ALLOW_UNVERIFIED_REPLAY") != "1":
@@ -358,6 +363,12 @@ def _require_exact_current_bundle_envelope(bundle: dict[str, Any], validated: di
         raise ExportError("retained Replay generated_at is not a timezone-aware ISO-8601 timestamp") from None
 
 
+def _require_exact_cp2_bundle_envelope(bundle: dict[str, Any], validated: dict[str, Any]) -> None:
+    """CP-2 generation: the same exact envelope as CUR (Replay emits the same top-level and metadata key sets under the CP-2 label; field names are unchanged,
+    only values differ). A thin entry point so the CUR call site above is textually unchanged; if Replay ever emits a different set, this is where a CP-2 set goes."""
+    _require_exact_current_bundle_envelope(bundle, validated)
+
+
 def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
     _require_supported_bundle_version(bundle)
     cp, proposal, moltbot = _extract_replay_inputs(bundle)
@@ -401,6 +412,8 @@ def _run_replay_validation(bundle: dict[str, Any]) -> tuple[str, list[dict[str, 
                     raise ExportError(f"retained Replay {field} differs from accepted validator")
             if revision == CUR_REVISIONS["control_plane"]:
                 _require_exact_current_bundle_envelope(bundle, validated)
+            elif revision == CP2_REVISIONS["control_plane"]:
+                _require_exact_cp2_bundle_envelope(bundle, validated)
         else:
             reconstructed = import_bounded_workflow(cp, proposal=proposal, moltbot_export=moltbot)
     except ReplayImportContractError as exc:
