@@ -1,0 +1,17 @@
+{
+ "captured_on": "2026-11-05",
+ "producer": {
+  "control_plane": "484fdbd297235dd24148ddb0703f2055a31eabff",
+  "note": "STRICT-TENANT GENERATION. PROVISIONAL DEVELOPMENT PIN, UNQUALIFIED, non-authorizing. Plain bounded run only."
+ },
+ "script": "generate_from_cp.py (PYTHONPATH=<cp>/src:<cp> python generate_from_cp.py <cp> <out-dir>)",
+ "script_sha256": "97b53c1f743cf42b33081c5374ef7b7fec0275645bd8297d8d61774a1a9cc489",
+ "sha256": {
+  "legacy_control_plane_run.json": "8059fff932f5e0d1c98e67071bded26d6923150852273539d8bfc22cdc7a8d2d",
+  "legacy_proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d",
+  "strict_control_plane_run.json": "724d2570990fc3b0db0b5168bb8fa4a12df1d08731f9dbcf58495c3989e507ee",
+  "strict_proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d",
+  "vectors.json": "e7d560862639df3a0059fad36a4165e7b21703c7a3b456bf4ae44c865dd0b254"
+ },
+ "source": "real Control Plane records written by the Control Plane's own flow helpers (tests/test_runtime_authority.py setup_flow/bind_approval, tests/test_bounded_authorization.py tenant_proposal/tenant_resolver_for) with a tenant-aware proposal and a runtime-authority profile, persisted by BoundedRecordStore; synthetic data, throwaway stores, nothing hand-edited"
+}

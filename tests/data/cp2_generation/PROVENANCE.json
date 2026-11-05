@@ -1,0 +1,19 @@
+{
+ "captured_on": "2026-11-05",
+ "control_plane": "484fdbd297235dd24148ddb0703f2055a31eabff",
+ "generator": {
+  "script": "generate_from_cp.py (in the Replay PR, not vendored here)",
+  "script_sha256": "97b53c1f743cf42b33081c5374ef7b7fec0275645bd8297d8d61774a1a9cc489"
+ },
+ "note": "CP-2 (strict-tenant) fixtures, vendored BYTE-IDENTICALLY from cogno-us/cognous-replay-bundle at the main merge commit below (PR #87 plus the PR #88 tenant-binding fix, which did not change these files; digests re-checked at that commit). Real Control Plane 484fdbd2 records, synthetic data; DEVELOPMENT PIN, UNQUALIFIED, non-authorizing.",
+ "replay_merge_commit": "93a76e281fcae6a65d2cd1d35376f87442dafb95",
+ "replay_provenance_sha256": "883f13a6773edd3d4b23b05953006fba9c35413a603f0753114e15ba87cc5226",
+ "sha256": {
+  "legacy_control_plane_run.json": "8059fff932f5e0d1c98e67071bded26d6923150852273539d8bfc22cdc7a8d2d",
+  "legacy_proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d",
+  "strict_control_plane_run.json": "724d2570990fc3b0db0b5168bb8fa4a12df1d08731f9dbcf58495c3989e507ee",
+  "strict_proposal.json": "d43ac343139f8c9393ddca4746961d1fc7a4e05bafa5a6c5f446157a53e5178d",
+  "vectors.json": "e7d560862639df3a0059fad36a4165e7b21703c7a3b456bf4ae44c865dd0b254"
+ },
+ "vendored_from": "cogno-us/cognous-replay-bundle tests/fixtures/strict_tenant_generation (PR #87, unchanged by PR #88)"
+}
