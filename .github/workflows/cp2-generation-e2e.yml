@@ -1,4 +1,4 @@
-# PROVISIONAL: CP2_REPLAY_REVISION is currently Replay PR #87 head d6c05bc5, to be re-pinned to the Replay merge SHA after #87 merges and an independent review is CLEAR.
+# CP2_REPLAY_REVISION is the cognous-replay-bundle main merge commit 93a76e28 (PR #88 on top of PR #87).
 # Runs tests/test_cp2_generation.py end to end against the real Replay at exactly CP2_REPLAY_REVISION (src/odes/common.py).
 # ODES_REQUIRE_CP2_E2E=1 makes the end-to-end tests FAIL instead of skip if the pinned Replay cannot be set up.
 name: CP-2 generation end-to-end

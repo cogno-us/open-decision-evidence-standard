@@ -113,14 +113,14 @@ CUR_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
     "moltbot_safe": "f7a55e2a8494801e49193f9f46935f0a971c248d"}
 # CP-2 generation (strict-tenant effect identity): Control Plane 484fdbd2 (bounded-authorization-effect/0.3-strict-tenant, CP #109) / runtime f7a55e2a and Manifest fa170815
 # (the same SHAs as CUR, written as literals here so a later CUR re-tie cannot silently move CP-2) / the Replay revision below, the Replay that defines the CP-2 label
-# (cognous-replay-bundle PR #87, generation id control-plane-strict-tenant-stack@484fdbd2). Added BESIDE CUR, which is not moved, renamed or reused: an exact tuple keyed by its
+# (cognous-replay-bundle PR #87, with the tenant-binding fix of PR #88; generation id control-plane-strict-tenant-stack@484fdbd2). Added BESIDE CUR, which is not moved, renamed or reused: an exact tuple keyed by its
 # Control Plane revision, never mixed, never a range. No earlier generation was edited.
-# R* (the Replay pin) is defined ONCE, on the next line. PROVISIONAL: it is currently PR #87 head d6c05bc5, to be re-pinned to the Replay MERGE SHA after #87 merges and an
-# independent review is CLEAR; the re-tie is this one line (plus the literal in tests/test_cp2_generation.py and the short SHA in the docs register). Until then this generation is DRAFT.
+# R* (the Replay pin) is defined ONCE, on the next line: the cognous-replay-bundle main merge commit 93a76e28 (PR #88 on top of PR #87). It carries the tenant-binding check
+# (an edited binding tenant_id is refused by Replay). Any later Replay change is a new generation, not a re-tie.
 # PROVISIONAL DEVELOPMENT PIN, UNQUALIFIED, non-authorizing. Provenance labels are caller-asserted: the label is not measured against any Control Plane checkout.
 # Scope: the plain bounded run only; the unsupported scope of CUR (effective_configuration, policy-binding members, reason vocabulary 0.3, selection_refusal, authorization-pin
 # evidence, Registry-governed selectors) stays refused. Alpha scaffolding: removed with the other hard pins at end-of-alpha (P5).
-CP2_REPLAY_REVISION = "d6c05bc552e404263a149548fc3f19ecbd8203b4"
+CP2_REPLAY_REVISION = "93a76e281fcae6a65d2cd1d35376f87442dafb95"
 CP2_PROFILE_VERSION = "odes-cognous-stack-export-0.2.8-security-runtime-cp2-candidate"
 CP2_REVISIONS = {"manifest": "fa170815ef96a54c233d0dd9da821b60debabf8b",
     "replay": CP2_REPLAY_REVISION,

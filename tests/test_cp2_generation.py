@@ -2,10 +2,9 @@
 
 Added BESIDE the current generation (CUR), which is unchanged (this is not a third in-place re-tie of CUR). Control Plane 484fdbd297235dd24148ddb0703f2055a31eabff is the
 strict tenant-aware effect identity generation (``bounded-authorization-effect/0.3-strict-tenant``; assigned under the Constitution at pin 1c2e920f, adoption not recorded).
-The Replay generation id is ``control-plane-strict-tenant-stack@484fdbd2`` (cognous-replay-bundle PR #87).
+The Replay generation id is ``control-plane-strict-tenant-stack@484fdbd2`` (cognous-replay-bundle PR #87, with the tenant-binding fix of PR #88).
 
-PROVISIONAL: the Replay pin R* below is the head of Replay PR #87 (d6c05bc5), to be re-pinned to the Replay MERGE SHA after #87 merges and an independent review is CLEAR.
-The re-tie touches the literal ``R_STAR`` below, ``CP2_REPLAY_REVISION`` in ``src/odes/common.py`` and the short SHA in the docs register. UNQUALIFIED, non-authorizing.
+The Replay pin R* below is the cognous-replay-bundle main merge commit 93a76e28 (PR #88 on top of PR #87). The tenant-binding check lives in that Replay. DEVELOPMENT PIN, UNQUALIFIED, non-authorizing.
 
 What is real and what is asserted by the caller:
 * ``tests/data/cp2_generation`` holds REAL Control Plane 484fdbd2 records (vendored byte-identically from the Replay PR; digests checked). They are tenant-aware, executor-less
@@ -45,7 +44,7 @@ DATA = ROOT / "tests" / "data" / "cp2_generation"
 CP2_CP = "484fdbd297235dd24148ddb0703f2055a31eabff"
 CP2_RT = "f7a55e2a8494801e49193f9f46935f0a971c248d"
 CP2_MANIFEST = "fa170815ef96a54c233d0dd9da821b60debabf8b"
-R_STAR = "d6c05bc552e404263a149548fc3f19ecbd8203b4"  # PROVISIONAL: Replay PR #87 head; re-pin to the Replay merge SHA after #87 merges and review is CLEAR
+R_STAR = "93a76e281fcae6a65d2cd1d35376f87442dafb95"  # cognous-replay-bundle main merge commit (PR #88 on top of PR #87)
 CP2_VERSION = "odes-cognous-stack-export-0.2.8-security-runtime-cp2-candidate"
 CP2_PROFILE_ID = "control-plane-strict-tenant-stack@484fdbd2"
 CUR_CP = "b19c47ddd020409d24e52e70b11359c46265edbb"
@@ -261,8 +260,8 @@ def test_p8_an_unaccepted_installed_replay_is_still_refused_for_a_cur_declaratio
 def test_the_cp2_fixtures_match_their_provenance_digests_and_the_replay_provenance():
     provenance = json.loads((DATA / "PROVENANCE.json").read_text(encoding="utf-8"))
     replay_provenance = json.loads((DATA / "REPLAY_PROVENANCE.json").read_text(encoding="utf-8"))
-    assert provenance["replay_pull_request_head"] == R_STAR and "PROVISIONAL" in provenance["note"]
-    assert provenance["vendored_from"] == "cogno-us/cognous-replay-bundle tests/fixtures/strict_tenant_generation (PR #87)"
+    assert provenance["replay_merge_commit"] == R_STAR and "re-pinned" not in provenance["note"]
+    assert provenance["vendored_from"] == "cogno-us/cognous-replay-bundle tests/fixtures/strict_tenant_generation (PR #87, unchanged by PR #88)"
     assert replay_provenance["producer"]["control_plane"] == CP2_CP
     assert hashlib.sha256((DATA / "REPLAY_PROVENANCE.json").read_bytes()).hexdigest() == provenance["replay_provenance_sha256"]
     files = sorted(p.name for p in DATA.iterdir() if p.is_file() and p.name not in ("PROVENANCE.json", "REPLAY_PROVENANCE.json"))
@@ -289,7 +288,7 @@ def test_the_cp2_records_are_the_real_strict_and_legacy_tenant_records():
 def test_the_documentation_states_the_pending_replay_repin_and_the_honest_limits():
     docs = (ROOT / "docs" / "capabilities-and-versions.md").read_text(encoding="utf-8")
     row = [line for line in docs.splitlines() if CP2_VERSION in line]
-    assert len(row) == 1 and "484fdbd2" in row[0] and "d6c05bc5" in row[0] and "re-pinned to the Replay merge SHA" in row[0]
+    assert len(row) == 1 and "484fdbd2" in row[0] and "93a76e28" in row[0] and "re-pinned" not in row[0] and "provisional" not in row[0].lower().replace("provisional development","")
     assert "assigned under the Constitution at pin 1c2e920f, adoption not recorded" in row[0] and "UNQUALIFIED" in row[0] and "caller-asserted" in row[0]
     profiles = (ROOT / "docs" / "security-runtime-p4-p2-profiles.md").read_text(encoding="utf-8")
     assert CP2_VERSION in profiles and "caller-asserted" in profiles.split(CP2_VERSION)[1]
@@ -495,6 +494,42 @@ def test_a_strict_record_with_a_wrong_missing_or_conflicting_generation_is_refus
     mutate(_runtime_decision(bundle))
     with pytest.raises(ExportError, match="pinned Replay semantic validation failed: .*(" + match + ")"):
         export(bundle)
+
+
+TENANT_CONFLICT = "decisions\\[0\\]\\.binding\\.tenant_id conflicts with committed operation"
+
+
+@pytest.mark.parametrize("tenant", ["tenant-beta", "tenant-alpha ", " tenant-alpha", "Tenant-Alpha", "TENANT-ALPHA"], ids=["other-tenant", "padded-right", "padded-left", "case-variant", "upper"])
+@pytest.mark.parametrize("kind", ["strict", "legacy"])
+def test_an_edited_binding_tenant_id_is_refused_through_replay_and_no_package_exists(replay, kind, tenant):
+    """The tenant check lives in Replay (93a76e28, PR #88); ODES has none of its own and surfaces Replay's refusal. The proposal still says tenant-alpha."""
+    assert load_tenant(kind)[1]["tenant_id"] == "tenant-alpha"
+    bundle = tenant_bundle(replay, kind)
+    _runtime_decision(bundle)["binding"]["tenant_id"] = tenant
+    with pytest.raises(ExportError, match="pinned Replay semantic validation failed: " + TENANT_CONFLICT):
+        export(bundle)
+    cp, proposal = load_tenant(kind)  # and Replay refuses the same edit at the source, so no bundle reaches ODES
+    cp["decisions"][0]["binding"]["tenant_id"] = tenant
+    with pytest.raises(replay.ImportContractError, match=TENANT_CONFLICT):
+        replay.import_bounded_workflow(cp, proposal=proposal, control_plane_revision=CP2_CP)
+
+
+@pytest.mark.parametrize("kind", ["strict", "legacy"])
+def test_an_empty_binding_tenant_id_is_refused_through_replay(replay, kind):
+    bundle = tenant_bundle(replay, kind)
+    _runtime_decision(bundle)["binding"]["tenant_id"] = ""
+    with pytest.raises(ExportError, match="pinned Replay semantic validation failed: .*requires a non-empty tenant_id on the binding"):
+        export(bundle)
+
+
+@pytest.mark.parametrize("kind", ["strict", "legacy"])
+def test_an_edited_binding_tenant_id_in_an_exported_package_does_not_validate(replay, kind):
+    package = export(tenant_bundle(replay, kind))
+    for r in package["provenance"]["retained_sources"]["reconstruction_bundle"]["records"]:
+        if r["record_type"] == "runtime_decision":
+            r["data"]["binding"]["tenant_id"] = "tenant-beta"
+    result = evaluate_recipient_package(seal(package), policy_for(package))
+    assert result["replay_semantic_consistency"]["status"] != "pass" and result["recipient_reliance_decision"]["status"] != "pass"
 
 
 @pytest.mark.parametrize("section", ["control_plane_attempt_transition", "effect_observation", "reconciliation"])
