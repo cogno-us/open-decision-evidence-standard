@@ -25,6 +25,7 @@ Recorded at repository commit `1ed3bb4` (main). Each row names where its value i
 | Profile identifier, historical | `odes_cognous_stack_export_0_1`, version `odes-cognous-stack-export-0.1.0` | `odes.common.PROFILE_ID`, `PROFILE_VERSION` |
 | Profile identifier, producer 2.0.0 | `odes_cognous_stack_export_0_2` | `odes.common.PROFILE_V2_ID` |
 | Profile identifier, explicit restrictions | `odes_cognous_stack_export_0_2_restrictions`; version is the generation's version plus `+restriction-semantics-1` | `odes.common.PROFILE_V2_RESTRICTIONS_ID`, `RESTRICTION_VERSION_SUFFIX`, [profile](../profiles/cognous-stack-export-0.2-restrictions.md) |
+| Profile identifier, explicit restrictions with attributed lifecycle assertion (PROPOSED, DEVELOPMENT ONLY, UNQUALIFIED) | `odes_cognous_stack_export_0_2_restrictions_lifecycle_0_1`; version is the generation's version plus `+restriction-semantics-1+lifecycle-semantics-1`; opt-in, never a default | `odes.common.PROFILE_V2_LIFECYCLE_ID`, `LIFECYCLE_VERSION_SUFFIX`, [profile](../profiles/cognous-stack-export-0.2-restrictions-lifecycle.md) |
 | Profile identifier, generic recipient | `odes_generic_recipient_0_1`, version `odes-generic-recipient-0.1.0-draft`; not a Cognous profile | `odes.generic_profile.GENERIC_PROFILE_ID`, `GENERIC_PROFILE_VERSION`, [profile](../profiles/generic-recipient-0.1.md) |
 | Transformation / profile version for `odes_cognous_stack_export_0_2` | `odes-cognous-stack-export-0.2.0`, with later generations below | `odes.common.PROFILE_V2_VERSION` |
 | Python package | `0.2.0` | `pyproject.toml` |

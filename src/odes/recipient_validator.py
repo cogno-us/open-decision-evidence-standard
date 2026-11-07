@@ -13,7 +13,12 @@ from .common import (
     PACKAGE_TYPE,
     PACKAGE_VERSION,
     PROFILE_ID,
+    LIFECYCLE_ASSERTION_KEYS,
+    LIFECYCLE_ISSUER_ASSERTED_LIMIT,
+    LIFECYCLE_SEMANTICS_VERSION,
+    LIFECYCLE_VERSION_SUFFIX,
     PROFILE_V2_ID,
+    PROFILE_V2_LIFECYCLE_ID,
     PROFILE_V2_RESTRICTIONS_ID,
     RESTRICTION_SEMANTICS_VERSION,
     RESTRICTION_UNKNOWN_LIMIT,
@@ -31,6 +36,7 @@ from .common import (
     SUPPORTED_V2_CONTROL_PLANE_REVISIONS,
     SUPPORTED_V2_REPLAY_REVISIONS,
     instant_problem,
+    lifecycle_assertion_problem,
     parse_instant,
     window_expired,
 )
@@ -45,7 +51,7 @@ PACKAGE_TOP_LEVEL_MEMBERS = frozenset({"package_type", "package_version", "creat
 
 
 SEMANTIC_DEADLINE_SECONDS = 5
-V2_FAMILY = frozenset({PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID})
+V2_FAMILY = frozenset({PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_LIFECYCLE_ID})
 _RESTRICTION_STATES = frozenset({"explicit_true", "explicit_false", "unknown"})
 
 
@@ -161,20 +167,24 @@ def _evaluate_profile(package: dict[str, Any], supported_profiles: list[str]) ->
         selected_control_plane = None
     if declared == PROFILE_ID and selected_control_plane in ALL_V2_CONTROL_PLANE_REVISIONS:
         reasons.append("repaired producer transformation cannot be relabeled as historical profile 0.1")
-    if declared in {PROFILE_ID, PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID}:
+    if declared in {PROFILE_ID, PROFILE_V2_ID, PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_LIFECYCLE_ID}:
         v2 = declared in V2_FAMILY
         integrity = package.get("integrity") if isinstance(package.get("integrity"), dict) else {}
         if "canonicalization_profile" in integrity and integrity["canonicalization_profile"] != CANONICALIZATION_PROFILE:
             reasons.append("the declared implementation profile is defined only with the legacy canonicalization profile")
         expected_version = SECURITY_RUNTIME_GENERATIONS[selected_control_plane][0] if v2 and selected_control_plane in SECURITY_RUNTIME_GENERATIONS else REFUSAL_PROFILE_VERSION if v2 and selected_control_plane == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if v2 and selected_control_plane == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if v2 else PROFILE_VERSION
-        if declared == PROFILE_V2_RESTRICTIONS_ID:
+        if declared in {PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_LIFECYCLE_ID}:
             expected_version += RESTRICTION_VERSION_SUFFIX
+        if declared == PROFILE_V2_LIFECYCLE_ID:
+            expected_version += LIFECYCLE_VERSION_SUFFIX
         if profile.get("implementation_profile_version") != expected_version:
             return _result("unsupported", [f"unsupported implementation_profile_version {profile.get('implementation_profile_version')!r}"], {"supported_profile_version": expected_version})
         if profile.get("schema_name") != SCHEMA_NAME or profile.get("schema_version") != SCHEMA_VERSION:
             reasons.append("profile schema coordinates do not match pder-v0.1")
         if not isinstance(package.get("provenance"), dict):
             reasons.append("Cognous-stack profile requires package provenance outside the pder-v0.1 base record")
+        if declared == PROFILE_V2_LIFECYCLE_ID:
+            reasons.extend(_lifecycle_semantics_reasons(package))
     evidence: dict[str, Any] = {"declared_profile": declared, "implementation_profile_version": profile.get("implementation_profile_version")}
     if declared == GENERIC_PROFILE_ID:
         if profile.get("implementation_profile_version") != GENERIC_PROFILE_VERSION:
@@ -378,6 +388,37 @@ def _evaluate_authority_and_freshness(record: dict[str, Any], status_inputs: dic
     return _result("fail" if reasons else "pass", reasons, {**evidence, "configured_status_inputs": status_inputs, "record_reported_freshness": status.get("freshness")})
 
 
+def _lifecycle_semantics_reasons(package: dict[str, Any]) -> list[str]:
+    """Checks for the opt-in lifecycle profile. The value is an attributed issuer assertion, bound to the record and the retained sources.
+
+    This establishes shape, attribution and binding only. It is not recipient status evidence and not proof of present validity.
+    """
+    record = package.get("record") if isinstance(package.get("record"), dict) else {}
+    provenance = package.get("provenance") if isinstance(package.get("provenance"), dict) else {}
+    member = provenance.get("lifecycle_semantics")
+    if not isinstance(member, dict) or member.get("semantics_version") != LIFECYCLE_SEMANTICS_VERSION:
+        return ["provenance.lifecycle_semantics is missing or unsupported; the lifecycle assertion is not established"]
+    reasons: list[str] = []
+    if set(member) != LIFECYCLE_ASSERTION_KEYS | {"semantics_version", "bound_to"}:
+        reasons.append("provenance.lifecycle_semantics has missing or unsupported members")
+    issuer = record.get("issuer") if isinstance(record.get("issuer"), dict) else {}
+    problem = lifecycle_assertion_problem({key: member.get(key) for key in LIFECYCLE_ASSERTION_KEYS}, issuer, record.get("decision_timestamp") or "")
+    if problem:
+        reasons.append(problem)
+    status = record.get("status") if isinstance(record.get("status"), dict) else {}
+    if (set(status) != {"freshness", "superseded", "revoked"} or status.get("freshness") != member.get("freshness")
+            or status.get("revoked") is not False or status.get("superseded") is not False):
+        reasons.append("record status does not equal the attributed lifecycle assertion")
+    artifacts = provenance.get("source_artifacts") if isinstance(provenance.get("source_artifacts"), dict) else {}
+    expected_binding = {"decision_id": record.get("decision_id"), "reconstruction_bundle_digest": artifacts.get("reconstruction_bundle_digest"),
+                        "manifest_digest": artifacts.get("manifest_digest")}
+    if member.get("bound_to") != expected_binding or any(not isinstance(v, str) or not v for v in expected_binding.values()):
+        reasons.append("lifecycle assertion is not bound to the record decision and the retained source digests")
+    if LIFECYCLE_ISSUER_ASSERTED_LIMIT not in (provenance.get("limits") if isinstance(provenance.get("limits"), list) else []):
+        reasons.append("the mandatory limitation for issuer-asserted lifecycle values is missing")
+    return reasons
+
+
 def _restriction_semantics_reasons(package: dict[str, Any]) -> list[str]:
     """Checks for the explicit restriction profile. Unknown is never unrestricted; an explicit false must be attributable."""
     record = package.get("record") if isinstance(package.get("record"), dict) else {}
@@ -444,7 +485,7 @@ def _evaluate_consumption(record: dict[str, Any], relying_party: str | None, pur
             reasons.append("restricted use has no implemented recipient authorization profile")
         if not policy.get("jurisdiction") or policy.get("jurisdiction") != risk.get("jurisdiction"):
             reasons.append("recipient jurisdiction is unavailable or differs from the record")
-    if package is not None and (package.get("profile") or {}).get("implementation_profile") in {PROFILE_V2_RESTRICTIONS_ID, GENERIC_PROFILE_ID}:
+    if package is not None and (package.get("profile") or {}).get("implementation_profile") in {PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_LIFECYCLE_ID, GENERIC_PROFILE_ID}:
         reasons.extend(_restriction_semantics_reasons(package))
     return _result("fail" if reasons else "pass", reasons, {"permitted_relying_parties": parties, "permitted_purposes": purposes})
 
@@ -504,9 +545,18 @@ def _replay_semantic_check(package: dict[str, Any]) -> dict[str, Any]:
         parties, purposes = conditions["permitted_relying_parties"], conditions["permitted_purposes"]
         if len(parties) != 1 or len(purposes) != 1:
             raise ValueError("implementation profile requires exact single-recipient/purpose export")
-        mode = "explicit" if package["profile"]["implementation_profile"] == PROFILE_V2_RESTRICTIONS_ID else "legacy"
+        declared_profile = package["profile"]["implementation_profile"]
+        mode = "explicit" if declared_profile in {PROFILE_V2_RESTRICTIONS_ID, PROFILE_V2_LIFECYCLE_ID} else "legacy"
+        extra: dict[str, Any] = {}
+        if declared_profile == PROFILE_V2_LIFECYCLE_ID:
+            # The lifecycle input is re-supplied from the package's own provenance so the re-export can reproduce it. This proves
+            # reconstruction consistency only; it is not independent evidence that the issuer's assertion is true.
+            member = package["provenance"].get("lifecycle_semantics")
+            if not isinstance(member, dict):
+                raise ValueError("lifecycle profile requires provenance.lifecycle_semantics")
+            extra["lifecycle_assertion"] = {key: deepcopy(member.get(key)) for key in LIFECYCLE_ASSERTION_KEYS}
         expected = export_cognous_stack_package(sources["manifest"], sources["reconstruction_bundle"],
-            relying_party=parties[0], purpose=purposes[0], expires_at=conditions["expires_at"], restriction_semantics=mode)
+            relying_party=parties[0], purpose=purposes[0], expires_at=conditions["expires_at"], restriction_semantics=mode, **extra)
         actual_material, expected_material = _normalized_replay_material(package, expected)
         if actual_material != expected_material:
             raise ValueError("package semantics differ from accepted Replay-derived transformation")

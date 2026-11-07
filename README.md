@@ -103,6 +103,7 @@ Labels as defined above. The revision of this repository that the stack selects 
 | [Cognous stack export 0.1](profiles/cognous-stack-export-0.1.md) | Historical Cognous export profile. | merged |
 | [Cognous stack export 0.2](profiles/cognous-stack-export-0.2.md) | Producer 2.0.0 export with Replay semantic consistency; the implementation profile selected for the stack is recorded in the hub lock. | selected |
 | [Cognous stack export 0.2 restrictions](profiles/cognous-stack-export-0.2-restrictions.md) | Explicit restriction semantics (`odes_cognous_stack_export_0_2_restrictions`): unknown is not unrestricted. | merged |
+| [Cognous stack export 0.2 restrictions + lifecycle](profiles/cognous-stack-export-0.2-restrictions-lifecycle.md) | PROPOSED, development only: opt-in `odes_cognous_stack_export_0_2_restrictions_lifecycle_0_1` with an attributed issuer lifecycle assertion; not adopted. | proposed |
 | [Generic recipient 0.1](profiles/generic-recipient-0.1.md) | `odes_generic_recipient_0_1`: needs no Cognous component and can carry the native evidence inventory; no Replay check is run or claimed. | merged |
 | [Native evidence inventory](docs/native-evidence-inventory.md) | Byte-preserving inventory of native evidence with limits; recipient checked; nothing fetched. | merged |
 | [Detached authentication](docs/detached-authentication.md) | Optional DSSE with Ed25519 (`pip install -e ".[signatures]"`); a verifying signature authenticates origin only. | merged |

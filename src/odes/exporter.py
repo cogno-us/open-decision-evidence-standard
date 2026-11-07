@@ -17,7 +17,11 @@ from .common import (
     PACKAGE_VERSION,
     PINNED_REVISIONS,
     PROFILE_ID,
+    LIFECYCLE_ISSUER_ASSERTED_LIMIT,
+    LIFECYCLE_SEMANTICS_VERSION,
+    LIFECYCLE_VERSION_SUFFIX,
     PROFILE_V2_ID,
+    PROFILE_V2_LIFECYCLE_ID,
     PROFILE_V2_RESTRICTIONS_ID,
     PROFILE_V2_VERSION,
     RESTRICTION_SEMANTICS_VERSION,
@@ -38,6 +42,8 @@ from .common import (
     SCHEMA_VERSION,
     SUPPORTED_V2_CONTROL_PLANE_REVISIONS,
     sha256,
+    lifecycle_assertion_problem,
+    parse_instant,
     utc_now_iso,
 )
 from .schema_validation import validate_record
@@ -620,8 +626,14 @@ def _event_summary(bundle: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _status_from_sources(bundle: dict[str, Any]) -> dict[str, Any]:
+def _status_from_sources(bundle: dict[str, Any], lifecycle_assertion: dict[str, Any] | None = None) -> dict[str, Any]:
     metadata = bundle.get("metadata") if isinstance(bundle.get("metadata"), dict) else {}
+    if lifecycle_assertion is not None:
+        # Opt-in lifecycle profile only. The value is the attributed issuer-reported assertion; it never combines with, or overrides,
+        # lifecycle state carried by the bundle, and revoked/superseded are not expressible through this input.
+        if any(key in metadata for key in ("lifecycle freshness", "odes_freshness", "freshness", "revoked", "superseded", "superseded_by", "revoked_at")):
+            raise ExportError("a lifecycle assertion cannot be combined with lifecycle state carried by the bundle metadata")
+        return {"freshness": lifecycle_assertion["freshness"], "superseded": False, "revoked": False}
     freshness = _unambiguous(metadata, "lifecycle freshness", "odes_freshness", "freshness") or "unknown"
     for flag in ("revoked", "superseded"):
         value = metadata.get(flag)
@@ -696,9 +708,11 @@ def _restriction_coordinates(risk: dict[str, Any], source: dict[str, Any] | None
     return coordinates, semantics
 
 
-def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z", restriction_semantics: str = "legacy") -> dict[str, Any]:
+def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle: dict[str, Any], *, relying_party: str = "recipient.example.org", purpose: str = "audit", expires_at: str = "2027-01-01T00:00:00Z", restriction_semantics: str = "legacy", lifecycle_assertion: dict[str, Any] | None = None) -> dict[str, Any]:
     if restriction_semantics not in {"legacy", "explicit"}:
         raise ExportError("restriction_semantics must be 'legacy' or 'explicit'")
+    if lifecycle_assertion is not None and restriction_semantics != "explicit":
+        raise ExportError("a lifecycle assertion requires explicit restriction semantics")
     manifest = deepcopy(_obj(manifest, "manifest"))
     bundle = deepcopy(_obj(reconstruction_bundle, "reconstruction_bundle"))
     replay_status, replay_findings, validated_replay = _run_replay_validation(bundle)
@@ -708,9 +722,14 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
     if explicit and not repaired:
         raise ExportError("explicit restriction semantics are defined for producer-2.0.0 generations only")
     profile_id = (PROFILE_V2_RESTRICTIONS_ID if explicit else PROFILE_V2_ID) if repaired else PROFILE_ID
+    if lifecycle_assertion is not None:
+        lifecycle_assertion = deepcopy(lifecycle_assertion)
+        profile_id = PROFILE_V2_LIFECYCLE_ID
     profile_version = SECURITY_RUNTIME_GENERATIONS[control_plane_revision][0] if control_plane_revision in SECURITY_RUNTIME_GENERATIONS else REFUSAL_PROFILE_VERSION if control_plane_revision == REFUSAL_REVISIONS["control_plane"] else MERGED_PROFILE_VERSION if control_plane_revision == MERGED_REVISIONS["control_plane"] else PROFILE_V2_VERSION if repaired else PROFILE_VERSION
     if explicit:
         profile_version += RESTRICTION_VERSION_SUFFIX
+    if lifecycle_assertion is not None:
+        profile_version += LIFECYCLE_VERSION_SUFFIX
     pins = _selected_v2_pins(control_plane_revision) if repaired else PINNED_REVISIONS
     _validate_manifest_binding(manifest, _extract_replay_inputs(bundle)[1])
     decision, decision_result = _check_decision_execution_consistency(bundle)
@@ -744,6 +763,12 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
     decided_at = decision.get("decided_at")
     if not decided_at:
         raise ExportError("decision_timestamp is required by pder-v0.1 but no retained decision time is evidenced; exporter will not substitute bundle generation or export time")
+    if lifecycle_assertion is not None:
+        problem = lifecycle_assertion_problem(lifecycle_assertion, {"organization_id": "cognous.synthetic.baseline", "system_id": "cognous-stack-exporter"}, str(decided_at))
+        if problem is None and parse_instant(lifecycle_assertion["asserted_at"]) > parse_instant(utc_now_iso()):
+            problem = "lifecycle asserted_at may not be in the future"
+        if problem is not None:
+            raise ExportError(problem)
     policy_versions = binding.get("policy_versions") if isinstance(binding.get("policy_versions"), list) else []
     policy_basis = []
     for item in policy_versions:
@@ -771,7 +796,7 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         "policy_basis": policy_basis,
         "risk_coordinates": risk_coordinates,
         "consumption_conditions": {"permitted_relying_parties": [relying_party], "permitted_purposes": [purpose], "expires_at": expires_at},
-        "status": _status_from_sources(bundle),
+        "status": _status_from_sources(bundle, lifecycle_assertion),
         "verification": {"signature_type": "content-digest", "issuer_key_reference": "content-digest-only:no-public-issuer-authentication", "conformance_profile": profile_id},
     }
     validate_record(record)
@@ -806,6 +831,13 @@ def export_cognous_stack_package(manifest: dict[str, Any], reconstruction_bundle
         package["provenance"]["restriction_semantics"] = restriction_states
         if any(restriction_states[k]["state"] == "unknown" for k in ("restricted_use_flag", "prohibited_use_flag", "jurisdiction")):
             package["provenance"]["limits"].append(RESTRICTION_UNKNOWN_LIMIT)
+    if lifecycle_assertion is not None:
+        package["provenance"]["lifecycle_semantics"] = {
+            "semantics_version": LIFECYCLE_SEMANTICS_VERSION,
+            **lifecycle_assertion,
+            "bound_to": {"decision_id": record["decision_id"], "reconstruction_bundle_digest": sha256(bundle), "manifest_digest": sha256(manifest)},
+        }
+        package["provenance"]["limits"].append(LIFECYCLE_ISSUER_ASSERTED_LIMIT)
     if repaired:
         package["provenance"]["retained_sources"] = {"manifest": manifest, "reconstruction_bundle": bundle}
         package["provenance"]["source_artifacts"]["reconstruction_bundle_id"] = bundle["bundle_id"]
