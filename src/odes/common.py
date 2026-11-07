@@ -39,6 +39,16 @@ RESTRICTION_SEMANTICS_VERSION = "restriction-semantics-1"
 RESTRICTION_UNKNOWN_LIMIT = ("Restriction semantics: where a restriction or jurisdiction value is recorded with state unknown, the record carries true "
                              "(or the text unknown) as a conservative placeholder. The placeholder does not establish a restriction, a prohibition "
                              "or a jurisdiction, and a recipient may not treat the record as unrestricted.")
+# Lifecycle semantics (DEVELOPMENT ONLY, PROPOSED, UNQUALIFIED): a separate opt-in profile id for exports that carry an attributed,
+# issuer-reported lifecycle (freshness) assertion beside the explicit restriction semantics. Every other profile id, including
+# PROFILE_V2_RESTRICTIONS_ID, is unchanged. The assertion is NOT recipient status evidence and does not grant authority.
+PROFILE_V2_LIFECYCLE_ID = "odes_cognous_stack_export_0_2_restrictions_lifecycle_0_1"
+LIFECYCLE_VERSION_SUFFIX = "+lifecycle-semantics-1"
+LIFECYCLE_SEMANTICS_VERSION = "lifecycle-semantics-1"
+LIFECYCLE_FRESHNESS_VALUES = frozenset({"current", "stale", "expired", "pending_revalidation"})
+LIFECYCLE_ASSERTION_KEYS = frozenset({"freshness", "asserted_by", "asserted_at", "source"})
+LIFECYCLE_ISSUER_ASSERTED_LIMIT = ("Lifecycle semantics: the record's lifecycle freshness is an attributed, issuer-reported assertion. It is not recipient "
+                                   "status evidence, does not establish present validity, and does not replace independently supplied recipient status inputs.")
 SUPPORTED_V2_CONTROL_PLANE_REVISIONS = (
     "2ea9528eeb87e14ff10f05de06473122b9df540f",
     "248d899634d9db3518e831bc7ab568a48733f825",
@@ -443,3 +453,33 @@ def deadline_open(at: datetime, deadline: datetime) -> bool:
 
 def deadline_passed(at: datetime, deadline: datetime) -> bool:
     return at > deadline
+
+
+def lifecycle_assertion_problem(assertion: Any, issuer: Any = None, decision_time: Any = None) -> str | None:
+    """None when ``assertion`` is a well-formed attributed lifecycle input; else a short reason. Pure syntax and attribution checks.
+
+    The closed shape is ``{freshness, asserted_by:{organization_id, system_id, actor_id}, asserted_at, source:{reference}}``. ``current`` is
+    never a default and an unattributed assertion is refused. When ``issuer`` is given, ``asserted_by`` must name that issuer
+    (an issuer-reported value); when ``decision_time`` is given, the assertion may not predate the decision.
+    """
+    if not isinstance(assertion, dict) or set(assertion) != LIFECYCLE_ASSERTION_KEYS:
+        return "lifecycle assertion must be an object with exactly freshness, asserted_by, asserted_at and source"
+    if not isinstance(assertion["freshness"], str) or assertion["freshness"] not in LIFECYCLE_FRESHNESS_VALUES:
+        return "lifecycle freshness must be one of " + ", ".join(sorted(LIFECYCLE_FRESHNESS_VALUES))
+    by = assertion["asserted_by"]
+    if (not isinstance(by, dict) or set(by) != {"organization_id", "system_id", "actor_id"}
+            or not all(isinstance(v, str) and v.strip() for v in by.values())):
+        return "lifecycle asserted_by must name organization_id, system_id and actor_id as non-empty strings"
+    if issuer is not None and (not isinstance(issuer, dict) or by["organization_id"] != issuer.get("organization_id") or by["system_id"] != issuer.get("system_id")):
+        return "lifecycle asserted_by must name the record issuer"
+    at = parse_instant(assertion["asserted_at"])
+    if at is None:
+        return "lifecycle asserted_at must be an RFC 3339 instant with an offset"
+    if decision_time is not None:
+        decided = parse_instant(decision_time)
+        if decided is None or at < decided:
+            return "lifecycle asserted_at may not predate the retained decision time"
+    source = assertion["source"]
+    if not isinstance(source, dict) or set(source) != {"reference"} or not isinstance(source["reference"], str) or not source["reference"].strip():
+        return "lifecycle source must be an object with a non-empty reference"
+    return None
